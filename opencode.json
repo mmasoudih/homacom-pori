@@ -6,7 +6,7 @@
       "enabled": true,
       "command": [
         "npx",
-        "shadcn-vue@latest",
+        "shadcn-vue@2.8.2",
         "mcp"
       ]
     }
