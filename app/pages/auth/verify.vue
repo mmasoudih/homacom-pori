@@ -84,7 +84,7 @@ const onResend = async () => {
 
 <template>
   <div dir="rtl" class="grid min-h-dvh bg-background lg:grid-cols-12">
-    <section class="flex flex-col lg:col-span-4">
+    <section class="flex flex-col lg:col-span-3">
       <div class="flex items-start justify-start p-6">
         <Button
           variant="ghost"
@@ -97,7 +97,7 @@ const onResend = async () => {
         </Button>
       </div>
 
-      <div class="flex flex-1 flex-col justify-center gap-8 px-6 pb-16 sm:px-12 lg:px-16">
+      <div class="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-8 px-6 pb-16 sm:px-12 lg:px-16">
         <div class="flex flex-col items-center gap-4 text-center">
           <img
             src="/homacom-logo.png"
@@ -125,8 +125,8 @@ const onResend = async () => {
               inputmode="numeric"
               :aria-invalid="!!codeErrors.length"
             >
-              <InputOTPGroup class="gap-2" dir="ltr">
-                <InputOTPSlot v-for="index in 5" :key="index" :index="index - 1" class="size-11 rounded-md text-base" />
+              <InputOTPGroup class="flex w-full gap-2" dir="ltr">
+                <InputOTPSlot v-for="index in 5" :key="index" :index="index - 1" class="h-11 min-w-0 flex-1 text-base" />
               </InputOTPGroup>
             </InputOTP>
             <FieldError v-if="codeErrors.length" :errors="codeErrors" />
@@ -152,7 +152,7 @@ const onResend = async () => {
       </div>
     </section>
 
-    <section class="hidden lg:col-span-8 lg:block">
+    <section class="hidden lg:col-span-9 lg:block">
       <div class="relative h-full min-h-dvh w-full">
         <Skeleton v-if="!backgroundImage" class="absolute inset-0 size-full rounded-none" />
         <img
