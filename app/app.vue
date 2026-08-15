@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import ModeToggle from './components/ModeToggle.vue';
+import { Toaster } from '@/components/ui/sonner'
 </script>
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <!-- <NuxtWelcome /> -->
-    <ModeToggle />
+    <NuxtPage />
+    <Toaster />
   </div>
 </template>
