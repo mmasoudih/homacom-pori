@@ -88,7 +88,7 @@ const onResend = async () => {
       <div class="flex items-start justify-start p-6">
         <Button
           variant="ghost"
-          class="text-primary"
+          class="text-primary hover:bg-primary hover:text-white cursor-pointer"
           aria-label="بازگشت"
           @click="router.back()"
         >
