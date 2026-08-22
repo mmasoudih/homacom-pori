@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: { port: 4500, host: "127.0.0.1" },
   css: ["~/assets/css/tailwind.css"],
+  app: {
+    head: {
+      htmlAttrs: { lang: "fa", dir: "rtl" },
+    },
+  },
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://ahoma.ir/api",

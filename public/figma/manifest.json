@@ -1,0 +1,524 @@
+{
+  "fileKey": "nYUqVbhrP6FdTd8szbpn0W",
+  "outDir": "/home/masoudi/Projects/pouria/homacom/public/figma",
+  "saved": [
+    {
+      "kind": "image-fill",
+      "id": "00a670d7eab5c6612f06f905a573e0fb4afa120d",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-00a670d7eab5c661.png",
+      "bytes": 32141
+    },
+    {
+      "kind": "image-fill",
+      "id": "01a97078534b73a597b54d33c488be2d681b7d12",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-01a97078534b73a5.png",
+      "bytes": 28160
+    },
+    {
+      "kind": "image-fill",
+      "id": "02036be2d327ff1868bedb60616b04803cd1cce2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-02036be2d327ff18.png",
+      "bytes": 190120
+    },
+    {
+      "kind": "image-fill",
+      "id": "07e29b135a3cb6e82b7daf4f8ecad44229831c6b",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-07e29b135a3cb6e8.png",
+      "bytes": 400282
+    },
+    {
+      "kind": "image-fill",
+      "id": "081e1f369576caeb8988b88e4b5375ffc1a25db3",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-081e1f369576caeb.png",
+      "bytes": 10243
+    },
+    {
+      "kind": "image-fill",
+      "id": "0c1054adc1450d354203eaa49ccd0ca3aa031934",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-0c1054adc1450d35.png",
+      "bytes": 72660
+    },
+    {
+      "kind": "image-fill",
+      "id": "0e3ddd77aff389af22355fa177b0ac1488410552",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-0e3ddd77aff389af.png",
+      "bytes": 103598
+    },
+    {
+      "kind": "image-fill",
+      "id": "193c4a2539f9a6687607b04d5eaaf99186b869e0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-193c4a2539f9a668.png",
+      "bytes": 92901
+    },
+    {
+      "kind": "image-fill",
+      "id": "1a3a4d85783c9d6f2390a5f5b0cad0845e68e8c6",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-1a3a4d85783c9d6f.png",
+      "bytes": 60753
+    },
+    {
+      "kind": "image-fill",
+      "id": "1ec7d226c01044ae42b2c0197c42f29a4fda8b05",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-1ec7d226c01044ae.png",
+      "bytes": 72509
+    },
+    {
+      "kind": "image-fill",
+      "id": "2136701c36483883312e2a3cf490c00f27dbce54",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-2136701c36483883.png",
+      "bytes": 99229
+    },
+    {
+      "kind": "image-fill",
+      "id": "21688553e4e41aa4909090ae61c5d20225fa4b6a",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-21688553e4e41aa4.png",
+      "bytes": 42228
+    },
+    {
+      "kind": "image-fill",
+      "id": "21757fcfc3f052b85b9fa9b19e205f7f41218d9f",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-21757fcfc3f052b8.png",
+      "bytes": 24408
+    },
+    {
+      "kind": "image-fill",
+      "id": "21f075633b75d651d287ddcdeb7845cff813aa4f",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-21f075633b75d651.png",
+      "bytes": 455001
+    },
+    {
+      "kind": "image-fill",
+      "id": "2a674022994aed43d55a2e43d10c9fd9a97db110",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-2a674022994aed43.png",
+      "bytes": 90636
+    },
+    {
+      "kind": "image-fill",
+      "id": "2de270d12fe3b219d71901c3a89bad1b2a7c776b",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-2de270d12fe3b219.png",
+      "bytes": 97907
+    },
+    {
+      "kind": "image-fill",
+      "id": "301c06457d3982e5d8e6ef76dd5ffb06c8be0aed",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-301c06457d3982e5.png",
+      "bytes": 146983
+    },
+    {
+      "kind": "image-fill",
+      "id": "311ac535d0c1a9729b46d21190c6331c88716783",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-311ac535d0c1a972.png",
+      "bytes": 246439
+    },
+    {
+      "kind": "image-fill",
+      "id": "357771ff5878e70be4c5624719e92551ef0980ad",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-357771ff5878e70b.png",
+      "bytes": 19992
+    },
+    {
+      "kind": "image-fill",
+      "id": "3e9cc2e18da827667f3e79f3e6c0a2f2848d4023",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-3e9cc2e18da82766.png",
+      "bytes": 8620
+    },
+    {
+      "kind": "image-fill",
+      "id": "4108505e597f35124bbd26010d8222390ab30be2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-4108505e597f3512.png",
+      "bytes": 83780
+    },
+    {
+      "kind": "image-fill",
+      "id": "464a641df08d34f13adf4ef3208e8871fbfe1ba5",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-464a641df08d34f1.png",
+      "bytes": 342671
+    },
+    {
+      "kind": "image-fill",
+      "id": "4883c6354fb8fcbe07648aaf825a4d909eb19f8e",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-4883c6354fb8fcbe.png",
+      "bytes": 1090616
+    },
+    {
+      "kind": "image-fill",
+      "id": "49dfa84112f6d165528fac4a5f5b1039d3c47bae",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-49dfa84112f6d165.png",
+      "bytes": 356548
+    },
+    {
+      "kind": "image-fill",
+      "id": "4d6a2b88b843507298c4f8dda3f4d91ad85ca94c",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-4d6a2b88b8435072.png",
+      "bytes": 384582
+    },
+    {
+      "kind": "image-fill",
+      "id": "52967dd8079fd57e9b9f275bb08b44cfda823244",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-52967dd8079fd57e.png",
+      "bytes": 362588
+    },
+    {
+      "kind": "image-fill",
+      "id": "52d72a01d4f5052e28fd17f9cfe1ba9134a4fd38",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-52d72a01d4f5052e.png",
+      "bytes": 735033
+    },
+    {
+      "kind": "image-fill",
+      "id": "59199db1f8775d26756c9f409a99a719a5e4bac0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-59199db1f8775d26.png",
+      "bytes": 54695
+    },
+    {
+      "kind": "image-fill",
+      "id": "5d59889983e0677081a671f6758713ab467a72ef",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-5d59889983e06770.png",
+      "bytes": 40374
+    },
+    {
+      "kind": "image-fill",
+      "id": "5db09d93bf7473ad42711f498f1bd4d7547c3872",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-5db09d93bf7473ad.png",
+      "bytes": 1673845
+    },
+    {
+      "kind": "image-fill",
+      "id": "5f27121cf7cbbde71ad6300e13a42a48f2de362f",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-5f27121cf7cbbde7.png",
+      "bytes": 152800
+    },
+    {
+      "kind": "image-fill",
+      "id": "603959b7e3e051657af0d3bedc255afab98969fd",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-603959b7e3e05165.png",
+      "bytes": 24826
+    },
+    {
+      "kind": "image-fill",
+      "id": "6c74086aac1b03635c8937a5699412bc5808d58b",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-6c74086aac1b0363.png",
+      "bytes": 1979716
+    },
+    {
+      "kind": "image-fill",
+      "id": "6df25cd971d272b0f180082b280d248e6354faa2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-6df25cd971d272b0.png",
+      "bytes": 213122
+    },
+    {
+      "kind": "image-fill",
+      "id": "80e0dd5ac4690fdadb40eb856bb3fdca73bb09b3",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-80e0dd5ac4690fda.png",
+      "bytes": 61607
+    },
+    {
+      "kind": "image-fill",
+      "id": "899574ec5867c977febd70fb130a9740ade32c57",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-899574ec5867c977.png",
+      "bytes": 359431
+    },
+    {
+      "kind": "image-fill",
+      "id": "8cfc51f6d61983d75c10eb68905fab08b084f3a8",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-8cfc51f6d61983d7.png",
+      "bytes": 95435
+    },
+    {
+      "kind": "image-fill",
+      "id": "90bb9cc2924c758b679231a4f7abec0ebd85ed3f",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-90bb9cc2924c758b.png",
+      "bytes": 49983
+    },
+    {
+      "kind": "image-fill",
+      "id": "952e51cbe3e690bce9b539b653639f80f00cf4d6",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-952e51cbe3e690bc.png",
+      "bytes": 143599
+    },
+    {
+      "kind": "image-fill",
+      "id": "96530bdcbbdac3e9c1469d6d1c8774bde794d925",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-96530bdcbbdac3e9.png",
+      "bytes": 79983
+    },
+    {
+      "kind": "image-fill",
+      "id": "99073013717cfe6efaa206c58b745164b4ba520c",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-99073013717cfe6e.png",
+      "bytes": 36451
+    },
+    {
+      "kind": "image-fill",
+      "id": "992d28edc3940fa536725e32778bd5cc6f6b9899",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-992d28edc3940fa5.png",
+      "bytes": 9022
+    },
+    {
+      "kind": "image-fill",
+      "id": "9a4ae11794662b5711be73e83f24a25e2eb31d77",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-9a4ae11794662b57.png",
+      "bytes": 142929
+    },
+    {
+      "kind": "image-fill",
+      "id": "9eca5bf432eebd3d9a95a041ae07b2643ade4d61",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-9eca5bf432eebd3d.png",
+      "bytes": 113008
+    },
+    {
+      "kind": "image-fill",
+      "id": "a0107251afa8a1727f155194fa605577a9e92878",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-a0107251afa8a172.png",
+      "bytes": 12155
+    },
+    {
+      "kind": "image-fill",
+      "id": "a3b65327303691bb335964c7980a85b6e485d609",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-a3b65327303691bb.png",
+      "bytes": 96034
+    },
+    {
+      "kind": "image-fill",
+      "id": "a3bf2f05d8688bdfcdc385792bf4f9363591208a",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-a3bf2f05d8688bdf.png",
+      "bytes": 163028
+    },
+    {
+      "kind": "image-fill",
+      "id": "a7a14fb560339b441a191a53ffaba601612ae61e",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-a7a14fb560339b44.png",
+      "bytes": 526510
+    },
+    {
+      "kind": "image-fill",
+      "id": "ac089932e4e58d5fe4b2c5d1badca9e5a8ae39a0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-ac089932e4e58d5f.png",
+      "bytes": 41495
+    },
+    {
+      "kind": "image-fill",
+      "id": "ae6aa87aee4fe37ba541fe34feb190e12e83b047",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-ae6aa87aee4fe37b.png",
+      "bytes": 40275
+    },
+    {
+      "kind": "image-fill",
+      "id": "aeb66b909312e7178c1f1f41159d892450df5015",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-aeb66b909312e717.png",
+      "bytes": 68632
+    },
+    {
+      "kind": "image-fill",
+      "id": "b124df30fa8cf54774e615486abee18ab5c9933c",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b124df30fa8cf547.png",
+      "bytes": 117011
+    },
+    {
+      "kind": "image-fill",
+      "id": "b2221e0f4f07b12cba3ba3c383763fbdb094f030",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b2221e0f4f07b12c.png",
+      "bytes": 406921
+    },
+    {
+      "kind": "image-fill",
+      "id": "b57f0152df1c2d25a71b6689dcebb34510d13d2c",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b57f0152df1c2d25.png",
+      "bytes": 94289
+    },
+    {
+      "kind": "image-fill",
+      "id": "b5f902be6c71b296885ca96a51099c3c1deefec0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b5f902be6c71b296.png",
+      "bytes": 28999
+    },
+    {
+      "kind": "image-fill",
+      "id": "b65ebd18e4d5d2f9f17e67f67bb0a203220c58e9",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b65ebd18e4d5d2f9.png",
+      "bytes": 136312
+    },
+    {
+      "kind": "image-fill",
+      "id": "b729f75b3f19c55bfc002a29d3915162381bbe64",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b729f75b3f19c55b.png",
+      "bytes": 151579
+    },
+    {
+      "kind": "image-fill",
+      "id": "b81254ae0cc9bcb4bca0b2281914c4cb6c6861a6",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b81254ae0cc9bcb4.png",
+      "bytes": 20525
+    },
+    {
+      "kind": "image-fill",
+      "id": "b9e4dc22f0fb5ebdc3aa0b04941b33bcdbb5bdd0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-b9e4dc22f0fb5ebd.png",
+      "bytes": 110699
+    },
+    {
+      "kind": "image-fill",
+      "id": "bafa68ffb2491a4198b2934e7d9b29050d9ca791",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-bafa68ffb2491a41.png",
+      "bytes": 492906
+    },
+    {
+      "kind": "image-fill",
+      "id": "bcf7fdbe4840c6f25c0402e1d13248e1231fde92",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-bcf7fdbe4840c6f2.png",
+      "bytes": 206891
+    },
+    {
+      "kind": "image-fill",
+      "id": "c06409733faa2563f9752d09c48da54c55a4fa2a",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-c06409733faa2563.png",
+      "bytes": 211602
+    },
+    {
+      "kind": "image-fill",
+      "id": "c0c190e0bee60b2a331b2dd1122e826b01f58c2e",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-c0c190e0bee60b2a.png",
+      "bytes": 357972
+    },
+    {
+      "kind": "image-fill",
+      "id": "c57c00bcebcde686d75bcf4faebea3c5809690e6",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-c57c00bcebcde686.png",
+      "bytes": 248436
+    },
+    {
+      "kind": "image-fill",
+      "id": "cc6a8cafa066c3ea4f1bfa4cb704c2ff0b62d6a4",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-cc6a8cafa066c3ea.png",
+      "bytes": 36950
+    },
+    {
+      "kind": "image-fill",
+      "id": "d1bb52e8eb9b1170be84929ca30935b71684a7d6",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-d1bb52e8eb9b1170.png",
+      "bytes": 239633
+    },
+    {
+      "kind": "image-fill",
+      "id": "dcd412f6c6b6f4218c3f1f7b7899e2df995df647",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-dcd412f6c6b6f421.png",
+      "bytes": 10809
+    },
+    {
+      "kind": "image-fill",
+      "id": "dedea640df2d55432c8eae0d7c0ae4e5156512c2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-dedea640df2d5543.png",
+      "bytes": 81998
+    },
+    {
+      "kind": "image-fill",
+      "id": "e2020cdafb96743f3f64047192cc00e2d3289ad2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e2020cdafb96743f.png",
+      "bytes": 144440
+    },
+    {
+      "kind": "image-fill",
+      "id": "e393cbb3afd42faad164d66ba05fdb19d9c1497b",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e393cbb3afd42faa.png",
+      "bytes": 208747
+    },
+    {
+      "kind": "image-fill",
+      "id": "e44e4b8ead1c759de0648fcc6b0b1f7f22284f9c",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e44e4b8ead1c759d.png",
+      "bytes": 520637
+    },
+    {
+      "kind": "image-fill",
+      "id": "e4d8a4e475bb2dd8167edbc005eaf086df76ef21",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e4d8a4e475bb2dd8.png",
+      "bytes": 157543
+    },
+    {
+      "kind": "image-fill",
+      "id": "e818b7c8f075bbf41b0340a08020bd5717bb2e43",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e818b7c8f075bbf4.png",
+      "bytes": 296376
+    },
+    {
+      "kind": "image-fill",
+      "id": "e8f2a7535f7fb25df2155835000e67ecd3bddbd3",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-e8f2a7535f7fb25d.png",
+      "bytes": 44084
+    },
+    {
+      "kind": "image-fill",
+      "id": "ea5f7a938ea2e0ce3b6b7d4b11e4c8ae81340ec5",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-ea5f7a938ea2e0ce.png",
+      "bytes": 153892
+    },
+    {
+      "kind": "image-fill",
+      "id": "eedc0bf76b5dc7cdb5d153023bc8859e4cbbff80",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-eedc0bf76b5dc7cd.png",
+      "bytes": 248145
+    },
+    {
+      "kind": "image-fill",
+      "id": "f0b0f82f371a45e0980fb6b54125d1f164295a59",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f0b0f82f371a45e0.png",
+      "bytes": 66170
+    },
+    {
+      "kind": "image-fill",
+      "id": "f3ffc241234d80ed9802fe6e57a40d1d3d36b7fb",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f3ffc241234d80ed.png",
+      "bytes": 52928
+    },
+    {
+      "kind": "image-fill",
+      "id": "f48409b4bd7d0235b09ab377636df19aeefc4d45",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f48409b4bd7d0235.png",
+      "bytes": 1227406
+    },
+    {
+      "kind": "image-fill",
+      "id": "f630baf18517054d1d7a8321de6ef2b167d0fff0",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f630baf18517054d.png",
+      "bytes": 44162
+    },
+    {
+      "kind": "image-fill",
+      "id": "f8129e8f26e24e6015b7865e9f192021858f33b2",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f8129e8f26e24e60.png",
+      "bytes": 86248
+    },
+    {
+      "kind": "image-fill",
+      "id": "f9dec0064052dff963f7a8c5c8f10325eefff98d",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-f9dec0064052dff9.png",
+      "bytes": 96411
+    },
+    {
+      "kind": "image-fill",
+      "id": "faa4a8621953f105633a81665952474fe4d3f8fd",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-faa4a8621953f105.png",
+      "bytes": 45662
+    },
+    {
+      "kind": "image-fill",
+      "id": "fc0d272a9ceafa5f9e344f689913f86fda27487b",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-fc0d272a9ceafa5f.png",
+      "bytes": 2152088
+    },
+    {
+      "kind": "image-fill",
+      "id": "ff65a9033ba49cd441fb9d55f9556b17573ed6b5",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-ff65a9033ba49cd4.png",
+      "bytes": 77391
+    },
+    {
+      "kind": "image-fill",
+      "id": "ff6f448e1a941825fe24f83ebbc5cca9fea1ef84",
+      "file": "/home/masoudi/Projects/pouria/homacom/public/figma/fill-ff6f448e1a941825.png",
+      "bytes": 101197
+    }
+  ],
+  "skipped": [],
+  "generatedAt": "2026-08-22T13:12:35.885Z"
+}
