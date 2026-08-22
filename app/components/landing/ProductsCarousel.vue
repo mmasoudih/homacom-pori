@@ -1,81 +1,93 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue'
+import { IconChevronLeft, IconLayoutGrid, IconDeviceLaptop, IconDeviceMobile } from '@tabler/icons-vue'
 import type { Product } from '~/data/landing'
-import ProductCard from './ProductCard.vue'
 
 withDefaults(defineProps<{
   title: string
   products: Product[]
   showAllHref?: string
+  pills?: {
+    prices: string[]
+    activePrice: string
+    cats: Array<{ label: string, icon: string }>
+    activeCat: string
+  }
 }>(), {
   showAllHref: '#',
+  pills: undefined,
 })
 
-const scrollRef = ref<HTMLElement>()
-
-function scroll(direction: 1 | -1) {
-  const el = scrollRef.value
-  if (!el)
-    return
-  const amount = el.clientWidth * 0.9
-  el.scrollBy({ left: direction * amount, behavior: 'smooth' })
+const catIcons: Record<string, typeof IconLayoutGrid> = {
+  laptop: IconDeviceLaptop,
+  mobile: IconDeviceMobile,
+  grid: IconLayoutGrid,
 }
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1400px] px-5">
-    <div class="rounded-3xl border border-border bg-card p-4 md:p-6">
-      <!-- header -->
-      <div class="mb-6 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="flex flex-col gap-0.5 leading-none">
-            <span class="block h-1.5 w-1.5 rounded-full bg-primary" />
-            <span class="block h-1.5 w-1.5 rounded-full bg-transparent" />
-          </span>
-          <h2 class="text-lg font-bold text-foreground md:text-xl">
-            {{ title }}
-          </h2>
-          <span class="mr-1 flex flex-col gap-0.5 leading-none">
-            <span class="block h-1.5 w-1.5 rounded-full bg-primary opacity-25" />
-            <span class="block h-1.5 w-1.5 rounded-full bg-primary" />
-          </span>
-        </div>
-        <div class="flex items-center gap-3">
-          <a :href="showAllHref" class="hidden text-sm font-bold text-primary hover:underline sm:block">
-            مشاهده همه
-          </a>
-          <div class="flex items-center gap-2">
-            <button
-                              class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-secondary"
-                              aria-label="بعدی"
-                              @click="scroll(1)"
-            >
-              <IconChevronRight class="size-4" />
-            </button>
-            <button
-                              class="flex size-9 cursor-pointer items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-secondary"
-                              aria-label="قبلی"
-                              @click="scroll(-1)"
-            >
-              <IconChevronLeft class="size-4" />
-            </button>
-          </div>
-        </div>
+  <section class="mx-auto w-full max-w-[1302px]">
+    <!-- Title row -->
+    <LandingSectionTitle :title="title" variant="row" />
+
+    <!-- Pills row (bestsellers only) -->
+    <div
+      v-if="pills"
+      class="mt-3 flex items-center justify-between"
+    >
+      <!-- Price pills (right in RTL) -->
+      <div class="flex items-center gap-2">
+        <button
+          v-for="p in pills.prices"
+          :key="p"
+          class="flex h-[38px] items-center rounded-full px-4 text-[13px] font-medium transition-colors"
+          :class="
+            (pills.activePrice === p)
+              ? 'bg-white text-foreground shadow-sm'
+              : 'bg-transparent text-[#6b7280] hover:bg-white/50'
+          "
+        >
+          {{ p }}
+        </button>
       </div>
 
-      <!-- carousel -->
-      <div
-        ref="scrollRef"
-        class="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        <div
-          v-for="product in products"
-          :key="product.id"
-          class="w-[220px] shrink-0 snap-start sm:w-[240px]"
+      <!-- Category pills (left in RTL) -->
+      <div class="flex items-center gap-2">
+        <button
+          v-for="c in pills.cats"
+          :key="c.label"
+          class="flex h-[38px] items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors"
+          :class="
+            (pills.activeCat === c.label)
+              ? 'bg-white text-foreground shadow-sm'
+              : 'bg-transparent text-[#6b7280] hover:bg-white/50'
+          "
         >
-          <ProductCard :product="product" />
-        </div>
+          {{ c.label }}
+          <component
+            :is="catIcons[c.icon]"
+            class="size-5"
+          />
+        </button>
       </div>
+    </div>
+
+    <!-- Products row -->
+    <div class="relative mt-4">
+      <div class="flex overflow-hidden">
+        <LandingProductCard
+          v-for="(product, i) in products"
+          :key="i"
+          :product="product"
+        />
+      </div>
+
+      <!-- Arrow -->
+      <button
+        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-foreground transition-colors hover:bg-secondary"
+        aria-label="محصولات قبلی"
+      >
+        <IconChevronLeft class="size-[18px]" />
+      </button>
     </div>
   </section>
 </template>

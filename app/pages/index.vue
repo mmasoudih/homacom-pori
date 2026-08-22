@@ -1,34 +1,67 @@
 <script setup lang="ts">
-import { products } from '~/data/landing'
+import {
+  newestProducts,
+  bestsellerProducts,
+  banners2,
+  banners4,
+  banners3,
+  stripBanner,
+  bestsellerFilters,
+} from '~/data/landing'
 
 useHead({
   title: 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال',
 })
-
-const newestProducts = products.slice(0, 8)
-const bestsellerProducts = [...products.slice(5), ...products.slice(0, 3)]
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
-    <main class="flex flex-col gap-10 py-10 md:gap-12">
+
+    <main class="flex flex-col items-center gap-10 py-10 md:gap-12">
       <LandingHeroCarousel />
+
       <LandingCategoriesSection id="categories" />
+
+      <LandingHomaAffSection />
+
+      <LandingBannerRow :items="banners2" :columns="2" />
+
       <LandingProductsCarousel
         title="جدیدترین محصولات"
         :products="newestProducts"
       />
-      <LandingBannerRow />
+
+      <!-- Strip banner -->
+      <a :href="stripBanner.href" class="mx-auto block w-full max-w-[1350px]">
+        <img
+          :src="stripBanner.image"
+          :alt="stripBanner.alt"
+          class="h-auto w-full rounded-2xl object-cover"
+        >
+      </a>
+
+      <LandingBestOfCategorySection />
+
+      <LandingBannerRow :items="banners4" :columns="4" />
+
       <LandingProductsCarousel
         title="پرفروش‌ترین محصولات"
         :products="bestsellerProducts"
+        :pills="bestsellerFilters"
       />
-      <LandingBrandsSection />
+
       <LandingOffersSection id="offers" />
+
+      <LandingBannerRow :items="banners3" :columns="3" centered />
+
+      <LandingBrandsSection />
+
       <LandingBlogSection />
-      <LandingAboutSection />
+
+      <LandingCeoSection />
     </main>
+
     <LandingSiteFooter id="contact" class="mt-auto" />
   </div>
 </template>

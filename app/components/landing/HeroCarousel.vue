@@ -1,78 +1,74 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue'
-import { useIntervalFn } from '@vueuse/core'
+import { IconChevronLeft } from '@tabler/icons-vue'
 
-const slides = [
-  { id: 1, image: '/figma/fill-fc0d272a9ceafa5f.png', alt: 'بنر تبلیغاتی هماکام' },
-  { id: 2, image: '/figma/fill-f48409b4bd7d0235.png', alt: 'بنر تبلیغاتی هماکام' },
-  { id: 3, image: '/figma/fill-5db09d93bf7473ad.png', alt: 'بنر تبلیغاتی هماکام' },
-]
+const active = ref(0)
+const total = 6
+const slide = '/figma/fill-4f5b0b1a98425788.png'
 
-const current = ref(0)
+let timer: ReturnType<typeof setInterval>
 
-function next() {
-  current.value = (current.value + 1) % slides.length
+function startAutoplay() {
+  timer = setInterval(() => {
+    active.value = (active.value + 1) % total
+  }, 6000)
 }
 
-function prev() {
-  current.value = (current.value - 1 + slides.length) % slides.length
+function go(dir: 1 | -1) {
+  active.value = (active.value + dir + total) % total
+  clearInterval(timer)
+  startAutoplay()
 }
 
-const { pause, resume } = useIntervalFn(next, 6000)
+onMounted(startAutoplay)
+onUnmounted(() => clearInterval(timer))
 </script>
 
 <template>
-  <section class="mx-auto max-w-[1400px] px-5">
-    <div
-      class="relative"
-      @mouseenter="pause()"
-      @mouseleave="resume()"
-    >
-      <div class="relative aspect-[1440/350] w-full overflow-hidden rounded-3xl bg-secondary">
-        <div
-          v-for="(slide, index) in slides"
-          :key="slide.id"
-          class="absolute inset-0 transition-opacity duration-700"
-          :class="index === current ? 'opacity-100' : 'pointer-events-none opacity-0'"
-        >
-          <img
-            :src="slide.image"
-            :alt="slide.alt"
-            class="size-full object-cover"
-            draggable="false"
-          >
-        </div>
-      </div>
-
-      <!-- arrows -->
-      <button
-        class="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-foreground shadow-lg backdrop-blur transition-transform hover:scale-105"
-        aria-label="اسلاید قبلی"
-        @click="prev"
+  <section class="relative mx-auto w-full max-w-[1440px]">
+    <div class="relative aspect-[1440/342] w-full overflow-hidden">
+      <!-- Slide -->
+      <img
+        :src="slide"
+        alt=" بنر اصلی هماکام"
+        class="h-full w-full object-cover transition-opacity duration-500"
       >
-        <IconChevronRight class="size-5" />
+
+      <!-- Arrows -->
+      <button
+        class="absolute left-[41px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white shadow-sm transition-colors hover:bg-secondary"
+        aria-label="قبلی"
+        @click="go(-1)"
+      >
+        <IconChevronLeft class="size-[18px] text-[#6b7280]" />
       </button>
       <button
-        class="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-foreground shadow-lg backdrop-blur transition-transform hover:scale-105"
-        aria-label="اسلاید بعدی"
-        @click="next"
+        class="absolute right-[41px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white shadow-sm transition-colors hover:bg-secondary"
+        aria-label="بعدی"
+        @click="go(1)"
       >
-        <IconChevronLeft class="size-5" />
+        <IconChevronLeft class="size-[18px] rotate-180 text-[#6b7280]" />
       </button>
     </div>
 
-    <!-- dots -->
-    <div class="mt-5 flex items-center justify-center gap-2">
+    <!-- Dots -->
+    <div class="mt-[18px] flex justify-center gap-[3px]">
       <button
-        v-for="(slide, index) in slides"
-        :key="slide.id"
-        :class="[
-          'h-1.5 cursor-pointer rounded-full transition-all duration-300',
-          index === current ? 'w-8 bg-primary' : 'w-6 bg-gray-300 hover:bg-gray-400',
-        ]"
-        :aria-label="`برو به اسلاید ${index + 1}`"
-        @click="current = index"
-      />
+        v-for="i in total"
+        :key="i"
+        class="h-2 rounded-full transition-all duration-300"
+        :class="
+          active === i - 1
+            ? 'relative w-[29px] bg-[#c8ccd2]'
+            : 'w-2 bg-[#c8ccd2]'
+        "
+        :aria-label="`اسلاید ${i}`"
+        @click="active = i - 1"
+      >
+        <span
+          v-if="active === i - 1"
+          class="absolute inset-y-0 right-0 w-[14px] rounded-full bg-primary"
+        />
+      </button>
     </div>
   </section>
 </template>

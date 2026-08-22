@@ -1,58 +1,64 @@
 <script setup lang="ts">
-import {
-  IconChevronLeft,
-  IconDeviceGamepad2,
-  IconDeviceLaptop,
-  IconDeviceTv,
-  IconDeviceWatch,
-  IconDevices,
-  IconHeadphones,
-  IconSmartHome,
-  IconSpeakerphone,
-} from '@tabler/icons-vue'
-import type { Component } from 'vue'
-import type { Category } from '~/data/landing'
+import { IconChevronLeft, IconHeadphones, IconDeviceWatch, IconDeviceLaptop, IconDeviceMobile, IconSpeakerphone, IconUsb, IconDeviceDesktop, IconDeviceGamepad2 } from '@tabler/icons-vue'
 import { categories } from '~/data/landing'
 
-const iconMap: Record<string, Component> = {
+const iconMap: Record<string, typeof IconHeadphones> = {
   headphones: IconHeadphones,
   watch: IconDeviceWatch,
   laptop: IconDeviceLaptop,
-  smartphone: IconDevices,
-  speaker: IconSpeakerphone,
-  monitor: IconDeviceTv,
+  mobile: IconDeviceMobile,
+  speakers: IconSpeakerphone,
+  usb: IconUsb,
+  display: IconDeviceDesktop,
   gamepad: IconDeviceGamepad2,
-  home: IconSmartHome,
 }
-
-const items = ref<Category[]>(categories)
 </script>
 
 <template>
-  <section class="mx-auto max-w-[1400px] px-5">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <NuxtLink
-        v-for="item in items"
-        :key="item.id"
-        href="#"
-        class="group flex cursor-pointer items-center justify-between rounded-2xl border border-border bg-card p-3 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+  <section id="categories" class="mx-auto w-full max-w-[1350px]">
+    <LandingSectionTitle title="دسته‌بندی‌ها" variant="centered" />
+    <div class="mt-[18px] grid grid-cols-2 gap-x-[18px] gap-y-[13px] md:grid-cols-4">
+      <article
+        v-for="cat in categories"
+        :key="cat.title"
+        class="group relative h-[95px]"
       >
-        <div class="flex items-center gap-3">
-          <!-- icon -->
-          <div class="flex size-[68px] shrink-0 items-center justify-center rounded-full border-[5px] border-secondary bg-card">
-            <component :is="iconMap[item.icon] || IconHeadphones" class="size-8 text-primary/30" />
+        <!-- Content card -->
+        <a
+          href="#"
+          class="absolute inset-y-[5px] left-0 right-[63px] flex items-center rounded-[20px] border border-[#e5e7eb] bg-white pl-[12px] pr-[45px] transition-shadow hover:shadow-md"
+        >
+          <div class="flex flex-col gap-[2px]">
+            <h3 class="text-[16px] font-bold leading-[24px] text-foreground">
+              {{ cat.title }}
+            </h3>
+            <p class="flex items-center gap-1 text-[12.5px] text-[#9ca3af]">
+              <span>محصول موجود است</span>
+              <span class="text-[14px] font-bold text-foreground">{{ cat.count }}</span>
+            </p>
           </div>
-          <div class="flex flex-col">
-            <span class="text-base font-semibold text-foreground">{{ item.title }}</span>
-            <span class="text-xs text-muted-foreground">
-              {{ item.count }} محصول موجود است
-            </span>
-          </div>
+        </a>
+
+        <!-- Circle -->
+        <div
+          class="absolute bottom-0 left-0 flex size-[95px] items-center justify-center rounded-full border-[5px] transition-colors"
+          :class="cat.accent ? 'border-[#fde9ec] bg-white' : 'border-[#f5f6f7] bg-white'"
+        >
+          <component
+            :is="iconMap[cat.icon]"
+            class="size-[47px]"
+            :class="cat.accent ? 'text-primary' : 'text-[#6b7280]'"
+          />
         </div>
-        <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors group-hover:bg-secondary">
-          <IconChevronLeft class="size-4" />
-        </span>
-      </NuxtLink>
+
+        <!-- Arrow button -->
+        <a
+          href="#"
+          class="absolute bottom-[10px] left-[10px] flex size-[35px] items-center justify-center rounded-full border border-[#e5e7eb] bg-white transition-colors group-hover:border-primary group-hover:text-primary"
+        >
+          <IconChevronLeft class="size-[18px]" />
+        </a>
+      </article>
     </div>
   </section>
 </template>

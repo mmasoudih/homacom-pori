@@ -1,76 +1,57 @@
 <script setup lang="ts">
-import { products } from '~/data/landing'
-import ProductCard from './ProductCard.vue'
-import SectionTitle from './SectionTitle.vue'
-
-const tabs = [
-  { id: 'all', label: 'همه' },
-  { id: 'gt200', label: 'بیشتر از ۲۰۰ میلیون' },
-  { id: 'lte200', label: 'تا ۲۰۰ میلیون' },
-  { id: 'lte100', label: 'تا ۱۰۰ میلیون' },
-] as const
-
-type TabId = typeof tabs[number]['id']
-
-const active = ref<TabId>('all')
-
-const filtered = computed(() => {
-  switch (active.value) {
-    case 'gt200':
-      return products.filter(p => p.price > 200_000_000)
-    case 'lte200':
-      return products.filter(p => p.price <= 200_000_000 && p.price > 100_000_000)
-    case 'lte100':
-      return products.filter(p => p.price <= 100_000_000)
-    default:
-      return products
-  }
-})
-
-const showAll = ref(false)
+import { IconChevronLeft } from '@tabler/icons-vue'
+import { offersGridRows, offersMeta } from '~/data/landing'
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1400px] px-5">
-    <div class="rounded-3xl border border-border bg-card p-4 md:p-6">
-      <div class="mb-6 flex flex-col items-center gap-5">
-        <SectionTitle title="پیشنهادهای هماکام" />
-        <div class="flex flex-wrap items-center justify-center gap-2">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            :class="[
-              'cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors',
-              active === tab.id
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-secondary',
-            ]"
-            @click="active = tab.id"
+  <section class="mx-auto w-full max-w-[1302px]">
+    <LandingSectionTitle title="پیشنهاد‌های هماکام" variant="centered" />
+
+    <div class="relative mt-[18px]">
+      <div class="grid gap-[18px]" style="grid-template-columns: repeat(6, 202px)">
+        <template v-for="(row, ri) in offersGridRows" :key="ri">
+          <article
+            v-for="(cell, ci) in row"
+            :key="`${ri}-${ci}`"
+            class="flex h-[252px] w-full flex-col items-center justify-center gap-2 rounded-[20px] border border-[#e5e7eb] bg-white p-4 transition-shadow hover:shadow-md"
           >
-            {{ tab.label }}
-          </button>
-        </div>
+            <!-- Image -->
+            <div class="flex h-[120px] w-full items-center justify-center">
+              <img
+                :src="cell.image"
+                alt=""
+                class="max-h-full max-w-full object-contain"
+              >
+            </div>
+
+            <!-- Price -->
+            <div class="flex w-full items-center justify-between">
+              <div class="flex flex-col">
+                <span
+                  v-if="offersMeta[ri * 6 + ci]?.hasOld"
+                  class="text-[13px] font-bold text-[#9ca3af] line-through"
+                >87,000,000</span>
+                <div class="flex items-baseline gap-1">
+                  <span class="text-[14px] font-extrabold text-foreground">87,000,000</span>
+                  <span class="text-[11px] text-[#9ca3af]">تومان</span>
+                </div>
+              </div>
+              <span
+                v-if="offersMeta[ri * 6 + ci]?.hasOld"
+                class="flex h-[22px] items-center justify-center rounded-lg bg-[#fde9ec] px-1 text-[11px] font-extrabold text-primary"
+              >%30</span>
+            </div>
+          </article>
+        </template>
       </div>
 
-      <div v-if="filtered.length" class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        <ProductCard
-          v-for="product in (showAll ? filtered : filtered.slice(0, 8))"
-          :key="product.id"
-          :product="product"
-        />
-      </div>
-      <p v-else class="py-16 text-center text-sm text-muted-foreground">
-        محصولی در این بازه قیمت پیدا نشد.
-      </p>
-
-      <div v-if="filtered.length > 8" class="mt-8 text-center">
-        <button
-          class="cursor-pointer rounded-xl border border-primary/30 px-8 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-          @click="showAll = !showAll"
-        >
-          {{ showAll ? 'نمایش کمتر' : 'نمایش بیشتر' }}
-        </button>
-      </div>
+      <!-- Arrow -->
+      <button
+        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-foreground transition-colors hover:bg-secondary"
+        aria-label="قبلی"
+      >
+        <IconChevronLeft class="size-[18px]" />
+      </button>
     </div>
   </section>
 </template>
