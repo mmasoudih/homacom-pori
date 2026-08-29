@@ -42,8 +42,8 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
           class="flex h-[38px] items-center rounded-full px-4 text-[13px] font-medium transition-colors"
           :class="
             (pills.activePrice === p)
-              ? 'bg-white text-foreground shadow-sm'
-              : 'bg-transparent text-[#6b7280] hover:bg-white/50'
+              ? 'bg-T-50 text-foreground shadow-sm'
+              : 'bg-transparent text-T-700 hover:bg-T-50/50'
           "
         >
           {{ p }}
@@ -58,8 +58,8 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
           class="flex h-[38px] items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors"
           :class="
             (pills.activeCat === c.label)
-              ? 'bg-white text-foreground shadow-sm'
-              : 'bg-transparent text-[#6b7280] hover:bg-white/50'
+              ? 'bg-T-50 text-foreground shadow-sm'
+              : 'bg-transparent text-T-700 hover:bg-T-50/50'
           "
         >
           {{ c.label }}
@@ -85,7 +85,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 
       <!-- Arrow (desktop only) -->
       <button
-        class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-foreground transition-colors hover:bg-secondary lg:flex"
+        class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary lg:flex"
         aria-label="محصولات قبلی"
       >
         <IconChevronLeft class="size-[18px]" />

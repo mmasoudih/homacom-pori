@@ -29,7 +29,7 @@ const showOldPrice = computed(
 )
 
 const priceColor = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-foreground'))
-const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : 'text-[#9ca3af]'))
+const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : 'text-T-600'))
 </script>
 
 <template>
@@ -49,7 +49,7 @@ const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : '
       </span>
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex h-[21px] items-center justify-center rounded-lg bg-[#fde9ec] px-1 text-[12px] font-extrabold text-primary"
+        class="flex h-[21px] items-center justify-center rounded-lg bg-R-10 px-1 text-[12px] font-extrabold text-primary"
       >{{ discount }}%</span>
     </div>
   </div>

@@ -58,7 +58,7 @@ onUnmounted(stop)
 
 <template>
   <div
-    :class="cn('flex h-[22px] w-full items-center justify-between gap-2 rounded-lg bg-[#fde9ec] px-3', props.class)"
+    :class="cn('flex h-[22px] w-full items-center justify-between gap-2 rounded-lg bg-R-10 px-3', props.class)"
     role="timer"
     :aria-label="label ? `${label} ${parts.hours}:${parts.minutes}:${parts.seconds}` : undefined"
   >

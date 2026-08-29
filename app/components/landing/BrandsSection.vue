@@ -12,7 +12,7 @@ import { brands } from '~/data/landing'
         v-for="brand in brands"
         :key="brand.name + brand.logo"
         href="#"
-        class="flex h-[78px] w-[130px] shrink-0 items-center justify-center rounded-[20px] border border-[#e5e7eb] bg-white"
+        class="flex h-[78px] w-[130px] shrink-0 items-center justify-center rounded-[20px] border border-T-400 bg-T-50"
       >
         <img
           :src="brand.logo"
@@ -29,7 +29,7 @@ import { brands } from '~/data/landing'
           v-for="brand in brands"
           :key="brand.name + brand.logo"
           href="#"
-          class="flex w-[166px] shrink-0 flex-col items-center justify-center gap-3 rounded-[20px] border border-[#e5e7eb] bg-white py-4 transition-shadow hover:shadow-md"
+          class="flex w-[166px] shrink-0 flex-col items-center justify-center gap-3 rounded-[20px] border border-T-400 bg-T-50 py-4 transition-shadow hover:shadow-md"
         >
           <img
             :src="brand.logo"

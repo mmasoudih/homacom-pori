@@ -8,7 +8,7 @@ const props = withDefaults(
     product: Product
     variant?: ProductVariant
     tone?: ProductTone
-    /** Extra classes on the image container (e.g. `bg-white` on colored sections). */
+    /** Extra classes on the image container (e.g. `bg-T-50` on colored sections). */
     imageClass?: string
     /** Color `value` that should render as selected (adds a ring). */
     selectedColor?: string
@@ -76,7 +76,7 @@ const colors = computed(() => normalizeColors(props.product.colors))
 
 const toneTitle = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-foreground'))
 const swatchBorder = computed(() =>
-  props.tone === 'inverted' ? 'border-white/40' : 'border-[#c8ccd2]',
+  props.tone === 'inverted' ? 'border-white/40' : 'border-T-500',
 )
 </script>
 
@@ -112,7 +112,7 @@ const swatchBorder = computed(() =>
       <!-- Discount: bottom-inline-start corner -->
       <span
         v-if="showDiscount && hasDiscount"
-        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg bg-[#fde9ec] px-1.5 text-[13px] font-extrabold text-primary"
+        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg bg-R-10 px-1.5 text-[13px] font-extrabold text-primary"
       >{{ discount }}%</span>
     </div>
 

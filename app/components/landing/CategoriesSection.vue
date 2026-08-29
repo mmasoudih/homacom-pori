@@ -28,12 +28,12 @@ const iconMap: Record<string, typeof IconHeadphones> = {
       >
         <span
           class="flex size-[78px] items-center justify-center rounded-full border-[5px]"
-          :class="cat.accent ? 'border-[#fde9ec] bg-white' : 'border-[#f5f6f7] bg-white'"
+          :class="cat.accent ? 'border-R-10 bg-T-50' : 'border-T-200 bg-T-50'"
         >
           <component
             :is="iconMap[cat.icon]"
             class="size-[30px]"
-            :class="cat.accent ? 'text-primary' : 'text-[#6b7280]'"
+            :class="cat.accent ? 'text-primary' : 'text-T-700'"
           />
         </span>
         <span class="text-center text-[13px] font-medium leading-[18px] text-foreground">
@@ -52,13 +52,13 @@ const iconMap: Record<string, typeof IconHeadphones> = {
         <!-- Content card -->
         <a
           href="#"
-          class="absolute inset-y-[5px] left-0 right-[63px] flex items-center rounded-[20px] border border-[#e5e7eb] bg-white pl-[12px] pr-[45px] transition-shadow hover:shadow-md"
+          class="absolute inset-y-[5px] left-0 right-[63px] flex items-center rounded-[20px] border border-T-400 bg-T-50 pl-[12px] pr-[45px] transition-shadow hover:shadow-md"
         >
           <div class="flex flex-col gap-[2px]">
             <h3 class="text-[16px] font-bold leading-[24px] text-foreground">
               {{ cat.title }}
             </h3>
-            <p class="flex items-center gap-1 text-[12.5px] text-[#9ca3af]">
+            <p class="flex items-center gap-1 text-[12.5px] text-T-600">
               <span>محصول موجود است</span>
               <span class="text-[14px] font-bold text-foreground">{{ cat.count }}</span>
             </p>
@@ -68,19 +68,19 @@ const iconMap: Record<string, typeof IconHeadphones> = {
         <!-- Circle -->
         <div
           class="absolute bottom-0 left-0 flex size-[95px] items-center justify-center rounded-full border-[5px] transition-colors"
-          :class="cat.accent ? 'border-[#fde9ec] bg-white' : 'border-[#f5f6f7] bg-white'"
+          :class="cat.accent ? 'border-R-10 bg-T-50' : 'border-T-200 bg-T-50'"
         >
           <component
             :is="iconMap[cat.icon]"
             class="size-[47px]"
-            :class="cat.accent ? 'text-primary' : 'text-[#6b7280]'"
+            :class="cat.accent ? 'text-primary' : 'text-T-700'"
           />
         </div>
 
         <!-- Arrow button -->
         <a
           href="#"
-          class="absolute bottom-[10px] left-[10px] flex size-[35px] items-center justify-center rounded-full border border-[#e5e7eb] bg-white transition-colors group-hover:border-primary group-hover:text-primary"
+          class="absolute bottom-[10px] left-[10px] flex size-[35px] items-center justify-center rounded-full border border-T-400 bg-T-50 transition-colors group-hover:border-primary group-hover:text-primary"
         >
           <IconChevronLeft class="size-[18px]" />
         </a>

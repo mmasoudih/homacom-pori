@@ -63,24 +63,24 @@ onUnmounted(() => clearInterval(timer))
 
       <!-- Arrows (desktop only) -->
       <button
-        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white shadow-sm transition-colors hover:bg-secondary xl:flex"
+        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary xl:flex"
         aria-label="قبلی"
         @click="go(-1)"
       >
-        <IconChevronLeft class="size-[18px] text-[#6b7280]" />
+        <IconChevronLeft class="size-[18px] text-T-700" />
       </button>
       <button
-        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white shadow-sm transition-colors hover:bg-secondary xl:flex"
+        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary xl:flex"
         aria-label="بعدی"
         @click="go(1)"
       >
-        <IconChevronLeft class="size-[18px] rotate-180 text-[#6b7280]" />
+        <IconChevronLeft class="size-[18px] rotate-180 text-T-700" />
       </button>
 
       <!-- Dots (mobile: inside bottom) -->
       <div class="absolute bottom-4 left-1/2 -translate-x-1/2 xl:hidden">
         <div
-          class="flex items-center justify-center gap-[2px] rounded-[50px] bg-white/65 px-[20px] py-2 shadow-[0_0_6px_rgba(0,0,0,0.08)] backdrop-blur-[75px]"
+          class="flex items-center justify-center gap-[2px] rounded-[50px] bg-T-50/65 px-[20px] py-2 shadow-[0_0_6px_rgba(0,0,0,0.08)] backdrop-blur-[75px]"
         >
           <button
             v-for="i in total"
@@ -88,8 +88,8 @@ onUnmounted(() => clearInterval(timer))
             class="h-2 rounded-full transition-all duration-300"
             :class="
               active === i - 1
-                ? 'relative w-[29px] bg-[#c8ccd2]'
-                : 'w-2 bg-[#c8ccd2]'
+                ? 'relative w-[29px] bg-T-500'
+                : 'w-2 bg-T-500'
             "
             :aria-label="`اسلاید ${i}`"
             @click="active = i - 1"
@@ -112,8 +112,8 @@ onUnmounted(() => clearInterval(timer))
         class="h-2 rounded-full transition-all duration-300"
         :class="
           active === i - 1
-            ? 'relative w-[29px] bg-[#c8ccd2]'
-            : 'w-2 bg-[#c8ccd2]'
+            ? 'relative w-[29px] bg-T-500'
+            : 'w-2 bg-T-500'
         "
         :aria-label="`اسلاید ${i}`"
         @click="active = i - 1"

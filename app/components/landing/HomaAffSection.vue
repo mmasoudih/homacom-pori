@@ -37,7 +37,7 @@ import { homaAffProducts } from '~/data/landing'
         tone="inverted"
         show-countdown
         countdown-label="هما آف"
-        image-class="bg-white"
+        image-class="bg-T-50"
         class="w-[180px] shrink-0"
       />
     </div>
@@ -57,20 +57,20 @@ import { homaAffProducts } from '~/data/landing'
             tone="inverted"
             show-countdown
             countdown-label="هما آف"
-            image-class="bg-white"
+            image-class="bg-T-50"
           />
         </div>
       </div>
 
       <!-- Arrows -->
       <button
-        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white text-foreground transition-colors hover:bg-white/90"
+        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground transition-colors hover:bg-T-50/90"
         aria-label="قبلی"
       >
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
-        class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white text-foreground transition-colors hover:bg-white/90"
+        class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground transition-colors hover:bg-T-50/90"
         aria-label="بعدی"
       >
         <IconChevronLeft class="size-[18px] rotate-180" />

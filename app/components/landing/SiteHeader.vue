@@ -20,13 +20,13 @@ const navIcons: Record<string, typeof IconCoins> = {
 </script>
 
 <template>
-  <header class="relative z-50 w-full border-b border-[#e5e7eb] bg-white">
+  <header class="relative z-50 w-full border-b border-T-400 bg-T-50">
     <!-- Desktop (≥1280px) -->
     <div class="relative mx-auto hidden h-[142px] max-w-[1350px] px-0 xl:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <!-- Cart button -->
       <button
-        class="absolute left-0 top-[22px] flex size-12 items-center justify-center rounded-full border border-[#c8ccd2] text-foreground transition-colors hover:bg-secondary"
+        class="absolute left-0 top-[22px] flex size-12 items-center justify-center rounded-full border border-T-500 text-foreground transition-colors hover:bg-secondary"
         aria-label="سبد خرید"
       >
         <IconShoppingBag class="size-6" />
@@ -43,18 +43,18 @@ const navIcons: Record<string, typeof IconCoins> = {
         </NuxtLink>
         <div class="mr-3 flex items-center gap-1 text-[15px] font-medium text-foreground" dir="rtl">
           <NuxtLink to="/auth/login" class="hover:text-primary">ورود</NuxtLink>
-          <span class="text-[#c8ccd2]">|</span>
+          <span class="text-T-500">|</span>
           <NuxtLink to="/auth/register" class="hover:text-primary">ثبت‌نام</NuxtLink>
         </div>
       </div>
 
       <!-- Search -->
-      <div class="absolute left-[330px] top-[22px] flex h-11 w-[480px] items-center gap-3 rounded-full border border-[#e5e7eb] bg-white px-4 focus-within:ring-2 focus-within:ring-primary/30">
-        <IconSearch class="size-5 shrink-0 text-[#9ca3af]" />
+      <div class="absolute left-[330px] top-[22px] flex h-11 w-[480px] items-center gap-3 rounded-full border border-T-400 bg-T-50 px-4 focus-within:ring-2 focus-within:ring-primary/30">
+        <IconSearch class="size-5 shrink-0 text-T-600" />
         <input
           type="text"
           placeholder="جستجو در محصولات ..."
-          class="w-full bg-transparent text-[15px] text-foreground placeholder:text-[#9ca3af] focus:outline-none"
+          class="w-full bg-transparent text-[15px] text-foreground placeholder:text-T-600 focus:outline-none"
         >
       </div>
 
@@ -99,9 +99,9 @@ const navIcons: Record<string, typeof IconCoins> = {
       </a>
 
       <!-- Search pill (left in RTL) -->
-      <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-[#e5e7eb] bg-[#f5f6f7] px-4">
-        <span class="flex-1 text-[15px] text-[#9ca3af]">جستجو در</span>
-        <IconSearch class="size-5 shrink-0 text-[#9ca3af]" />
+      <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
+        <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
+        <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
     </div>
   </header>

@@ -22,7 +22,7 @@ const activeItems = computed(() => {
     <!-- Mobile: tabs + list -->
     <div class="mt-[18px] lg:hidden">
       <!-- Tab bar -->
-      <div class="flex border-b border-[#e5e7eb]">
+      <div class="flex border-b border-T-400">
         <button
           v-for="tab in tabs"
           :key="tab.label"
@@ -30,7 +30,7 @@ const activeItems = computed(() => {
           :class="
             activeTab === tab.label
               ? 'border-primary text-foreground'
-              : 'border-transparent text-[#9ca3af]'
+              : 'border-transparent text-T-600'
           "
           @click="activeTab = tab.label"
         >
@@ -45,7 +45,7 @@ const activeItems = computed(() => {
         :key="i"
         :product="item"
         variant="horizontal"
-        class="h-[122px] border-b border-[#e5e7eb]"
+        class="h-[122px] border-b border-T-400"
       />
     </div>
 
@@ -57,9 +57,9 @@ const activeItems = computed(() => {
         class="flex flex-col"
       >
         <!-- Column header -->
-        <div class="flex h-[70px] items-center justify-between border-b border-[#e5e7eb] px-4">
+        <div class="flex h-[70px] items-center justify-between border-b border-T-400 px-4">
           <h3 class="text-[14px] font-bold text-foreground">{{ col.category }}</h3>
-          <a href="#" class="text-[12px] font-medium text-[#9ca3af] transition-colors hover:text-primary">مشاهده همه</a>
+          <a href="#" class="text-[12px] font-medium text-T-600 transition-colors hover:text-primary">مشاهده همه</a>
         </div>
 
         <!-- Mini cards -->
@@ -68,7 +68,7 @@ const activeItems = computed(() => {
           :key="i"
           :product="item"
           variant="horizontal"
-          class="h-[155px] border-b border-[#e5e7eb] px-4 transition-colors hover:bg-secondary/30"
+          class="h-[155px] border-b border-T-400 px-4 transition-colors hover:bg-secondary/30"
         />
       </div>
     </div>
@@ -76,13 +76,13 @@ const activeItems = computed(() => {
     <!-- Arrows (desktop) -->
     <div class="relative hidden lg:block">
       <button
-        class="absolute -left-[19px] top-[200px] flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-foreground transition-colors hover:bg-secondary"
+        class="absolute -left-[19px] top-[200px] flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary"
         aria-label="قبلی"
       >
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
-        class="absolute -right-[19px] top-[200px] flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-foreground transition-colors hover:bg-secondary"
+        class="absolute -right-[19px] top-[200px] flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary"
         aria-label="بعدی"
       >
         <IconChevronLeft class="size-[18px] rotate-180" />

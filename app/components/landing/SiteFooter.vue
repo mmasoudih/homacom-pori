@@ -22,7 +22,7 @@ function scrollTop() {
 </script>
 
 <template>
-  <footer class="bg-[#f5f6f7] pt-10">
+  <footer class="bg-T-200 pt-10">
     <!-- Mobile: accordion + about + back to top -->
     <div class="lg:hidden">
       <!-- Accordion -->
@@ -30,7 +30,7 @@ function scrollTop() {
         <div
           v-for="row in accordionRows"
           :key="row.title"
-          class="border-b border-[#e5e7eb]"
+          class="border-b border-T-400"
         >
           <button
             class="flex h-[60px] w-full items-center justify-between text-[15px] font-bold text-foreground"
@@ -38,7 +38,7 @@ function scrollTop() {
           >
             <span>{{ row.title }}</span>
             <IconChevronDown
-              class="size-4 text-[#9ca3af] transition-transform duration-200"
+              class="size-4 text-T-600 transition-transform duration-200"
               :class="openRow === row.title ? 'rotate-180' : ''"
             />
           </button>
@@ -50,7 +50,7 @@ function scrollTop() {
               v-for="(link, li) in row.links"
               :key="li"
               href="#"
-              class="text-[13px] text-[#6b7280] transition-colors hover:text-primary"
+              class="text-[13px] text-T-700 transition-colors hover:text-primary"
             >{{ link }}</a>
           </div>
         </div>
@@ -68,7 +68,7 @@ function scrollTop() {
       </div>
 
       <!-- About -->
-      <div class="border-t border-[#e5e7eb]">
+      <div class="border-t border-T-400">
         <div class="mx-auto max-w-[1260px] px-4 py-6">
           <div class="flex items-start gap-3">
             <a href="#" class="shrink-0">
@@ -76,7 +76,7 @@ function scrollTop() {
             </a>
             <div class="flex flex-col gap-2">
               <h3 class="text-[16px] font-bold text-foreground">فروشگاه اینترنتی هماکام</h3>
-              <p class="line-clamp-3 text-[13px] leading-[22px] text-[#6b7280]">
+              <p class="line-clamp-3 text-[13px] leading-[22px] text-T-700">
                 {{ footerData.about }}
               </p>
               <a href="#" class="text-[13px] font-medium text-primary">نمایش بیشتر</a>
@@ -87,16 +87,16 @@ function scrollTop() {
 
       <!-- Back to top + Copyright -->
       <div class="mx-auto max-w-[1260px] px-4 pb-28 pt-2 xl:pb-10">
-        <div class="flex flex-col items-center gap-4 border-t border-[#e5e7eb] py-4">
+        <div class="flex flex-col items-center gap-4 border-t border-T-400 py-4">
           <a
             href="#"
-            class="flex h-[46px] items-center gap-2 rounded-full border border-[#e5e7eb] bg-white px-6 text-[13px] font-medium text-foreground transition-colors hover:text-primary"
+            class="flex h-[46px] items-center gap-2 rounded-full border border-T-400 bg-T-50 px-6 text-[13px] font-medium text-foreground transition-colors hover:text-primary"
             @click.prevent="scrollTop"
           >
             <IconArrowUp class="size-4 text-primary" />
             بازگشت به بالا
           </a>
-          <p class="text-[12px] text-[#9ca3af]">{{ footerData.copyright }}</p>
+          <p class="text-[12px] text-T-600">{{ footerData.copyright }}</p>
         </div>
       </div>
     </div>
@@ -149,7 +149,7 @@ function scrollTop() {
                 v-for="link in col.links"
                 :key="link"
                 href="#"
-                class="text-[13px] text-[#6b7280] transition-colors hover:text-primary"
+                class="text-[13px] text-T-700 transition-colors hover:text-primary"
               >{{ link }}</a>
             </nav>
           </div>
@@ -158,11 +158,11 @@ function scrollTop() {
 
       <!-- About section -->
       <div class="mx-auto mt-8 max-w-[1260px] px-4">
-        <div class="flex items-start gap-6 rounded-2xl bg-white p-6">
+        <div class="flex items-start gap-6 rounded-2xl bg-T-50 p-6">
           <a href="#" class="shrink-0">
             <img src="/homacom-logo.png" alt="هماکام" class="h-[86px] w-[91px] object-contain">
           </a>
-          <p class="flex-1 text-[13px] leading-[22px] text-[#6b7280]">
+          <p class="flex-1 text-[13px] leading-[22px] text-T-700">
             {{ footerData.about }}
           </p>
         </div>
@@ -170,17 +170,17 @@ function scrollTop() {
 
       <!-- Back to top + Copyright -->
       <div class="mx-auto mt-4 max-w-[1260px] px-4">
-        <div class="flex flex-col items-center gap-3 border-t border-[#e5e7eb] py-4">
+        <div class="flex flex-col items-center gap-3 border-t border-T-400 py-4">
           <a
             href="#"
             class="flex items-center gap-2 text-[13px] font-medium text-foreground transition-colors hover:text-primary"
             @click.prevent="scrollTop"
           >
-            <span class="h-px w-16 bg-[#e5e7eb]" />
+            <span class="h-px w-16 bg-T-400" />
             بازگشت به بالا
-            <span class="h-px w-16 bg-[#e5e7eb]" />
+            <span class="h-px w-16 bg-T-400" />
           </a>
-          <p class="text-[12px] text-[#9ca3af]">{{ footerData.copyright }}</p>
+          <p class="text-[12px] text-T-600">{{ footerData.copyright }}</p>
         </div>
       </div>
     </div>

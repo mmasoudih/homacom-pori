@@ -38,7 +38,7 @@ watch(
     <!-- Broken / missing image fallback -->
     <div
       v-if="broken"
-      class="flex size-full items-center justify-center text-[#9ca3af]"
+      class="flex size-full items-center justify-center text-T-600"
       role="img"
       :aria-label="alt || 'تصویر در دسترس نیست'"
     >

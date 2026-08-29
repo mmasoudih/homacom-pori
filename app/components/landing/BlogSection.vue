@@ -11,7 +11,7 @@ import { blogPosts } from '~/data/landing'
       <article
         v-for="(post, i) in blogPosts"
         :key="i"
-        class="w-[210px] shrink-0 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white"
+        class="w-[210px] shrink-0 overflow-hidden rounded-2xl border border-T-400 bg-T-50"
       >
         <!-- Image -->
         <div class="aspect-[210/151] w-full overflow-hidden">
@@ -27,8 +27,8 @@ import { blogPosts } from '~/data/landing'
           <h3 class="line-clamp-2 min-h-[44px] text-[14px] font-bold leading-[22px] text-foreground">
             {{ post.title }}
           </h3>
-          <div class="flex items-center justify-between border-t border-[#e5e7eb] pt-3">
-            <span class="text-[12px] text-[#9ca3af]">{{ post.date }}</span>
+          <div class="flex items-center justify-between border-t border-T-400 pt-3">
+            <span class="text-[12px] text-T-600">{{ post.date }}</span>
             <a href="#" class="text-[12px] font-medium text-foreground transition-colors hover:text-primary">
               ادامه مطلب
             </a>
@@ -42,7 +42,7 @@ import { blogPosts } from '~/data/landing'
       <article
         v-for="(post, i) in blogPosts"
         :key="i"
-        class="group overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white transition-shadow hover:shadow-md"
+        class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50 transition-shadow hover:shadow-md"
       >
         <!-- Image -->
         <div class="aspect-[324/180] w-full overflow-hidden">
@@ -58,8 +58,8 @@ import { blogPosts } from '~/data/landing'
           <h3 class="line-clamp-2 min-h-[44px] text-[14px] font-bold leading-[22px] text-foreground">
             {{ post.title }}
           </h3>
-          <div class="flex items-center justify-between border-t border-[#e5e7eb] pt-3">
-            <span class="text-[12px] text-[#9ca3af]">{{ post.date }}</span>
+          <div class="flex items-center justify-between border-t border-T-400 pt-3">
+            <span class="text-[12px] text-T-600">{{ post.date }}</span>
             <a href="#" class="text-[12px] font-medium text-foreground transition-colors hover:text-primary">
               ادامه مطلب
             </a>
