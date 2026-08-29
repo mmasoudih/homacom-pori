@@ -1,13 +1,52 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { offersGridRows, offersMeta } from '~/data/landing'
+
+const flatOffers = offersGridRows.flat()
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1302px]">
+  <section class="mx-auto w-full max-w-[1302px] px-4 py-5 md:px-0 md:py-6">
     <LandingSectionTitle title="پیشنهاد‌های هماکام" variant="centered" />
 
-    <div class="relative mt-[18px]">
+    <!-- Mobile: 2-col grid -->
+    <div class="mt-[18px] grid grid-cols-2 gap-x-[10px] gap-y-[10px] lg:hidden">
+      <article
+        v-for="(cell, i) in flatOffers"
+        :key="i"
+        class="flex flex-col items-center gap-[16px]"
+      >
+        <!-- Image -->
+        <div class="flex h-[132px] w-full items-center justify-center">
+          <img
+            :src="cell.image"
+            alt=""
+            class="max-h-full max-w-full rounded-[20px] object-contain"
+          >
+        </div>
+
+        <!-- Price -->
+        <div class="flex w-full items-start justify-between">
+          <div class="flex flex-col">
+            <span
+              v-if="offersMeta[i]?.hasOld"
+              class="text-[13px] font-bold text-[#9ca3af] line-through"
+            >87,000,000</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-[14px] font-extrabold text-foreground">87,000,000</span>
+              <span class="text-[11px] text-[#9ca3af]">تومان</span>
+            </div>
+          </div>
+          <span
+            v-if="offersMeta[i]?.hasOld"
+            class="flex h-[21px] w-[38px] items-center justify-center rounded-lg bg-[#fde9ec] text-[12px] font-extrabold text-primary"
+          >%30</span>
+        </div>
+      </article>
+    </div>
+
+    <!-- Desktop: 6-col strip -->
+    <div class="relative mt-[18px] hidden lg:block">
       <div class="grid gap-[18px]" style="grid-template-columns: repeat(6, 202px)">
         <template v-for="(row, ri) in offersGridRows" :key="ri">
           <article

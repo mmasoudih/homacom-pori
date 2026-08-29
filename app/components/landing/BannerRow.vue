@@ -10,9 +10,13 @@ withDefaults(defineProps<{
 
 <template>
   <div
-    class="mx-auto w-full max-w-[1350px]"
-    :class="columns > 1 ? 'grid gap-[18px]' : ''"
-    :style="columns > 1 ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : {}"
+    class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-6"
+    :class="
+      columns > 1
+        ? 'grid grid-cols-1 gap-[18px] ' +
+          ({ 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4' } as Record<number, string>)[columns]
+        : ''
+    "
   >
     <a
       v-for="(item, i) in items"
@@ -24,7 +28,13 @@ withDefaults(defineProps<{
         :src="item.image"
         :alt="item.alt || ''"
         class="h-full w-full object-cover"
-        :class="centered ? 'aspect-[278/212] rounded-none' : ''"
+        :class="
+          columns > 1
+            ? 'aspect-[370/136] lg:aspect-auto'
+            : centered
+              ? 'aspect-[278/212] rounded-none'
+              : ''
+        "
         :style="!centered ? {} : { margin: '0 auto', width: '278px' }"
       >
     </a>

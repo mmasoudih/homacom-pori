@@ -15,9 +15,35 @@ const iconMap: Record<string, typeof IconHeadphones> = {
 </script>
 
 <template>
-  <section id="categories" class="mx-auto w-full max-w-[1350px]">
+  <section id="categories" class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-6">
     <LandingSectionTitle title="دسته‌بندی‌ها" variant="centered" />
-    <div class="mt-[18px] grid grid-cols-2 gap-x-[18px] gap-y-[13px] md:grid-cols-4">
+
+    <!-- Mobile: circular icon grid -->
+    <div class="mt-[18px] grid grid-cols-4 gap-y-[13px] md:hidden">
+      <a
+        v-for="cat in categories"
+        :key="cat.title"
+        href="#"
+        class="flex flex-col items-center gap-[6px]"
+      >
+        <span
+          class="flex size-[78px] items-center justify-center rounded-full border-[5px]"
+          :class="cat.accent ? 'border-[#fde9ec] bg-white' : 'border-[#f5f6f7] bg-white'"
+        >
+          <component
+            :is="iconMap[cat.icon]"
+            class="size-[30px]"
+            :class="cat.accent ? 'text-primary' : 'text-[#6b7280]'"
+          />
+        </span>
+        <span class="text-center text-[13px] font-medium leading-[18px] text-foreground">
+          {{ cat.title }}
+        </span>
+      </a>
+    </div>
+
+    <!-- Desktop: card grid -->
+    <div class="mt-[18px] hidden grid-cols-2 gap-x-[18px] gap-y-[13px] md:grid md:grid-cols-4">
       <article
         v-for="cat in categories"
         :key="cat.title"

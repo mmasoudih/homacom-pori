@@ -18,48 +18,62 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="flex flex-col items-center gap-10 px-4 py-10 pb-24 md:gap-12 md:px-0 xl:pb-10">
-      <LandingHeroCarousel />
+    <!--
+      Mobile section order follows the Figma "Landing Mobile" frame:
+      categories → هما آف → strip → جدیدترین → بهترینها → banner(2) → پرفروش → پیشنهادها → وبلاگ → برندها.
+      Desktop keeps DOM order via lg:order-none.
+    -->
+    <main class="flex flex-col items-center">
+      <LandingHeroCarousel class=" pb-5 md:pb-6" />
 
-      <LandingCategoriesSection id="categories" />
+      <LandingCategoriesSection id="categories" class="order-1 w-full lg:order-none" />
 
-      <LandingHomaAffSection />
+      <LandingHomaAffSection class="order-2 py-5 lg:order-none lg:py-6" />
 
-      <LandingBannerRow :items="banners2" :columns="2" />
+      <LandingBannerRow :items="banners2" :columns="2" class="order-6 w-full lg:order-none" />
 
       <LandingProductsCarousel
         title="جدیدترین محصولات"
         :products="newestProducts"
+        class="order-4 w-full lg:order-none"
       />
 
       <!-- Strip banner -->
-      <a :href="stripBanner.href" class="mx-auto block w-full max-w-[1350px]">
+      <a
+        :href="stripBanner.href"
+        class="order-3 block w-full max-w-[1350px] py-5 lg:order-none lg:mx-auto lg:py-6"
+      >
         <img
           :src="stripBanner.image"
           :alt="stripBanner.alt"
-          class="h-auto w-full rounded-2xl object-cover"
+          class="h-auto w-full rounded-none object-cover lg:rounded-2xl"
         >
       </a>
 
-      <LandingBestOfCategorySection />
+      <LandingBestOfCategorySection class="order-5 w-full lg:order-none" />
 
-      <LandingBannerRow :items="banners4" :columns="4" />
+      <LandingBannerRow
+        :items="banners4"
+        :columns="4"
+        class="order-7 hidden w-full lg:order-none lg:block"
+      />
 
       <LandingProductsCarousel
         title="پرفروش‌ترین محصولات"
         :products="bestsellerProducts"
         :pills="bestsellerFilters"
+        class="order-7 w-full lg:order-none"
       />
 
-      <LandingOffersSection id="offers" />
+      <LandingOffersSection id="offers" class="order-8 w-full lg:order-none" />
 
-      <LandingBannerRow :items="banners3" :columns="3" centered />
+      <LandingBannerRow :items="banners3" :columns="3" centered class="order-7 hidden w-full lg:order-none lg:block" />
 
-      <LandingBrandsSection />
+      <LandingBrandsSection class="order-10 w-full lg:order-none" />
 
-      <LandingBlogSection />
+      <LandingBlogSection class="order-9 w-full lg:order-none" />
 
-      <LandingCeoSection />
+      <LandingCeoSection class="hidden lg:block" />
     </main>
 
     <LandingSiteFooter id="contact" class="mt-auto" />

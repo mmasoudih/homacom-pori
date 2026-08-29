@@ -18,7 +18,7 @@ const route = useRoute()
 
 const items: NavItem[] = [
   { label: 'خانه', icon: IconHome2, href: '/', active: true },
-  { label: 'دسته\u200Cبندی', icon: IconLayoutGrid, href: '/categories' },
+  { label: 'دسته‌بندی', icon: IconLayoutGrid, href: '/categories' },
   { label: 'سبد خرید', icon: IconShoppingBag, href: '/cart' },
   { label: 'بلاگ', icon: IconNotes, href: '/blog' },
   { label: 'پروفایل', icon: IconUser, href: '/profile' },
@@ -27,14 +27,14 @@ const items: NavItem[] = [
 
 <template>
   <nav
-    class="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 items-center gap-0.5 rounded-full bg-white/90 px-5 py-2 backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.08)] xl:hidden"
+    class="fixed bottom-4 inset-x-4 z-50 grid grid-cols-5 rounded-full border border-[#e5e7eb] bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] xl:hidden"
     dir="rtl"
   >
     <NuxtLink
       v-for="item in items"
       :key="item.label"
       :to="item.href"
-      class="flex flex-col items-center gap-[5px] px-4 transition-colors"
+      class="flex h-[68px] flex-col items-center justify-center gap-[5px] transition-colors"
       :class="route.path === item.href ? 'text-primary' : 'text-muted-foreground'"
     >
       <component :is="item.icon" class="size-5" />

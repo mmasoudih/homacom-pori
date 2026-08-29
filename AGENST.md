@@ -1,0 +1,2 @@
+- always use "codebase-memory-mcp"
+- for see the screenshot content use this "DeepSeek V4 Flash Vision Exp" model from "deepseek" provider
