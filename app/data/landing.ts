@@ -6,12 +6,15 @@ export interface Category {
 }
 
 export interface Product {
+  id?: string | number
   image: string
   title: string
   price: string
   oldPrice?: string
   discount?: string
   colors?: string[]
+  /** Optional discount expiry used to render a live countdown. */
+  discountExpiresAt?: string | Date
 }
 
 export interface OfferCard {
@@ -60,28 +63,25 @@ const IMG = {
   p39: '/figma/fill-603959b7e3e05165.png',
 }
 
-export const homaAffProducts = [
-  {
-    ...({ image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch } as Product),
-    countdown: '04:51:35',
-  },
-  {
-    ...({ image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset2 } as Product),
-    countdown: '04:51:35',
-  },
-  {
-    ...({ image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop } as Product),
-    countdown: '04:51:35',
-  },
-  {
-    ...({ image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset } as Product),
-    countdown: '04:51:35',
-  },
-  {
-    ...({ image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung } as Product),
-    countdown: '04:51:35',
-  },
-] as Array<Product & { countdown: string }>
+const hoursFromNow = (hours: number) => new Date(Date.now() + hours * 60 * 60 * 1000)
+
+const makeAffProduct = (image: string, colors: string[]): Product => ({
+  image,
+  title: SAMSUNG_TITLE,
+  price: '87,000,000',
+  oldPrice: '92,000,000',
+  discount: '%30',
+  colors,
+  discountExpiresAt: hoursFromNow(4),
+})
+
+export const homaAffProducts: Product[] = [
+  makeAffProduct(IMG.watch, swatchSets.watch),
+  makeAffProduct(IMG.headset2, swatchSets.headset2),
+  makeAffProduct(IMG.laptop, swatchSets.laptop),
+  makeAffProduct(IMG.headset, swatchSets.headset),
+  makeAffProduct(IMG.samsung, swatchSets.samsung),
+]
 
 export const banners2 = [
   { image: '/figma/fill-e44e4b8ead1c759d.png', alt: 'بنر هماکام', href: '#' },

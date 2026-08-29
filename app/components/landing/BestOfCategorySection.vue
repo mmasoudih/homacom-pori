@@ -40,41 +40,13 @@ const activeItems = computed(() => {
       </div>
 
       <!-- Items -->
-      <article
+      <Product
         v-for="(item, i) in activeItems"
         :key="i"
-        class="flex h-[122px] items-center border-b border-[#e5e7eb]"
-      >
-        <!-- Image -->
-        <div class="ml-3 flex size-[84px] shrink-0 items-center justify-center">
-          <img
-            :src="item.image"
-            :alt="item.title"
-            class="max-h-full max-w-full object-contain"
-          >
-        </div>
-
-        <!-- Info -->
-        <div class="flex flex-1 flex-col gap-1">
-          <h4 class="line-clamp-2 text-[13px] font-bold leading-[18px] text-foreground">
-            {{ item.title }}
-          </h4>
-          <div class="flex items-center gap-1">
-            <span
-              v-if="item.oldPrice"
-              class="text-[13px] font-bold text-[#9ca3af] line-through"
-            >{{ item.oldPrice }}</span>
-            <div class="flex items-baseline gap-1">
-              <span class="text-[15px] font-extrabold text-foreground">{{ item.price }}</span>
-              <span class="text-[11px] text-[#9ca3af]">تومان</span>
-            </div>
-            <span
-              v-if="item.discount"
-              class="mr-1 flex h-[20px] items-center justify-center rounded-lg bg-[#fde9ec] px-1 text-[11px] font-extrabold text-primary"
-            >{{ item.discount }}</span>
-          </div>
-        </div>
-      </article>
+        :product="item"
+        variant="horizontal"
+        class="h-[122px] border-b border-[#e5e7eb]"
+      />
     </div>
 
     <!-- Desktop: 3-column grid -->
@@ -91,41 +63,13 @@ const activeItems = computed(() => {
         </div>
 
         <!-- Mini cards -->
-        <article
+        <Product
           v-for="(item, i) in col.items"
           :key="i"
-          class="flex h-[155px] items-center border-b border-[#e5e7eb] px-4 transition-colors hover:bg-secondary/30"
-        >
-          <!-- Image -->
-          <div class="ml-4 flex size-[84px] shrink-0 items-center justify-center">
-            <img
-              :src="item.image"
-              :alt="item.title"
-              class="max-h-full max-w-full object-contain"
-            >
-          </div>
-
-          <!-- Info -->
-          <div class="flex flex-1 flex-col gap-1">
-            <h4 class="line-clamp-2 text-[13px] font-bold leading-[18px] text-foreground">
-              {{ item.title }}
-            </h4>
-            <div class="flex items-center gap-1">
-              <span
-                v-if="item.oldPrice"
-                class="text-[13px] font-bold text-[#9ca3af] line-through"
-              >{{ item.oldPrice }}</span>
-              <div class="flex items-baseline gap-1">
-                <span class="text-[15px] font-extrabold text-foreground">{{ item.price }}</span>
-                <span class="text-[11px] text-[#9ca3af]">تومان</span>
-              </div>
-              <span
-                v-if="item.discount"
-                class="mr-1 flex h-[20px] items-center justify-center rounded-lg bg-[#fde9ec] px-1 text-[11px] font-extrabold text-primary"
-              >{{ item.discount }}</span>
-            </div>
-          </div>
-        </article>
+          :product="item"
+          variant="horizontal"
+          class="h-[155px] border-b border-[#e5e7eb] px-4 transition-colors hover:bg-secondary/30"
+        />
       </div>
     </div>
 

@@ -74,10 +74,12 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
     <!-- Products row -->
     <div class="relative mt-4">
       <div class="flex gap-3 overflow-x-auto pb-1 lg:gap-0 lg:overflow-hidden lg:pb-0">
-        <LandingProductCard
+        <Product
           v-for="(product, i) in products"
           :key="i"
           :product="product"
+          variant="vertical"
+          class="w-[180px] shrink-0 md:w-[260px]"
         />
       </div>
 
