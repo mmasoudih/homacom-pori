@@ -13,6 +13,8 @@ const slides = [
 const active = ref(0)
 const total = slides.length
 
+const SLIDE_DURATION = 6000
+
 let timer: ReturnType<typeof setInterval>
 let touchX = 0
 
@@ -20,7 +22,7 @@ function startAutoplay() {
   clearInterval(timer)
   timer = setInterval(() => {
     active.value = (active.value + 1) % total
-  }, 6000)
+  }, SLIDE_DURATION)
 }
 
 function go(dir: 1 | -1) {
@@ -76,24 +78,29 @@ onUnmounted(() => clearInterval(timer))
       </button>
 
       <!-- Dots (mobile: inside bottom) -->
-      <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-[3px] xl:hidden">
-        <button
-          v-for="i in total"
-          :key="i"
-          class="h-2 rounded-full transition-all duration-300"
-          :class="
-            active === i - 1
-              ? 'relative w-[29px] bg-white/60'
-              : 'w-2 bg-white/60'
-          "
-          :aria-label="`اسلاید ${i}`"
-          @click="active = i - 1"
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 xl:hidden">
+        <div
+          class="flex items-center justify-center gap-[2px] rounded-[50px] bg-white/65 px-[20px] py-2 shadow-[0_0_6px_rgba(0,0,0,0.08)] backdrop-blur-[75px]"
         >
-          <span
-            v-if="active === i - 1"
-            class="absolute inset-y-0 right-0 w-[14px] rounded-full bg-white"
-          />
-        </button>
+          <button
+            v-for="i in total"
+            :key="i"
+            class="h-2 rounded-full transition-all duration-300"
+            :class="
+              active === i - 1
+                ? 'relative w-[29px] bg-[#c8ccd2]'
+                : 'w-2 bg-[#c8ccd2]'
+            "
+            :aria-label="`اسلاید ${i}`"
+            @click="active = i - 1"
+          >
+            <span
+              v-if="active === i - 1"
+              class="carousel-fill absolute inset-y-0 right-0 w-full rounded-full bg-primary"
+              :style="{ animationDuration: `${SLIDE_DURATION}ms` }"
+            />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -113,9 +120,27 @@ onUnmounted(() => clearInterval(timer))
       >
         <span
           v-if="active === i - 1"
-          class="absolute inset-y-0 right-0 w-[14px] rounded-full bg-primary"
+          class="carousel-fill absolute inset-y-0 right-0 w-full rounded-full bg-primary"
+          :style="{ animationDuration: `${SLIDE_DURATION}ms` }"
         />
       </button>
     </div>
   </section>
 </template>
+
+<style scoped>
+@keyframes carousel-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.carousel-fill {
+  animation-name: carousel-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+</style>
