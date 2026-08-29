@@ -34,11 +34,15 @@ import { homaAffProducts } from '~/data/landing'
         :key="i"
         :product="product"
         variant="vertical"
-        tone="inverted"
         show-countdown
         countdown-label="هما آف"
         image-class="bg-T-50"
         class="w-[180px] shrink-0"
+        :class="[
+            i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
+            i === homaAffProducts.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
+            i > 0 && i < homaAffProducts.length - 1 ? 'rounded-none' : '',
+        ]"
       />
     </div>
 
@@ -54,7 +58,6 @@ import { homaAffProducts } from '~/data/landing'
           <Product
             :product="product"
             variant="vertical"
-            tone="inverted"
             show-countdown
             countdown-label="هما آف"
             image-class="bg-T-50"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Product, ProductTone, ProductVariant } from '~/utils/product'
-import { normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
+import { discountBadgeClass, normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(
@@ -74,9 +74,14 @@ const colors = computed(() => normalizeColors(props.product.colors))
 
 // --- Tone helpers ----------------------------------------------------------
 
-const toneTitle = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-foreground'))
+const toneTitle = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-T-900'))
 const swatchBorder = computed(() =>
   props.tone === 'inverted' ? 'border-white/40' : 'border-T-500',
+)
+// Card surface: white bg + T-400 border for the default tone; transparent on
+// colored (inverted) sections so the section bg shows through.
+const cardSurface = computed(() =>
+  props.tone === 'inverted' ? '' : 'bg-T-50 border border-T-400',
 )
 </script>
 
@@ -84,7 +89,7 @@ const swatchBorder = computed(() =>
   <!-- ============================== Vertical ============================= -->
   <article
     v-if="variant === 'vertical'"
-    :class="cn('group relative flex w-full flex-col', toneTitle, props.class)"
+    :class="cn('group relative flex w-full flex-col rounded-2xl p-3', toneTitle, cardSurface, props.class)"
   >
     <div class="relative">
       <ProductImage
@@ -112,7 +117,8 @@ const swatchBorder = computed(() =>
       <!-- Discount: bottom-inline-start corner -->
       <span
         v-if="showDiscount && hasDiscount"
-        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg bg-R-10 px-1.5 text-[13px] font-extrabold text-primary"
+        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg px-1.5 text-[13px] font-extrabold"
+        :class="discountBadgeClass(tone)"
       >{{ discount }}%</span>
     </div>
 
@@ -141,7 +147,7 @@ const swatchBorder = computed(() =>
   <!-- ============================= Horizontal ============================ -->
   <article
     v-else-if="variant === 'horizontal'"
-    :class="cn('group relative flex w-full items-center gap-3', toneTitle, props.class)"
+    :class="cn('group relative flex w-full items-center gap-3 rounded-xl p-2', toneTitle, cardSurface, props.class)"
   >
     <ProductImage
       :src="product.image"
@@ -175,7 +181,7 @@ const swatchBorder = computed(() =>
   <!-- =============================== Minimal ============================= -->
   <article
     v-else
-    :class="cn('group relative flex w-full flex-col gap-2', toneTitle, props.class)"
+    :class="cn('group relative flex w-full flex-col gap-2 rounded-2xl p-2.5', toneTitle, cardSurface, props.class)"
   >
     <ProductImage
       :src="product.image"

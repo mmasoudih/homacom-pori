@@ -78,3 +78,12 @@ export function normalizeColors(colors?: Array<string | ProductColor>): ProductC
 export function formatCurrency(value: number): string {
   return `${formatPrice(value)} تومان`
 }
+
+/**
+ * Discount-percent badge colors per tone.
+ * Default: solid brand red with white text. Inverted (on colored sections):
+ * light red chip with red text so it stays visible against the section bg.
+ */
+export function discountBadgeClass(tone: ProductTone = 'default'): string {
+  return tone === 'inverted' ? 'bg-R-50 text-R-300' : 'bg-R-300 text-white'
+}

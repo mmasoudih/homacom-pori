@@ -58,13 +58,13 @@ onUnmounted(stop)
 
 <template>
   <div
-    :class="cn('flex h-[22px] w-full items-center justify-between gap-2 rounded-lg bg-R-10 px-3', props.class)"
+    :class="cn('flex h-[22px] w-full items-center justify-between gap-2 rounded-lg bg-R-50 px-3', props.class)"
     role="timer"
     :aria-label="label ? `${label} ${parts.hours}:${parts.minutes}:${parts.seconds}` : undefined"
   >
-    <span class="text-[13px] font-bold tabular-nums text-primary" dir="ltr">
+    <span class="text-[13px] font-bold tabular-nums text-R-300" dir="ltr">
       {{ parts.hours }}:{{ parts.minutes }}:{{ parts.seconds }}
     </span>
-    <span v-if="label" class="text-[11px] font-bold text-primary">{{ label }}</span>
+    <span v-if="label" class="text-[11px] font-bold text-R-300">{{ label }}</span>
   </div>
 </template>

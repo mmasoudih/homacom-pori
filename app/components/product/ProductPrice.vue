@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProductTone } from '~/utils/product'
+import { discountBadgeClass } from '~/utils/product'
 import { formatPrice } from '~/utils/format'
 import { cn } from '~/lib/utils'
 
@@ -28,7 +29,7 @@ const showOldPrice = computed(
   () => props.showOriginalPrice && props.originalPrice != null && props.originalPrice > props.price,
 )
 
-const priceColor = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-foreground'))
+const priceColor = computed(() => (props.tone === 'inverted' ? 'text-white' : 'text-T-600'))
 const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : 'text-T-600'))
 </script>
 
@@ -49,7 +50,8 @@ const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : '
       </span>
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex h-[21px] items-center justify-center rounded-lg bg-R-10 px-1 text-[12px] font-extrabold text-primary"
+        class="flex h-[21px] items-center justify-center rounded-lg px-1 text-[12px] font-extrabold"
+        :class="discountBadgeClass(tone)"
       >{{ discount }}%</span>
     </div>
   </div>
