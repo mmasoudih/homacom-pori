@@ -13,6 +13,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      // @ts-expect-error process is available in node environment
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://ahoma.ir/api",
     },
   },
@@ -27,7 +28,12 @@ export default defineNuxtConfig({
     classSuffix: '',
     preference: 'light',
     fallback: 'light',
-    disable: true
-  }
-
+  },
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: true,
+      extensions: ['vue'],
+    },
+  ],
 });

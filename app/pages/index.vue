@@ -18,7 +18,7 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="flex flex-col items-center gap-10 py-10 md:gap-12">
+    <main class="flex flex-col items-center gap-10 px-4 py-10 pb-24 md:gap-12 md:px-0 xl:pb-10">
       <LandingHeroCarousel />
 
       <LandingCategoriesSection id="categories" />
@@ -63,5 +63,7 @@ useHead({
     </main>
 
     <LandingSiteFooter id="contact" class="mt-auto" />
+
+    <LandingMobileBottomNav />
   </div>
 </template>
