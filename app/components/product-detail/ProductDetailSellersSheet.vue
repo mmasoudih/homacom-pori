@@ -43,7 +43,7 @@ function addToCart(seller: Seller) {
 }
 
 const dialogShell
-  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)]'
+  = 'top-0! start-0! translate-x-0! translate-y-0! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! rounded-none! flex! flex-col!'
 </script>
 
 <template>
@@ -81,7 +81,7 @@ const dialogShell
       </div>
 
       <!-- Seller cards -->
-      <div class="flex max-h-[65vh] flex-col gap-3 overflow-y-auto px-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+      <div class="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
         <article
           v-for="seller in filtered"
           :key="seller.id"

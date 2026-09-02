@@ -19,7 +19,7 @@ const review = computed(() => props.product.review)
 const specs = computed(() => props.product.specGroups)
 
 const dialogShell
-  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:h-[92dvh]! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)]'
+  = 'top-0! start-0! translate-x-0! translate-y-0! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! rounded-none! flex! flex-col!'
 </script>
 
 <template>
@@ -43,7 +43,7 @@ const dialogShell
       </div>
 
       <!-- ============================ Review ============================ -->
-      <div v-if="mode === 'review'" class="flex max-h-[78vh] flex-col gap-4 overflow-y-auto px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-5">
+      <div v-if="mode === 'review'" class="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-5">
         <h2 class="text-[14px] font-bold text-T-900">{{ review.title }}</h2>
 
         <p
@@ -104,7 +104,7 @@ const dialogShell
       </div>
 
       <!-- ============================ Specs ============================= -->
-      <div v-else class="flex max-h-[78vh] flex-col gap-6 overflow-y-auto px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-5">
+      <div v-else class="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-5">
         <section
           v-for="group in specs"
           :key="group.title"

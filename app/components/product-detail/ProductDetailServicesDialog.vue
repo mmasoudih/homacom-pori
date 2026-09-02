@@ -83,7 +83,7 @@ function confirm() {
 
 /** Centered dialog on desktop, bottom sheet on mobile. */
 const dialogShell
-  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)]'
+  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)] max-sm:data-[state=open]:slide-in-from-bottom-full! max-sm:data-[state=closed]:slide-out-to-bottom-full! max-sm:data-[state=open]:zoom-in-100! max-sm:data-[state=closed]:zoom-out-100! max-sm:data-[state=open]:fade-in-100! max-sm:data-[state=closed]:fade-out-100! max-sm:duration-300!'
 </script>
 
 <template>
@@ -136,16 +136,16 @@ const dialogShell
             class="rounded-xl border border-T-300 px-4 last:border-b max-sm:px-3"
           >
             <UiAccordionTrigger class="py-4 text-[13.5px] font-medium text-T-900 hover:no-underline [&>svg]:size-4 [&>svg]:text-T-600">
-              <span class="flex items-center gap-2">
+              <span class="flex w-full items-center gap-2">
+                <component :is="categoryIcons[category.icon]" class="size-5 shrink-0 text-T-600" stroke-width="1.5" />
                 {{ category.title }}
                 <span
                   v-if="category.items.some(item => draft.has(item.id))"
-                  class="flex size-[18px] items-center justify-center rounded-full bg-R-300 text-[10.5px] font-bold text-white"
+                  class="ms-auto flex size-[18px] items-center justify-center rounded-full bg-R-300 text-[10.5px] font-bold text-white"
                 >
                   {{ category.items.filter(item => draft.has(item.id)).length }}
                 </span>
               </span>
-              <component :is="categoryIcons[category.icon]" class="size-5 shrink-0 text-T-600" stroke-width="1.5" />
             </UiAccordionTrigger>
             <UiAccordionContent class="pb-4">
               <ul class="flex flex-col gap-2.5" :class="ci === 0 && 'pt-1'">

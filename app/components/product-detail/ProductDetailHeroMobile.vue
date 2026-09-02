@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   IconChevronLeft,
+  IconChevronRight,
   IconStarFilled,
   IconInfoCircle,
   IconPlus,
@@ -40,6 +41,81 @@ const emit = defineEmits<{
 }>()
 
 const activeImage = ref(0)
+const imageCount = computed(() => props.product.images.length)
+const canNavigate = computed(() => imageCount.value > 1)
+
+function nextImage() {
+  activeImage.value = (activeImage.value + 1) % imageCount.value
+}
+
+function prevImage() {
+  activeImage.value = (activeImage.value - 1 + imageCount.value) % imageCount.value
+}
+
+// Manual swipe handling. A non-passive touchmove lets us preventDefault so the
+// browser doesn't hijack horizontal gestures; direction locking keeps vertical
+// page scrolling working when the gesture starts on the image.
+const galleryRef = ref<HTMLElement | null>(null)
+const SWIPE_THRESHOLD = 40
+let swipeStartX = 0
+let swipeStartY = 0
+let swipeLockedHorizontal = false
+let swipeLockedVertical = false
+
+function onTouchStart(event: TouchEvent) {
+  const touch = event.touches[0]
+  if (!touch)
+    return
+  swipeStartX = touch.clientX
+  swipeStartY = touch.clientY
+  swipeLockedHorizontal = false
+  swipeLockedVertical = false
+}
+
+function onTouchMove(event: TouchEvent) {
+  if (swipeLockedVertical)
+    return
+  const touch = event.touches[0]
+  if (!touch)
+    return
+  const dx = touch.clientX - swipeStartX
+  const dy = touch.clientY - swipeStartY
+  if (!swipeLockedHorizontal) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8)
+      return
+    swipeLockedHorizontal = Math.abs(dx) > Math.abs(dy)
+    swipeLockedVertical = !swipeLockedHorizontal
+  }
+  if (swipeLockedHorizontal)
+    event.preventDefault()
+}
+
+function onTouchEnd(event: TouchEvent) {
+  if (!swipeLockedHorizontal)
+    return
+  const touch = event.changedTouches[0]
+  if (!touch)
+    return
+  const dx = touch.clientX - swipeStartX
+  if (Math.abs(dx) < SWIPE_THRESHOLD)
+    return
+  if (dx < 0)
+    nextImage()
+  else
+    prevImage()
+}
+
+onMounted(() => {
+  galleryRef.value?.addEventListener('touchstart', onTouchStart, { passive: true })
+  galleryRef.value?.addEventListener('touchmove', onTouchMove, { passive: false })
+  galleryRef.value?.addEventListener('touchend', onTouchEnd, { passive: true })
+})
+onBeforeUnmount(() => {
+  galleryRef.value?.removeEventListener('touchstart', onTouchStart)
+  galleryRef.value?.removeEventListener('touchmove', onTouchMove)
+  galleryRef.value?.removeEventListener('touchend', onTouchEnd)
+})
+
 const discountPercent = computed(() =>
   getDiscountPercent(props.product.price, props.product.oldPrice ?? 0),
 )
@@ -68,13 +144,37 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
 <template>
   <div :class="cn('flex w-full flex-col bg-T-100 lg:hidden', props.class)">
     <!-- Gallery -->
-    <div class="relative flex w-full items-center justify-center bg-T-50">
-      <ProductImage
-        :src="product.images[activeImage]?.src"
-        :alt="product.title"
-        container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
-        image-class="max-h-[92%] max-w-[92%]"
-      />
+    <div ref="galleryRef" class="relative flex w-full select-none items-center justify-center bg-T-50">
+      <Transition name="img-fade" mode="out-in">
+        <ProductImage
+          :key="activeImage"
+          :src="product.images[activeImage]?.src"
+          :alt="product.title"
+          container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
+          image-class="max-h-[92%] max-w-[92%]"
+        />
+      </Transition>
+
+      <!-- Prev / next arrows -->
+      <button
+        v-if="canNavigate"
+        type="button"
+        class="absolute start-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-T-900/25 text-white backdrop-blur-sm transition-colors hover:bg-T-900/45"
+        aria-label="تصویر قبلی"
+        @click="prevImage"
+      >
+        <IconChevronRight class="size-5" />
+      </button>
+      <button
+        v-if="canNavigate"
+        type="button"
+        class="absolute end-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-T-900/25 text-white backdrop-blur-sm transition-colors hover:bg-T-900/45"
+        aria-label="تصویر بعدی"
+        @click="nextImage"
+      >
+        <IconChevronLeft class="size-5" />
+      </button>
+
       <!-- Image counter -->
       <span
         class="absolute bottom-3 start-3 flex h-7 items-center gap-1.5 rounded-lg bg-T-900/60 px-2.5 text-[11px] font-medium text-white"
@@ -372,5 +472,14 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
 <style scoped>
 .font-inter {
   font-family: 'Inter', 'Arad', sans-serif;
+}
+
+.img-fade-enter-active,
+.img-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.img-fade-enter-from,
+.img-fade-leave-to {
+  opacity: 0;
 }
 </style>

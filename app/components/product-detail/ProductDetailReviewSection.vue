@@ -103,7 +103,7 @@ const emit = defineEmits<{
       <button
         v-if="showMoreCount"
         type="button"
-        class="flex items-center gap-1 self-start text-[12.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+        class="flex items-center gap-1 self-start text-[12.5px] font-medium text-R-300 transition-colors hover:text-R-400 lg:hidden"
         @click="emit('show-more')"
       >
         <IconChevronDown class="size-4" />
