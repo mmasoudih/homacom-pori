@@ -76,10 +76,10 @@ const navIcons: Record<string, typeof IconCoins> = {
 
       <!-- Nav -->
       <nav class="absolute bottom-[22px] right-0 flex items-center gap-8">
-        <a
+        <NuxtLink
           v-for="item in headerNav"
           :key="item.label"
-          :href="item.href"
+          :to="item.href"
           class="flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
         >
           <component
@@ -87,7 +87,7 @@ const navIcons: Record<string, typeof IconCoins> = {
             class="size-5 text-primary"
           />
           {{ item.label }}
-        </a>
+        </NuxtLink>
       </nav>
     </div>
 

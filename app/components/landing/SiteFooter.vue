@@ -42,17 +42,17 @@ function scrollTop() {
               :class="openRow === row.title ? 'rotate-180' : ''"
             />
           </button>
-          <div
-            v-if="openRow === row.title"
-            class="flex flex-col gap-3 pb-4"
-          >
-            <a
-              v-for="(link, li) in row.links"
-              :key="li"
-              href="#"
-              class="text-[13px] text-T-700 transition-colors hover:text-primary"
-            >{{ link }}</a>
-          </div>
+<div
+          v-if="openRow === row.title"
+          class="flex flex-col gap-3 pb-4"
+        >
+          <NuxtLink
+            v-for="(link, li) in row.links"
+            :key="li"
+            :to="typeof link === 'string' ? '#' : link.href"
+            class="text-[13px] text-T-700 transition-colors hover:text-primary"
+          >{{ typeof link === 'string' ? link : link.label }}</NuxtLink>
+        </div>
         </div>
 
         <!-- Trust badges -->
@@ -145,12 +145,12 @@ function scrollTop() {
           >
             <h4 class="text-[14px] font-bold text-foreground">{{ col.title }}</h4>
             <nav class="flex flex-col gap-2">
-              <a
+              <NuxtLink
                 v-for="link in col.links"
-                :key="link"
-                href="#"
+                :key="typeof link === 'string' ? link : link.label"
+                :to="typeof link === 'string' ? '#' : link.href"
                 class="text-[13px] text-T-700 transition-colors hover:text-primary"
-              >{{ link }}</a>
+              >{{ typeof link === 'string' ? link : link.label }}</NuxtLink>
             </nav>
           </div>
         </div>

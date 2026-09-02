@@ -24,9 +24,9 @@ export interface OfferCard {
 }
 
 export const headerNav = [
-  { label: 'خرید اقساطی', icon: 'coins', href: '#' },
-  { label: 'پنل همکار و سازمانی', icon: 'user-check', href: '#' },
-  { label: 'خرید حضوری', icon: 'store', href: '#' },
+  { label: 'خرید اقساطی', icon: 'coins', href: '/installment' },
+  { label: 'پنل همکار و سازمانی', icon: 'user-check', href: '/collaboration' },
+  { label: 'خرید حضوری', icon: 'store', href: '/branch' },
   { label: 'دسته بندی محصولات', icon: 'grid', href: '#categories' },
 ]
 
@@ -248,15 +248,36 @@ export const footerData = {
   columns: [
     {
       title: 'دسترسی سریع',
-      links: ['صفحه اصلی', 'وبلاگ', 'خرید اقساطی', 'تماس با ما', 'درباره ما', 'برندها'],
+      links: [
+        { label: 'صفحه اصلی', href: '/' },
+        { label: 'وبلاگ', href: '#' },
+        { label: 'خرید اقساطی', href: '/installment' },
+        { label: 'تماس با ما', href: '/contact-us' },
+        { label: 'درباره ما', href: '/about-us' },
+        { label: 'برندها', href: '/brands' },
+      ],
     },
     {
       title: 'راهنمای مشتریان',
-      links: ['همکاری با ما', 'سوالات متداول', 'شرایط و مقررات', 'راهنمای گارانتی', 'مجوزها', 'فروش حضوری'],
+      links: [
+        { label: 'همکاری با ما', href: '/collaboration' },
+        { label: 'سوالات متداول', href: '/faq' },
+        { label: 'شرایط و مقررات', href: '/terms' },
+        { label: 'راهنمای گارانتی', href: '/guarantee' },
+        { label: 'مجوزها', href: '#' },
+        { label: 'فروش حضوری', href: '/branch' },
+      ],
     },
     {
       title: 'لینک‌های پربازدید',
-      links: ['خرید لپ‌تاپ', 'خرید گوشی موبایل', 'خرید هندزفری', 'خرید پلی استیشن ۵', 'خرید تبلت', 'خرید آیفون'],
+      links: [
+        { label: 'خرید لپ‌تاپ', href: '#' },
+        { label: 'خرید گوشی موبایل', href: '#' },
+        { label: 'خرید هندزفری', href: '#' },
+        { label: 'خرید پلی استیشن ۵', href: '#' },
+        { label: 'خرید تبلت', href: '#' },
+        { label: 'خرید آیفون', href: '#' },
+      ],
     },
   ],
   about:
