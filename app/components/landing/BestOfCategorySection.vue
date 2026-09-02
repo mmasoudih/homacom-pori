@@ -45,6 +45,7 @@ const activeItems = computed(() => {
         :key="i"
         :product="item"
         variant="horizontal"
+        :href="item.id ? `/product/${item.id}` : ''"
         class="h-[122px] border-b border-T-400"
       />
     </div>
@@ -68,6 +69,7 @@ const activeItems = computed(() => {
           :key="i"
           :product="item"
           variant="horizontal"
+          :href="item.id ? `/product/${item.id}` : ''"
           class="h-[155px] border-b border-T-400 px-4 transition-colors hover:bg-secondary/30"
         />
       </div>

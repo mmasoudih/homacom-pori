@@ -55,15 +55,16 @@ export function getDiscountPercent(price: number, originalPrice: number): number
 export function resolveDiscount(
   discount: string | number | undefined,
   price: number,
-  originalPrice: number,
+  originalPrice?: number,
 ): number | null {
   const explicit = parseDiscount(discount)
-  const hasOriginal = Number.isFinite(originalPrice) && originalPrice > 0
+  const original = originalPrice ?? 0
+  const hasOriginal = Number.isFinite(original) && original > 0
   if (explicit != null && explicit > 0) {
-    if (hasOriginal && price >= originalPrice) return null
+    if (hasOriginal && price >= original) return null
     return Math.min(explicit, 100)
   }
-  return getDiscountPercent(price, originalPrice)
+  return getDiscountPercent(price, original)
 }
 
 /** Normalize `string[]` or `ProductColor[]` colors into `ProductColor[]`. */

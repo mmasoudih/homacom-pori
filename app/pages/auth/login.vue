@@ -32,7 +32,7 @@ const { handleSubmit, isSubmitting } = useForm({
   initialValues: { mobile: '' },
 })
 
-const { data: loginPage } = await useFetch(() => `${config.public.apiBase}/getLoginPageInfo`)
+const { data: loginPage } = await useFetch<{ data?: { image?: { img?: string, alt?: string } } }>(() => `${config.public.apiBase}/getLoginPageInfo`)
 
 const backgroundImage = computed(() => loginPage.value?.data?.image?.img ?? '')
 const backgroundAlt = computed(() => loginPage.value?.data?.image?.alt ?? 'تصویر ورود')
@@ -44,8 +44,8 @@ const onSubmit = handleSubmit(async (values) => {
     await sendOtp(values.mobile)
     await router.push({ path: '/auth/verify', query: { mobile: values.mobile } })
   }
-  catch (err: any) {
-    toast.error(err?.message || 'ارسال کد تأیید با خطا مواجه شد.')
+  catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : 'ارسال کد تأیید با خطا مواجه شد.')
   }
 })
 </script>

@@ -37,6 +37,7 @@ import { homaAffProducts } from '~/data/landing'
         show-countdown
         countdown-label="هما آف"
         image-class="bg-T-50"
+        :href="product.id ? `/product/${product.id}` : ''"
         class="w-[180px] shrink-0"
         :class="[
             i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
@@ -61,6 +62,7 @@ import { homaAffProducts } from '~/data/landing'
             show-countdown
             countdown-label="هما آف"
             image-class="bg-T-50"
+            :href="product.id ? `/product/${product.id}` : ''"
           />
         </div>
       </div>

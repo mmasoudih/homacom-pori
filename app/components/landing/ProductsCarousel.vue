@@ -79,6 +79,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
           :key="i"
           :product="product"
           variant="vertical"
+          :href="product.id ? `/product/${product.id}` : ''"
           class="w-[180px] shrink-0 md:w-[260px]"
         />
       </div>

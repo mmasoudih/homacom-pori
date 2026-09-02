@@ -1,3 +1,5 @@
+import { DEMO_PRODUCT_ID } from './product'
+
 export interface Category {
   title: string
   count: string
@@ -42,13 +44,13 @@ export const categories: Category[] = [
 const SAMSUNG_TITLE =
   'گوشی موبایل سامسونگ مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت'
 
-const swatchSets: Record<string, string[]> = {
+const swatchSets = {
   samsung: ['#56dd1c', '#68a1d5', '#ffffff'],
   headset: ['#ff8800', '#5d5dff', '#ebc8cb'],
   laptop: ['#1d1d1f', '#ffffff'],
   headset2: ['#ef233c', '#5d5dff'],
   watch: ['#a4b7c8', '#ff8800'],
-}
+} satisfies Record<string, string[]>
 
 const IMG = {
   samsung: '/figma/fill-ff65a9033ba49cd4.png',
@@ -66,6 +68,7 @@ const IMG = {
 const hoursFromNow = (hours: number) => new Date(Date.now() + hours * 60 * 60 * 1000)
 
 const makeAffProduct = (image: string, colors: string[]): Product => ({
+  id: DEMO_PRODUCT_ID,
   image,
   title: SAMSUNG_TITLE,
   price: '87,000,000',
@@ -89,11 +92,11 @@ export const banners2 = [
 ]
 
 export const newestProducts: Product[] = [
-  { image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
-  { image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset2 },
-  { image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
-  { image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
-  { image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset2 },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
+  { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
 ]
 
 export const stripBanner = {
@@ -109,28 +112,28 @@ export const bestOfCategories = [
   {
     category: 'گوشی موبایل',
     items: [
-      { image: IMG.watch, title: SAMSUNG_TITLE, price: '92,000,000' },
-      { image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000' },
-      { image: IMG.phone3, title: SAMSUNG_TITLE, price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.phone3, title: SAMSUNG_TITLE, price: '92,000,000' },
     ],
   },
   {
     category: 'لپ‌تاپ',
     items: [
-      { image: IMG.laptop, title: LAPTOP_TITLE, price: '92,000,000' },
-      { image: IMG.laptop2, title: LAPTOP_TITLE, price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
-      { image: IMG.laptop3, title: LAPTOP_TITLE, price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: LAPTOP_TITLE, price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: LAPTOP_TITLE, price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
+      { id: DEMO_PRODUCT_ID, image: IMG.laptop3, title: LAPTOP_TITLE, price: '92,000,000' },
     ],
   },
   {
     category: 'هدفون و هندزفری',
     items: [
-      { image: IMG.headset, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
-      { image: IMG.p39, title: 'هدفون بلوتوثی مدل P39 کد 2021', price: '92,000,000' },
-      { image: IMG.headset2, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.headset, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
+      { id: DEMO_PRODUCT_ID, image: IMG.p39, title: 'هدفون بلوتوثی مدل P39 کد 2021', price: '92,000,000' },
+      { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '92,000,000' },
     ],
   },
-] as Array<{ category: string; items: Array<{ image: string; title: string; price: string; oldPrice?: string; discount?: string }> }>
+] as Array<{ category: string; items: Array<{ id?: string; image: string; title: string; price: string; oldPrice?: string; discount?: string }> }>
 
 export const banners4 = [
   { image: '/figma/fill-b65ebd18e4d5d2f9.png', alt: 'بنر هماکام', href: '#' },

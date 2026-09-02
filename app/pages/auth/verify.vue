@@ -40,7 +40,7 @@ const { handleSubmit, isSubmitting } = useForm({
 
 const { value: code, errors: codeErrors } = useField('code')
 
-const { data: loginPage } = await useFetch(() => `${config.public.apiBase}/getLoginPageInfo`)
+const { data: loginPage } = await useFetch<{ data?: { image?: { img?: string, alt?: string } } }>(() => `${config.public.apiBase}/getLoginPageInfo`)
 
 const backgroundImage = computed(() => loginPage.value?.data?.image?.img ?? '')
 const backgroundAlt = computed(() => loginPage.value?.data?.image?.alt ?? 'تصویر ورود')
@@ -58,8 +58,8 @@ const onSubmit = handleSubmit(async (formValues) => {
     }
     await router.push('/')
   }
-  catch (err: any) {
-    toast.error(err?.message || 'کد تأیید صحیح نیست.')
+  catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : 'کد تأیید صحیح نیست.')
   }
 })
 
@@ -73,8 +73,8 @@ const onResend = async () => {
     await sendOtp(mobile.value)
     toast.success('کد تأیید مجدداً ارسال شد.')
   }
-  catch (err: any) {
-    toast.error(err?.message || 'ارسال مجدد کد با خطا مواجه شد.')
+  catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : 'ارسال مجدد کد با خطا مواجه شد.')
   }
   finally {
     isResending.value = false
@@ -119,8 +119,8 @@ const onResend = async () => {
               کد تأیید
             </FieldLabel>
             <InputOTP
-              v-model="code"
               id="verify-code"
+              v-model="code"
               :maxlength="5"
               inputmode="numeric"
               :aria-invalid="!!codeErrors.length"

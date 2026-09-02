@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from 'clsx'
 import type { Product, ProductTone, ProductVariant } from '~/utils/product'
 import { discountBadgeClass, normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 import { cn } from '~/lib/utils'
@@ -19,7 +20,9 @@ const props = withDefaults(
     showDiscount?: boolean
     showOriginalPrice?: boolean
     showCountdown?: boolean
-    class?: string
+    /** When set, the card renders as a link pointing to this route. */
+    href?: string
+    class?: ClassValue
   }>(),
   {
     variant: 'vertical',
@@ -32,9 +35,14 @@ const props = withDefaults(
     showDiscount: undefined,
     showOriginalPrice: undefined,
     showCountdown: undefined,
+    href: '',
     class: '',
   },
 )
+
+// Renders as a NuxtLink when `href` is provided, otherwise a plain article.
+const cardTag = computed(() => (props.href ? resolveComponent('NuxtLink') : 'article'))
+const cardLinkAttrs = computed(() => (props.href ? { to: props.href } : {}))
 
 // --- Variant defaults ------------------------------------------------------
 
@@ -87,8 +95,10 @@ const cardSurface = computed(() =>
 
 <template>
   <!-- ============================== Vertical ============================= -->
-  <article
+  <component
+    :is="cardTag"
     v-if="variant === 'vertical'"
+    v-bind="cardLinkAttrs"
     :class="cn('group relative flex w-full flex-col rounded-2xl p-3', toneTitle, cardSurface, props.class)"
   >
     <div class="relative">
@@ -142,11 +152,13 @@ const cardSurface = computed(() =>
       :label="countdownLabel"
       class="mt-3"
     />
-  </article>
+  </component>
 
   <!-- ============================= Horizontal ============================ -->
-  <article
+  <component
+    :is="cardTag"
     v-else-if="variant === 'horizontal'"
+    v-bind="cardLinkAttrs"
     :class="cn('group relative flex w-full items-center gap-3 rounded-xl p-2', toneTitle, cardSurface, props.class)"
   >
     <ProductImage
@@ -176,11 +188,13 @@ const cardSurface = computed(() =>
         class="mt-1"
       />
     </div>
-  </article>
+  </component>
 
   <!-- =============================== Minimal ============================= -->
-  <article
+  <component
+    :is="cardTag"
     v-else
+    v-bind="cardLinkAttrs"
     :class="cn('group relative flex w-full flex-col gap-2 rounded-2xl p-2.5', toneTitle, cardSurface, props.class)"
   >
     <ProductImage
@@ -203,5 +217,5 @@ const cardSurface = computed(() =>
       :expires-at="product.discountExpiresAt"
       :label="countdownLabel"
     />
-  </article>
+  </component>
 </template>

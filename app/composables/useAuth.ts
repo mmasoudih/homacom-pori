@@ -13,7 +13,7 @@ interface VerifyCodeResponse {
   }
 }
 
-interface ApiError {
+interface ApiErrorPayload {
   error?: Record<string, string[]>
   msg?: string
 }
@@ -47,9 +47,10 @@ export function useAuth() {
 
       return res
     }
-    catch (err: any) {
-      const message = err?.data?.error?.code?.at(0) || err?.data?.msg || 'کد تأیید صحیح نیست.'
-      throw new Error(message)
+    catch (err: unknown) {
+      const payload = (err as { data?: ApiErrorPayload })?.data
+      const message = payload?.error?.code?.at(0) || payload?.msg || 'کد تأیید صحیح نیست.'
+      throw new Error(message, { cause: err })
     }
   }
 
