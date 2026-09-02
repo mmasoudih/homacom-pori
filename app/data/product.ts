@@ -7,6 +7,16 @@ export type StockStatus = 'available' | 'out_of_stock'
 export interface ProductDetailColor {
   name: string
   value: string
+  /** Shade ramp (light → dark) rendered as the striped mobile swatch. */
+  shades?: string[]
+}
+
+export interface InsuranceOption {
+  id: string
+  name: string
+  price: number
+  oldPrice?: number
+  discount?: number
 }
 
 export type GalleryItemType = 'image' | 'video' | 'view360'
@@ -68,8 +78,23 @@ export interface ServiceCatalogItem {
 export interface ServiceCategory {
   id: string
   title: string
-  icon: 'sim' | 'insurance' | 'invoice' | 'warranty' | 'charger' | 'accessory'
+  icon: 'sim' | 'insurance' | 'invoice' | 'warranty' | 'charger' | 'accessory' | 'games' | 'apps'
   items: ServiceCatalogItem[]
+}
+
+export type SellerType = 'cash' | 'installment' | 'credit'
+
+export interface Seller {
+  id: string
+  name: string
+  logo: string
+  creditLabel: string
+  /** 2×2 info grid: [label, value] pairs. */
+  info: Array<{ label: string, value: string }>
+  price: number
+  oldPrice?: number
+  discount?: number
+  type: SellerType
 }
 
 export interface StickyLink {
@@ -132,6 +157,8 @@ export interface ProductDetail {
   warrantyOptions: WarrantyOption[]
   defaultWarrantyId: string
   storageOptions: StorageOption[]
+  insuranceOptions: InsuranceOption[]
+  sellers: Seller[]
   seller: { label: string, name: string }
   price: number
   oldPrice?: number
@@ -146,6 +173,13 @@ export interface ProductDetail {
   review: ExpertReview
   specsTable: SpecTableRow[]
   specsMoreCount: number
+  /** Grouped specs for the mobile full-view sheet. */
+  specGroups: Array<{ title: string, rows: SpecTableRow[] }>
+  /** «مزایای خرید حضوری» section (mobile). */
+  inPersonBenefits: {
+    title: string
+    text: string
+  }
   comments: {
     summary: CommentsSummary
     items: ProductComment[]
@@ -211,6 +245,79 @@ const SPECS_TABLE: SpecTableRow[] = [
   { label: 'باتری', value: '5000 میلی‌آمپر ساعت' },
   { label: 'اقلام همراه گوشی', value: 'شارژر - کابل USB' },
 ]
+
+const INSURANCE_OPTIONS: InsuranceOption[] = [
+  { id: 'ins-saman', name: 'بیمه تجهیزات دیجیتال - بیمه سامان', price: 885000, oldPrice: 1005000, discount: 12 },
+  { id: 'ins-sina', name: 'بیمه تجهیزات دیجیتال - بیمه سینا', price: 750000 },
+  { id: 'ins-matin', name: 'بیمه تجهیزات دیجیتال - بیمه متین', price: 690000 },
+]
+
+const SELLERS: Seller[] = [
+  {
+    id: 'seller-homacom',
+    name: 'هماکام',
+    logo: '/homacom-logo.png',
+    creditLabel: 'اعتبار خرید: اعتباری هماکام',
+    info: [
+      { label: 'اعتبار / وام', value: 'وام' },
+      { label: 'نوع ضمانت', value: 'چک صیادی یکنفس' },
+      { label: 'بازه تسویه', value: '۴ ماهه، ۱۸ ماه' },
+      { label: 'سقف وام', value: '۲۰ و ۶۰ میلیون تومان' },
+    ],
+    price: 8749000,
+    oldPrice: 9400000,
+    discount: 7,
+    type: 'installment',
+  },
+  {
+    id: 'seller-abnapay',
+    name: 'ابن‌پی',
+    logo: '/homacom-logo.png',
+    creditLabel: 'اعتبار خرید: آبنوس ابن‌پی',
+    info: [
+      { label: 'اعتبار / وام', value: 'وام' },
+      { label: 'نوع ضمانت', value: 'چک صیادی یکنفس' },
+      { label: 'بازه تسویه', value: '۴ ماهه، ۱۸ ماه' },
+      { label: 'سقف وام', value: '۲۰ و ۶۰ میلیون تومان' },
+    ],
+    price: 87000000,
+    oldPrice: 94000000,
+    discount: 7,
+    type: 'credit',
+  },
+  {
+    id: 'seller-lendo',
+    name: 'لندو',
+    logo: '/homacom-logo.png',
+    creditLabel: 'اعتبار خرید: تالابین لندو',
+    info: [
+      { label: 'اعتبار / وام', value: 'وام' },
+      { label: 'نوع ضمانت', value: 'چک صیادی یکنفس' },
+      { label: 'بازه تسویه', value: '۴ ماهه، ۱۸ ماه' },
+      { label: 'سقف وام', value: '۲۰ و ۶۰ میلیون تومان' },
+    ],
+    price: 87000000,
+    oldPrice: 94000000,
+    discount: 7,
+    type: 'credit',
+  },
+]
+
+const SPEC_GROUPS: Array<{ title: string, rows: SpecTableRow[] }> = [
+  {
+    title: 'مشخصات کلی',
+    rows: SPECS_TABLE.slice(0, 4),
+  },
+  {
+    title: 'مشخصات دوربین',
+    rows: SPECS_TABLE.slice(4),
+  },
+]
+
+const IN_PERSON_BENEFITS = {
+  title: 'مزایای خرید حضوری',
+  text: 'می‌توانید کالای خود را به صورت حضوری از فروشگاه هماکام واقع در تهران، خیابان ولیعصر دریافت و از نزدیک بررسی کنید. مزیت خرید حضوری از فروشگاه هماکام این است که می‌توانید محصول را قبل از خرید به صورت کامل و با خیال راحت بررسی کرده و از اصالت کالا مطمئن شوید؛ همچنین بدون هزینه ارسال، کالای خود را همان لحظه تحویل بگیرید.',
+}
 
 const QUESTIONS: ProductQuestion[] = [
   { id: 'q1', question: 'آیا این گوشی ضد آب است؟', answer: 'خیر، این گوشی قابلیت مقاومت در برابر آب ندارد.' },
@@ -279,6 +386,34 @@ const SERVICE_CATALOG: ServiceCategory[] = [
     items: [
       { id: 'svc-chg-1', label: 'شارژر دیواری ۲۵ وات سامسونگ', price: 490000 },
       { id: 'svc-chg-2', label: 'کابل Type-C اصلی سامسونگ', price: 180000 },
+    ],
+  },
+  {
+    id: 'cat-games',
+    title: 'بازی',
+    icon: 'games',
+    items: [
+      { id: 'svc-game-1', label: 'سیم باری کال آف دیوتی موبایل', price: 320000 },
+      { id: 'svc-game-2', label: 'فوتسال ۲۰۲۶', price: 450000 },
+      { id: 'svc-game-3', label: 'با دیدنی کامل ۶ GTA', price: 530000 },
+    ],
+  },
+  {
+    id: 'cat-apps',
+    title: 'نرم‌افزارهای کاربردی',
+    icon: 'apps',
+    items: [
+      { id: 'svc-app-1', label: 'پکیج نرم‌افزارهای آفیس موبایل', price: 290000 },
+      { id: 'svc-app-2', label: 'اشتراک یک‌ساله آنتی‌ویروس', price: 350000 },
+    ],
+  },
+  {
+    id: 'cat-accessory',
+    title: 'لوازم جانبی',
+    icon: 'accessory',
+    items: [
+      { id: 'svc-acc-1', label: 'قاب محافظ اصلی سامسونگ', price: 220000 },
+      { id: 'svc-acc-2', label: 'محافظ صفحه‌نمایش سخت', price: 120000 },
     ],
   },
 ]
@@ -355,10 +490,10 @@ export const mockProductDetail: ProductDetail = {
   stockStatus: 'available',
   availabilityText: 'موجود در انبار هماکام',
   colors: [
-    { name: 'مشکی', value: '#1D1D1F' },
-    { name: 'نقره‌ای', value: '#C8CCD2' },
-    { name: 'آبی تیره', value: '#1F3A93' },
-    { name: 'بنفش', value: '#8E7CC3' },
+    { name: 'مشکی', value: '#1D1D1F', shades: ['#4b4b52', '#333338', '#1D1D1F', '#0a0a0c'] },
+    { name: 'نقره‌ای', value: '#C8CCD2', shades: ['#eef0f2', '#d5dae0', '#C8CCD2', '#9aa1a9'] },
+    { name: 'آبی تیره', value: '#1F3A93', shades: ['#6a83c9', '#3d57b1', '#1F3A93', '#122457'] },
+    { name: 'بنفش', value: '#8E7CC3', shades: ['#c3b7e0', '#a99bd1', '#8E7CC3', '#5f5194'] },
   ],
   warrantyOptions: [
     { id: 'war-shahin', label: 'گارانتی ۲۴ ماهه شاهین تک' },
@@ -370,6 +505,8 @@ export const mockProductDetail: ProductDetail = {
     { id: 'sto-128', label: '۱۲۸ گیگابایت', price: 8749000 },
     { id: 'sto-256', label: '۲۵۶ گیگابایت', price: 9225000 },
   ],
+  insuranceOptions: INSURANCE_OPTIONS,
+  sellers: SELLERS,
   seller: { label: 'فروشنده', name: 'هماکام' },
   price: 8749000,
   oldPrice: 9225000,
@@ -381,6 +518,8 @@ export const mockProductDetail: ProductDetail = {
   review: REVIEW,
   specsTable: SPECS_TABLE,
   specsMoreCount: 8,
+  specGroups: SPEC_GROUPS,
+  inPersonBenefits: IN_PERSON_BENEFITS,
   comments: {
     summary: { average: 3.5, total: 180, distribution: [62, 45, 30, 25, 18] },
     items: [

@@ -9,11 +9,18 @@ defineProps<{
 const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
+
+const dialogShell
+  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)]'
 </script>
 
 <template>
   <UiDialog :open="open" @update:open="emit('update:open', $event)">
-    <UiDialogContent class="max-w-[560px] gap-0 rounded-2xl p-0 sm:max-w-[560px]">
+    <UiDialogContent
+      :class="dialogShell"
+      :show-close-button="false"
+      class="max-w-[560px] gap-0 rounded-2xl p-0 sm:max-w-[560px]"
+    >
       <div class="flex items-center justify-between px-6 pt-5">
         <UiDialogTitle class="text-[16px] font-bold text-T-900">
           {{ insurance.title }}

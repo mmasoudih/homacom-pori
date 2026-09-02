@@ -1,9 +1,32 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { IconPackage, IconFileText } from '@tabler/icons-vue'
+import {
+  IconPackage,
+  IconFileText,
+  IconX,
+  IconDeviceMobile,
+  IconUmbrella,
+  IconReceipt,
+  IconShieldCheck,
+  IconPlug,
+  IconUsb,
+  IconDeviceGamepad,
+  IconApps,
+} from '@tabler/icons-vue'
 import type { ServiceCatalogItem, ServiceCategory } from '~/data/product'
 import { formatPrice } from '~/utils/format'
 import { cn } from '~/lib/utils'
+
+const categoryIcons = {
+  sim: IconDeviceMobile,
+  insurance: IconUmbrella,
+  invoice: IconReceipt,
+  warranty: IconShieldCheck,
+  charger: IconPlug,
+  accessory: IconUsb,
+  games: IconDeviceGamepad,
+  apps: IconApps,
+} as const
 
 const props = withDefaults(
   defineProps<{
@@ -57,11 +80,19 @@ function confirm() {
   emit('confirm', [...draft.value])
   emit('update:open', false)
 }
+
+/** Centered dialog on desktop, bottom sheet on mobile. */
+const dialogShell
+  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)]'
 </script>
 
 <template>
   <UiDialog :open="open" @update:open="emit('update:open', $event)">
-    <UiDialogContent class="max-w-[580px] gap-0 rounded-2xl p-0 sm:max-w-[580px]">
+    <UiDialogContent
+      :class="dialogShell"
+      :show-close-button="false"
+      class="max-w-[580px] gap-0 rounded-2xl p-0 sm:max-w-[580px]"
+    >
       <!-- Header -->
       <div class="flex flex-col gap-3 p-6 pb-4">
         <div class="flex items-center justify-between">
@@ -81,18 +112,20 @@ function confirm() {
           <UiDialogClose
             class="flex size-9 items-center justify-center rounded-full text-T-600 transition-colors hover:bg-T-100 hover:text-T-900"
             aria-label="بستن"
-          />
+          >
+            <IconX class="size-5" />
+          </UiDialogClose>
         </div>
       </div>
 
       <div class="h-px w-full bg-T-300" />
 
       <!-- Body: accordion of categories -->
-      <div class="max-h-[420px] overflow-y-auto px-6">
+      <div class="max-h-[420px] overflow-y-auto px-6 max-sm:max-h-[52vh] max-sm:px-4">
         <UiAccordion
           type="single"
           collapsible
-          class="w-full"
+          class="flex w-full flex-col gap-2"
           :default-value="expanded"
           @update:model-value="expanded = $event as string"
         >
@@ -100,10 +133,19 @@ function confirm() {
             v-for="(category, ci) in categories"
             :key="category.id"
             :value="category.id"
-            class="border-b border-T-300 last:border-b-0"
+            class="rounded-xl border border-T-300 px-4 last:border-b max-sm:px-3"
           >
             <UiAccordionTrigger class="py-4 text-[13.5px] font-medium text-T-900 hover:no-underline [&>svg]:size-4 [&>svg]:text-T-600">
-              {{ category.title }}
+              <span class="flex items-center gap-2">
+                {{ category.title }}
+                <span
+                  v-if="category.items.some(item => draft.has(item.id))"
+                  class="flex size-[18px] items-center justify-center rounded-full bg-R-300 text-[10.5px] font-bold text-white"
+                >
+                  {{ category.items.filter(item => draft.has(item.id)).length }}
+                </span>
+              </span>
+              <component :is="categoryIcons[category.icon]" class="size-5 shrink-0 text-T-600" stroke-width="1.5" />
             </UiAccordionTrigger>
             <UiAccordionContent class="pb-4">
               <ul class="flex flex-col gap-2.5" :class="ci === 0 && 'pt-1'">

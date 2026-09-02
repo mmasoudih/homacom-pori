@@ -15,13 +15,14 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [target: 'specs' | 'comments']
+  'show-more': []
 }>()
 </script>
 
 <template>
   <section :id="props.id" :class="cn('flex w-full scroll-mt-6 flex-col gap-5', props.class)">
-    <!-- In-page nav -->
-    <div class="flex items-center justify-between">
+    <!-- In-page nav (desktop) -->
+    <div class="hidden items-center justify-between lg:flex">
       <div class="flex items-center gap-2">
         <span class="h-[18px] w-1 rounded-full bg-R-300" />
         <h2 class="text-[16px] font-bold text-R-300">نقد و بررسی</h2>
@@ -36,6 +37,12 @@ const emit = defineEmits<{
       </div>
     </div>
 
+    <!-- Mobile section title -->
+    <div class="flex items-center gap-2 lg:hidden">
+      <span class="h-[18px] w-1 rounded-full bg-R-300" />
+      <h2 class="text-[16px] font-bold text-T-900">نقد و بررسی</h2>
+    </div>
+
     <!-- Article -->
     <article class="flex flex-col gap-4">
       <h3 class="text-[14px] font-bold text-T-900">{{ review.title }}</h3>
@@ -47,7 +54,7 @@ const emit = defineEmits<{
       <img
         :src="review.image"
         :alt="review.imageAlt"
-        class="mx-auto h-auto w-full max-w-[520px] rounded-2xl object-cover"
+        class="mx-auto h-auto w-full rounded-2xl object-cover lg:max-w-[520px]"
       >
 
       <p class="text-[14px] font-bold text-T-900">ویژگی‌های این گوشی در بررسی‌های تخصصی هماکام:</p>
@@ -64,7 +71,7 @@ const emit = defineEmits<{
         </li>
       </ul>
 
-      <div class="grid grid-cols-2 gap-6">
+      <div class="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-6">
         <div class="flex flex-col gap-2">
           <h4 class="text-[13px] font-bold text-[#3BB77E]">{{ review.strengthsTitle }}</h4>
           <ul class="flex flex-col gap-1.5">
@@ -97,6 +104,7 @@ const emit = defineEmits<{
         v-if="showMoreCount"
         type="button"
         class="flex items-center gap-1 self-start text-[12.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+        @click="emit('show-more')"
       >
         <IconChevronDown class="size-4" />
         مشخصات بیشتر

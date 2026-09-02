@@ -12,6 +12,10 @@ const props = withDefaults(
   }>(),
   { id: 'product-specs', moreCount: 0, class: '' },
 )
+
+const emit = defineEmits<{
+  'show-more': []
+}>()
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const props = withDefaults(
       </div>
       <button
         type="button"
-        class="flex items-center gap-1 text-[12.5px] text-T-700 transition-colors hover:text-R-300"
+        class="hidden items-center gap-1 text-[12.5px] text-T-700 transition-colors hover:text-R-300 lg:flex"
       >
         مشاهده همه
         <IconChevronDown class="size-4" />
@@ -34,7 +38,7 @@ const props = withDefaults(
       <div
         v-for="(row, i) in rows"
         :key="row.label"
-        class="flex items-center justify-between px-5 py-4"
+        class="flex flex-col items-start gap-1 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
         :class="i % 2 === 0 ? 'bg-R-10/40' : 'bg-T-50'"
       >
         <span class="text-[13px] font-medium text-T-900">{{ row.label }}</span>
@@ -46,6 +50,7 @@ const props = withDefaults(
       v-if="moreCount"
       type="button"
       class="flex items-center gap-1 self-start text-[12.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+      @click="emit('show-more')"
     >
       <IconChevronDown class="size-4" />
       {{ moreCount }} مشخصات بیشتر

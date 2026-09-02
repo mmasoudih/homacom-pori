@@ -29,12 +29,12 @@ const props = withDefaults(
       </button>
     </div>
 
-    <div class="flex items-stretch gap-4 overflow-x-auto pb-1">
+    <div class="flex items-stretch gap-3 overflow-x-auto pb-1 lg:gap-4">
       <NuxtLink
         v-for="item in products"
         :key="item.id"
         :to="`/product/${item.id}`"
-        class="w-[238px] shrink-0"
+        class="w-[172px] shrink-0 lg:w-[238px]"
       >
         <Product :product="item" class="h-full" />
       </NuxtLink>
