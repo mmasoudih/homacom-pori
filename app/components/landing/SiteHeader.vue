@@ -17,10 +17,27 @@ const navIcons: Record<string, typeof IconCoins> = {
   store: IconBuildingStore,
   grid: IconLayoutGrid,
 }
+
+const route = useRoute()
+
+const megaOpen = ref(false)
+const megaTriggerEl = ref<HTMLElement | null>(null)
+
+function handleMegaClose() {
+  megaOpen.value = false
+  megaTriggerEl.value?.focus()
+}
+
+watch(
+  () => route.fullPath,
+  () => {
+    megaOpen.value = false
+  },
+)
 </script>
 
 <template>
-  <header class="relative z-50 w-full border-b border-T-400 bg-T-50">
+  <header class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
     <!-- Desktop (≥1280px) -->
     <div class="relative mx-auto hidden h-[142px] max-w-[1350px] px-0 xl:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
@@ -76,18 +93,29 @@ const navIcons: Record<string, typeof IconCoins> = {
 
       <!-- Nav -->
       <nav class="absolute bottom-[22px] right-0 flex items-center gap-8">
-        <NuxtLink
-          v-for="item in headerNav"
-          :key="item.label"
-          :to="item.href"
-          class="flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
-        >
-          <component
-            :is="navIcons[item.icon]"
-            class="size-5 text-primary"
-          />
-          {{ item.label }}
-        </NuxtLink>
+        <template v-for="item in headerNav" :key="item.label">
+          <button
+            v-if="item.mega"
+            :ref="(el) => (megaTriggerEl = el as HTMLElement | null)"
+            type="button"
+            class="flex items-center gap-2 text-[15px] font-medium transition-colors"
+            :class="megaOpen ? 'text-primary' : 'text-foreground hover:text-primary'"
+            aria-haspopup="menu"
+            :aria-expanded="megaOpen"
+            @click="megaOpen = !megaOpen"
+          >
+            <component :is="navIcons[item.icon]" class="size-5 text-primary" />
+            {{ item.label }}
+          </button>
+          <NuxtLink
+            v-else
+            :to="item.href"
+            class="flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
+          >
+            <component :is="navIcons[item.icon]" class="size-5 text-primary" />
+            {{ item.label }}
+          </NuxtLink>
+        </template>
       </nav>
     </div>
 
@@ -104,5 +132,7 @@ const navIcons: Record<string, typeof IconCoins> = {
         <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
     </div>
+
+    <CategoriesCategoryMegaMenu :open="megaOpen" @close="handleMegaClose" />
   </header>
 </template>
