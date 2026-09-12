@@ -4,7 +4,7 @@ import { homaAffProducts } from '~/data/landing'
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1401px] overflow-hidden bg-primary lg:rounded-3xl lg:px-[25px] lg:py-[25px]">
+  <section class="relative isolate mx-auto w-full max-w-[1401px] overflow-hidden bg-R-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[url(/icons/texture.svg)] before:bg-repeat before:opacity-[0.05] before:content-[''] lg:rounded-3xl lg:px-[25px] lg:py-[25px]">
     <!-- Mobile title row -->
     <div class="flex items-center justify-between px-4 pt-[25px] lg:hidden">
       <a
@@ -24,7 +24,7 @@ import { homaAffProducts } from '~/data/landing'
 
     <!-- Desktop title row -->
     <div class="mb-[21px] hidden lg:block">
-      <LandingSectionTitle title="هما آف" variant="row" light />
+      <LandingSectionTitle title="هما آف" variant="row" light indicator="right" indicator-color="white" />
     </div>
 
     <!-- Mobile products row -->
