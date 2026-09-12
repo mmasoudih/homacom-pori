@@ -29,6 +29,35 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
       canScrollPrev.value = api?.canScrollPrev() || false
     }
 
+    // Embla has no native "free drag with snap": `dragFree` disables snapping.
+    // Restore it by snapping to the nearest slide once a free scroll settles.
+    function attachFreeSnap(api: CarouselApi) {
+      let snapping = false
+
+      api.on("settle", () => {
+        if (snapping) {
+          snapping = false
+          return
+        }
+
+        const snaps = api.scrollSnapList()
+        const target = api.selectedScrollSnap()
+        const targetProgress = snaps[target] ?? 0
+
+        const maxPx = Math.max(
+          api.containerNode().scrollWidth - api.rootNode().clientWidth,
+          0,
+        )
+        const distancePx = Math.abs(api.scrollProgress() - targetProgress) * maxPx
+
+        if (distancePx < 1)
+          return
+
+        snapping = true
+        api.scrollTo(target)
+      })
+    }
+
     onMounted(() => {
       if (!emblaApi.value)
         return
@@ -36,6 +65,9 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
       emblaApi.value?.on("init", onSelect)
       emblaApi.value?.on("reInit", onSelect)
       emblaApi.value?.on("select", onSelect)
+
+      if (opts?.dragFree)
+        attachFreeSnap(emblaApi.value)
 
       emits("init-api", emblaApi.value)
     })

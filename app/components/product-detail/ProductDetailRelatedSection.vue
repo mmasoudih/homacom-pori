@@ -30,7 +30,7 @@ const props = withDefaults(
       </button>
     </div>
 
-    <Carousel :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }">
+    <Carousel :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }">
       <CarouselContent class="-ms-3 lg:-ms-4">
         <CarouselItem
           v-for="item in products"

@@ -10,7 +10,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     <!-- Mobile: horizontal scroll -->
     <Carousel
       class="mt-[18px] lg:hidden"
-      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="-ms-3">
         <CarouselItem

@@ -50,7 +50,7 @@ const flatOffers = offersGridRows.flat()
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
       class="relative mt-[18px] hidden lg:block"
-      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="-ms-[18px]">
         <CarouselItem

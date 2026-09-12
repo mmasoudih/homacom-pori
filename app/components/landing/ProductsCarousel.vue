@@ -78,7 +78,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
       class="relative mt-4 px-4 md:px-0"
-      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
         <CarouselItem

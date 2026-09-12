@@ -37,7 +37,7 @@ const cardRounding = (i: number) => [
     <!-- Mobile products row -->
     <Carousel
       class="mt-4 px-4 pb-4 lg:hidden"
-      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
         <CarouselItem
@@ -63,7 +63,7 @@ const cardRounding = (i: number) => [
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
       class="relative hidden lg:block"
-      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
         <CarouselItem
