@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import {
-  IconPhoneCall,
-  IconSearch,
-  IconShoppingBag,
-  IconUserCheck,
-  IconCoins,
-  IconUserCheck as IconUserPanel,
-  IconBuildingStore,
-  IconLayoutGrid,
-} from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
+import coinsFront from '../../../public/icons/coins-front.svg?raw'
+import userCheckCircleAlt from '../../../public/icons/user-check-circle-alt.svg?raw'
+import storeIcon from '../../../public/icons/store.svg?raw'
+import gridSquareCircle from '../../../public/icons/grid-square-circle.svg?raw'
 
-const navIcons: Record<string, typeof IconCoins> = {
-  coins: IconCoins,
-  'user-check': IconUserPanel,
-  store: IconBuildingStore,
-  grid: IconLayoutGrid,
+const navIcons: Record<string, string> = {
+  coins: coinsFront,
+  'user-check': userCheckCircleAlt,
+  store: storeIcon,
+  grid: gridSquareCircle,
 }
 
 const route = useRoute()
@@ -39,26 +33,20 @@ watch(
 <template>
   <header class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
     <!-- Desktop (≥1280px) -->
-    <div class="relative mx-auto hidden h-[142px] max-w-[1350px] px-0 xl:block">
+    <div class="mx-auto hidden h-[142px] max-w-[1350px] grid-cols-[86px_480px_1fr_269px_61px] grid-rows-2 px-0 xl:grid">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <!-- Cart button -->
       <button
-        class="absolute left-0 top-[22px] flex size-12 items-center justify-center rounded-full border border-T-500 text-foreground transition-colors hover:bg-secondary"
+        class="relative col-start-5 row-start-1 mt-[22px] flex size-12 items-center justify-center justify-self-end rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
         aria-label="سبد خرید"
       >
-        <IconShoppingBag class="size-6" />
-        <span class="absolute left-[7px] top-[7px] flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">4</span>
+        <img src="/icons/shopping-bag.svg" alt="" class="size-6">
+        <span class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">4</span>
       </button>
 
       <!-- Auth pill -->
-      <div class="absolute left-[61px] top-[22px] flex h-12 items-center gap-0">
-        <NuxtLink
-          to="/auth/login"
-          class="flex items-center gap-1.5 rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
-        >
-          <IconUserCheck class="size-5" />
-        </NuxtLink>
-        <div class="mr-3 flex items-center gap-1 text-[15px] font-medium text-foreground" dir="rtl">
+      <div class="col-start-4 row-start-1 mt-[22px] flex h-12 items-center justify-self-end">
+        <div class="flex h-12 items-center gap-1 rounded-full border border-T-400 px-4 text-[15px] font-medium text-T-900" dir="rtl">
           <NuxtLink to="/auth/login" class="hover:text-primary">ورود</NuxtLink>
           <span class="text-T-500">|</span>
           <NuxtLink to="/auth/register" class="hover:text-primary">ثبت‌نام</NuxtLink>
@@ -66,53 +54,56 @@ watch(
       </div>
 
       <!-- Search -->
-      <div class="absolute left-[330px] top-[22px] flex h-11 w-[480px] items-center gap-3 rounded-full border border-T-400 bg-T-50 px-4 focus-within:ring-2 focus-within:ring-primary/30">
-        <IconSearch class="size-5 shrink-0 text-T-600" />
+      <div class="col-start-2 row-start-1 mt-[22px] flex h-11 w-[480px] items-center justify-self-start gap-3 rounded-full border border-T-300 bg-T-200 px-4">
         <input
           type="text"
           placeholder="جستجو در محصولات ..."
-          class="w-full bg-transparent text-[15px] text-foreground placeholder:text-T-600 focus:outline-none"
+          class="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-T-600"
         >
+        <span
+          class="size-5 shrink-0 bg-T-800 [mask-image:url(/icons/search.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          aria-hidden="true"
+        />
       </div>
 
       <!-- Logo -->
-      <a href="#" class="absolute right-0 top-4">
-        <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
+      <a href="#" class="col-start-1 row-start-1 mt-4 justify-self-start self-start">
+        <img src="/icons/logo.svg" alt="هماکام" class="h-[52px] w-[70px] object-contain">
       </a>
 
       <!-- Row 2: Phone, Nav -->
       <!-- Phone -->
       <a
         href="tel:0121-3250789"
-        class="absolute bottom-[22px] left-0 flex items-center gap-2 text-[15px] font-semibold text-foreground"
+        class="col-span-2 col-start-4 row-start-2 mb-[22px] flex items-center justify-self-end gap-2 self-end text-[15px] font-semibold text-foreground"
         dir="ltr"
       >
-        <IconPhoneCall class="size-5 text-primary" />
-        0121-3250789
+        <img src="/icons/phone-call.svg" alt="" class="size-5">
+        <span><span class="text-R-300">0121</span>-3250789</span>
       </a>
 
       <!-- Nav -->
-      <nav class="absolute bottom-[22px] right-0 flex items-center gap-8">
+      <nav class="col-span-3 col-start-1 row-start-2 mb-[22px] flex items-center justify-self-start gap-8 self-end">
         <template v-for="item in headerNav" :key="item.label">
           <button
             v-if="item.mega"
             :ref="(el) => (megaTriggerEl = el as HTMLElement | null)"
             type="button"
-            class="flex items-center gap-2 text-[15px] font-medium transition-colors"
+            class="group flex items-center gap-2 text-[15px] font-medium transition-colors"
             :class="megaOpen ? 'text-primary' : 'text-foreground hover:text-primary'"
             aria-haspopup="menu"
             :aria-expanded="megaOpen"
             @click="megaOpen = !megaOpen"
           >
-            <component :is="navIcons[item.icon]" class="size-5 text-primary" />
+            <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
             {{ item.label }}
           </button>
           <NuxtLink
             v-else
             :to="item.href"
-            class="flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
+            class="group flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
           >
-            <component :is="navIcons[item.icon]" class="size-5 text-primary" />
+            <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
             {{ item.label }}
           </NuxtLink>
         </template>

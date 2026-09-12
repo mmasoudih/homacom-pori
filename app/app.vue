@@ -2,7 +2,7 @@
 import { Toaster } from '@/components/ui/sonner'
 </script>
 <template>
-  <div>
+  <div dir="rtl">
     <NuxtRouteAnnouncer />
     <NuxtPage />
     <Toaster />
