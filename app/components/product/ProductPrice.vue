@@ -11,6 +11,8 @@ const props = withDefaults(
     discount?: number | null
     showOriginalPrice?: boolean
     showDiscount?: boolean
+    /** Overrides the current-price text color (unit and old price are unaffected). */
+    priceClass?: string
     tone?: ProductTone
     class?: string
   }>(),
@@ -19,6 +21,7 @@ const props = withDefaults(
     discount: null,
     showOriginalPrice: true,
     showDiscount: true,
+    priceClass: '',
     tone: 'default',
     class: '',
   },
@@ -37,7 +40,7 @@ const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : '
   <div :class="cn('flex flex-col gap-1', props.class)">
     <!-- New / discounted price -->
     <div class="flex items-baseline gap-1">
-      <span class="text-[15px] font-extrabold leading-none" :class="priceColor">
+      <span class="text-[15px] font-extrabold leading-none" :class="cn(priceColor, props.priceClass)">
         {{ formatPrice(price) }}
       </span>
       <span class="text-[11px]" :class="dimColor">تومان</span>

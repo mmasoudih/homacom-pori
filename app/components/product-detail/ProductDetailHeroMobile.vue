@@ -471,7 +471,7 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
 
 <style scoped>
 .font-inter {
-  font-family: 'Inter', 'Arad', sans-serif;
+  font-family: 'Arad', 'Inter', sans-serif;
 }
 
 .img-fade-enter-active,

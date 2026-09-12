@@ -84,6 +84,11 @@ export const homaAffProducts: Product[] = [
   makeAffProduct(IMG.laptop, swatchSets.laptop),
   makeAffProduct(IMG.headset, swatchSets.headset),
   makeAffProduct(IMG.samsung, swatchSets.samsung),
+  makeAffProduct(IMG.laptop2, swatchSets.laptop),
+  makeAffProduct(IMG.phone2, swatchSets.samsung),
+  makeAffProduct(IMG.laptop3, swatchSets.laptop),
+  makeAffProduct(IMG.phone3, swatchSets.samsung),
+  makeAffProduct(IMG.p39, swatchSets.headset),
 ]
 
 export const banners2 = [

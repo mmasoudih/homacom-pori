@@ -219,6 +219,6 @@ function scrollToSection(id: string) {
 
 <style scoped>
 .font-inter {
-  font-family: 'Inter', 'Arad', sans-serif;
+  font-family: 'Arad', 'Inter', sans-serif;
 }
 </style>

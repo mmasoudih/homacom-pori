@@ -15,6 +15,8 @@ const props = withDefaults(
     selectedColor?: string
     /** Optional label rendered inside the countdown chip. */
     countdownLabel?: string
+    /** Where the discount badge renders: over the image (default) or inline beside the price. */
+    discountPlacement?: 'image' | 'inline'
     showColors?: boolean
     showTitle?: boolean
     showDiscount?: boolean
@@ -30,6 +32,7 @@ const props = withDefaults(
     imageClass: '',
     selectedColor: '',
     countdownLabel: '',
+    discountPlacement: 'image',
     showColors: undefined,
     showTitle: undefined,
     showDiscount: undefined,
@@ -91,6 +94,8 @@ const swatchBorder = computed(() =>
 const cardSurface = computed(() =>
   props.tone === 'inverted' ? '' : 'bg-T-50 border border-T-400',
 )
+// When true, the discount badge moves out of the image into a row beside the price.
+const inlineDiscount = computed(() => props.discountPlacement === 'inline')
 </script>
 
 <template>
@@ -124,9 +129,9 @@ const cardSurface = computed(() =>
         />
       </div>
 
-      <!-- Discount: bottom-inline-start corner -->
+      <!-- Discount: bottom-inline-start corner (hidden when inline beside the price) -->
       <span
-        v-if="showDiscount && hasDiscount"
+        v-if="showDiscount && hasDiscount && !inlineDiscount"
         class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg px-1.5 text-[13px] font-extrabold"
         :class="discountBadgeClass(tone)"
       >{{ discount }}%</span>
@@ -136,7 +141,30 @@ const cardSurface = computed(() =>
       {{ product.title }}
     </h3>
 
+    <!-- Inline: discount badge on the right, price on the left -->
+    <div
+      v-if="inlineDiscount"
+      class="mt-auto flex items-center justify-between gap-2 pt-2"
+    >
+      <span
+        v-if="showDiscount && hasDiscount"
+        class="flex h-[21px] shrink-0 items-center justify-center rounded-lg px-1 text-[12px] font-extrabold"
+        :class="discountBadgeClass(tone)"
+      >{{ discount }}%</span>
+      <ProductPrice
+        class="items-end"
+        price-class="text-T-900"
+        :price="price"
+        :original-price="originalPrice"
+        :discount="discount"
+        :show-original-price="showOriginalPrice"
+        :show-discount="false"
+        :tone="tone"
+      />
+    </div>
+
     <ProductPrice
+      v-else
       class="mt-auto pt-2"
       :price="price"
       :original-price="originalPrice"
