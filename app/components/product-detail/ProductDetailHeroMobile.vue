@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -11,10 +11,13 @@ import {
   IconCoins,
   IconPhoto,
 } from '@tabler/icons-vue'
+import Fade from 'embla-carousel-fade'
 import type { ProductDetail, ServiceCatalogItem } from '~/data/product'
 import { formatPrice } from '~/utils/format'
 import { getDiscountPercent } from '~/utils/product'
 import { cn } from '~/lib/utils'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import type { CarouselApi } from '@/components/ui/carousel'
 
 const props = withDefaults(
   defineProps<{
@@ -40,81 +43,20 @@ const emit = defineEmits<{
   'remove-service': [id: string]
 }>()
 
-const activeImage = ref(0)
+const galleryIndex = ref(0)
 const imageCount = computed(() => props.product.images.length)
 const canNavigate = computed(() => imageCount.value > 1)
+const fadePlugins = [Fade()]
 
-function nextImage() {
-  activeImage.value = (activeImage.value + 1) % imageCount.value
+function onGalleryInit(api: CarouselApi) {
+  galleryIndex.value = api.selectedScrollSnap()
+  api.on('select', () => {
+    galleryIndex.value = api.selectedScrollSnap()
+  })
+  api.on('reInit', () => {
+    galleryIndex.value = api.selectedScrollSnap()
+  })
 }
-
-function prevImage() {
-  activeImage.value = (activeImage.value - 1 + imageCount.value) % imageCount.value
-}
-
-// Manual swipe handling. A non-passive touchmove lets us preventDefault so the
-// browser doesn't hijack horizontal gestures; direction locking keeps vertical
-// page scrolling working when the gesture starts on the image.
-const galleryRef = ref<HTMLElement | null>(null)
-const SWIPE_THRESHOLD = 40
-let swipeStartX = 0
-let swipeStartY = 0
-let swipeLockedHorizontal = false
-let swipeLockedVertical = false
-
-function onTouchStart(event: TouchEvent) {
-  const touch = event.touches[0]
-  if (!touch)
-    return
-  swipeStartX = touch.clientX
-  swipeStartY = touch.clientY
-  swipeLockedHorizontal = false
-  swipeLockedVertical = false
-}
-
-function onTouchMove(event: TouchEvent) {
-  if (swipeLockedVertical)
-    return
-  const touch = event.touches[0]
-  if (!touch)
-    return
-  const dx = touch.clientX - swipeStartX
-  const dy = touch.clientY - swipeStartY
-  if (!swipeLockedHorizontal) {
-    if (Math.abs(dx) < 8 && Math.abs(dy) < 8)
-      return
-    swipeLockedHorizontal = Math.abs(dx) > Math.abs(dy)
-    swipeLockedVertical = !swipeLockedHorizontal
-  }
-  if (swipeLockedHorizontal)
-    event.preventDefault()
-}
-
-function onTouchEnd(event: TouchEvent) {
-  if (!swipeLockedHorizontal)
-    return
-  const touch = event.changedTouches[0]
-  if (!touch)
-    return
-  const dx = touch.clientX - swipeStartX
-  if (Math.abs(dx) < SWIPE_THRESHOLD)
-    return
-  if (dx < 0)
-    nextImage()
-  else
-    prevImage()
-}
-
-onMounted(() => {
-  galleryRef.value?.addEventListener('touchstart', onTouchStart, { passive: true })
-  galleryRef.value?.addEventListener('touchmove', onTouchMove, { passive: false })
-  galleryRef.value?.addEventListener('touchend', onTouchEnd, { passive: true })
-})
-onBeforeUnmount(() => {
-  galleryRef.value?.removeEventListener('touchstart', onTouchStart)
-  galleryRef.value?.removeEventListener('touchmove', onTouchMove)
-  galleryRef.value?.removeEventListener('touchend', onTouchEnd)
-})
 
 const discountPercent = computed(() =>
   getDiscountPercent(props.product.price, props.product.oldPrice ?? 0),
@@ -144,16 +86,34 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
 <template>
   <div :class="cn('flex w-full flex-col bg-T-100 lg:hidden', props.class)">
     <!-- Gallery -->
-    <div ref="galleryRef" class="relative flex w-full select-none items-center justify-center bg-T-50">
-      <Transition name="img-fade" mode="out-in">
-        <ProductImage
-          :key="activeImage"
-          :src="product.images[activeImage]?.src"
-          :alt="product.title"
-          container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
-          image-class="max-h-[92%] max-w-[92%]"
-        />
-      </Transition>
+    <Carousel
+      v-slot="{ scrollNext, scrollPrev }"
+      class="relative w-full select-none bg-T-50"
+      :opts="{ direction: 'rtl', loop: true, align: 'start' }"
+      :plugins="fadePlugins"
+      @init-api="onGalleryInit"
+    >
+      <CarouselContent class="ms-0">
+        <CarouselItem
+          v-for="(image, i) in product.images"
+          :key="`${image.type}-${i}`"
+          class="flex basis-full items-center justify-center ps-0 transition-opacity duration-200"
+        >
+          <ProductImage
+            :src="image.src"
+            :alt="product.title"
+            container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
+            image-class="max-h-[92%] max-w-[92%]"
+          />
+          <div
+            v-if="image.type !== 'image'"
+            class="absolute bottom-3 flex items-center gap-1 rounded-full bg-T-900/70 px-3 py-1.5 text-[11px] text-white"
+          >
+            <component :is="image.type === 'video' ? IconVideo : IconRefresh" class="size-3.5" />
+            {{ image.type === 'video' ? 'ویدیوی محصول' : 'نمای ۳۶۰ درجه' }}
+          </div>
+        </CarouselItem>
+      </CarouselContent>
 
       <!-- Prev / next arrows -->
       <button
@@ -161,7 +121,7 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
         type="button"
         class="absolute start-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-T-900/25 text-white backdrop-blur-sm transition-colors hover:bg-T-900/45"
         aria-label="تصویر قبلی"
-        @click="prevImage"
+        @click="scrollPrev"
       >
         <IconChevronRight class="size-5" />
       </button>
@@ -170,7 +130,7 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
         type="button"
         class="absolute end-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-T-900/25 text-white backdrop-blur-sm transition-colors hover:bg-T-900/45"
         aria-label="تصویر بعدی"
-        @click="nextImage"
+        @click="scrollNext"
       >
         <IconChevronLeft class="size-5" />
       </button>
@@ -180,9 +140,9 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
         class="absolute bottom-3 start-3 flex h-7 items-center gap-1.5 rounded-lg bg-T-900/60 px-2.5 text-[11px] font-medium text-white"
       >
         <IconPhoto class="size-4" />
-        <span dir="ltr">{{ product.images.length }}/{{ activeImage + 1 }}</span>
+        <span dir="ltr">{{ product.images.length }}/{{ galleryIndex + 1 }}</span>
       </span>
-    </div>
+    </Carousel>
 
     <!-- Discount badge -->
     <div v-if="product.oldPrice" class="flex justify-start bg-T-50 px-4 pb-3 pt-1">
@@ -472,14 +432,5 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
 <style scoped>
 .font-inter {
   font-family: 'Arad', 'Inter', sans-serif;
-}
-
-.img-fade-enter-active,
-.img-fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.img-fade-enter-from,
-.img-fade-leave-to {
-  opacity: 0;
 }
 </style>

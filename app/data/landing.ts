@@ -102,6 +102,11 @@ export const newestProducts: Product[] = [
   { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
   { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
   { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop3, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone3, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.p39, title: SAMSUNG_TITLE, price: '84,000,000', colors: swatchSets.headset },
 ]
 
 export const stripBanner = {

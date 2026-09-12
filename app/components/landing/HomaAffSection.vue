@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { homaAffProducts } from '~/data/landing'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 
-const affRow = ref<HTMLElement | null>(null)
-
-function scrollAff(step: number) {
-  affRow.value?.scrollBy({ left: step, behavior: 'smooth' })
-}
+const cardRounding = (i: number) => [
+  i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
+  i === homaAffProducts.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
+  i > 0 && i < homaAffProducts.length - 1 ? 'rounded-none' : '',
+]
 </script>
 
 <template>
@@ -35,65 +35,73 @@ function scrollAff(step: number) {
     </div>
 
     <!-- Mobile products row -->
-    <div class="mt-4 flex overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
-      <Product
-        v-for="(product, i) in homaAffProducts"
-        :key="i"
-        :product="product"
-        variant="vertical"
-        show-countdown
-        countdown-label="هما آف"
-        image-class="bg-T-50"
-        :href="product.id ? `/product/${product.id}` : ''"
-        class="w-[180px] shrink-0"
-        :class="[
-            i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
-            i === homaAffProducts.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
-            i > 0 && i < homaAffProducts.length - 1 ? 'rounded-none' : '',
-        ]"
-      />
-    </div>
-
-    <!-- Desktop products row -->
-    <div class="relative hidden lg:block">
-      <div
-        ref="affRow"
-        class="flex overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        <Product
+    <Carousel
+      class="mt-4 px-4 pb-4 lg:hidden"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+    >
+      <CarouselContent class="ms-0">
+        <CarouselItem
           v-for="(product, i) in homaAffProducts"
           :key="i"
-          :product="product"
-          variant="vertical"
-          show-countdown
-          countdown-label="هما آف"
-          image-class="bg-T-50"
-          discount-placement="inline"
-          :href="product.id ? `/product/${product.id}` : ''"
-          class="w-[270px] shrink-0"
-          :class="[
-            i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
-            i === homaAffProducts.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
-            i > 0 && i < homaAffProducts.length - 1 ? 'rounded-none' : '',
-          ]"
-        />
-      </div>
+          class="w-[180px] shrink-0 basis-auto ps-0"
+        >
+          <Product
+            :product="product"
+            variant="vertical"
+            show-countdown
+            countdown-label="هما آف"
+            image-class="bg-T-50"
+            :href="product.id ? `/product/${product.id}` : ''"
+            class="w-full"
+            :class="cardRounding(i)"
+          />
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
+
+    <!-- Desktop products row -->
+    <Carousel
+      v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
+      class="relative hidden lg:block"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+    >
+      <CarouselContent class="ms-0">
+        <CarouselItem
+          v-for="(product, i) in homaAffProducts"
+          :key="i"
+          class="w-[270px] shrink-0 basis-auto ps-0"
+        >
+          <Product
+            :product="product"
+            variant="vertical"
+            show-countdown
+            countdown-label="هما آف"
+            image-class="bg-T-50"
+            discount-placement="inline"
+            :href="product.id ? `/product/${product.id}` : ''"
+            class="w-full"
+            :class="cardRounding(i)"
+          />
+        </CarouselItem>
+      </CarouselContent>
 
       <!-- Arrows -->
       <button
-        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90"
+        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90 disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="قبلی"
-        @click="scrollAff(-270)"
+        :disabled="!canScrollNext"
+        @click="scrollNext"
       >
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
-        class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90"
+        class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90 disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="بعدی"
-        @click="scrollAff(270)"
+        :disabled="!canScrollPrev"
+        @click="scrollPrev"
       >
         <IconChevronLeft class="size-[18px] rotate-180" />
       </button>
-    </div>
+    </Carousel>
   </section>
 </template>

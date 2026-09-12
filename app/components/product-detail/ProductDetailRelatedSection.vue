@@ -2,6 +2,7 @@
 import { IconChevronLeft } from '@tabler/icons-vue'
 import type { ProductDetail } from '~/data/product'
 import { cn } from '~/lib/utils'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 
 const props = withDefaults(
   defineProps<{
@@ -29,15 +30,18 @@ const props = withDefaults(
       </button>
     </div>
 
-    <div class="flex items-stretch gap-3 overflow-x-auto pb-1 lg:gap-4">
-      <NuxtLink
-        v-for="item in products"
-        :key="item.id"
-        :to="`/product/${item.id}`"
-        class="w-[172px] shrink-0 lg:w-[238px]"
-      >
-        <Product :product="item" class="h-full" />
-      </NuxtLink>
-    </div>
+    <Carousel :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }">
+      <CarouselContent class="-ms-3 lg:-ms-4">
+        <CarouselItem
+          v-for="item in products"
+          :key="item.id"
+          class="w-[184px] shrink-0 basis-auto ps-3 lg:w-[254px] lg:ps-4"
+        >
+          <NuxtLink :to="`/product/${item.id}`" class="block h-full">
+            <Product :product="item" class="h-full" />
+          </NuxtLink>
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
   </section>
 </template>

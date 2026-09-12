@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { brands } from '~/data/landing'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 </script>
 
 <template>
@@ -7,38 +8,54 @@ import { brands } from '~/data/landing'
     <LandingSectionTitle title="محبوب‌ترین برندها" variant="row" />
 
     <!-- Mobile: horizontal scroll logo boxes -->
-    <div class="mt-[18px] flex gap-2 overflow-x-auto pb-1 lg:hidden">
-      <a
-        v-for="brand in brands"
-        :key="brand.name + brand.logo"
-        href="#"
-        class="flex h-[78px] w-[130px] shrink-0 items-center justify-center rounded-[20px] border border-T-400 bg-T-50"
-      >
-        <img
-          :src="brand.logo"
-          :alt="brand.name"
-          class="h-[49px] w-[65px] object-contain"
-        >
-      </a>
-    </div>
-
-    <!-- Desktop: cards -->
-    <div class="relative mt-[18px] hidden overflow-hidden lg:block">
-      <div class="flex gap-2">
-        <a
+    <Carousel
+      class="mt-[18px] lg:hidden"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+    >
+      <CarouselContent class="-ms-2">
+        <CarouselItem
           v-for="brand in brands"
           :key="brand.name + brand.logo"
-          href="#"
-          class="flex w-[166px] shrink-0 flex-col items-center justify-center gap-3 rounded-[20px] border border-T-400 bg-T-50 py-4 transition-shadow hover:shadow-md"
+          class="w-[138px] shrink-0 basis-auto ps-2"
         >
-          <img
-            :src="brand.logo"
-            :alt="brand.name"
-            class="h-[49px] w-[65px] object-contain"
+          <a
+            href="#"
+            class="flex h-[78px] w-full items-center justify-center rounded-[20px] border border-T-400 bg-T-50"
           >
-          <span class="text-[14px] font-medium text-foreground">{{ brand.name }}</span>
-        </a>
-      </div>
-    </div>
+            <img
+              :src="brand.logo"
+              :alt="brand.name"
+              class="h-[49px] w-[65px] object-contain"
+            >
+          </a>
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
+
+    <!-- Desktop: cards -->
+    <Carousel
+      class="mt-[18px] hidden lg:block"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+    >
+      <CarouselContent class="-ms-2">
+        <CarouselItem
+          v-for="brand in brands"
+          :key="brand.name + brand.logo"
+          class="w-[174px] shrink-0 basis-auto ps-2"
+        >
+          <a
+            href="#"
+            class="flex w-full flex-col items-center justify-center gap-3 rounded-[20px] border border-T-400 bg-T-50 py-4 transition-shadow hover:shadow-md"
+          >
+            <img
+              :src="brand.logo"
+              :alt="brand.name"
+              class="h-[49px] w-[65px] object-contain"
+            >
+            <span class="text-[14px] font-medium text-foreground">{{ brand.name }}</span>
+          </a>
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
   </section>
 </template>

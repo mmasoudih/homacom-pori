@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { IconPhotoOff } from '@tabler/icons-vue'
 import { cn } from '~/lib/utils'
 
@@ -13,14 +13,27 @@ const props = withDefaults(
   { src: '', alt: '', containerClass: '', imageClass: '' },
 )
 
+const imgEl = ref<HTMLImageElement | null>(null)
 const loaded = ref(false)
 const broken = ref(false)
 
+function syncState() {
+  const el = imgEl.value
+  if (el && el.complete) {
+    if (el.naturalWidth > 0) loaded.value = true
+    else broken.value = true
+  }
+}
+
+onMounted(syncState)
+
 watch(
   () => props.src,
-  () => {
+  async () => {
     loaded.value = false
     broken.value = false
+    await nextTick()
+    syncState()
   },
 )
 </script>
@@ -47,6 +60,7 @@ watch(
 
     <img
       v-show="!broken"
+      ref="imgEl"
       :src="src"
       :alt="alt"
       loading="lazy"

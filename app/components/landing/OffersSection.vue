@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { offersGridRows, offersMeta } from '~/data/landing'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 
 const flatOffers = offersGridRows.flat()
 </script>
@@ -45,13 +46,19 @@ const flatOffers = offersGridRows.flat()
       </article>
     </div>
 
-    <!-- Desktop: 6-col strip -->
-    <div class="relative mt-[18px] hidden lg:block">
-      <div class="grid gap-[18px]" style="grid-template-columns: repeat(6, 202px)">
-        <template v-for="(row, ri) in offersGridRows" :key="ri">
+    <!-- Desktop: 6-col carousel -->
+    <Carousel
+      v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
+      class="relative mt-[18px] hidden lg:block"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps' }"
+    >
+      <CarouselContent class="-ms-[18px]">
+        <CarouselItem
+          v-for="(cell, i) in flatOffers"
+          :key="i"
+          class="w-[220px] shrink-0 basis-auto ps-[18px]"
+        >
           <article
-            v-for="(cell, ci) in row"
-            :key="`${ri}-${ci}`"
             class="flex h-[252px] w-full flex-col items-center justify-center gap-2 rounded-[20px] border border-T-400 bg-T-50 p-4 transition-shadow hover:shadow-md"
           >
             <!-- Image -->
@@ -67,7 +74,7 @@ const flatOffers = offersGridRows.flat()
             <div class="flex w-full items-center justify-between">
               <div class="flex flex-col">
                 <span
-                  v-if="offersMeta[ri * 6 + ci]?.hasOld"
+                  v-if="offersMeta[i]?.hasOld"
                   class="text-[13px] font-bold text-T-600 line-through"
                 >87,000,000</span>
                 <div class="flex items-baseline gap-1">
@@ -76,21 +83,31 @@ const flatOffers = offersGridRows.flat()
                 </div>
               </div>
               <span
-                v-if="offersMeta[ri * 6 + ci]?.hasOld"
+                v-if="offersMeta[i]?.hasOld"
                 class="flex h-[22px] items-center justify-center rounded-lg bg-R-10 px-1 text-[11px] font-extrabold text-primary"
               >%30</span>
             </div>
           </article>
-        </template>
-      </div>
+        </CarouselItem>
+      </CarouselContent>
 
-      <!-- Arrow -->
+      <!-- Arrows -->
       <button
-        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary"
+        class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="قبلی"
+        :disabled="!canScrollNext"
+        @click="scrollNext"
       >
         <IconChevronLeft class="size-[18px]" />
       </button>
-    </div>
+      <button
+        class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="بعدی"
+        :disabled="!canScrollPrev"
+        @click="scrollPrev"
+      >
+        <IconChevronLeft class="size-[18px] rotate-180" />
+      </button>
+    </Carousel>
   </section>
 </template>

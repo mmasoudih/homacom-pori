@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { IconChevronLeft } from '@tabler/icons-vue'
+import Autoplay from 'embla-carousel-autoplay'
+import Fade from 'embla-carousel-fade'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import type { CarouselApi } from '@/components/ui/carousel'
 
 const slides = [
   '/figma/fill-4f5b0b1a98425788.jpg',
@@ -10,56 +15,59 @@ const slides = [
   '/figma/fill-8cfc51f6d61983d7.jpg',
 ]
 
-const active = ref(0)
 const total = slides.length
-
 const SLIDE_DURATION = 6000
 
-let timer: ReturnType<typeof setInterval>
-let touchX = 0
+const autoplay = Autoplay({ delay: SLIDE_DURATION, stopOnInteraction: false })
+const plugins = [autoplay, Fade()]
 
-function startAutoplay() {
-  clearInterval(timer)
-  timer = setInterval(() => {
-    active.value = (active.value + 1) % total
-  }, SLIDE_DURATION)
+const active = ref(0)
+const api = ref<CarouselApi>()
+
+function syncActive() {
+  active.value = api.value?.selectedScrollSnap() ?? 0
+}
+
+function onInit(emblaApi: CarouselApi) {
+  api.value = emblaApi
+  syncActive()
+  emblaApi.on('select', syncActive)
+  emblaApi.on('reInit', syncActive)
+}
+
+function goTo(i: number) {
+  api.value?.scrollTo(i)
+  autoplay.reset()
 }
 
 function go(dir: 1 | -1) {
-  active.value = (active.value + dir + total) % total
-  startAutoplay()
+  if (dir === 1) api.value?.scrollNext()
+  else api.value?.scrollPrev()
+  autoplay.reset()
 }
-
-function onTouchStart(e: TouchEvent) {
-  touchX = e.touches[0]?.clientX ?? 0
-}
-
-function onTouchEnd(e: TouchEvent) {
-  const dx = (e.changedTouches[0]?.clientX ?? touchX) - touchX
-  // RTL: swipe left → next slide
-  if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1)
-}
-
-onMounted(startAutoplay)
-onUnmounted(() => clearInterval(timer))
 </script>
 
 <template>
   <section class="relative mx-auto w-full max-w-[1440px]">
-    <div
-      class="relative aspect-[402/291] w-full cursor-pointer touch-pan-y overflow-hidden md:aspect-[1440/342]"
-      @touchstart.passive="onTouchStart"
-      @touchend.passive="onTouchEnd"
+    <Carousel
+      class="flex aspect-[402/291] w-full md:aspect-[1440/342]"
+      :opts="{ direction: 'rtl', loop: true, align: 'start' }"
+      :plugins="plugins"
+      @init-api="onInit"
     >
-      <!-- Slides -->
-      <img
-        v-for="(slide, i) in slides"
-        :key="slide"
-        :src="slide"
-        alt=" بنر اصلی هماکام"
-        class="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
-        :class="active === i ? 'opacity-100' : 'opacity-0'"
-      >
+      <CarouselContent class="ms-0 h-full">
+        <CarouselItem
+          v-for="slide in slides"
+          :key="slide"
+          class="h-full basis-full ps-0 transition-opacity duration-500"
+        >
+          <img
+            :src="slide"
+            alt="بنر اصلی هماکام"
+            class="h-full w-full object-cover"
+          >
+        </CarouselItem>
+      </CarouselContent>
 
       <!-- Arrows (desktop only) -->
       <button
@@ -92,7 +100,7 @@ onUnmounted(() => clearInterval(timer))
                 : 'w-2 bg-T-500'
             "
             :aria-label="`اسلاید ${i}`"
-            @click="active = i - 1"
+            @click="goTo(i - 1)"
           >
             <span
               v-if="active === i - 1"
@@ -102,7 +110,7 @@ onUnmounted(() => clearInterval(timer))
           </button>
         </div>
       </div>
-    </div>
+    </Carousel>
 
     <!-- Dots (desktop: below) -->
     <div class="mt-[18px] hidden justify-center gap-[3px] xl:flex">
@@ -116,7 +124,7 @@ onUnmounted(() => clearInterval(timer))
             : 'w-2 bg-T-500'
         "
         :aria-label="`اسلاید ${i}`"
-        @click="active = i - 1"
+        @click="goTo(i - 1)"
       >
         <span
           v-if="active === i - 1"
