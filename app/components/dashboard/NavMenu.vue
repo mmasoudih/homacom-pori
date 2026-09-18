@@ -27,10 +27,23 @@ const navIcons: Record<DashboardNavIcon, Component> = {
 }
 
 const route = useRoute()
+const router = useRouter()
 const logoutOpen = ref(false)
 
+/** Longest nav href that the current path lives under (so nested order pages keep "سفارش‌های من" active). */
+const activeHref = computed(() => {
+  const matches = dashboardNav
+    .filter(item => item.href !== '#' && (route.path === item.href || route.path.startsWith(`${item.href}/`)))
+    .sort((a, b) => b.href.length - a.href.length)
+  return matches[0]?.href
+})
+
 function onNavClick(item: typeof dashboardNav[number]) {
-  if (item.key === 'logout') logoutOpen.value = true
+  if (item.key === 'logout') {
+    logoutOpen.value = true
+    return
+  }
+  if (item.href.startsWith('/')) router.push(item.href)
 }
 </script>
 
@@ -43,7 +56,7 @@ function onNavClick(item: typeof dashboardNav[number]) {
         type="button"
         class="flex items-center gap-3 rounded-xl px-3 py-3 text-[13.5px] font-medium transition-colors"
         :class="
-          !item.danger && route.path === item.href
+          !item.danger && activeHref === item.href
             ? 'bg-T-200 text-T-900'
             : item.danger
               ? 'text-primary hover:bg-R-10'

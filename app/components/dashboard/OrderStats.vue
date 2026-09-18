@@ -8,6 +8,12 @@ const toneClass: Record<OrderStatTone, string> = {
   delivered: 'bg-emerald-50 text-emerald-500',
   returned: 'bg-sky-50 text-sky-500',
 }
+
+const statHref: Record<OrderStatTone, string> = {
+  current: '/dashboard/orders?tab=current',
+  delivered: '/dashboard/orders?tab=delivered',
+  returned: '/dashboard/orders?tab=returned',
+}
 </script>
 
 <template>
@@ -23,20 +29,21 @@ const toneClass: Record<OrderStatTone, string> = {
         </span>
       </div>
 
-      <a
-        href="#"
+      <NuxtLink
+        to="/dashboard/orders"
         class="flex items-center gap-1 text-[13px] font-medium text-primary transition-colors hover:text-R-400"
       >
         مشاهده همه
         <IconChevronLeft class="size-4" />
-      </a>
+      </NuxtLink>
     </div>
 
     <div class="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-      <div
+      <NuxtLink
         v-for="stat in orderStats"
         :key="stat.key"
-        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center sm:flex-row sm:justify-between sm:p-4 sm:text-start"
+        :to="statHref[stat.key]"
+        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center transition-colors hover:border-T-500 sm:flex-row sm:justify-between sm:p-4 sm:text-start"
       >
         <div class="order-2 flex flex-col gap-1 sm:order-1">
           <span class="text-lg font-extrabold leading-none text-T-900 sm:text-2xl">{{ stat.count }}</span>
@@ -49,7 +56,7 @@ const toneClass: Record<OrderStatTone, string> = {
         >
           <IconShoppingBag class="size-5 sm:size-6" />
         </span>
-      </div>
+      </NuxtLink>
     </div>
   </section>
 </template>
