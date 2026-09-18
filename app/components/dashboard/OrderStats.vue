@@ -32,22 +32,22 @@ const toneClass: Record<OrderStatTone, string> = {
       </a>
     </div>
 
-    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
       <div
         v-for="stat in orderStats"
         :key="stat.key"
-        class="flex items-center justify-between rounded-2xl border border-T-400 bg-T-50 p-4"
+        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center sm:flex-row sm:justify-between sm:p-4 sm:text-start"
       >
-        <div class="flex flex-col gap-1">
-          <span class="text-2xl font-extrabold leading-none text-T-900">{{ stat.count }}</span>
-          <span class="text-[13px] text-T-600">{{ stat.label }}</span>
+        <div class="order-2 flex flex-col gap-1 sm:order-1">
+          <span class="text-lg font-extrabold leading-none text-T-900 sm:text-2xl">{{ stat.count }}</span>
+          <span class="text-[10px] leading-tight text-T-600 sm:text-[13px]">{{ stat.label }}</span>
         </div>
 
         <span
-          class="flex size-11 shrink-0 items-center justify-center rounded-xl"
+          class="order-1 flex size-9 shrink-0 items-center justify-center rounded-xl sm:order-2 sm:size-11"
           :class="toneClass[stat.key]"
         >
-          <IconShoppingBag class="size-6" />
+          <IconShoppingBag class="size-5 sm:size-6" />
         </span>
       </div>
     </div>

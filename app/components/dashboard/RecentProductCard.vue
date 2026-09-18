@@ -18,7 +18,7 @@ const discount = computed(() =>
 </script>
 
 <template>
-  <article class="group relative flex w-full flex-col rounded-2xl border border-T-400 bg-T-50 p-3">
+  <article class="group relative flex w-full flex-col rounded-2xl border border-T-400 bg-T-50 p-2.5 sm:p-3">
     <div class="relative">
       <ProductImage
         :src="product.image"
@@ -35,7 +35,7 @@ const discount = computed(() =>
       />
     </div>
 
-    <h3 class="mt-3 line-clamp-2 h-10 text-[13px] font-bold leading-[20px] text-T-900">
+    <h3 class="mt-3 line-clamp-2 h-10 text-[12px] font-bold leading-[20px] text-T-900 sm:text-[13px]">
       {{ product.title }}
     </h3>
 
@@ -49,7 +49,7 @@ const discount = computed(() =>
 
     <button
       type="button"
-      class="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-T-400 text-[13px] font-medium text-T-800 transition-colors hover:border-primary hover:text-primary"
+      class="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-T-400 text-[12px] font-medium text-T-800 transition-colors hover:border-primary hover:text-primary sm:h-10 sm:text-[13px]"
     >
       <IconShoppingBag class="size-4" />
       افزودن به سبد

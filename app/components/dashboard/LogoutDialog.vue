@@ -28,7 +28,7 @@ async function confirm() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 text-center sm:max-w-[400px]">
+    <DialogContent class="rounded-2xl p-6 text-center max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[400px]">
       <div class="flex flex-col items-center gap-4">
         <span class="flex size-16 items-center justify-center rounded-full bg-R-50 text-primary">
           <IconLogout class="size-7" />

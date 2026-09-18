@@ -26,7 +26,7 @@ import { recentlyViewed } from '~/data/dashboard'
         <CarouselItem
           v-for="(product, i) in recentlyViewed"
           :key="i"
-          class="w-[230px] shrink-0 basis-auto ps-0 pe-3"
+          class="w-[170px] shrink-0 basis-auto ps-0 pe-3 sm:w-[230px]"
         >
           <DashboardRecentProductCard :product="product" />
         </CarouselItem>

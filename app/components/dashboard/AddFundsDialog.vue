@@ -63,7 +63,7 @@ watch(
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 sm:max-w-[400px]">
+    <DialogContent class="rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[400px]">
       <DialogHeader>
         <DialogTitle class="text-center text-[15px] font-bold text-T-900 sm:text-start">
           افزایش موجودی کیف پول
