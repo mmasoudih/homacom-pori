@@ -22,7 +22,7 @@ const items: NavItem[] = [
   { label: 'دسته‌بندی', icon: IconLayoutGrid, href: '/categories', sheet: true },
   { label: 'سبد خرید', icon: IconShoppingBag, href: '/cart' },
   { label: 'بلاگ', icon: IconNotes, href: '/blog' },
-  { label: 'پروفایل', icon: IconUser, href: '/profile' },
+  { label: 'پروفایل', icon: IconUser, href: '/dashboard' },
 ]
 
 const categoriesOpen = ref(false)

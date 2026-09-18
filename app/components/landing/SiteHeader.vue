@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
+import { IconBell, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
+import { unreadNotifications } from '~/data/dashboard'
 import coinsFront from '../../../public/icons/coins-front.svg?raw'
 import userCheckCircleAlt from '../../../public/icons/user-check-circle-alt.svg?raw'
 import storeIcon from '../../../public/icons/store.svg?raw'
@@ -14,6 +16,9 @@ const navIcons: Record<string, string> = {
 }
 
 const route = useRoute()
+
+const token = useCookie('auth_token')
+const authed = computed(() => !!token.value)
 
 const megaOpen = ref(false)
 const megaTriggerEl = ref<HTMLElement | null>(null)
@@ -82,9 +87,33 @@ onMounted(() => {
           <span class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">4</span>
         </button>
 
-        <!-- Auth pill -->
+        <!-- Auth: logged-in cluster or login pill -->
         <div class="col-start-4 row-start-1 mt-[22px] flex h-12 items-center justify-self-end">
-          <div class="flex h-12 items-center gap-1 rounded-full border border-T-400 px-4 text-[15px] font-medium text-T-900" dir="rtl">
+          <div v-if="authed" class="flex items-center gap-2">
+            <NuxtLink
+              to="/dashboard"
+              class="flex size-11 items-center justify-center rounded-full bg-T-200 text-T-600 transition-colors hover:bg-T-300"
+              aria-label="حساب کاربری"
+            >
+              <IconUser class="size-6" />
+            </NuxtLink>
+            <NuxtLink
+              to="/dashboard"
+              class="relative flex size-11 items-center justify-center rounded-full border border-T-400 text-T-700 transition-colors hover:bg-secondary"
+              aria-label="اعلان‌ها"
+            >
+              <IconBell class="size-5" />
+              <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                {{ unreadNotifications }}
+              </span>
+            </NuxtLink>
+          </div>
+
+          <div
+            v-else
+            class="flex h-12 items-center gap-1 rounded-full border border-T-400 px-4 text-[15px] font-medium text-T-900"
+            dir="rtl"
+          >
             <NuxtLink to="/auth/login" class="hover:text-primary">ورود</NuxtLink>
             <span class="text-T-500">|</span>
             <NuxtLink to="/auth/register" class="hover:text-primary">ثبت‌نام</NuxtLink>
@@ -173,6 +202,18 @@ onMounted(() => {
         <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
         <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
+
+      <NuxtLink
+        v-if="authed"
+        to="/dashboard"
+        class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
+        aria-label="حساب کاربری"
+      >
+        <IconUser class="size-6" />
+        <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+          {{ unreadNotifications }}
+        </span>
+      </NuxtLink>
     </div>
 
     <CategoriesCategoryMegaMenu :open="megaOpen" @close="handleMegaClose" />
