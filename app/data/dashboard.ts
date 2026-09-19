@@ -73,7 +73,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { key: 'comments', label: 'دیدگاه‌های من', icon: 'comments', href: '/dashboard/comments' },
   { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '/dashboard/notifications', badge: notificationBadgeCount },
   { key: 'support', label: 'پشتیبانی', icon: 'support', href: '/dashboard/tickets' },
-  { key: 'account', label: 'اطلاعات حساب کاربری', icon: 'account', href: '#' },
+  { key: 'account', label: 'اطلاعات حساب کاربری', icon: 'account', href: '/dashboard/account' },
   { key: 'logout', label: 'خروج از حساب کاربری', icon: 'logout', href: '#', danger: true },
 ]
 

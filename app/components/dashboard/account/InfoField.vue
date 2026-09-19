@@ -1,0 +1,32 @@
+<script setup lang="ts">
+import { IconPencil, IconPlus } from '@tabler/icons-vue'
+
+defineProps<{
+  label: string
+  value?: string
+  add?: boolean
+  ltr?: boolean
+}>()
+
+const emit = defineEmits<{
+  edit: []
+}>()
+</script>
+
+<template>
+  <div class="flex items-center gap-4 px-6 py-5">
+    <div class="flex min-w-0 flex-1 flex-col gap-1">
+      <span class="text-[12px] text-T-600">{{ label }}</span>
+      <span v-if="value" class="truncate text-[14px] font-bold text-T-900" :dir="ltr ? 'ltr' : undefined">{{ value }}</span>
+    </div>
+    <button
+      type="button"
+      class="flex size-8 shrink-0 items-center justify-center text-primary transition-colors hover:text-R-400"
+      :aria-label="label"
+      @click="emit('edit')"
+    >
+      <IconPlus v-if="add" class="size-5" />
+      <IconPencil v-else class="size-[18px]" />
+    </button>
+  </div>
+</template>
