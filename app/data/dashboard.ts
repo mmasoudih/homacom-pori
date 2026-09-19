@@ -65,7 +65,7 @@ export const orderStats: OrderStat[] = [
 export const dashboardNav: DashboardNavItem[] = [
   { key: 'dashboard', label: 'داشبورد', icon: 'dashboard', href: '/dashboard' },
   { key: 'orders', label: 'سفارش‌های من', icon: 'orders', href: '/dashboard/orders' },
-  { key: 'favorites', label: 'مورد علاقه‌ها', icon: 'favorites', href: '#' },
+  { key: 'favorites', label: 'مورد علاقه‌ها', icon: 'favorites', href: '/dashboard/favorites' },
   { key: 'addresses', label: 'لیست آدرس‌ها', icon: 'addresses', href: '#' },
   { key: 'comments', label: 'دیدگاه‌های من', icon: 'comments', href: '#' },
   { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '#' },

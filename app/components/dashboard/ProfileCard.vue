@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IconChevronLeft, IconPencil, IconUser, IconWallet } from '@tabler/icons-vue'
 import { dashboardUser, wallet } from '~/data/dashboard'
-import { formatPrice } from '~/utils/format'
+import { formatPriceFa } from '~/utils/format'
 
 const balance = ref(wallet.balance)
 const fundsOpen = ref(false)
@@ -35,7 +35,7 @@ function onCharged(amount: number) {
     <div class="mt-4 flex items-center justify-between rounded-xl border border-T-400 px-4 py-3">
       <IconWallet class="size-5 shrink-0 text-T-800" />
       <span class="text-[14px] font-bold text-T-900">
-        {{ formatPrice(balance) }}
+        {{ formatPriceFa(balance) }}
         <span class="text-[11px] font-normal text-T-600">تومان</span>
       </span>
     </div>
