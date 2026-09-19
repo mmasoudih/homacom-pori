@@ -2,12 +2,17 @@
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { IconPlus, IconMinus, IconX } from '@tabler/icons-vue'
-import type { ProductDetail } from '~/data/product'
+
+/** Minimal shape so the dialog can serve both the product page and dashboard comments. */
+export interface CommentDialogProduct {
+  title: string
+  images: Array<{ src?: string }>
+}
 
 const props = withDefaults(
   defineProps<{
     open: boolean
-    product: ProductDetail
+    product: CommentDialogProduct
   }>(),
   {},
 )
