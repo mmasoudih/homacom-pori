@@ -66,7 +66,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { key: 'dashboard', label: 'داشبورد', icon: 'dashboard', href: '/dashboard' },
   { key: 'orders', label: 'سفارش‌های من', icon: 'orders', href: '/dashboard/orders' },
   { key: 'favorites', label: 'مورد علاقه‌ها', icon: 'favorites', href: '/dashboard/favorites' },
-  { key: 'addresses', label: 'لیست آدرس‌ها', icon: 'addresses', href: '#' },
+  { key: 'addresses', label: 'لیست آدرس‌ها', icon: 'addresses', href: '/dashboard/addresses' },
   { key: 'comments', label: 'دیدگاه‌های من', icon: 'comments', href: '#' },
   { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '#' },
   { key: 'support', label: 'پشتیبانی', icon: 'support', href: '#' },
