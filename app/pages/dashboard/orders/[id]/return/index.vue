@@ -37,6 +37,7 @@ useHead({
 </script>
 
 <template>
+  <div>
   <DashboardOrdersBareShell>
     <div class="flex items-center justify-between gap-3 pb-6">
       <h1 class="text-lg font-bold text-T-900">انتخاب کالاهای مرجوعی</h1>
@@ -91,4 +92,28 @@ useHead({
       </button>
     </div>
   </DashboardOrdersBareShell>
+
+  <DashboardOrdersMobileBareShell
+    title="انتخاب کالاهای مرجوعی"
+    align="center"
+    :back-to="`/dashboard/orders/${id}`"
+  >
+    <DashboardOrdersMobileReturnSelectRow
+      v-for="item in order?.items ?? []"
+      :key="item.id"
+      v-model="selected[item.id]"
+      :item="item"
+    />
+
+    <template #footer>
+      <button
+        type="button"
+        class="h-11 w-full rounded-xl bg-primary text-[13px] font-bold text-white"
+        @click="submit"
+      >
+        تایید و ادامه
+      </button>
+    </template>
+  </DashboardOrdersMobileBareShell>
+  </div>
 </template>

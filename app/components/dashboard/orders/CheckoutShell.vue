@@ -17,7 +17,7 @@ const navItems = [
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-T-50">
+  <div class="hidden min-h-dvh flex-col bg-T-50 xl:flex">
     <header class="w-full border-b border-T-400 bg-T-50">
       <div class="mx-auto flex max-w-[1350px] items-center justify-between gap-6 px-4 py-3 lg:px-6">
         <NuxtLink

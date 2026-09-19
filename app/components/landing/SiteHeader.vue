@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
-import { IconBell, IconUser } from '@tabler/icons-vue'
+import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
 import { unreadNotifications } from '~/data/dashboard'
 import coinsFront from '../../../public/icons/coins-front.svg?raw'

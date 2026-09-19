@@ -18,7 +18,7 @@ interface NavItem {
 const route = useRoute()
 
 const items: NavItem[] = [
-  { label: 'خانه', icon: IconHome2, href: '/', active: true },
+  { label: 'خانه', icon: IconHome2, href: '/' },
   { label: 'دسته‌بندی', icon: IconLayoutGrid, href: '/categories', sheet: true },
   { label: 'سبد خرید', icon: IconShoppingBag, href: '/cart' },
   { label: 'بلاگ', icon: IconNotes, href: '/blog' },
@@ -26,6 +26,11 @@ const items: NavItem[] = [
 ]
 
 const categoriesOpen = ref(false)
+
+function isActive(href: string) {
+  if (href === '/') return route.path === '/'
+  return route.path === href || route.path.startsWith(`${href}/`)
+}
 </script>
 
 <template>
@@ -48,7 +53,7 @@ const categoriesOpen = ref(false)
         v-else
         :to="item.href"
         class="flex h-[68px] flex-col items-center justify-center gap-[5px] transition-colors"
-        :class="route.path === item.href ? 'text-primary' : 'text-muted-foreground'"
+        :class="isActive(item.href) ? 'text-primary' : 'text-muted-foreground'"
       >
         <component :is="item.icon" class="size-5" />
         <span class="text-[12.5px] font-semibold leading-[17.9px]">{{ item.label }}</span>

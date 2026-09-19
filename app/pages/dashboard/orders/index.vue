@@ -58,51 +58,91 @@ useHead({
 </script>
 
 <template>
-  <DashboardOrdersShell>
-    <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
-      <!-- Header -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pb-4">
-        <h1 class="text-xl font-bold text-T-900">سفارش‌های من</h1>
+  <div>
+    <DashboardOrdersShell>
+      <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
+        <!-- Header -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4">
+          <h1 class="text-xl font-bold text-T-900">سفارش‌های من</h1>
 
-        <div class="flex w-full max-w-[260px] items-center gap-2 border-b border-T-400 pb-1.5">
-          <input
-            v-model="search"
-            type="search"
-            placeholder="جستجو در سفارش‌ها..."
-            class="min-w-0 flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-500"
-          >
-          <IconSearch class="size-4 shrink-0 text-T-500" />
+          <div class="flex w-full max-w-[260px] items-center gap-2 border-b border-T-400 pb-1.5">
+            <input
+              v-model="search"
+              type="search"
+              placeholder="جستجو در سفارش‌ها..."
+              class="min-w-0 flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-500"
+            >
+            <IconSearch class="size-4 shrink-0 text-T-500" />
+          </div>
         </div>
+
+        <!-- Tabs -->
+        <DashboardOrdersTabs v-model="activeTab" :tabs="orderTabs" />
+
+        <!-- List -->
+        <div v-if="showEmpty" class="mt-2">
+          <DashboardOrdersEmptyState />
+        </div>
+
+        <template v-else>
+          <div class="mt-6 flex flex-col gap-4">
+            <template v-if="isReturnTab">
+              <DashboardOrdersReturnCard
+                v-for="request in filteredReturns"
+                :key="request.id"
+                :request="request"
+              />
+            </template>
+            <template v-else>
+              <DashboardOrdersOrderCard
+                v-for="order in filteredOrders"
+                :key="order.id"
+                :order="order"
+              />
+            </template>
+          </div>
+
+          <DashboardOrdersPagination v-model:page="page" :pages="pages" class="mt-6" />
+        </template>
+      </section>
+    </DashboardOrdersShell>
+
+    <DashboardOrdersMobileShell title="سفارش‌های من" align="start">
+      <!-- Search -->
+      <div class="mb-4 flex h-11 items-center gap-3 rounded-full border border-T-300 bg-T-100 px-4">
+        <input
+          v-model="search"
+          type="search"
+          placeholder="جستجو در سفارش‌ها ..."
+          class="flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-600"
+        >
+        <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
 
       <!-- Tabs -->
-      <DashboardOrdersTabs v-model="activeTab" :tabs="orderTabs" />
-
-      <!-- List -->
-      <div v-if="showEmpty" class="mt-2">
-        <DashboardOrdersEmptyState />
+      <div class="mb-4 border-b border-T-300 pb-3">
+        <DashboardOrdersMobileTabs v-model="activeTab" :tabs="orderTabs" />
       </div>
 
-      <template v-else>
-        <div class="mt-6 flex flex-col gap-4">
-          <template v-if="isReturnTab">
-            <DashboardOrdersReturnCard
-              v-for="request in filteredReturns"
-              :key="request.id"
-              :request="request"
-            />
-          </template>
-          <template v-else>
-            <DashboardOrdersOrderCard
-              v-for="order in filteredOrders"
-              :key="order.id"
-              :order="order"
-            />
-          </template>
-        </div>
+      <!-- List -->
+      <DashboardOrdersMobileEmptyState v-if="showEmpty" />
 
-        <DashboardOrdersPagination v-model:page="page" :pages="pages" class="mt-6" />
-      </template>
-    </section>
-  </DashboardOrdersShell>
+      <div v-else class="flex flex-col gap-3">
+        <template v-if="isReturnTab">
+          <DashboardOrdersMobileReturnCard
+            v-for="request in filteredReturns"
+            :key="request.id"
+            :request="request"
+          />
+        </template>
+        <template v-else>
+          <DashboardOrdersMobileOrderCard
+            v-for="order in filteredOrders"
+            :key="order.id"
+            :order="order"
+          />
+        </template>
+      </div>
+    </DashboardOrdersMobileShell>
+  </div>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { IconFileInvoice } from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
 import type { ReturnRequest } from '~/data/orders'
 import { findReturn, returnItemStatusMeta, returnStatusMeta } from '~/data/orders'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
@@ -22,6 +24,7 @@ useHead({
 </script>
 
 <template>
+  <div>
   <DashboardOrdersShell>
     <DashboardOrdersDetailHeader
       v-if="request"
@@ -133,4 +136,84 @@ useHead({
       </NuxtLink>
     </div>
   </DashboardOrdersShell>
+
+  <DashboardOrdersMobileBareShell
+    title="جزئیات سفارش"
+    align="center"
+    :back-to="'/dashboard/orders?tab=returned'"
+  >
+    <template #action>
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-[12.5px] font-semibold text-primary"
+        @click="toast.info('نمایش فاکتور')"
+      >
+        <IconFileInvoice class="size-5" />
+        مشاهده فاکتور
+      </button>
+    </template>
+
+    <template v-if="request && meta">
+      <section class="mb-4 rounded-2xl border border-T-300 bg-T-50 p-4">
+        <DashboardOrdersMobileInfoList :items="infoItems" />
+      </section>
+
+      <section class="mb-4 rounded-2xl border border-T-300 bg-T-50 p-4">
+        <DashboardOrdersMobileStatusPanel
+          :label="meta.label"
+          :tone="meta.tone"
+          :icon="meta.icon"
+          :percent="meta.progress"
+        />
+      </section>
+
+      <div
+        v-if="request.status === 'approved' || request.status === 'completed'"
+        class="mb-4 rounded-xl bg-indigo-50/70 p-4"
+      >
+        <p class="text-[12px] font-bold text-T-800">کالاهای تاییدشده را به آدرس زیر ارسال کنید.</p>
+        <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 text-[11.5px] text-T-600">
+          <span>آدرس:</span>
+          <b class="font-semibold text-T-800">انبار مرکزی هماکام - واحد مرجوعی، تهران، بلوار فردوس شرق، پلاک ۱۲۸</b>
+        </div>
+        <div class="mt-2 flex flex-wrap items-center gap-x-2 text-[11.5px] text-T-600">
+          <span>کد پستی:</span>
+          <DashboardOrdersCopyValue :value="toPersianDigits(request.postalCode)" :copy-value="request.postalCode" />
+        </div>
+      </div>
+
+      <DashboardOrdersAlertNote class="mb-4">
+        <template v-if="request.status === 'review'">
+          درخواست مرجوعی شما با موفقیت ثبت شد و در صف بررسی قرار گرفت. نتیجه بررسی از طریق پیامک و همین صفحه اعلام می‌شود.
+        </template>
+        <template v-else-if="request.status === 'approved'">
+          درخواست مرجوعی شما تایید شد و آماده مرحله ارسال کالا است. پس از رسیدن کالا به انبار، کارشناسان صحت کالا و تطابق آن با دلیل مرجوعی را بررسی می‌کنند.
+        </template>
+        <template v-else-if="request.status === 'completed'">
+          مرجوعی با موفقیت انجام شد و مبلغ به کیف پول شما واریز و پیگیری می‌شود.
+        </template>
+        <template v-else>
+          درخواست مرجوعی شما بررسی شد و با توجه به شرایط اعلام‌شده، امکان مرجوع کردن کالا وجود ندارد.
+        </template>
+      </DashboardOrdersAlertNote>
+
+      <h2 class="mb-3 text-center text-[14px] font-bold text-T-900">
+        اطلاعات کالاهای مرجوعی: ({{ toPersianDigits(request.items.length) }})
+      </h2>
+
+      <DashboardOrdersMobileReturnDetailItem
+        v-for="item in request.items"
+        :key="item.id"
+        :item="item"
+      />
+    </template>
+
+    <div v-else class="rounded-2xl border border-T-300 bg-T-50 p-10 text-center">
+      <p class="text-[14px] font-bold text-T-900">درخواست مرجوعی مورد نظر یافت نشد.</p>
+      <NuxtLink to="/dashboard/orders" class="mt-3 inline-block text-[13px] font-semibold text-primary">
+        بازگشت به سفارش‌های من
+      </NuxtLink>
+    </div>
+  </DashboardOrdersMobileBareShell>
+  </div>
 </template>

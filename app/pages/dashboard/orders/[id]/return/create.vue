@@ -17,13 +17,13 @@ interface ReturnForm {
 }
 
 const form = reactive<Record<string, ReturnForm>>({})
+const removedIds = ref<string[]>([])
 
 const selectedItems = computed(() => {
   const items = order.value?.items ?? []
   const query = String(route.query.items ?? '')
-  if (!query) return items
-  const ids = query.split(',')
-  return items.filter(item => ids.includes(item.id))
+  const ids = query ? query.split(',') : null
+  return items.filter(item => (ids ? ids.includes(item.id) : true) && !removedIds.value.includes(item.id))
 })
 
 function entry(itemId: string): ReturnForm {
@@ -55,6 +55,15 @@ function onUpload(itemId: string, event: Event) {
   input.value = ''
 }
 
+function removeImage(itemId: string, index: number) {
+  form[itemId]?.images.splice(index, 1)
+}
+
+function removeItem(itemId: string) {
+  removedIds.value = [...removedIds.value, itemId]
+  Reflect.deleteProperty(form, itemId)
+}
+
 function goBack() {
   router.push(`/dashboard/orders/${id.value}/return`)
 }
@@ -70,6 +79,7 @@ useHead({
 </script>
 
 <template>
+  <div>
   <DashboardOrdersBareShell>
     <div class="flex items-center justify-between gap-3 pb-6">
       <h1 class="text-lg font-bold text-T-900">انتخاب کالاهای مرجوعی</h1>
@@ -197,4 +207,48 @@ useHead({
       </button>
     </div>
   </DashboardOrdersBareShell>
+
+  <DashboardOrdersMobileBareShell
+    title="انتخاب کالاهای مرجوعی"
+    align="center"
+    :back-to="`/dashboard/orders/${id}/return`"
+  >
+    <DashboardOrdersMobileReturnFormCard
+      v-for="item in selectedItems"
+      :key="item.id"
+      :item="item"
+      :quantity="form[item.id]?.quantity ?? 1"
+      :reason="form[item.id]?.reason ?? ''"
+      :description="form[item.id]?.description ?? ''"
+      :images="form[item.id]?.images ?? []"
+      @update:quantity="entry(item.id).quantity = $event"
+      @update:reason="entry(item.id).reason = $event"
+      @update:description="entry(item.id).description = $event"
+      @increment="increment(item.id)"
+      @decrement="decrement(item.id)"
+      @remove="removeItem(item.id)"
+      @upload="onUpload(item.id, $event)"
+      @remove-image="removeImage(item.id, $event)"
+    />
+
+    <template #footer>
+      <div class="flex gap-3">
+        <button
+          type="button"
+          class="h-11 flex-1 rounded-xl border border-T-300 font-semibold text-T-800"
+          @click="goBack"
+        >
+          بازگشت
+        </button>
+        <button
+          type="button"
+          class="h-11 flex-1 rounded-xl bg-primary font-bold text-white"
+          @click="submit"
+        >
+          ثبت درخواست
+        </button>
+      </div>
+    </template>
+  </DashboardOrdersMobileBareShell>
+  </div>
 </template>

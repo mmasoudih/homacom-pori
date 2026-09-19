@@ -43,7 +43,8 @@ useHead({
 </script>
 
 <template>
-  <DashboardOrdersCheckoutShell :back-to="`/dashboard/orders/${id}`">
+  <div>
+    <DashboardOrdersCheckoutShell :back-to="`/dashboard/orders/${id}`">
     <template v-if="order">
       <!-- Banner -->
       <div class="flex items-start gap-3 rounded-[16px] bg-indigo-50 p-4 lg:p-5">
@@ -207,4 +208,42 @@ useHead({
       </NuxtLink>
     </div>
   </DashboardOrdersCheckoutShell>
+
+  <DashboardOrdersMobileBareShell
+    v-if="order"
+    title="اطلاعات پرداخت"
+    align="center"
+    :back-to="`/dashboard/orders/${id}`"
+  >
+    <DashboardOrdersMobileCheckoutSummary
+      v-model:selected-method="selectedMethod"
+      v-model:selected-bank="selectedBank"
+      v-model:selected-wallet="selectedWallet"
+      :order-code="order.code"
+    />
+    <template #footer>
+      <button
+        type="button"
+        class="h-12 w-full rounded-xl bg-primary text-[13px] font-bold text-white"
+        @click="pay"
+      >
+        پرداخت
+      </button>
+    </template>
+  </DashboardOrdersMobileBareShell>
+
+  <DashboardOrdersMobileBareShell
+    v-else
+    title="اطلاعات پرداخت"
+    align="center"
+    :back-to="`/dashboard/orders/${id}`"
+  >
+    <div class="rounded-2xl border border-T-300 bg-T-50 p-10 text-center">
+      <p class="text-[14px] font-bold text-T-900">سفارش مورد نظر یافت نشد.</p>
+      <NuxtLink to="/dashboard/orders" class="mt-3 inline-block text-[13px] font-semibold text-primary">
+        بازگشت به سفارش‌های من
+      </NuxtLink>
+    </div>
+  </DashboardOrdersMobileBareShell>
+  </div>
 </template>

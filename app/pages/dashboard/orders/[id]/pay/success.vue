@@ -21,7 +21,8 @@ useHead({
 </script>
 
 <template>
-  <DashboardOrdersSuccessShell>
+  <div>
+    <DashboardOrdersSuccessShell>
     <DashboardOrdersSuccessCard
       v-if="order"
       title="پرداخت شما با موفقیت انجام شد"
@@ -101,4 +102,74 @@ useHead({
       </NuxtLink>
     </div>
   </DashboardOrdersSuccessShell>
+
+  <DashboardOrdersMobileSuccessShell v-if="order">
+    <DashboardOrdersMobileSuccessCard
+      title="پرداخت شما با موفقیت انجام شد"
+      description="این پرداخت ثبت شد؛ اما بخشی از مبلغ سفارش هنوز باقی مانده و سفارش شما پس از تکمیل پرداخت نهایی و وارد مرحله ارسال می‌شود."
+    >
+      <!-- Receipt -->
+      <div class="flex flex-col divide-y divide-T-300 rounded-xl border border-T-400 text-start">
+        <div class="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+          <span class="text-T-600">شماره سفارش:</span>
+          <span class="font-bold text-T-900">{{ toPersianDigits(orderNumber) }}</span>
+        </div>
+        <div class="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+          <span class="text-T-600">تاریخ و ساعت پرداخت:</span>
+          <span class="font-bold text-T-900">۱۴۰۴/۱۱/۱۳ - ۲۰:۴۵</span>
+        </div>
+        <div class="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+          <span class="text-T-600">شماره پیگیری سفارش:</span>
+          <DashboardOrdersCopyValue value="۱۲۵۸۴۷۳۵۲" copy-value="125847352" />
+        </div>
+        <div class="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+          <span class="text-T-600">مبلغ پرداختی:</span>
+          <span class="font-bold text-T-900">{{ formatPriceFa(totals.paid) }} تومان</span>
+        </div>
+      </div>
+
+      <!-- Remaining -->
+      <div class="mt-4 flex items-center justify-center gap-6 rounded-xl border border-T-400 p-4">
+        <div class="flex w-full flex-col gap-3 text-start text-[12px] text-T-600">
+          <div class="flex items-center justify-between gap-3">
+            <span>مبلغ سفارش:</span>
+            <b class="font-bold text-T-900">{{ formatPriceFa(totals.total) }} تومان</b>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span>مجموع پرداخت‌شده:</span>
+            <b class="font-bold text-T-900">{{ formatPriceFa(totals.paid) }} تومان</b>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span>مبلغ باقی‌مانده:</span>
+            <b class="font-bold text-T-900">{{ formatPriceFa(totals.remaining) }} تومان</b>
+          </div>
+        </div>
+
+        <DashboardOrdersProgressRing :percent="order.payment?.percent ?? 45" label="پرداخت شده" />
+      </div>
+
+      <p class="mt-5 text-start text-[11.5px] leading-[22px] text-T-600">
+        هر پرداخت شما به‌صورت جداگانه ثبت می‌شود؛ می‌توانید همین حالا ادامه دهید یا از مسیر
+        «داشبورد ← سفارش‌های من ← جزئیات سفارش» باقی‌مانده را کامل کنید.
+      </p>
+
+      <template #footer>
+        <div class="flex gap-3">
+          <NuxtLink
+            :to="`/dashboard/orders/${id}`"
+            class="flex h-11 flex-1 items-center justify-center rounded-xl border border-T-300 bg-T-50 text-[13px] font-semibold text-T-800"
+          >
+            جزئیات سفارش
+          </NuxtLink>
+          <NuxtLink
+            :to="`/dashboard/orders/${id}/pay`"
+            class="flex h-11 flex-1 items-center justify-center rounded-xl border border-primary text-[13px] font-bold text-primary"
+          >
+            ادامه پرداخت - {{ formatPriceFa(totals.remaining) }}
+          </NuxtLink>
+        </div>
+      </template>
+    </DashboardOrdersMobileSuccessCard>
+  </DashboardOrdersMobileSuccessShell>
+  </div>
 </template>

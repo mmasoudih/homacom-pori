@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-dvh flex-col bg-T-50">
+  <div class="hidden min-h-dvh flex-col bg-T-50 xl:flex">
     <LandingSiteHeader />
 
     <main class="mx-auto w-full max-w-[1350px] flex-1 px-4 py-6 lg:px-6 lg:py-8">

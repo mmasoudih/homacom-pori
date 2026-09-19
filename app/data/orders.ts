@@ -48,6 +48,10 @@ export interface OrderTransaction {
   bank: string
   trackingCode: string
   amount: number
+  /** Mobile transaction row: payment method label. */
+  method?: string
+  /** Mobile transaction row: date + time label. */
+  datetime?: string
 }
 
 export interface Order {
@@ -146,14 +150,16 @@ export interface OrderTab {
   key: 'all' | 'current' | 'delivered' | 'cancelled' | 'returned'
   label: string
   count: number
+  /** Mobile-only count (screenshots show a different number than desktop). */
+  mobileCount?: number
 }
 
 export const orderTabs: OrderTab[] = [
-  { key: 'all', label: 'همه', count: 116 },
-  { key: 'current', label: 'جاری', count: 4 },
-  { key: 'delivered', label: 'تحویل داده شده', count: 90 },
-  { key: 'cancelled', label: 'لغو شده', count: 2 },
-  { key: 'returned', label: 'مرجوع شده', count: 2 },
+  { key: 'all', label: 'همه', count: 116, mobileCount: 116 },
+  { key: 'current', label: 'جاری', count: 4, mobileCount: 4 },
+  { key: 'delivered', label: 'تحویل داده شده', count: 90, mobileCount: 90 },
+  { key: 'cancelled', label: 'لغو شده', count: 2, mobileCount: 20 },
+  { key: 'returned', label: 'مرجوع شده', count: 2, mobileCount: 20 },
 ]
 
 /* ------------------------------------------------------------------ *
@@ -190,9 +196,9 @@ const REASON_MISMATCH = 'مغایرت با اطلاعات درج شده در س�
  * ------------------------------------------------------------------ */
 
 const sharedTransactions: OrderTransaction[] = [
-  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '259863339', amount: 1_000_000 },
-  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '259863339', amount: 800_000 },
-  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '259863339', amount: 800_000 },
+  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 800_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
 ]
 
 const sharedReceiver = {
@@ -327,6 +333,23 @@ export const paymentMethods: PaymentMethod[] = [
 export const creditWallets: CreditWallet[] = [
   { id: 'baloon', name: 'کیف پول بالون', balance: 10_500_000 },
   { id: 'avazo', name: 'کیف پول آواژو', balance: 0 },
+]
+
+export interface InvoiceLine {
+  label: string
+  value: number
+  icon: 'bag' | 'tag' | 'shield' | 'tools' | 'truck' | 'wallet'
+}
+
+/** Mobile checkout "صورت‌حساب" breakdown. */
+export const checkoutInvoice: InvoiceLine[] = [
+  { label: 'مجموع قیمت کالاها', value: 87_000_000, icon: 'bag' },
+  { label: 'تخفیف', value: 3_000_000, icon: 'tag' },
+  { label: 'مبلغ بیمه‌ها', value: 5_000_000, icon: 'shield' },
+  { label: 'خدمات', value: 3_000_000, icon: 'tools' },
+  { label: 'هزینه ارسال', value: 400_000, icon: 'truck' },
+  { label: 'تخفیف', value: 3_000_000, icon: 'tag' },
+  { label: 'مبلغ قابل پرداخت', value: 87_000_000, icon: 'wallet' },
 ]
 
 export const returnReasons = [
