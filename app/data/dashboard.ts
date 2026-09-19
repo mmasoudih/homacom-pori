@@ -1,4 +1,5 @@
 import type { Product } from '~/utils/product'
+import { notificationBadgeCount } from './notifications'
 import { DEMO_PRODUCT_ID } from './product'
 
 export interface DashboardUser {
@@ -39,6 +40,8 @@ export interface DashboardNavItem {
   href: string
   /** Renders the item in the brand red (logout). */
   danger?: boolean
+  /** Count shown in a red pill at the end of the nav row. */
+  badge?: number
 }
 
 export const dashboardUser: DashboardUser = {
@@ -68,7 +71,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { key: 'favorites', label: 'مورد علاقه‌ها', icon: 'favorites', href: '/dashboard/favorites' },
   { key: 'addresses', label: 'لیست آدرس‌ها', icon: 'addresses', href: '/dashboard/addresses' },
   { key: 'comments', label: 'دیدگاه‌های من', icon: 'comments', href: '/dashboard/comments' },
-  { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '#' },
+  { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '/dashboard/notifications', badge: notificationBadgeCount },
   { key: 'support', label: 'پشتیبانی', icon: 'support', href: '#' },
   { key: 'account', label: 'اطلاعات حساب کاربری', icon: 'account', href: '#' },
   { key: 'logout', label: 'خروج از حساب کاربری', icon: 'logout', href: '#', danger: true },

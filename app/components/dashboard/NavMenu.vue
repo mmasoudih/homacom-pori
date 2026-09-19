@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-vue'
 import type { DashboardNavIcon } from '~/data/dashboard'
 import { dashboardNav } from '~/data/dashboard'
+import { toPersianDigits } from '~/utils/format'
 
 const navIcons: Record<DashboardNavIcon, Component> = {
   dashboard: IconLayoutDashboard,
@@ -70,6 +71,12 @@ function onNavClick(item: typeof dashboardNav[number]) {
           :class="item.danger ? 'text-primary' : 'text-T-700'"
         />
         {{ item.label }}
+        <span
+          v-if="item.badge"
+          class="ms-auto flex size-[18px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold leading-none text-white"
+        >
+          {{ toPersianDigits(item.badge) }}
+        </span>
       </button>
     </nav>
 
