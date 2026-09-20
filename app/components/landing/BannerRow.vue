@@ -27,12 +27,12 @@ withDefaults(defineProps<{
       <img
         :src="item.image"
         :alt="item.alt || ''"
-        class="h-full w-full object-cover"
+        class="h-full w-full rounded-2xl object-cover"
         :class="
           columns > 1
             ? 'aspect-[370/136] lg:aspect-auto'
             : centered
-              ? 'aspect-[278/212] rounded-none'
+              ? 'aspect-[278/212]'
               : ''
         "
         :style="!centered ? {} : { margin: '0 auto', width: '278px' }"

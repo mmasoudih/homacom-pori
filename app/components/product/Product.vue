@@ -2,6 +2,7 @@
 import type { ClassValue } from 'clsx'
 import type { Product, ProductTone, ProductVariant } from '~/utils/product'
 import { discountBadgeClass, normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
+import { toPersianDigits } from '~/utils/format'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(
@@ -134,7 +135,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
         v-if="showDiscount && hasDiscount && !inlineDiscount"
         class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg px-1.5 text-[13px] font-extrabold"
         :class="discountBadgeClass(tone)"
-      >{{ discount }}%</span>
+      >{{ toPersianDigits(discount!) }}٪</span>
     </div>
 
     <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-10 text-[14px] font-bold leading-[20px]">
@@ -144,15 +145,15 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     <!-- Inline: discount badge on the right, price on the left -->
     <div
       v-if="inlineDiscount"
-      class="mt-auto flex items-center justify-between gap-2 pt-2"
+      class="mt-auto flex items-start gap-2 pt-2"
     >
       <span
         v-if="showDiscount && hasDiscount"
         class="flex h-[21px] shrink-0 items-center justify-center rounded-lg px-1 text-[12px] font-extrabold"
         :class="discountBadgeClass(tone)"
-      >{{ discount }}%</span>
+      >{{ toPersianDigits(discount!) }}٪</span>
       <ProductPrice
-        class="items-end"
+        class="ms-auto items-end"
         price-class="text-T-900"
         :price="price"
         :original-price="originalPrice"

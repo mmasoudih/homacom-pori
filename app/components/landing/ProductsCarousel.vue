@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IconChevronLeft, IconLayoutGrid, IconDeviceLaptop, IconDeviceMobile } from '@tabler/icons-vue'
 import type { Product } from '~/data/landing'
+import { toPersianDigits } from '~/utils/format'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 
 withDefaults(defineProps<{
@@ -36,32 +37,16 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
         v-if="pills"
         class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
       >
-        <!-- Price pills -->
-        <div class="flex items-center gap-2">
-          <button
-            v-for="p in pills.prices"
-            :key="p"
-            class="flex h-[38px] items-center rounded-full px-4 text-[13px] font-medium transition-colors"
-            :class="
-              (pills.activePrice === p)
-                ? 'bg-T-50 text-foreground shadow-sm'
-                : 'bg-transparent text-T-700 hover:bg-T-50/50'
-            "
-          >
-            {{ p }}
-          </button>
-        </div>
-
         <!-- Category pills -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1">
           <button
             v-for="c in pills.cats"
             :key="c.label"
             class="flex h-[38px] items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors"
             :class="
               (pills.activeCat === c.label)
-                ? 'bg-T-50 text-foreground shadow-sm'
-                : 'bg-transparent text-T-700 hover:bg-T-50/50'
+                ? 'border border-T-400 bg-T-50 text-foreground shadow-sm'
+                : 'text-T-700 hover:bg-T-50/50'
             "
           >
             {{ c.label }}
@@ -69,6 +54,22 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
               :is="catIcons[c.icon]"
               class="size-5"
             />
+          </button>
+        </div>
+
+        <!-- Price pills -->
+        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1">
+          <button
+            v-for="p in pills.prices"
+            :key="p"
+            class="flex h-[38px] items-center rounded-full px-4 text-[13px] font-medium transition-colors"
+            :class="
+              (pills.activePrice === p)
+                ? 'border border-T-400 bg-T-50 text-foreground shadow-sm'
+                : 'text-T-700 hover:bg-T-50/50'
+            "
+          >
+            {{ toPersianDigits(p) }}
           </button>
         </div>
       </div>
@@ -90,6 +91,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
           <Product
             :product="product"
             variant="vertical"
+            discount-placement="inline"
             :href="product.id ? `/product/${product.id}` : ''"
             class="w-full rounded-none border-0"
           />
