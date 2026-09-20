@@ -55,7 +55,7 @@ useHead({
       <LandingBannerRow
         :items="banners4"
         :columns="4"
-        class="order-7 hidden w-full lg:order-none lg:block"
+        class="order-7 hidden w-full lg:order-none lg:grid"
       />
 
       <LandingProductsCarousel
@@ -67,7 +67,7 @@ useHead({
 
       <LandingOffersSection id="offers" class="order-8 w-full lg:order-none" />
 
-      <LandingBannerRow :items="banners3" :columns="3" centered class="order-7 hidden w-full lg:order-none lg:block" />
+      <LandingBannerRow :items="banners3" :columns="3" centered class="order-7 hidden w-full lg:order-none lg:grid" />
 
       <LandingBrandsSection class="order-10 w-full lg:order-none" />
 
