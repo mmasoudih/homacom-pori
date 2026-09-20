@@ -121,6 +121,7 @@ const LAPTOP_TITLE =
 export const bestOfCategories = [
   {
     category: 'گوشی موبایل',
+    icon: 'mobile',
     items: [
       { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '92,000,000' },
       { id: DEMO_PRODUCT_ID, image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000' },
@@ -129,6 +130,7 @@ export const bestOfCategories = [
   },
   {
     category: 'لپ‌تاپ',
+    icon: 'laptop',
     items: [
       { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: LAPTOP_TITLE, price: '92,000,000' },
       { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: LAPTOP_TITLE, price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
@@ -137,13 +139,14 @@ export const bestOfCategories = [
   },
   {
     category: 'هدفون و هندزفری',
+    icon: 'headphones',
     items: [
       { id: DEMO_PRODUCT_ID, image: IMG.headset, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '84,000,000', oldPrice: '92,000,000', discount: '%30' },
       { id: DEMO_PRODUCT_ID, image: IMG.p39, title: 'هدفون بلوتوثی مدل P39 کد 2021', price: '92,000,000' },
       { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: 'هدفون بیت مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت', price: '92,000,000' },
     ],
   },
-] as Array<{ category: string; items: Array<{ id?: string; image: string; title: string; price: string; oldPrice?: string; discount?: string }> }>
+] as Array<{ category: string; icon: string; items: Array<{ id?: string; image: string; title: string; price: string; oldPrice?: string; discount?: string }> }>
 
 export const banners4 = [
   { image: '/figma/fill-b65ebd18e4d5d2f9.png', alt: 'بنر هماکام', href: '#' },

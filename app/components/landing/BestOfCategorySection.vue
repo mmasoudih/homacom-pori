@@ -2,6 +2,9 @@
 import { IconChevronLeft, IconDeviceLaptop, IconDeviceMobile } from '@tabler/icons-vue'
 import { bestOfCategories } from '~/data/landing'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import mobileIcon from '../../../public/icons/mobile.svg?raw'
+import laptopIcon from '../../../public/icons/laptop.svg?raw'
+import headphonesIcon from '../../../public/icons/headphones-waveform.svg?raw'
 
 const activeTab = ref('لپ‌تاپ')
 
@@ -9,6 +12,12 @@ const tabs = [
   { label: 'لپ‌تاپ', icon: IconDeviceLaptop },
   { label: 'گوشی موبایل', icon: IconDeviceMobile },
 ]
+
+const iconMap: Record<string, string> = {
+  mobile: mobileIcon,
+  laptop: laptopIcon,
+  headphones: headphonesIcon,
+}
 
 const activeItems = computed(() => {
   const col = bestOfCategories.find((c) => c.category === activeTab.value)
@@ -46,28 +55,34 @@ const activeItems = computed(() => {
         :key="i"
         :product="item"
         variant="horizontal"
+        discount-placement="inline"
         :href="item.id ? `/product/${item.id}` : ''"
-        class="h-[122px] border-b border-T-400"
+        class="h-[122px] border-b border-T-400 px-4"
+        image-class="w-[84px] bg-transparent"
       />
     </div>
 
     <!-- Desktop: 3-column carousel -->
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-      class="relative mt-[18px] hidden md:block"
+      class="relative mt-[18px] hidden lg:block"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
-      <CarouselContent class="-ms-[18px]">
+      <CarouselContent class="-ms-[10px]">
         <CarouselItem
           v-for="col in bestOfCategories"
           :key="col.category"
-          class="basis-1/3 ps-[18px]"
+          class="basis-1/3 ps-[10px]"
         >
-          <div class="flex flex-col">
+          <div class="flex flex-col overflow-hidden rounded-3xl border border-T-400 bg-T-50">
             <!-- Column header -->
-            <div class="flex h-[70px] items-center justify-between border-b border-T-400 px-4">
+            <div class="flex h-[70px] items-center justify-center gap-2 bg-T-200 px-4">
+              <span
+                class="[&>svg]:block [&>svg]:size-[22px] text-T-700"
+                aria-hidden="true"
+                v-html="iconMap[col.icon]"
+              />
               <h3 class="text-[14px] font-bold text-foreground">{{ col.category }}</h3>
-              <a href="#" class="text-[12px] font-medium text-T-600 transition-colors hover:text-primary">مشاهده همه</a>
             </div>
 
             <!-- Mini cards -->
@@ -76,8 +91,10 @@ const activeItems = computed(() => {
               :key="i"
               :product="item"
               variant="horizontal"
+              discount-placement="inline"
               :href="item.id ? `/product/${item.id}` : ''"
-              class="h-[155px] border-b border-T-400 px-4 transition-colors hover:bg-secondary/30"
+              class="h-[150px] border-b border-T-400 px-4 last:border-b-0 transition-colors hover:bg-secondary/30"
+              image-class="w-[96px] bg-transparent"
             />
           </div>
         </CarouselItem>
@@ -85,7 +102,7 @@ const activeItems = computed(() => {
 
       <!-- Arrows (desktop) -->
       <button
-        class="absolute -left-[19px] top-[200px] hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+        class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="قبلی"
         :disabled="!canScrollNext"
         @click="scrollNext"
@@ -93,7 +110,7 @@ const activeItems = computed(() => {
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
-        class="absolute -right-[19px] top-[200px] hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+        class="absolute -right-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="بعدی"
         :disabled="!canScrollPrev"
         @click="scrollPrev"
