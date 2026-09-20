@@ -13,7 +13,6 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      // @ts-expect-error process is available in node environment
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://ahoma.ir/api",
     },
   },

@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.output
+.nuxt
+.nitro
+.data
+.cache
+dist
+
+# Version control / tooling
+.git
+.gitignore
+.codegraph
+.agents
+.github
+.gitea
+.vscode
+.idea
+.fleet
+.DS_Store
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Docs
+README.md
+AGENTS.md
+AGENST.md
