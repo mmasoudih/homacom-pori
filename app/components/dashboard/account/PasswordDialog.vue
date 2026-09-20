@@ -1,30 +1,29 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 
 const props = defineProps<{
   open: boolean
-  firstName: string
-  lastName: string
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'submit': [payload: { firstName: string, lastName: string }]
+  'submit': [payload: { password: string }]
 }>()
 
-const form = reactive({ firstName: '', lastName: '' })
+const password = ref('')
+const confirmPassword = ref('')
 
 watch(
   () => props.open,
   (open) => {
-    if (open) {
-      form.firstName = props.firstName
-      form.lastName = props.lastName
+    if (!open) {
+      password.value = ''
+      confirmPassword.value = ''
     }
   },
-  { immediate: true },
 )
 
 function close() {
@@ -32,8 +31,11 @@ function close() {
 }
 
 function submit() {
-  if (!form.firstName.trim() || !form.lastName.trim()) return
-  emit('submit', { firstName: form.firstName.trim(), lastName: form.lastName.trim() })
+  if (!password.value || password.value !== confirmPassword.value) {
+    toast.error('رمز عبور و تکرار آن یکسان نیستند.')
+    return
+  }
+  emit('submit', { password: password.value })
   close()
 }
 </script>
@@ -43,22 +45,22 @@ function submit() {
     <DialogContent class="gap-6 rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
       <div class="border-b border-T-300 pb-4">
         <DialogTitle class="text-start text-[16px] font-bold text-T-900">
-          نام و نام خانوادگی
+          رمزعبور
         </DialogTitle>
       </div>
 
       <p class="text-start text-[12.5px] leading-6 text-T-600">
-        لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید
+        برای حساب خود یک رمز عبور انتخاب کنید
       </p>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام</span>
-        <Input v-model="form.firstName" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        <span class="text-[13px] text-T-800">رمز عبور</span>
+        <Input v-model="password" type="password" class="h-11 rounded-xl border-T-400 text-[13px]" />
       </div>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام خانوادگی</span>
-        <Input v-model="form.lastName" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        <span class="text-[13px] text-T-800">تکرار رمز عبور</span>
+        <Input v-model="confirmPassword" type="password" class="h-11 rounded-xl border-T-400 text-[13px]" />
       </div>
 
       <div class="flex gap-3">

@@ -14,7 +14,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex items-center gap-4 px-6 py-5">
+  <div class="flex items-center gap-4 px-6 py-4">
     <div class="flex min-w-0 flex-1 flex-col gap-1">
       <span class="text-[12px] text-T-600">{{ label }}</span>
       <span v-if="value" class="truncate text-[14px] font-bold text-T-900" :dir="ltr ? 'ltr' : undefined">{{ value }}</span>

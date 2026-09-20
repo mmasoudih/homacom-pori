@@ -36,8 +36,8 @@ const emit = defineEmits<{
             class="inline-flex items-center gap-1.5 text-[13px] font-medium text-primary transition-colors hover:text-R-400"
             @click="emit('change-image')"
           >
-            ویرایش تصویر پروفایل
             <IconPencil class="size-4" />
+            ویرایش تصویر پروفایل
           </button>
           <button
             type="button"

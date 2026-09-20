@@ -5,24 +5,20 @@ import { Input } from '@/components/ui/input'
 
 const props = defineProps<{
   open: boolean
-  firstName: string
-  lastName: string
+  email: string
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'submit': [payload: { firstName: string, lastName: string }]
+  'submit': [payload: { email: string }]
 }>()
 
-const form = reactive({ firstName: '', lastName: '' })
+const form = reactive({ email: '' })
 
 watch(
   () => props.open,
   (open) => {
-    if (open) {
-      form.firstName = props.firstName
-      form.lastName = props.lastName
-    }
+    if (open) form.email = props.email
   },
   { immediate: true },
 )
@@ -32,8 +28,8 @@ function close() {
 }
 
 function submit() {
-  if (!form.firstName.trim() || !form.lastName.trim()) return
-  emit('submit', { firstName: form.firstName.trim(), lastName: form.lastName.trim() })
+  if (!form.email.trim()) return
+  emit('submit', { email: form.email.trim() })
   close()
 }
 </script>
@@ -43,22 +39,17 @@ function submit() {
     <DialogContent class="gap-6 rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
       <div class="border-b border-T-300 pb-4">
         <DialogTitle class="text-start text-[16px] font-bold text-T-900">
-          نام و نام خانوادگی
+          ایمیل
         </DialogTitle>
       </div>
 
       <p class="text-start text-[12.5px] leading-6 text-T-600">
-        لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید
+        لطفا ادرس ایمیل خود را وارد کنید
       </p>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام</span>
-        <Input v-model="form.firstName" class="h-11 rounded-xl border-T-400 text-[13px]" />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام خانوادگی</span>
-        <Input v-model="form.lastName" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        <span class="text-[13px] text-T-800">آدرس ایمیل</span>
+        <Input v-model="form.email" type="email" dir="ltr" class="h-11 rounded-xl border-T-400 text-[13px]" />
       </div>
 
       <div class="flex gap-3">

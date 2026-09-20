@@ -16,9 +16,7 @@ const emit = defineEmits<{
 
 <template>
   <section>
-    <h2 class="px-4 pb-3 pt-4 text-[15px] font-bold text-T-900">مشخصات فردی</h2>
-
-    <div class="flex items-center gap-3 px-4">
+    <div class="flex items-center gap-3 px-4 pt-4">
       <span class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-full bg-T-200 text-T-700">
         <img v-if="image" :src="image" class="size-full object-cover">
         <IconUser v-else class="size-7" />
@@ -32,14 +30,14 @@ const emit = defineEmits<{
       </div>
     </div>
 
-    <div class="mt-3 flex items-center gap-5 px-4">
+    <div class="mt-3 flex items-center justify-center gap-5 px-4">
       <button
         type="button"
         class="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-primary"
         @click="emit('change-image')"
       >
-        ویرایش تصویر پروفایل
         <IconPencil class="size-4" />
+        ویرایش تصویر پروفایل
       </button>
       <button
         type="button"

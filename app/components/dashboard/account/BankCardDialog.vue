@@ -1,27 +1,28 @@
 <script setup lang="ts">
+import { IconInfoCircle } from '@tabler/icons-vue'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 
 const props = defineProps<{
   open: boolean
-  firstName: string
-  lastName: string
+  cardNumber: string
+  shebaNumber: string
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'submit': [payload: { firstName: string, lastName: string }]
+  'submit': [payload: { cardNumber: string, shebaNumber: string }]
 }>()
 
-const form = reactive({ firstName: '', lastName: '' })
+const form = reactive({ cardNumber: '', shebaNumber: '' })
 
 watch(
   () => props.open,
   (open) => {
     if (open) {
-      form.firstName = props.firstName
-      form.lastName = props.lastName
+      form.cardNumber = props.cardNumber
+      form.shebaNumber = props.shebaNumber
     }
   },
   { immediate: true },
@@ -32,8 +33,8 @@ function close() {
 }
 
 function submit() {
-  if (!form.firstName.trim() || !form.lastName.trim()) return
-  emit('submit', { firstName: form.firstName.trim(), lastName: form.lastName.trim() })
+  if (!form.cardNumber.trim() || !form.shebaNumber.trim()) return
+  emit('submit', { cardNumber: form.cardNumber.trim(), shebaNumber: form.shebaNumber.trim() })
   close()
 }
 </script>
@@ -43,22 +44,29 @@ function submit() {
     <DialogContent class="gap-6 rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
       <div class="border-b border-T-300 pb-4">
         <DialogTitle class="text-start text-[16px] font-bold text-T-900">
-          نام و نام خانوادگی
+          شماره کارت
         </DialogTitle>
       </div>
 
       <p class="text-start text-[12.5px] leading-6 text-T-600">
-        لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید
+        اطلاعات حساب بانکی خود را وارد کنید
       </p>
 
-      <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام</span>
-        <Input v-model="form.firstName" class="h-11 rounded-xl border-T-400 text-[13px]" />
+      <div class="flex items-start gap-2 rounded-xl border border-[#e8cf9a] bg-[#f2ddb4] px-4 py-3 text-[#cf982c]">
+        <IconInfoCircle class="mt-0.5 size-4 shrink-0" />
+        <span class="text-[12px] font-bold leading-5">
+          نام دارنده حساب بانکی باید با نام صاحب شماره موبایل ثبت‌شده در حساب کاربری یکسان باشد.
+        </span>
       </div>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[13px] text-T-800">نام خانوادگی</span>
-        <Input v-model="form.lastName" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        <span class="text-[13px] text-T-800">شماره کارت</span>
+        <Input v-model="form.cardNumber" inputmode="numeric" dir="ltr" class="h-11 rounded-xl border-T-400 text-[13px]" />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-[13px] text-T-800">شماره شبا</span>
+        <Input v-model="form.shebaNumber" inputmode="numeric" dir="ltr" class="h-11 rounded-xl border-T-400 text-[13px]" />
       </div>
 
       <div class="flex gap-3">

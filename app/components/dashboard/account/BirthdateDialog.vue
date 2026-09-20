@@ -16,17 +16,15 @@ const emit = defineEmits<{
   'submit': [payload: { year: string, month: string, day: string, birthDate: string }]
 }>()
 
-const year = ref('')
-const month = ref('')
-const day = ref('')
+const form = reactive({ year: '', month: '', day: '' })
 
 watch(
   () => props.open,
   (open) => {
     if (open) {
-      year.value = props.year
-      month.value = props.month
-      day.value = props.day
+      form.year = props.year
+      form.month = props.month
+      form.day = props.day
     }
   },
   { immediate: true },
@@ -37,12 +35,12 @@ function close() {
 }
 
 function submit() {
-  if (!year.value || !month.value || !day.value) return
+  if (!form.year || !form.month || !form.day) return
   emit('submit', {
-    year: year.value,
-    month: month.value,
-    day: day.value,
-    birthDate: formatBirthDate(year.value, month.value, day.value),
+    year: form.year,
+    month: form.month,
+    day: form.day,
+    birthDate: formatBirthDate(form.year, form.month, form.day),
   })
   close()
 }
@@ -50,17 +48,19 @@ function submit() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
-      <DialogTitle class="text-start text-[15px] font-bold text-T-900">
-        تاریخ تولد
-      </DialogTitle>
+    <DialogContent class="gap-6 rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
+      <div class="border-b border-T-300 pb-4">
+        <DialogTitle class="text-start text-[16px] font-bold text-T-900">
+          تاریخ تولد
+        </DialogTitle>
+      </div>
 
       <div class="flex gap-3">
         <div class="flex flex-1 flex-col gap-2">
           <span class="text-[13px] text-T-800">سال</span>
           <div class="relative">
             <select
-              v-model="year"
+              v-model="form.year"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
               <option value="" disabled>انتخاب سال</option>
@@ -74,7 +74,7 @@ function submit() {
           <span class="text-[13px] text-T-800">ماه</span>
           <div class="relative">
             <select
-              v-model="month"
+              v-model="form.month"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
               <option value="" disabled>انتخاب ماه</option>
@@ -88,7 +88,7 @@ function submit() {
           <span class="text-[13px] text-T-800">روز</span>
           <div class="relative">
             <select
-              v-model="day"
+              v-model="form.day"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
               <option value="" disabled>انتخاب روز</option>

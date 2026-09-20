@@ -13,12 +13,12 @@ const emit = defineEmits<{
   'submit': [payload: { nationalId: string }]
 }>()
 
-const nationalId = ref('')
+const form = reactive({ nationalId: '' })
 
 watch(
   () => props.open,
   (open) => {
-    if (open) nationalId.value = props.nationalId
+    if (open) form.nationalId = props.nationalId
   },
   { immediate: true },
 )
@@ -28,22 +28,24 @@ function close() {
 }
 
 function submit() {
-  if (!nationalId.value.trim()) return
-  emit('submit', { nationalId: nationalId.value.trim() })
+  if (!form.nationalId.trim()) return
+  emit('submit', { nationalId: form.nationalId.trim() })
   close()
 }
 </script>
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
-      <DialogTitle class="text-start text-[15px] font-bold text-T-900">
-        کد ملی
-      </DialogTitle>
+    <DialogContent class="gap-6 rounded-2xl p-6 max-sm:top-auto max-sm:bottom-0 max-sm:max-w-none max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-3xl max-sm:border-x-0 max-sm:border-b-0 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom sm:max-w-[380px]">
+      <div class="border-b border-T-300 pb-4">
+        <DialogTitle class="text-start text-[16px] font-bold text-T-900">
+          کد ملی
+        </DialogTitle>
+      </div>
 
       <div class="flex flex-col gap-2">
         <span class="text-[13px] text-T-800">کد ملی</span>
-        <Input v-model="nationalId" inputmode="numeric" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        <Input v-model="form.nationalId" inputmode="numeric" class="h-11 rounded-xl border-T-400 text-[13px]" />
       </div>
 
       <div class="flex gap-3">
