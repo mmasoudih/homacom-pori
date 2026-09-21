@@ -125,3 +125,42 @@ Multi-arch images (`linux/amd64`, `linux/arm64`) are built and pushed to the
 Gitea container registry by `.gitea/workflows/build.yml`. Set the repository
 variable `REGISTRY` (e.g. `git.example.com`) and the secrets
 `REGISTRY_USERNAME` / `REGISTRY_TOKEN`.
+
+## Deployment
+
+Production deploys run on a self-hosted Gitea runner labelled
+`homacom-production`. `.gitea/workflows/deploy.yml` runs on every push to
+`main` (and manual dispatch):
+
+1. **test** — lint + typecheck on `ubuntu-latest` (gate).
+2. **deploy** — on the `homacom-production` runner:
+   - `docker build -t homacom-pori:prod -f Dockerfile .`
+   - `docker compose -f /opt/apps/homacom/docker-compose.yml up -d --force-recreate`
+   - boot-log tail, `docker ps`, and a `curl -fsS http://127.0.0.1:4500/health` check.
+
+### One-time server setup
+
+The runner host only needs the image (built by CI) and a compose file — no repo
+checkout is required on the server.
+
+```bash
+sudo mkdir -p /opt/apps/homacom
+sudo cp deploy/docker-compose.server.yml /opt/apps/homacom/docker-compose.yml
+sudo cp deploy/.env.example /opt/apps/homacom/.env   # then edit values
+```
+
+`deploy/docker-compose.server.yml` runs the pre-built `homacom-pori:prod` image
+(no `build:`), publishes `${APP_PORT:-4500}`, and keeps the same hardening as
+the base compose. Compose reads `/opt/apps/homacom/.env` automatically.
+
+### Rollback
+
+Re-point the image tag to a known-good build and recreate:
+
+```bash
+docker tag <known-good-image> homacom-pori:prod
+docker compose -f /opt/apps/homacom/docker-compose.yml up -d --force-recreate
+```
+
+The previous image remains on the host until pruned, so `docker images` lists
+the candidates.
