@@ -15,7 +15,7 @@ const ROOT_NODE: Category = { id: '__root', title: 'دسته‌بندی محصو
 
 const stack = ref<Category[]>([ROOT_NODE])
 
-const current = computed(() => stack.value[stack.value.length - 1])
+const current = computed(() => stack.value[stack.value.length - 1]!)
 const items = computed(() => current.value.children ?? [])
 
 function openLevel(cat: Category) {

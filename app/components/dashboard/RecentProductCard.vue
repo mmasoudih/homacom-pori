@@ -29,9 +29,9 @@ const discount = computed(() =>
       <span
         v-if="colors.length"
         class="absolute top-2 end-2 size-[10px] rounded-[3px] border border-T-500"
-        :style="{ backgroundColor: colors[0].value }"
+        :style="{ backgroundColor: colors[0]?.value }"
         role="img"
-        :aria-label="colors[0].name ?? 'رنگ محصول'"
+        :aria-label="colors[0]?.name ?? 'رنگ محصول'"
       />
     </div>
 

@@ -10,6 +10,8 @@ import {
   IconBox,
   IconCoins,
   IconPhoto,
+  IconVideo,
+  IconRefresh,
 } from '@tabler/icons-vue'
 import Fade from 'embla-carousel-fade'
 import type { ProductDetail, ServiceCatalogItem } from '~/data/product'
@@ -49,6 +51,7 @@ const canNavigate = computed(() => imageCount.value > 1)
 const fadePlugins = [Fade()]
 
 function onGalleryInit(api: CarouselApi) {
+  if (!api) return
   galleryIndex.value = api.selectedScrollSnap()
   api.on('select', () => {
     galleryIndex.value = api.selectedScrollSnap()

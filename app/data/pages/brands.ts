@@ -22,7 +22,7 @@ const base: BrandItem[] = [
 ]
 
 /** 40 cards = 8 columns × 5 rows on desktop. */
-export const brands: BrandItem[] = Array.from({ length: 40 }, (_, i) => base[i % base.length])
+export const brands: BrandItem[] = Array.from({ length: 40 }, (_, i) => base[i % base.length]!)
 
 export const brandsPage = {
   title: 'برندها',
