@@ -29,6 +29,7 @@ function syncActive() {
 }
 
 function onInit(emblaApi: CarouselApi) {
+  if (!emblaApi) return
   api.value = emblaApi
   syncActive()
   emblaApi.on('select', syncActive)

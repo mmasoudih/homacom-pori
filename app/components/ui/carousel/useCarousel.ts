@@ -1,7 +1,7 @@
 import type { UnwrapRefCarouselApi as CarouselApi, CarouselEmits, CarouselProps } from "./interface"
 import { createInjectionState } from "@vueuse/core"
 import emblaCarouselVue from "embla-carousel-vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, unref } from "vue"
 
 const [useProvideCarousel, useInjectCarousel] = createInjectionState(
   ({
@@ -32,6 +32,9 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
     // Embla has no native "free drag with snap": `dragFree` disables snapping.
     // Restore it by snapping to the nearest slide once a free scroll settles.
     function attachFreeSnap(api: CarouselApi) {
+      if (!api)
+        return
+
       let snapping = false
 
       api.on("settle", () => {
@@ -66,7 +69,7 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
       emblaApi.value?.on("reInit", onSelect)
       emblaApi.value?.on("select", onSelect)
 
-      if (opts?.dragFree)
+      if (unref(opts)?.dragFree)
         attachFreeSnap(emblaApi.value)
 
       emits("init-api", emblaApi.value)

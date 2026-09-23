@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 defineProps<{
   item: OrderItem
-  modelValue: boolean
+  modelValue?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -17,7 +17,7 @@ const emit = defineEmits<{
     <Checkbox
       :model-value="modelValue"
       class="size-5 rounded-md"
-      @update:model-value="emit('update:modelValue', $event)"
+      @update:model-value="emit('update:modelValue', Boolean($event))"
     />
     <ProductImage
       :src="item.image"

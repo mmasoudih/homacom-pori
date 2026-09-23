@@ -41,10 +41,10 @@ const activeChip = ref(0)
         <!-- First section: warranty guide + product chips -->
         <section class="flex flex-col items-center text-center lg:items-start lg:text-start">
           <h2 class="text-[20px] font-bold leading-[30px] text-foreground">
-            {{ guaranteePage.sections[0].heading }}
+            {{ guaranteePage.sections[0]?.heading }}
           </h2>
           <p class="mt-3 max-w-[1000px] text-[14.5px] leading-[28px] text-T-700">
-            {{ guaranteePage.sections[0].body }}
+            {{ guaranteePage.sections[0]?.body }}
           </p>
         </section>
 
