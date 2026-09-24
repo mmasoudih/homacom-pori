@@ -1,7 +1,5 @@
-# syntax=docker/dockerfile:1
-
 # --- Base -------------------------------------------------------------------
-FROM node:24-alpine AS base
+FROM public.ecr.aws/docker/library/node:24-alpine AS base
 ENV PNPM_HOME="/pnpm" \
     PATH="/pnpm:$PATH"
 RUN corepack enable
@@ -21,7 +19,7 @@ COPY . .
 RUN pnpm build
 
 # --- Runtime ----------------------------------------------------------------
-FROM node:24-alpine AS runtime
+FROM public.ecr.aws/docker/library/node:24-alpine AS runtime
 ENV NODE_ENV=production \
     NITRO_HOST=0.0.0.0 \
     NITRO_PORT=3000
