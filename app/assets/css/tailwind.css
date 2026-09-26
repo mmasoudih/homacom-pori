@@ -273,6 +273,12 @@
     @apply border-border outline-ring/50;
   }
 
+  /* The site header animates its height (collapse on scroll), which would
+     otherwise trigger scroll anchoring and make the scroll position drift. */
+  html {
+    overflow-anchor: none;
+  }
+
   body {
     @apply bg-background text-foreground;
   }

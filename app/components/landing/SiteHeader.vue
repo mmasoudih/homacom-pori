@@ -54,35 +54,22 @@ watch(
 )
 
 // Hide the phone + nav row when scrolling down, reveal it when scrolling up.
-// The row also collapses the header height, which shifts layout and makes the
-// browser fire compensating scroll events — a short lock keeps that from
-// flipping the state back mid-transition.
 const { y: scrollY } = useWindowScroll()
 const rowHidden = ref(false)
 let lastScrollY = 0
-let scrollLockUntil = 0
 
 watch(scrollY, (value) => {
-  const now = Date.now()
-  if (now < scrollLockUntil) {
-    lastScrollY = value
+  const delta = value - lastScrollY
+  lastScrollY = value
+
+  // Always reveal at the very top of the page.
+  if (value < 80) {
+    rowHidden.value = false
     return
   }
 
-  const delta = value - lastScrollY
-  const next = value < 80
-    ? false
-    : delta > 6
-      ? true
-      : delta < -6
-        ? false
-        : rowHidden.value
-
-  if (next !== rowHidden.value) {
-    rowHidden.value = next
-    scrollLockUntil = now + 700
-  }
-  lastScrollY = value
+  if (delta > 6) rowHidden.value = true
+  else if (delta < -6) rowHidden.value = false
 })
 
 onMounted(() => {
