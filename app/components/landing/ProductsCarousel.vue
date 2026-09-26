@@ -27,7 +27,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1302px] rounded-[20px] border border-T-400 py-5 md:py-6">
+  <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 md:py-6">
     <div class="px-4 md:px-5">
       <!-- Title row -->
       <LandingSectionTitle :title="title" variant="row" :indicator="'right'" />

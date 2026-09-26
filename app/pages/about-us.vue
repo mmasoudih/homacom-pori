@@ -13,7 +13,7 @@ useHead({
 
     <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-0">
       <!-- Hero card -->
-      <section class="mt-10 w-full max-w-[1100px] rounded-[16px] border border-T-400 bg-T-50 p-6 lg:mt-14 lg:grid lg:grid-cols-[240px_1fr] lg:gap-10 lg:p-10">
+      <section class="mt-10 w-full max-w-[1440px] rounded-[16px] border border-T-400 bg-T-50 p-6 lg:mt-14 lg:grid lg:grid-cols-[240px_1fr] lg:gap-10 lg:p-10">
         <!-- Right rail -->
         <div class="flex flex-col items-center gap-5 lg:items-start lg:pt-2">
           <span class="flex size-14 items-center justify-center rounded-full bg-R-10">
@@ -42,7 +42,7 @@ useHead({
       </section>
 
       <!-- Article -->
-      <section class="mt-10 w-full max-w-[1100px] rounded-[16px] border border-T-400 bg-T-50 p-6 lg:mt-12 lg:p-8">
+      <section class="mt-10 w-full max-w-[1440px] rounded-[16px] border border-T-400 bg-T-50 p-6 lg:mt-12 lg:p-8">
         <template v-for="(section, si) in aboutPage.sections" :key="si">
           <h2
             class="text-[18px] font-bold leading-[28px] text-primary"

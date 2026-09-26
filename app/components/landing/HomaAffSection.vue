@@ -11,7 +11,7 @@ const cardRounding = (i: number) => [
 </script>
 
 <template>
-  <section class="relative isolate mx-auto w-full max-w-[1401px] overflow-hidden bg-R-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[url(/icons/texture.svg)] before:bg-repeat before:opacity-[0.05] before:content-[''] lg:rounded-3xl lg:px-[25px] lg:py-[25px]">
+  <section class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden bg-R-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[url(/icons/texture.svg)] before:bg-repeat before:opacity-[0.05] before:content-[''] lg:rounded-3xl lg:px-[25px] lg:py-[25px]">
     <!-- Mobile title row -->
     <div class="flex items-center justify-between px-4 pt-[25px] lg:hidden">
       <a

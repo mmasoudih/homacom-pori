@@ -4,7 +4,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-6">
+  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 md:px-0 md:py-6">
     <LandingSectionTitle title="وبلاگ" variant="row" />
 
     <!-- Mobile: horizontal scroll -->

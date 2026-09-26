@@ -95,7 +95,7 @@ onMounted(() => {
     <LandingTopBar />
 
     <!-- Desktop (≥1280px) -->
-    <div class="mx-auto hidden max-w-[1350px] xl:block">
+    <div class="mx-auto hidden max-w-[1440px] xl:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->

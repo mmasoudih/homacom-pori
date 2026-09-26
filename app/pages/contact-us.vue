@@ -80,7 +80,7 @@ const socialIcons = {
         </p>
       </div>
 
-      <div class="mt-10 flex w-full max-w-[1100px] flex-col gap-4 lg:mt-12">
+      <div class="mt-10 flex w-full max-w-[1440px] flex-col gap-4 lg:mt-12">
         <!-- Online guide -->
         <section class="rounded-[16px] border border-T-400 bg-T-50 p-5 lg:p-6">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-10">
@@ -179,7 +179,7 @@ const socialIcons = {
       </div>
 
       <!-- Message form -->
-      <section class="mt-10 w-full max-w-[1100px] rounded-[16px] border border-T-400 bg-T-50 p-5 lg:p-8">
+      <section class="mt-10 w-full max-w-[1440px] rounded-[16px] border border-T-400 bg-T-50 p-5 lg:p-8">
         <h2 class="text-[18px] font-bold text-foreground">{{ contactPage.form.title }}</h2>
         <p class="mt-2 text-[13.5px] leading-[22px] text-T-600">
           {{ contactPage.form.subtitle }}

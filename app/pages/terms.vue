@@ -29,7 +29,7 @@ useHead({
       </PagesPageHeader>
 
       <!-- Document sections -->
-      <div class="mt-12 w-full max-w-[900px] px-4 lg:mt-16">
+      <div class="mt-12 w-full max-w-[1440px] px-4 lg:mt-16">
         <template v-for="(section, si) in termsPage.sections" :key="si">
           <section class="py-2">
             <h2 class="text-[20px] font-bold leading-[30px] text-foreground">

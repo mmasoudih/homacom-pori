@@ -19,7 +19,7 @@ const navItems = [
 <template>
   <div class="hidden min-h-dvh flex-col bg-T-50 xl:flex">
     <header class="w-full border-b border-T-400 bg-T-50">
-      <div class="mx-auto flex max-w-[1350px] items-center justify-between gap-6 px-4 py-3 lg:px-6">
+      <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-3 lg:px-6">
         <NuxtLink
           :to="props.backTo"
           class="flex shrink-0 items-center gap-1.5 text-[13px] font-semibold text-primary transition-colors hover:text-R-400"
@@ -43,7 +43,7 @@ const navItems = [
       </div>
     </header>
 
-    <main class="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
+    <main class="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
       <slot />
     </main>
   </div>

@@ -37,7 +37,7 @@ const activeChip = ref(0)
       />
 
       <!-- Sections -->
-      <div class="mt-10 w-full max-w-[1260px] px-4 lg:mt-14">
+      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14">
         <!-- First section: warranty guide + product chips -->
         <section class="flex flex-col items-center text-center lg:items-start lg:text-start">
           <h2 class="text-[20px] font-bold leading-[30px] text-foreground">
