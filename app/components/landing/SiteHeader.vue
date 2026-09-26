@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWindowScroll } from '@vueuse/core'
+import { useElementSize, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
 import { unreadNotifications } from '~/data/dashboard'
@@ -7,6 +7,13 @@ import coinsFront from '../../../public/icons/coins-front.svg?raw'
 import userCheckCircleAlt from '../../../public/icons/user-check-circle-alt.svg?raw'
 import storeIcon from '../../../public/icons/store.svg?raw'
 import gridSquareCircle from '../../../public/icons/grid-square-circle.svg?raw'
+
+withDefaults(defineProps<{
+  /** Render the quick-access circle strip inside the header (home page only). */
+  quickCategories?: boolean
+}>(), {
+  quickCategories: false,
+})
 
 const navIcons: Record<string, string> = {
   coins: coinsFront,
@@ -16,6 +23,17 @@ const navIcons: Record<string, string> = {
 }
 
 const route = useRoute()
+
+// Expose the rendered header height as a CSS variable so the mega-menu panel
+// (teleported to <body>, position: fixed) sits flush under the header on every
+// page — accounting for the top bar, the collapsing nav row and circle strip.
+const headerEl = ref<HTMLElement | null>(null)
+const { height: headerHeight } = useElementSize(headerEl)
+
+watch(headerHeight, (height) => {
+  if (!import.meta.client || height <= 0) return
+  document.documentElement.style.setProperty('--site-header-offset', `${Math.round(height)}px`)
+})
 
 const token = useCookie('auth_token')
 const authed = computed(() => !!token.value)
@@ -73,7 +91,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
+  <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
+    <LandingTopBar />
+
     <!-- Desktop (≥1280px) -->
     <div class="mx-auto hidden max-w-[1350px] xl:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
@@ -141,13 +161,16 @@ onMounted(() => {
 
       <!-- Row 2: Phone + Nav (collapses on scroll down, reveals on scroll up) -->
       <div
-        class="grid overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        class="grid grid-cols-1 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
         :class="rowHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'"
       >
-        <div class="min-h-0">
+        <div class="min-h-0 min-w-0">
           <div
-            class="flex items-center justify-between pt-[27px] pb-[21px] transition-[transform,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            :class="rowHidden ? '-translate-y-4 blur-[2px]' : 'translate-y-0 blur-0'"
+            class="flex items-center justify-between pt-[27px] transition-[transform,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            :class="[
+              quickCategories ? 'pb-3' : 'pb-[21px]',
+              rowHidden ? '-translate-y-4 blur-[2px]' : 'translate-y-0 blur-0',
+            ]"
           >
             <!-- Nav -->
             <nav class="flex items-center gap-8">
@@ -186,34 +209,52 @@ onMounted(() => {
               <span><span class="text-R-300">0121</span>-3250789</span>
             </a>
           </div>
+
+          <div class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
+          <!-- Quick-access circle strip (home only) -->
+          <LandingHeaderCircleStrip v-if="quickCategories" class="w-full pb-[20px]" />
+
         </div>
       </div>
     </div>
 
     <!-- Mobile / Tablet (<1280px) -->
-    <div class="flex h-[73px] items-center justify-between px-4 xl:hidden">
-      <!-- Logo (right in RTL) -->
-      <a href="#" class="shrink-0">
-        <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
-      </a>
+    <div class="xl:hidden">
+      <div class="flex h-[73px] items-center justify-between px-4">
+        <!-- Logo (right in RTL) -->
+        <a href="#" class="shrink-0">
+          <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
+        </a>
 
-      <!-- Search pill (left in RTL) -->
-      <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
-        <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
-        <IconSearch class="size-5 shrink-0 text-T-600" />
+        <!-- Search pill (left in RTL) -->
+        <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
+          <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
+          <IconSearch class="size-5 shrink-0 text-T-600" />
+        </div>
+
+        <NuxtLink
+          v-if="authed"
+          to="/dashboard"
+          class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
+          aria-label="حساب کاربری"
+        >
+          <IconUser class="size-6" />
+          <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+            {{ unreadNotifications }}
+          </span>
+        </NuxtLink>
       </div>
 
-      <NuxtLink
-        v-if="authed"
-        to="/dashboard"
-        class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
-        aria-label="حساب کاربری"
+      <!-- Quick-access circle strip, after the search box (home only) -->
+      <div
+        v-if="quickCategories"
+        class="grid grid-cols-1 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        :class="rowHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'"
       >
-        <IconUser class="size-6" />
-        <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-          {{ unreadNotifications }}
-        </span>
-      </NuxtLink>
+        <div class="min-h-0 min-w-0">
+          <LandingHeaderCircleStrip class="w-full px-4 pb-3" />
+        </div>
+      </div>
     </div>
 
     <CategoriesCategoryMegaMenu :open="megaOpen" @close="handleMegaClose" />

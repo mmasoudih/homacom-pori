@@ -41,6 +41,40 @@ export const categories: Category[] = [
   { title: 'صوتی تصویری', count: '150', icon: 'speakers' },
 ]
 
+export interface HeaderCircle {
+  title: string
+  subtitle: string
+  image: string
+  href: string
+  badge?: string
+  accent?: boolean
+}
+
+const headerCircleLabels = [
+  { title: 'کولر اسپلیت', subtitle: 'جنرال موتور' },
+  { title: 'اسپیکر', subtitle: 'بلوتوثی' },
+  { title: 'آیفون ۱۷ پروکس', subtitle: 'نارنجی' },
+]
+
+/**
+ * Home-page header quick-access circle strip.
+ * NOTE: placeholder content mocked from the design screenshot — the three
+ * titles below are cycled to fill the strip. Swap for real titles/hrefs later.
+ */
+export const headerCircles: HeaderCircle[] = Array.from(
+  { length: 18 },
+  (_, i) => {
+    const label = headerCircleLabels[i % headerCircleLabels.length]!
+    return {
+      ...label,
+      image: '/header-slider-products.png',
+      href: '#',
+      badge: 'خرید',
+      accent: label.title === 'کولر اسپلیت',
+    }
+  },
+)
+
 const SAMSUNG_TITLE =
   'گوشی موبایل سامسونگ مدل Galaxy A05s دو سیم‌کارت ظرفیت 128GB و رم 4 گیگابایت'
 

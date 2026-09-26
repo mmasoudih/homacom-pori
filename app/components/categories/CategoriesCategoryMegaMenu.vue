@@ -183,11 +183,11 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 .mega-panel {
   position: fixed;
-  top: 142px;
+  top: var(--site-header-offset, 142px);
   right: 0;
   z-index: 50;
   width: 66.667%;
-  height: calc(100vh - 142px);
+  height: calc(100vh - var(--site-header-offset, 142px));
   animation: mega-panel-in 180ms ease-out;
 }
 

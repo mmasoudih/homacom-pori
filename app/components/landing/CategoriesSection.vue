@@ -23,7 +23,7 @@ const iconMap: Record<string, string> = {
 </script>
 
 <template>
-  <section id="categories" class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-16">
+  <section id="categories" class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-10">
     <LandingSectionTitle title="دسته‌بندی‌ها" variant="centered" class="mb-8" />
 
     <!-- Mobile: circular icon grid -->

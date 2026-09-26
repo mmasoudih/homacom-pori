@@ -16,7 +16,7 @@ useHead({
 
 <template>
   <div class="flex min-h-dvh flex-col bg-background">
-    <LandingSiteHeader />
+    <LandingSiteHeader quick-categories />
 
     <!--
       Mobile section order follows the Figma "Landing Mobile" frame:
