@@ -210,7 +210,7 @@ onMounted(() => {
             </a>
           </div>
 
-          <div class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
+          <div v-if="quickCategories" class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
           <!-- Quick-access circle strip (home only) -->
           <LandingHeaderCircleStrip v-if="quickCategories" class="w-full pb-[20px]" />
 
