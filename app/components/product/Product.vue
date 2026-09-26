@@ -122,7 +122,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
         <span
           v-for="(color, ci) in colors"
           :key="`${color.value}-${ci}`"
-          class="size-[10px] rounded-[3px] border"
+          class="size-3.5 rounded-[3px] border"
           :class="cn(swatchBorder, selectedColor === color.value && 'ring-1 ring-primary ring-offset-1')"
           :style="{ backgroundColor: color.value }"
           role="img"
@@ -149,7 +149,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     >
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex h-[21px] shrink-0 items-center justify-center rounded-lg px-1 text-[12px] font-extrabold"
+        class="flex shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold py-1 px-2"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
       <ProductPrice
