@@ -160,8 +160,10 @@ onMounted(() => {
       </div>
 
       <!-- Row 2: Phone + Nav (collapses on scroll down, reveals on scroll up) -->
+      <!-- overflow-clip + clip-margin (instead of overflow-hidden) so the strip's
+           arrows can protrude past the container edge without being cropped. -->
       <div
-        class="grid grid-cols-1 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        class="grid grid-cols-1 overflow-clip transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] [overflow-clip-margin:24px]"
         :class="rowHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'"
       >
         <div class="min-h-0 min-w-0">
