@@ -120,6 +120,10 @@
   --color-R-400: var(--R-400);
   --color-R-500: var(--R-500);
 
+  /* Brand purple / top announcement bar */
+  --color-P-400: var(--P-400);
+  --color-P-500: var(--P-500);
+
   /* Neutral / text */
   --color-T-50: var(--T-50);
   --color-T-100: var(--T-100);
@@ -143,10 +147,16 @@
   --font-sans: "Arad", "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --animate-marquee: marquee 40s linear infinite;
+  --animate-topbar-in: topbar-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
+  }
+
+  @keyframes topbar-in {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 }
 
@@ -162,6 +172,10 @@
   --R-300: #ef233c;
   --R-400: #a7192a;
   --R-500: #921525;
+
+  /* Brand purple / top announcement bar */
+  --P-400: #4f4699;
+  --P-500: #423A85;
 
   /* Neutral / text palette (light mode) */
   --T-50: #FFFFFF;
@@ -259,6 +273,12 @@
     @apply border-border outline-ring/50;
   }
 
+  /* The site header animates its height (collapse on scroll), which would
+     otherwise trigger scroll anchoring and make the scroll position drift. */
+  html {
+    overflow-anchor: none;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -269,7 +289,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee {
+    .animate-marquee,
+    .animate-topbar-in {
       animation: none;
     }
   }

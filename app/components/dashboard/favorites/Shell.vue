@@ -2,7 +2,7 @@
   <div class="hidden min-h-dvh flex-col bg-T-50 xl:flex">
     <LandingSiteHeader />
 
-    <main class="mx-auto w-full max-w-[1350px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
+    <main class="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
       <div class="flex flex-col gap-6 xl:flex-row xl:items-start">
         <DashboardSidebar class="hidden xl:block xl:w-[340px] xl:shrink-0" />
 

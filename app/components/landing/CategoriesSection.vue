@@ -23,7 +23,7 @@ const iconMap: Record<string, string> = {
 </script>
 
 <template>
-  <section id="categories" class="mx-auto w-full max-w-[1350px] px-4 py-5 md:px-0 md:py-16">
+  <section id="categories" class="mx-auto w-full max-w-[1440px] px-4 py-5 md:px-0 md:py-10">
     <LandingSectionTitle title="دسته‌بندی‌ها" variant="centered" class="mb-8" />
 
     <!-- Mobile: circular icon grid -->
@@ -62,14 +62,14 @@ const iconMap: Record<string, string> = {
         <!-- Content card -->
         <a
           href="#"
-          class="col-span-2 col-start-2 row-start-1 my-[5px] flex items-center justify-end rounded-[20px] border-2 border-T-400 bg-T-50 pl-[45px] pr-[12px] transition-colors group-hover:border-R-50"
+          class="col-span-2 col-start-2 row-start-1 my-[5px] flex items-center justify-start rounded-[20px] border-2 border-T-400 bg-T-50 pl-[45px] pr-10 transition-colors group-hover:border-R-50"
           dir="rtl"
         >
           <div class="flex flex-col gap-[2px]">
             <h3 class="text-[16px] font-bold leading-[24px] text-foreground">
               {{ cat.title }}
             </h3>
-            <p class="flex items-center gap-1 text-[12.5px] text-T-600">
+            <p class="flex flex-row-reverse items-center gap-1 text-[12.5px] text-T-600">
               <span>محصول موجود است</span>
               <span class="text-[14px] font-bold text-foreground">{{ cat.count }}</span>
             </p>

@@ -58,7 +58,7 @@ const categoryIcons = {
 
     <main class="flex flex-col items-center pb-16">
       <!-- Hero -->
-      <section class="mt-10 grid w-full max-w-[1260px] grid-cols-1 items-center gap-10 px-4 lg:mt-16 lg:grid-cols-[1fr_380px] lg:gap-16 lg:px-0">
+      <section class="mt-10 grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-4 lg:mt-16 lg:grid-cols-[1fr_380px] lg:gap-16 lg:px-0">
         <div class="flex flex-col items-center text-center lg:items-start lg:text-start">
           <span class="text-[14px] font-semibold text-primary">خرید اقساطی</span>
           <h1 class="mt-2 text-[28px] font-bold leading-[42px] text-foreground lg:text-[34px] lg:leading-[50px]">
@@ -118,7 +118,7 @@ const categoryIcons = {
       </section>
 
       <!-- Steps -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <h2 class="text-center text-[22px] font-bold leading-[32px] text-foreground lg:text-start">
           {{ installmentPage.stepsTitle }}
         </h2>
@@ -148,7 +148,7 @@ const categoryIcons = {
       </section>
 
       <!-- Partners -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <h2 class="text-[22px] font-bold leading-[32px] text-primary">
           {{ installmentPage.partnersTitle }}
         </h2>
@@ -171,7 +171,7 @@ const categoryIcons = {
       </section>
 
       <!-- Plan panel -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <div class="flex flex-col rounded-[16px] border border-T-400 bg-T-50 p-6 lg:flex-row lg:items-center lg:justify-between lg:p-8">
           <div class="flex flex-col gap-4">
             <h3 class="text-[18px] font-bold text-foreground">
@@ -210,7 +210,7 @@ const categoryIcons = {
       </section>
 
       <!-- Benefits -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <h2 class="text-[22px] font-bold leading-[32px] text-primary">
           {{ installmentPage.benefitsTitle }}
         </h2>
@@ -243,7 +243,7 @@ const categoryIcons = {
       </section>
 
       <!-- FAQ -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <h2 class="text-[22px] font-bold leading-[32px] text-primary">
           {{ installmentPage.faqTitle }}
         </h2>
@@ -257,7 +257,7 @@ const categoryIcons = {
       </section>
 
       <!-- Categories -->
-      <section class="mt-16 w-full max-w-[1260px] px-4 lg:mt-20 lg:px-0">
+      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-0">
         <h2 class="text-[22px] font-bold leading-[32px] text-primary">
           {{ installmentPage.categoriesTitle }}
         </h2>

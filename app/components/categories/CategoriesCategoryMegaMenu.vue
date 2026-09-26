@@ -100,10 +100,14 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 <template>
   <Teleport to="body">
-    <Transition name="mega">
-      <div v-if="open" class="hidden xl:block">
-        <CategoriesMegaMenuBackdrop @close="emit('close')" />
+    <!-- Backdrop gets its own fade so it appears smoothly (it animates its own
+         opacity rather than relying on the parent's opacity transition). -->
+    <Transition name="mega-backdrop">
+      <CategoriesMegaMenuBackdrop v-if="open" class="hidden xl:block" @close="emit('close')" />
+    </Transition>
 
+    <Transition name="mega">
+      <div v-if="open" class="relative z-[101] hidden xl:block">
         <nav
           ref="panelRoot"
           class="mega-panel bg-T-50 shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
@@ -181,13 +185,27 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   opacity: 0;
 }
 
+.mega-backdrop-enter-active,
+.mega-backdrop-leave-active {
+  transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mega-backdrop-enter-from,
+.mega-backdrop-leave-to {
+  opacity: 0;
+}
+
 .mega-panel {
   position: fixed;
-  top: 142px;
+  /* Anchored right under the trigger button (see SiteHeader syncMegaPosition);
+     falls back to the header bottom if the var is unset. Sticks to the right
+     edge of the screen. */
+  top: var(--mega-panel-top, var(--site-header-offset, 142px));
   right: 0;
-  z-index: 50;
+  /* Above the sticky header (z-60) and every other overlay so the panel is
+     always the topmost layer. */
+  z-index: 80;
   width: 66.667%;
-  height: calc(100vh - 142px);
+  height: calc(100vh - var(--mega-panel-top, var(--site-header-offset, 142px)));
   animation: mega-panel-in 180ms ease-out;
 }
 

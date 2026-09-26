@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWindowScroll } from '@vueuse/core'
+import { useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
 import { unreadNotifications } from '~/data/dashboard'
@@ -7,6 +7,13 @@ import coinsFront from '../../../public/icons/coins-front.svg?raw'
 import userCheckCircleAlt from '../../../public/icons/user-check-circle-alt.svg?raw'
 import storeIcon from '../../../public/icons/store.svg?raw'
 import gridSquareCircle from '../../../public/icons/grid-square-circle.svg?raw'
+
+withDefaults(defineProps<{
+  /** Render the quick-access circle strip inside the header (home page only). */
+  quickCategories?: boolean
+}>(), {
+  quickCategories: false,
+})
 
 const navIcons: Record<string, string> = {
   coins: coinsFront,
@@ -16,6 +23,17 @@ const navIcons: Record<string, string> = {
 }
 
 const route = useRoute()
+
+// Expose the rendered header height as a CSS variable so the mega-menu panel
+// (teleported to <body>, position: fixed) sits flush under the header on every
+// page — accounting for the top bar, the collapsing nav row and circle strip.
+const headerEl = ref<HTMLElement | null>(null)
+const { height: headerHeight } = useElementSize(headerEl)
+
+watch(headerHeight, (height) => {
+  if (!import.meta.client || height <= 0) return
+  document.documentElement.style.setProperty('--site-header-offset', `${Math.round(height)}px`)
+})
 
 const token = useCookie('auth_token')
 const authed = computed(() => !!token.value)
@@ -36,35 +54,62 @@ watch(
 )
 
 // Hide the phone + nav row when scrolling down, reveal it when scrolling up.
-// The row also collapses the header height, which shifts layout and makes the
-// browser fire compensating scroll events — a short lock keeps that from
-// flipping the state back mid-transition.
 const { y: scrollY } = useWindowScroll()
 const rowHidden = ref(false)
 let lastScrollY = 0
-let scrollLockUntil = 0
 
 watch(scrollY, (value) => {
-  const now = Date.now()
-  if (now < scrollLockUntil) {
-    lastScrollY = value
+  const delta = value - lastScrollY
+  lastScrollY = value
+
+  // Never collapse the header while the mega menu is open.
+  if (megaOpen.value) {
+    rowHidden.value = false
     return
   }
 
-  const delta = value - lastScrollY
-  const next = value < 80
-    ? false
-    : delta > 6
-      ? true
-      : delta < -6
-        ? false
-        : rowHidden.value
-
-  if (next !== rowHidden.value) {
-    rowHidden.value = next
-    scrollLockUntil = now + 700
+  // Always reveal at the very top of the page.
+  if (value < 80) {
+    rowHidden.value = false
+    return
   }
-  lastScrollY = value
+
+  if (delta > 6) rowHidden.value = true
+  else if (delta < -6) rowHidden.value = false
+})
+
+// Anchor the teleported mega panel right under the trigger button rather than
+// under the whole header: expose the button's viewport coordinates as CSS vars.
+function syncMegaPosition() {
+  if (!import.meta.client) return
+  const el = megaTriggerEl.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  document.documentElement.style.setProperty('--mega-panel-top', `${Math.round(rect.bottom)}px`)
+}
+
+function toggleMega() {
+  // Measure before opening so the panel/backdrop mount at their final position
+  // instead of flashing at the fallback offset and jumping.
+  if (!megaOpen.value) syncMegaPosition()
+  megaOpen.value = !megaOpen.value
+}
+
+watch(megaOpen, async (open) => {
+  if (!open) return
+  // Keep the header expanded while the menu is open, then re-measure once the
+  // DOM has settled so the panel stays anchored under the trigger button.
+  rowHidden.value = false
+  await nextTick()
+  syncMegaPosition()
+})
+
+watch(rowHidden, () => {
+  if (megaOpen.value) syncMegaPosition()
+})
+
+useEventListener(window, 'resize', () => {
+  if (megaOpen.value) syncMegaPosition()
 })
 
 onMounted(() => {
@@ -73,9 +118,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
+  <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50" :class="{'pb-2' : rowHidden || megaOpen}">
+    <LandingTopBar />
+
     <!-- Desktop (≥1280px) -->
-    <div class="mx-auto hidden max-w-[1350px] xl:block">
+    <div class="mx-auto hidden max-w-[1440px] xl:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->
@@ -140,14 +187,19 @@ onMounted(() => {
       </div>
 
       <!-- Row 2: Phone + Nav (collapses on scroll down, reveals on scroll up) -->
+      <!-- overflow-clip + clip-margin (instead of overflow-hidden) so the strip's
+           arrows can protrude past the container edge without being cropped. -->
       <div
-        class="grid overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        class="grid grid-cols-1 overflow-clip transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] [overflow-clip-margin:24px]"
         :class="rowHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'"
       >
-        <div class="min-h-0">
+        <div class="min-h-0 min-w-0">
           <div
-            class="flex items-center justify-between pt-[27px] pb-[21px] transition-[transform,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            :class="rowHidden ? '-translate-y-4 blur-[2px]' : 'translate-y-0 blur-0'"
+            class="flex items-center justify-between pt-[27px] transition-[transform,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            :class="[
+              quickCategories ? 'pb-3' : 'pb-[21px]',
+              rowHidden ? '-translate-y-4 blur-[2px]' : 'translate-y-0 blur-0',
+            ]"
           >
             <!-- Nav -->
             <nav class="flex items-center gap-8">
@@ -160,7 +212,7 @@ onMounted(() => {
                   :class="megaOpen ? 'text-primary' : 'text-foreground hover:text-primary'"
                   aria-haspopup="menu"
                   :aria-expanded="megaOpen"
-                  @click="megaOpen = !megaOpen"
+                  @click="toggleMega"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
                   {{ item.label }}
@@ -186,34 +238,52 @@ onMounted(() => {
               <span><span class="text-R-300">0121</span>-3250789</span>
             </a>
           </div>
+
+          <div v-if="quickCategories" class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
+          <!-- Quick-access circle strip (home only) -->
+          <LandingHeaderCircleStrip v-if="quickCategories" class="w-full pb-[20px]" />
+
         </div>
       </div>
     </div>
 
     <!-- Mobile / Tablet (<1280px) -->
-    <div class="flex h-[73px] items-center justify-between px-4 xl:hidden">
-      <!-- Logo (right in RTL) -->
-      <a href="#" class="shrink-0">
-        <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
-      </a>
+    <div class="xl:hidden">
+      <div class="flex h-[73px] items-center justify-between px-4">
+        <!-- Logo (right in RTL) -->
+        <a href="#" class="shrink-0">
+          <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
+        </a>
 
-      <!-- Search pill (left in RTL) -->
-      <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
-        <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
-        <IconSearch class="size-5 shrink-0 text-T-600" />
+        <!-- Search pill (left in RTL) -->
+        <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
+          <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
+          <IconSearch class="size-5 shrink-0 text-T-600" />
+        </div>
+
+        <NuxtLink
+          v-if="authed"
+          to="/dashboard"
+          class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
+          aria-label="حساب کاربری"
+        >
+          <IconUser class="size-6" />
+          <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+            {{ unreadNotifications }}
+          </span>
+        </NuxtLink>
       </div>
 
-      <NuxtLink
-        v-if="authed"
-        to="/dashboard"
-        class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
-        aria-label="حساب کاربری"
+      <!-- Quick-access circle strip, after the search box (home only) -->
+      <div
+        v-if="quickCategories"
+        class="grid grid-cols-1 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        :class="rowHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'"
       >
-        <IconUser class="size-6" />
-        <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-          {{ unreadNotifications }}
-        </span>
-      </NuxtLink>
+        <div class="min-h-0 min-w-0">
+          <LandingHeaderCircleStrip class="w-full px-4 pb-3" />
+        </div>
+      </div>
     </div>
 
     <CategoriesCategoryMegaMenu :open="megaOpen" @close="handleMegaClose" />

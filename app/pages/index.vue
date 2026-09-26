@@ -16,7 +16,7 @@ useHead({
 
 <template>
   <div class="flex min-h-dvh flex-col bg-background">
-    <LandingSiteHeader />
+    <LandingSiteHeader quick-categories />
 
     <!--
       Mobile section order follows the Figma "Landing Mobile" frame:
@@ -41,7 +41,7 @@ useHead({
       <!-- Strip banner -->
       <a
         :href="stripBanner.href"
-        class="order-3 block w-full max-w-[1350px] py-5 lg:order-none lg:mx-auto lg:py-6"
+        class="order-3 block w-full max-w-[1440px] py-5 lg:order-none lg:mx-auto lg:py-6"
       >
         <img
           :src="stripBanner.image"

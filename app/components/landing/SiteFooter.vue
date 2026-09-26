@@ -26,7 +26,7 @@ function scrollTop() {
     <!-- Mobile: accordion + about + back to top -->
     <div class="lg:hidden">
       <!-- Accordion -->
-      <div class="mx-auto flex max-w-[1260px] flex-col px-4">
+      <div class="mx-auto flex max-w-[1440px] flex-col px-4">
         <div
           v-for="row in accordionRows"
           :key="row.title"
@@ -69,7 +69,7 @@ function scrollTop() {
 
       <!-- About -->
       <div class="border-t border-T-400">
-        <div class="mx-auto max-w-[1260px] px-4 py-6">
+        <div class="mx-auto max-w-[1440px] px-4 py-6">
           <div class="flex items-start gap-3">
             <a href="#" class="shrink-0">
               <img src="/homacom-logo.png" alt="هماکام" class="h-[61px] w-[58px] object-contain">
@@ -86,7 +86,7 @@ function scrollTop() {
       </div>
 
       <!-- Back to top + Copyright -->
-      <div class="mx-auto max-w-[1260px] px-4 pb-28 pt-2 xl:pb-10">
+      <div class="mx-auto max-w-[1440px] px-4 pb-28 pt-2 xl:pb-10">
         <div class="flex flex-col items-center gap-4 border-t border-T-400 py-4">
           <a
             href="#"
@@ -104,7 +104,7 @@ function scrollTop() {
     <!-- Desktop -->
     <div class="hidden lg:block">
       <!-- Links section -->
-      <div class="mx-auto max-w-[1260px] px-4">
+      <div class="mx-auto max-w-[1440px] px-4">
         <div class="grid grid-cols-2 gap-8 md:grid-cols-5">
           <!-- Trust badges -->
           <div class="flex flex-col items-center gap-4">
@@ -157,7 +157,7 @@ function scrollTop() {
       </div>
 
       <!-- About section -->
-      <div class="mx-auto mt-8 max-w-[1260px] px-4">
+      <div class="mx-auto mt-8 max-w-[1440px] px-4">
         <div class="flex items-start gap-6 rounded-2xl bg-T-50 p-6">
           <a href="#" class="shrink-0">
             <img src="/homacom-logo.png" alt="هماکام" class="h-[86px] w-[91px] object-contain">
@@ -169,7 +169,7 @@ function scrollTop() {
       </div>
 
       <!-- Back to top + Copyright -->
-      <div class="mx-auto mt-4 max-w-[1260px] px-4">
+      <div class="mx-auto mt-4 max-w-[1440px] px-4">
         <div class="flex flex-col items-center gap-3 border-t border-T-400 py-4">
           <a
             href="#"

@@ -18,7 +18,7 @@ const expanded = ref(false)
 
 <template>
   <section :class="cn('w-full bg-T-100', props.class)">
-    <div class="mx-auto flex max-w-[1260px] flex-col items-center px-4 py-10 lg:py-14">
+    <div class="mx-auto flex max-w-[1440px] flex-col items-center px-4 py-10 lg:py-14">
       <div class="flex w-full flex-col items-center gap-4 lg:flex-row lg:items-start lg:gap-8">
         <h2 class="shrink-0 text-[18px] font-bold leading-[28px] text-foreground lg:pt-0.5">
           {{ title }}

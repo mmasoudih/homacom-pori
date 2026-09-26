@@ -39,7 +39,7 @@ const activeTab = ref(3)
       />
 
       <!-- Section title -->
-      <section class="mt-12 flex w-full max-w-[1260px] flex-col items-center px-4 text-center lg:mt-14 lg:items-start lg:text-start">
+      <section class="mt-12 flex w-full max-w-[1440px] flex-col items-center px-4 text-center lg:mt-14 lg:items-start lg:text-start">
         <h2 class="text-[22px] font-bold leading-[32px] text-[#D0021B]">
           {{ branchPage.sectionTitle }}
         </h2>
@@ -49,7 +49,7 @@ const activeTab = ref(3)
       </section>
 
       <!-- Branches -->
-      <div class="mt-12 flex w-full max-w-[1260px] flex-col gap-16 px-4 lg:mt-16">
+      <div class="mt-12 flex w-full max-w-[1440px] flex-col gap-16 px-4 lg:mt-16">
         <section
           v-for="branch in branchPage.branches"
           :key="branch.id"

@@ -10,9 +10,9 @@ const slides = [
   '/figma/fill-4f5b0b1a98425788.jpg',
   '/figma/fill-fc0d272a9ceafa5f.jpg',
   '/figma/fill-f48409b4bd7d0235.jpg',
-  '/figma/fill-5db09d93bf7473ad.jpg',
-  '/figma/fill-c0c190e0bee60b2a.jpg',
-  '/figma/fill-8cfc51f6d61983d7.jpg',
+  // '/figma/fill-5db09d93bf7473ad.jpg',
+  // '/figma/fill-c0c190e0bee60b2a.jpg',
+  // '/figma/fill-8cfc51f6d61983d7.jpg',
 ]
 
 const total = slides.length

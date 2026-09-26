@@ -51,7 +51,7 @@ const productIcons = {
 
     <main class="flex flex-col items-center pb-16">
       <!-- Hero -->
-      <section class="mt-10 grid w-full max-w-[1260px] grid-cols-1 items-center gap-10 px-4 lg:mt-16 lg:grid-cols-[380px_1fr] lg:gap-16 lg:px-0">
+      <section class="mt-10 grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-4 lg:mt-16 lg:grid-cols-[380px_1fr] lg:gap-16 lg:px-0">
         <!-- Chart card (left column in RTL) -->
         <div class="order-2">
           <div class="rounded-[16px] border border-T-400 bg-T-50 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
@@ -149,7 +149,7 @@ const productIcons = {
       </section>
 
       <!-- Audiences -->
-      <section class="mt-20 w-full max-w-[1260px] px-4 lg:mt-24 lg:px-0">
+      <section class="mt-20 w-full max-w-[1440px] px-4 lg:mt-24 lg:px-0">
         <LandingSectionTitle :title="collaborationPage.audiencesTitle" variant="centered" />
         <p class="mx-auto mt-4 max-w-[640px] text-center text-[15px] leading-[26px] text-T-700">
           {{ collaborationPage.audiencesIntro }}
@@ -187,7 +187,7 @@ const productIcons = {
       </section>
 
       <!-- Comparison -->
-      <section class="mt-20 w-full max-w-[1260px] px-4 lg:mt-24 lg:px-0">
+      <section class="mt-20 w-full max-w-[1440px] px-4 lg:mt-24 lg:px-0">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <!-- Them (right in RTL) -->
           <div class="rounded-[16px] border border-T-400 bg-T-50 p-8">
@@ -226,7 +226,7 @@ const productIcons = {
       </section>
 
       <!-- Products -->
-      <section class="mt-20 w-full max-w-[1260px] px-4 lg:mt-24 lg:px-0">
+      <section class="mt-20 w-full max-w-[1440px] px-4 lg:mt-24 lg:px-0">
         <LandingSectionTitle :title="collaborationPage.productsTitle" variant="centered" />
         <p class="mx-auto mt-4 max-w-[640px] text-center text-[15px] leading-[26px] text-T-700">
           {{ collaborationPage.productsIntro }}
@@ -252,7 +252,7 @@ const productIcons = {
       </section>
 
       <!-- FAQ -->
-      <section class="mt-20 w-full max-w-[1260px] px-4 lg:mt-24 lg:px-0">
+      <section class="mt-20 w-full max-w-[1440px] px-4 lg:mt-24 lg:px-0">
         <LandingSectionTitle :title="collaborationPage.faqTitle" variant="centered" />
         <p class="mx-auto mt-4 max-w-[640px] text-center text-[15px] leading-[26px] text-T-700">
           {{ collaborationPage.faqSubtitle }}

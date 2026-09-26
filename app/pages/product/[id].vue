@@ -151,11 +151,11 @@ function navigateToSection(target: 'specs' | 'comments') {
 
     <main class="flex flex-col items-center lg:pb-14">
       <!-- Product not found -->
-      <ProductDetailNotFound v-if="!loading && notFound" class="mt-10 w-full max-w-[1350px] px-4 lg:mt-16 lg:px-0" />
+      <ProductDetailNotFound v-if="!loading && notFound" class="mt-10 w-full max-w-[1440px] px-4 lg:mt-16 lg:px-0" />
 
       <template v-else>
         <!-- Skeleton -->
-        <ProductDetailSkeleton v-if="loading || !product" class="w-full max-w-[1350px]" />
+        <ProductDetailSkeleton v-if="loading || !product" class="w-full max-w-[1440px]" />
 
         <template v-else>
           <!-- ======================= Mobile hero ======================= -->
@@ -174,7 +174,7 @@ function navigateToSection(target: 'specs' | 'comments') {
           />
 
           <!-- ======================= Desktop hero ======================= -->
-          <div class="mt-12 hidden w-full max-w-[1350px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid">
+          <div class="mt-12 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid">
             <ProductDetailGallery
               :images="product.images"
               :alt="product.title"
@@ -204,11 +204,11 @@ function navigateToSection(target: 'specs' | 'comments') {
           </div>
 
           <!-- ================== Desktop-only sections =================== -->
-          <ProductDetailTrustStrip class="mt-12 hidden w-full max-w-[1350px] lg:flex" />
+          <ProductDetailTrustStrip class="mt-12 hidden w-full max-w-[1440px] lg:flex" />
 
           <div
             v-if="product.stockStatus === 'available'"
-            class="mt-12 hidden w-full max-w-[1350px] flex-col gap-10 lg:flex"
+            class="mt-12 hidden w-full max-w-[1440px] flex-col gap-10 lg:flex"
           >
             <ProductDetailFeaturesSection
               :rows="product.features.rows"
@@ -228,7 +228,7 @@ function navigateToSection(target: 'specs' | 'comments') {
           </div>
 
           <!-- ============== Review + specs + comments + related ============== -->
-          <div class="mt-8 flex w-full max-w-[1350px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
+          <div class="mt-8 flex w-full max-w-[1440px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
             <div class="flex min-w-0 flex-col gap-10 lg:gap-12">
               <ProductDetailReviewSection
                 id="product-review"
@@ -266,16 +266,16 @@ function navigateToSection(target: 'specs' | 'comments') {
           <ProductDetailRelatedSection
             :title="product.relatedTitle"
             :products="product.related"
-            class="mt-6 w-full max-w-[1350px] px-4 lg:mt-14 lg:px-0"
+            class="mt-6 w-full max-w-[1440px] px-4 lg:mt-14 lg:px-0"
           />
 
           <!-- ================== Insurance / benefits ===================== -->
-          <HomaInsuranceBanner class="mt-12 hidden w-full max-w-[1350px] lg:block" />
+          <HomaInsuranceBanner class="mt-12 hidden w-full max-w-[1440px] lg:block" />
 
           <ProductDetailInPersonBenefits
             :title="product.inPersonBenefits.title"
             :text="product.inPersonBenefits.text"
-            class="mt-6 w-full max-w-[1350px] px-4"
+            class="mt-6 w-full max-w-[1440px] px-4"
           />
         </template>
       </template>
