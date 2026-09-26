@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementSize, useWindowScroll } from '@vueuse/core'
+import { useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
 import { unreadNotifications } from '~/data/dashboard'
@@ -62,6 +62,12 @@ watch(scrollY, (value) => {
   const delta = value - lastScrollY
   lastScrollY = value
 
+  // Never collapse the header while the mega menu is open.
+  if (megaOpen.value) {
+    rowHidden.value = false
+    return
+  }
+
   // Always reveal at the very top of the page.
   if (value < 80) {
     rowHidden.value = false
@@ -72,13 +78,47 @@ watch(scrollY, (value) => {
   else if (delta < -6) rowHidden.value = false
 })
 
+// Anchor the teleported mega panel right under the trigger button rather than
+// under the whole header: expose the button's viewport coordinates as CSS vars.
+function syncMegaPosition() {
+  if (!import.meta.client) return
+  const el = megaTriggerEl.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  document.documentElement.style.setProperty('--mega-panel-top', `${Math.round(rect.bottom)}px`)
+}
+
+function toggleMega() {
+  // Measure before opening so the panel/backdrop mount at their final position
+  // instead of flashing at the fallback offset and jumping.
+  if (!megaOpen.value) syncMegaPosition()
+  megaOpen.value = !megaOpen.value
+}
+
+watch(megaOpen, async (open) => {
+  if (!open) return
+  // Keep the header expanded while the menu is open, then re-measure once the
+  // DOM has settled so the panel stays anchored under the trigger button.
+  rowHidden.value = false
+  await nextTick()
+  syncMegaPosition()
+})
+
+watch(rowHidden, () => {
+  if (megaOpen.value) syncMegaPosition()
+})
+
+useEventListener(window, 'resize', () => {
+  if (megaOpen.value) syncMegaPosition()
+})
+
 onMounted(() => {
   lastScrollY = window.scrollY
 })
 </script>
 
 <template>
-  <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50">
+  <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50" :class="{'pb-2' : rowHidden || megaOpen}">
     <LandingTopBar />
 
     <!-- Desktop (≥1280px) -->
@@ -172,7 +212,7 @@ onMounted(() => {
                   :class="megaOpen ? 'text-primary' : 'text-foreground hover:text-primary'"
                   aria-haspopup="menu"
                   :aria-expanded="megaOpen"
-                  @click="megaOpen = !megaOpen"
+                  @click="toggleMega"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
                   {{ item.label }}
