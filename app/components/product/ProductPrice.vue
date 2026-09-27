@@ -96,7 +96,7 @@ const dimColor = computed(() =>
     </div>
 
     <!-- Original price + discount badge -->
-    <div class="flex items-center gap-1.5">
+    <div class="flex min-h-4 items-center gap-1.5">
       <span
         v-if="showOldPrice"
         class="text-[16px] font-medium leading-none line-through"
