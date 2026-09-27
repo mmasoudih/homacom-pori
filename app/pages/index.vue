@@ -35,6 +35,7 @@ useHead({
       <LandingProductsCarousel
         title="جدیدترین محصولات"
         :products="newestProducts"
+        :per-view="5"
         class="order-4 w-full lg:order-none"
       />
 

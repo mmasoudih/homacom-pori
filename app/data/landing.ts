@@ -130,10 +130,30 @@ export const banners2 = [
   { image: '/figma/fill-07e29b135a3cb6e8.png', alt: 'بنر هماکام', href: '#' },
 ]
 
-export const newestProducts: Product[] = [
+/** Pool of products rendered by the «پرفروش‌ترین محصولات» row (scrollable carousel). */
+export const bestsellerProducts: Product[] = [
   { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
   { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset2 },
   { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
+  { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop3, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone3, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.p39, title: SAMSUNG_TITLE, price: '84,000,000', colors: swatchSets.headset },
+]
+
+/**
+ * «جدیدترین محصولات» landing row: the five products laid out in the design
+ * (DOM order = right → left): iPhone, black headset, laptop, pink headset,
+ * watch — then extra products the carousel scrolls to (5 shown per view).
+ * `colors` use the shared `swatchSets` palettes per card.
+ */
+export const newestProducts: Product[] = [
+  { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.samsung },
   { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
   { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
   { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
@@ -199,8 +219,6 @@ export const bestsellerFilters = {
   ],
   activeCat: 'همه',
 }
-
-export const bestsellerProducts: Product[] = [...newestProducts]
 
 export const offersGridRows: OfferCard[][] = [
   [

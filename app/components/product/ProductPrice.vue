@@ -64,15 +64,15 @@ const dimColor = computed(() => (props.tone === 'inverted' ? 'text-white/50' : '
   <div v-else :class="cn('flex flex-col gap-1', props.class)">
     <!-- New / discounted price -->
     <div class="flex items-baseline gap-1">
-      <span class="text-[15px] font-extrabold leading-none" :class="cn(priceColor, props.priceClass)">
+      <span class="text-[16px] font-extrabold leading-none" :class="cn(priceColor, props.priceClass)">
         {{ formatPriceFa(price) }}
       </span>
-      <span class="text-[11px]" :class="dimColor">تومان</span>
+      <span class="text-[14px]" :class="dimColor">تومان</span>
     </div>
 
     <!-- Original price + discount badge -->
     <div class="flex items-center gap-1.5">
-      <span v-if="showOldPrice" class="text-[13px] font-bold leading-none line-through" :class="dimColor">
+      <span v-if="showOldPrice" class="text-[16px] font-medium leading-none line-through" :class="dimColor">
         {{ formatPriceFa(originalPrice!) }}
       </span>
       <span

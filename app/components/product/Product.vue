@@ -138,7 +138,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
       >{{ toPersianDigits(discount!) }}٪</span>
     </div>
 
-    <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-10 text-[14px] font-bold leading-[20px]">
+    <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-14 text-[16px] leading-[26px]">
       {{ product.title }}
     </h3>
 
@@ -149,7 +149,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     >
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex shrink-0 items-center justify-center rounded-full text-[12.5px] font-extrabold py-0.5 px-2.5"
+        class="flex shrink-0 items-center justify-center rounded-full text-[14px] font-extrabold py-0.5 px-2.5"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
       <ProductPrice
