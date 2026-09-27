@@ -29,8 +29,6 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      # Advisory: the app has pre-existing type errors unrelated to the image.
-      # Flip to a hard gate once they are resolved.
       - name: Typecheck
         run: pnpm typecheck
         continue-on-error: true
@@ -40,17 +38,24 @@ jobs:
     runs-on: homacom-production
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Login to Gitea registry
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | \
+            docker login git.homapanel.ir \
+            -u "${{ secrets.REGISTRY_USERNAME }}" \
+            --password-stdin
 
-      - name: Build production image
+      - name: Pull latest production image
         run: |
           set -euo pipefail
-          docker build -t homacom-pori:prod -f Dockerfile .
+          docker pull git.homapanel.ir/admin/front:latest
 
       - name: Deploy production container
         run: |
           set -euo pipefail
+          docker compose \
+            -f /opt/apps/homacom/docker-compose.yml \
+            pull
           docker compose \
             -f /opt/apps/homacom/docker-compose.yml \
             up -d \
@@ -60,14 +65,14 @@ jobs:
         run: |
           set -euo pipefail
           sleep 3
-          docker logs --tail 100 homacom-pori-web 2>&1 | tee /tmp/homacom-boot.log
+          docker logs --tail 100 homacom-front 2>&1 | tee /tmp/homacom-boot.log
 
       - name: Show container status
         run: |
-          docker ps --filter name=homacom-pori-web
+          docker ps --filter name=homacom-front
 
       - name: Health check
         run: |
           set -euo pipefail
           sleep 5
-          curl -fsS http://127.0.0.1:4500/health
+          curl -fsS http://127.0.0.1:3001/
