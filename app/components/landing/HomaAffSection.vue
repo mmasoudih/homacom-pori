@@ -36,7 +36,7 @@ const cardRounding = (i: number) => [
 
     <!-- Mobile products row -->
     <Carousel
-      class="mt-4 px-4 pb-4 lg:hidden"
+      class="mt-4 px-4 pb-4 lg:hidden [&>[data-slot=carousel-content]]:rounded-3xl"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
@@ -52,7 +52,7 @@ const cardRounding = (i: number) => [
             countdown-label="هما آف"
             image-class="bg-T-50"
             :href="product.id ? `/product/${product.id}` : ''"
-            class="w-full"
+            class="w-full rounded-none"
             :class="cardRounding(i)"
           />
         </CarouselItem>
@@ -62,7 +62,7 @@ const cardRounding = (i: number) => [
     <!-- Desktop products row -->
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-      class="relative hidden lg:block"
+      class="relative hidden lg:block [&>[data-slot=carousel-content]]:rounded-3xl"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
@@ -79,7 +79,7 @@ const cardRounding = (i: number) => [
             image-class="bg-T-50"
             discount-placement="inline"
             :href="product.id ? `/product/${product.id}` : ''"
-            class="w-full"
+            class="w-full rounded-none"
             :class="cardRounding(i)"
           />
         </CarouselItem>
@@ -87,6 +87,7 @@ const cardRounding = (i: number) => [
 
       <!-- Arrows -->
       <button
+        v-if="canScrollNext"
         class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90 disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="قبلی"
         :disabled="!canScrollNext"
@@ -95,6 +96,7 @@ const cardRounding = (i: number) => [
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
+        v-if="canScrollPrev"
         class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-T-50 text-foreground shadow-md transition-colors hover:bg-T-50/90 disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="بعدی"
         :disabled="!canScrollPrev"

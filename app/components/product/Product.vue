@@ -133,7 +133,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
       <!-- Discount: bottom-inline-start corner (hidden when inline beside the price) -->
       <span
         v-if="showDiscount && hasDiscount && !inlineDiscount"
-        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg px-1.5 text-[13px] font-extrabold"
+        class="absolute bottom-2 start-2 flex items-center justify-center rounded-lg px-1.5 py-0.5 text-[12.5px] font-extrabold"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
     </div>
@@ -149,7 +149,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     >
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold py-1 px-2"
+        class="flex shrink-0 items-center justify-center rounded-full text-[12.5px] font-extrabold py-0.5 px-2.5"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
       <ProductPrice

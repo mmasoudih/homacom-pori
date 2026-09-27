@@ -30,7 +30,7 @@ useHead({
 
       <LandingHomaAffSection class="order-2 py-5 lg:order-none lg:py-6" />
 
-      <LandingBannerRow :items="banners2" :columns="2" class="order-6 w-full lg:order-none" />
+      <LandingBannerRow :items="banners2" :columns="2" class="order-6 w-full lg:order-none lg:max-w-[1440px]" />
 
       <LandingProductsCarousel
         title="جدیدترین محصولات"
