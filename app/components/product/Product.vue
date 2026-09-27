@@ -197,7 +197,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     />
 
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-      <h4 v-if="showTitle" class="line-clamp-2 text-[13px] leading-[22px] text-T-800">
+      <h4 v-if="showTitle" class="line-clamp-2 text-[16px] leading-[26px] text-T-800">
         {{ product.title }}
       </h4>
 
