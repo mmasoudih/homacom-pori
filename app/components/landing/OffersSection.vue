@@ -80,6 +80,7 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
 
         <!-- Arrows -->
         <button
+          v-if="canScrollNext"
           class="absolute -left-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="قبلی"
           :disabled="!canScrollNext"
@@ -88,6 +89,7 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
           <IconChevronLeft class="size-[18px]" />
         </button>
         <button
+          v-if="canScrollPrev"
           class="absolute -right-[19px] top-1/2 flex size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="بعدی"
           :disabled="!canScrollPrev"

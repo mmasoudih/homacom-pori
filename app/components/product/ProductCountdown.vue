@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { cn } from '~/lib/utils'
+import { toPersianDigits } from '~/utils/format'
 
 const props = withDefaults(
   defineProps<{
@@ -58,13 +59,13 @@ onUnmounted(stop)
 
 <template>
   <div
-    :class="cn('flex h-[22px] w-full items-center justify-between gap-2 rounded-lg bg-R-50 px-3', props.class)"
+    :class="cn('flex w-full items-center justify-between gap-2 rounded-md bg-R-50 px-3 py-0.5', props.class)"
     role="timer"
     :aria-label="label ? `${label} ${parts.hours}:${parts.minutes}:${parts.seconds}` : undefined"
   >
-    <span v-if="label" class="text-[11px] font-bold text-R-300">{{ label }}</span>
-    <span class="text-[13px] font-bold tabular-nums text-R-300" dir="ltr">
-      {{ parts.hours }}:{{ parts.minutes }}:{{ parts.seconds }}
+    <span v-if="label" class="relative top-0.5 text-[14px] font-extrabold text-R-300">{{ label }}</span>
+    <span class="relative top-0.5 text-[14px] font-extrabold tabular-nums text-R-300" dir="ltr">
+      {{ toPersianDigits(parts.hours) }}:{{ toPersianDigits(parts.minutes) }}:{{ toPersianDigits(parts.seconds) }}
     </span>
   </div>
 </template>

@@ -50,7 +50,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
       <article
         v-for="(post, i) in blogPosts"
         :key="i"
-        class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50 transition-shadow hover:shadow-md"
+        class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50"
       >
         <!-- Image -->
         <div class="aspect-[324/180] w-full overflow-hidden">
@@ -63,12 +63,12 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 
         <!-- Content -->
         <div class="flex flex-col gap-3 px-4 py-3">
-          <h3 class="line-clamp-2 min-h-[44px] text-[14px] font-bold leading-[22px] text-foreground">
+          <h3 class="line-clamp-2 min-h-[44px] text-[16px] leading-[22px] text-foreground">
             {{ post.title }}
           </h3>
-          <div class="flex items-center justify-between border-t border-T-400 pt-3">
-            <span class="text-[12px] text-T-600">{{ post.date }}</span>
-            <a href="#" class="text-[12px] font-medium text-foreground transition-colors hover:text-primary">
+          <div class="flex items-center justify-between pt-3">
+            <span class="text-[14px] text-T-800">{{ post.date }}</span>
+            <a href="#" class="text-[14px] text-R-300  font-medium transition-colors hover:text-primary group-hover:underline">
               ادامه مطلب
             </a>
           </div>

@@ -22,12 +22,12 @@ withDefaults(defineProps<{
       v-for="(item, i) in items"
       :key="i"
       :href="item.href || '#'"
-      class="block overflow-hidden"
+      class="block overflow-hidden bg-[#bddfff] rounded-2xl"
     >
       <img
         :src="item.image"
         :alt="item.alt || ''"
-        class="h-full w-full rounded-2xl object-cover"
+        class="h-full w-full object-cover"
         :class="
           columns > 1
             ? 'aspect-[370/136] lg:aspect-auto'

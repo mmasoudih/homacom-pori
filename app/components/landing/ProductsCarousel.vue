@@ -4,10 +4,12 @@ import type { Product } from '~/data/landing'
 import { toPersianDigits } from '~/utils/format'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   title: string
   products: Product[]
   showAllHref?: string
+  /** How many cards a desktop viewport shows at once (e.g. 5). Omit for fixed-width scrolling. */
+  perView?: number
   pills?: {
     prices: string[]
     activePrice: string
@@ -16,8 +18,25 @@ withDefaults(defineProps<{
   }
 }>(), {
   showAllHref: '#',
+  perView: undefined,
   pills: undefined,
 })
+
+// Desktop basis per supported viewport count. Kept literal so Tailwind emits them.
+const basisByCount: Record<number, string> = {
+  2: 'md:basis-1/2',
+  3: 'md:basis-1/3',
+  4: 'md:basis-1/4',
+  5: 'md:basis-1/5',
+  6: 'md:basis-1/6',
+}
+
+// `basis-1/5` overrides the item width on desktop; mobile keeps fixed 180px cards.
+const itemBasisClass = computed(() =>
+  props.perView != null && basisByCount[props.perView]
+    ? basisByCount[props.perView]
+    : 'md:w-[259px]',
+)
 
 const catIcons: Record<string, typeof IconLayoutGrid> = {
   laptop: IconDeviceLaptop,
@@ -28,7 +47,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 
 <template>
   <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 md:py-6">
-    <div class="px-4 md:px-5">
+    <div class="px-4 md:px-6">
       <!-- Title row -->
       <LandingSectionTitle :title="title" variant="row" :indicator="'right'" />
 
@@ -78,20 +97,22 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
     <!-- Products row -->
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-      class="relative mt-4 px-4 md:px-0"
+      class="relative mt-6 px-4"
+      :class="perView ? 'md:px-6' : 'md:px-0'"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">
         <CarouselItem
           v-for="(product, i) in products"
           :key="i"
-          class="w-[180px] shrink-0 basis-auto ps-0 md:w-[259px]"
-          :class="i > 0 ? 'border-s border-T-400' : ''"
+          class="w-[180px] shrink-0 basis-auto ps-0"
+          :class="[i > 0 ? 'border-s border-T-400' : '', itemBasisClass]"
         >
           <Product
             :product="product"
             variant="vertical"
             discount-placement="inline"
+            image-class="bg-transparent"
             :href="product.id ? `/product/${product.id}` : ''"
             class="w-full rounded-none border-0"
           />
@@ -100,6 +121,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 
       <!-- Arrows (desktop only) -->
       <button
+        v-if="canScrollNext"
         class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="محصولات قبلی"
         :disabled="!canScrollNext"
@@ -108,6 +130,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
+        v-if="canScrollPrev"
         class="absolute -right-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="محصولات بعدی"
         :disabled="!canScrollPrev"

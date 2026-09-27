@@ -133,12 +133,12 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
       <!-- Discount: bottom-inline-start corner (hidden when inline beside the price) -->
       <span
         v-if="showDiscount && hasDiscount && !inlineDiscount"
-        class="absolute bottom-2 start-2 flex h-[25px] items-center justify-center rounded-lg px-1.5 text-[13px] font-extrabold"
+        class="absolute bottom-2 start-2 flex items-center justify-center rounded-lg px-1.5 py-0.5 text-[12.5px] font-extrabold"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
     </div>
 
-    <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-10 text-[14px] font-bold leading-[20px]">
+    <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-14 text-[16px] leading-[26px]">
       {{ product.title }}
     </h3>
 
@@ -149,7 +149,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     >
       <span
         v-if="showDiscount && hasDiscount"
-        class="flex shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold py-1 px-2"
+        class="flex shrink-0 items-center justify-center rounded-full text-[14px] font-extrabold py-0.5 px-2.5"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
       <ProductPrice
@@ -197,7 +197,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     />
 
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-      <h4 v-if="showTitle" class="line-clamp-2 text-[13px] leading-[22px] text-T-800">
+      <h4 v-if="showTitle" class="line-clamp-2 text-[16px] leading-[26px] text-T-800">
         {{ product.title }}
       </h4>
 

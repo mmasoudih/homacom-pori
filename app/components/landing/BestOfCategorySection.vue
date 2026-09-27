@@ -78,11 +78,11 @@ const activeItems = computed(() => {
             <!-- Column header -->
             <div class="flex h-[70px] items-center justify-center gap-2 bg-T-200 px-4">
               <span
-                class="[&>svg]:block [&>svg]:size-[22px] text-T-700"
+                class="[&>svg]:block [&>svg]:size-[32px] text-T-700"
                 aria-hidden="true"
                 v-html="iconMap[col.icon]"
               />
-              <h3 class="text-[14px] font-bold text-foreground">{{ col.category }}</h3>
+              <h3 class="text-[18px] font-bold text-foreground">{{ col.category }}</h3>
             </div>
 
             <!-- Mini cards -->
@@ -93,7 +93,7 @@ const activeItems = computed(() => {
               variant="horizontal"
               discount-placement="inline"
               :href="item.id ? `/product/${item.id}` : ''"
-              class="h-[150px] border-b border-T-400 px-4 last:border-b-0 transition-colors hover:bg-secondary/30"
+              class="h-[150px] border-b-0 border-T-400 px-4 last:border-b-0 rounded-none transition-colors hover:bg-secondary/30"
               image-class="w-[96px] bg-transparent"
             />
           </div>
@@ -102,6 +102,7 @@ const activeItems = computed(() => {
 
       <!-- Arrows (desktop) -->
       <button
+        v-if="canScrollNext"
         class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="قبلی"
         :disabled="!canScrollNext"
@@ -110,6 +111,7 @@ const activeItems = computed(() => {
         <IconChevronLeft class="size-[18px]" />
       </button>
       <button
+        v-if="canScrollPrev"
         class="absolute -right-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="بعدی"
         :disabled="!canScrollPrev"

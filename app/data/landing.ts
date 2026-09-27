@@ -130,10 +130,30 @@ export const banners2 = [
   { image: '/figma/fill-07e29b135a3cb6e8.png', alt: 'بنر هماکام', href: '#' },
 ]
 
-export const newestProducts: Product[] = [
+/** Pool of products rendered by the «پرفروش‌ترین محصولات» row (scrollable carousel). */
+export const bestsellerProducts: Product[] = [
   { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
   { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.headset2 },
   { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
+  { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop3, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone2, title: SAMSUNG_TITLE, price: '92,000,000', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.phone3, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
+  { id: DEMO_PRODUCT_ID, image: IMG.p39, title: SAMSUNG_TITLE, price: '84,000,000', colors: swatchSets.headset },
+]
+
+/**
+ * «جدیدترین محصولات» landing row: the five products laid out in the design
+ * (DOM order = right → left): iPhone, black headset, laptop, pink headset,
+ * watch — then extra products the carousel scrolls to (5 shown per view).
+ * `colors` use the shared `swatchSets` palettes per card.
+ */
+export const newestProducts: Product[] = [
+  { id: DEMO_PRODUCT_ID, image: IMG.watch, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
+  { id: DEMO_PRODUCT_ID, image: IMG.headset2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.watch },
+  { id: DEMO_PRODUCT_ID, image: IMG.laptop, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.samsung },
   { id: DEMO_PRODUCT_ID, image: IMG.headset, title: SAMSUNG_TITLE, price: '87,000,000', colors: swatchSets.headset },
   { id: DEMO_PRODUCT_ID, image: IMG.samsung, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.samsung },
   { id: DEMO_PRODUCT_ID, image: IMG.laptop2, title: SAMSUNG_TITLE, price: '87,000,000', oldPrice: '92,000,000', discount: '%30', colors: swatchSets.laptop },
@@ -199,8 +219,6 @@ export const bestsellerFilters = {
   ],
   activeCat: 'همه',
 }
-
-export const bestsellerProducts: Product[] = [...newestProducts]
 
 export const offersGridRows: OfferCard[][] = [
   [
@@ -277,13 +295,67 @@ export const blogPosts = [
   },
 ]
 
+export interface SeoSegment {
+  text: string
+  /** `strong` renders bold dark (T-900); `accent` renders bold brand red. */
+  tone?: 'strong' | 'accent'
+}
+
+export interface SeoTopic {
+  /** Optional bold sub-heading rendered above the paragraphs. */
+  heading?: string
+  paragraphs: SeoSegment[][]
+}
+
 export const ceoSection = {
   title: 'فروشگاه اینترنتی هماکام',
-  body:
-    ' مرجعی بزرگ و معتبر برای خرید انواع لوازم دیجیتال و غیردیجیتال مورد نیاز شماست. با ورود به فروشگاه آنلاین هماکام، کلیه لوازم مورد نیاز خود نظیر گجت‌ها، موبایل و لپ تاپ، لوازم خانگی برقی و غیربرقی، سکه و طلا، زیبایی و سلامت، ابزارآلات و تجهیزات، لوازم ورزش و سفر و کتاب و نوشت افزار را تهیه کنید.',
+  intro: [
+    { text: 'مرجعی بزرگ و معتبر برای خرید انواع لوازم دیجیتال و غیردیجیتال مورد نیاز شماست. با ورود به فروشگاه آنلاین ' },
+    { text: 'هماکام', tone: 'strong' },
+    { text: '، کلیه لوازم مورد نیاز خود نظیر گجت‌ها، موبایل و لپ تاپ، لوازم خانگی برقی و غیربرقی، سکه و طلا، زیبایی و سلامت، ابزارآلات و تجهیزات، لوازم ورزش و سفر و کتاب و نوشت افزار را تهیه کنید.' },
+  ] as SeoSegment[],
+  /** Revealed by the «نمایش بیشتر» toggle. */
+  more: [
+    // Continuation of the intro paragraph — flows directly beneath it.
+    {
+      paragraphs: [[
+        { text: 'داشتن اینماد، ارسال سریع و به‌موقع به سراسر ایران، ضمانت اصالت کالا و امکان خرید نقد و اقساط، از دلایلی هستند که نظر مثبت کاربران به خرید از ' },
+        { text: 'هماکام', tone: 'strong' },
+        { text: ' را جلب کرده است.' },
+      ]],
+    },
+    {
+      heading: 'خرید انواع گوشی موبایل',
+      paragraphs: [[
+        { text: 'این روزها که کلیه ' },
+        { text: 'لوازم جانبی موبایل', tone: 'accent' },
+        { text: ' مانند آداپتور شارژ از جعبه گوشی و دیگر گجت‌ها حذف شده، شما می‌توانید در کنار خرید گوشی هوشمند خود، کلیه اقلام مورد نیاز نظیر قاب، گلس، شارژر و پاوربانک را خریداری کنید. علاوه بر آن، می‌توانید لوازم جانبی مورد نیاز برای ساعت هوشمند، تبلت، لپ تاپ و سایر گجت‌ها را از فروشگاه هماکام تهیه کنید.' },
+      ]],
+    },
+    {
+      heading: 'انواع لوازم جانبی کالای دیجیتال',
+      paragraphs: [
+        [
+          { text: 'مرجعی بزرگ و معتبر برای خرید انواع لوازم دیجیتال و غیردیجیتال مورد نیاز شماست. با ورود به فروشگاه آنلاین هماکام، کلیه لوازم مورد نیاز خود نظیر گجت‌ها، ' },
+          { text: 'موبایل', tone: 'accent' },
+          { text: ' و لپ تاپ، لوازم خانگی برقی و غیربرقی، سکه و طلا، زیبایی و سلامت، ابزارآلات و تجهیزات، لوازم ورزش و سفر و کتاب و نوشت افزار را تهیه کنید.' },
+        ],
+        [
+          { text: 'داشتن اینماد، ارسال سریع و به‌موقع به سراسر ایران، ضمانت اصالت کالا و امکان خرید نقد و اقساط، از دلایلی هستند که نظر مثبت کاربران به خرید از هماکام را جلب کرده است.' },
+        ],
+      ],
+    },
+    {
+      heading: 'لپ تاپ و تبلت از برترین برندها',
+      paragraphs: [[
+        { text: 'لپ تاپ یکی از مهم‌ترین ابزارهای کار و سرگرمی به شمار می‌رود. انواع لپ‌تاپ‌های گیمینگ، حرفه‌ای و عمومی در فروشگاه اینترنتی هماکام عرضه می‌شوند. شما می‌توانید از میان برندهای معتبر لپ‌تاپ مانند مک بوک ، ایسوس، دل، لنوو، امس‌آی و اچ‌پی، گزینه‌ای متناسب با نیازهای خود انتخاب کنید. همچنین مطالعه نظرات کاربران و نقد و بررسی تخصصی محصولات، نقش مؤثری در انتخاب بهتر لپ تاپ دارد. همچنین، چنانچه برای طراحی، تماشای فیلم و بازی، و شرکت در کلاس‌های مجازی به یک تبلت نیاز داشته باشید، بهترین و مطرح‌ترین برندها، از جمله اپل، سامسونگ، شیائومی و مایکروسافت، در هماکام موجود است. در کنار خرید تبلت مورد نظر خود، می‌توانید لوازم جانبی آن مانند قلم، گلس و کاور را نیز تهیه کنید.' },
+      ]],
+    },
+  ] as SeoTopic[],
 }
 
 export const footerData = {
+  contactTitle: 'ارتباط با هماکام',
   phones: ['0939-3206066', '0121-3250789'],
   email: 'Homacom@info.mail',
   address: 'تهران، خیابان ولیعصر، بالاتر از میدان ونک، کوچه یاس، پلاک ۲۴، واحد ۵',
@@ -327,7 +399,16 @@ export const footerData = {
       ],
     },
   ],
-  about:
-    'شرکت بازرگانی کهن تجارت کنگان با نام تجاری هماکام (HomaCom)، یک مجموعه تخصصی در حوزه فروش و توزیع محصولات الکترونیکی است. هماکام فعالیت خود را در بازار آنلاین از تابستان ۱۴۰۱ آغاز کرد و در مدت کوتاهی توانست جایگاهی ارزشمند در میان مشتریان و همکاران حوزه دیجیتال به دست آورد.',
-  copyright: '© تمامی حقوق مادی و معنوی برای هماکام محفوظ است.',
+  about: [
+    { text: 'شرکت بازرگانی کهن تجارت کنگان با نام تجاری ' },
+    { text: 'هماکام', tone: 'strong' },
+    { text: ' (HomaCom)، یک مجموعه تخصصی در حوزه فروش و توزیع ' },
+    { text: 'محصولات الکترونیکی', tone: 'strong' },
+    { text: ' است. هماکام فعالیت خود را در بازار آنلاین از تابستان ۱۴۰۱ آغاز کرد و در مدت کوتاهی توانست جایگاهی ارزشمند در میان مشتریان و همکاران حوزه دیجیتال به دست آورد.' },
+  ] as SeoSegment[],
+  copyright: [
+    { text: '© تمامی حقوق مادی و معنوی برای ' },
+    { text: 'هماکام', tone: 'accent' },
+    { text: ' محفوظ است.' },
+  ] as SeoSegment[],
 }
