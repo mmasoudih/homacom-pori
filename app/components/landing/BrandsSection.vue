@@ -41,18 +41,18 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
         <CarouselItem
           v-for="brand in brands"
           :key="brand.name + brand.logo"
-          class="w-[174px] shrink-0 basis-auto ps-2"
+          class="shrink-0 basis-auto ps-2 py-2"
         >
           <a
             href="#"
-            class="flex w-full flex-col items-center justify-center gap-3 rounded-[20px] border border-T-400 bg-T-50 py-4 transition-shadow hover:shadow-md"
+            class="px-14 flex w-full flex-col items-center justify-center gap-0 rounded-[20px] border border-T-400 bg-T-50 py-2 transition-shadow"
           >
             <img
               :src="brand.logo"
               :alt="brand.name"
-              class="h-[49px] w-[65px] object-contain"
+              class="h-[50px] w-[65px] object-contain"
             >
-            <span class="text-[14px] font-medium text-foreground">{{ brand.name }}</span>
+            <span class="text-[16px] text-foreground">{{ brand.name }}</span>
           </a>
         </CarouselItem>
       </CarouselContent>
