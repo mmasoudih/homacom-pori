@@ -9,18 +9,32 @@ const props = withDefaults(
     images: GalleryItem[]
     alt?: string
     class?: string
+    /** Catalog id to add/remove from the compare list when «مقایسه» is clicked. */
+    compareId?: string
   }>(),
-  { alt: '', class: '' },
+  { alt: '', class: '', compareId: '' },
 )
 
 const active = ref(0)
 const current = computed(() => props.images[active.value])
+
+const { has: inCompare, add: addCompare } = useCompare()
 
 const actionRail = [
   { icon: IconHeart, label: 'افزودن به علاقه‌مندی‌ها' },
   { icon: IconArrowsLeftRight, label: 'مقایسه' },
   { icon: IconShare, label: 'اشتراک‌گذاری' },
 ]
+
+function onAction(label: string) {
+  if (label !== 'مقایسه' || !props.compareId) return
+  addCompare(props.compareId)
+  navigateTo('/compare')
+}
+
+function isActionActive(label: string) {
+  return label === 'مقایسه' && !!props.compareId && inCompare(props.compareId)
+}
 </script>
 
 <template>
@@ -34,7 +48,9 @@ const actionRail = [
           :key="action.label"
           type="button"
           class="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-T-200 hover:text-T-900"
+          :class="isActionActive(action.label) ? 'text-primary' : ''"
           :aria-label="action.label"
+          @click="onAction(action.label)"
         >
           <component :is="action.icon" class="size-5" />
         </button>

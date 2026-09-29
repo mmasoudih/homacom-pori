@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { getProductDetail } from '~/data/product'
+import { DEMO_COMPARE_PRODUCT_ID } from '~/data/compare'
 
 const route = useRoute()
 const router = useRouter()
@@ -178,6 +179,7 @@ function navigateToSection(target: 'specs' | 'comments') {
             <ProductDetailGallery
               :images="product.images"
               :alt="product.title"
+              :compare-id="DEMO_COMPARE_PRODUCT_ID"
             />
 
             <ProductDetailInfoBox

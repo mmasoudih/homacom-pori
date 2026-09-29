@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ClassValue } from 'clsx'
+import { IconArrowsLeftRight } from '@tabler/icons-vue'
 import type { Product, ProductTone, ProductVariant } from '~/utils/product'
 import { discountBadgeClass, normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 import { toPersianDigits } from '~/utils/format'
@@ -23,6 +24,8 @@ const props = withDefaults(
     showDiscount?: boolean
     showOriginalPrice?: boolean
     showCountdown?: boolean
+    /** Renders a compare toggle in the image corner (vertical variant only). */
+    showCompare?: boolean
     /** When set, the card renders as a link pointing to this route. */
     href?: string
     class?: ClassValue
@@ -39,6 +42,7 @@ const props = withDefaults(
     showDiscount: undefined,
     showOriginalPrice: undefined,
     showCountdown: undefined,
+    showCompare: false,
     href: '',
     class: '',
   },
@@ -97,6 +101,11 @@ const cardSurface = computed(() =>
 )
 // When true, the discount badge moves out of the image into a row beside the price.
 const inlineDiscount = computed(() => props.discountPlacement === 'inline')
+
+// --- Compare toggle (vertical variant) ------------------------------------
+const { has: inCompare, toggle: toggleCompare } = useCompare()
+const compareId = computed(() => (props.product.id != null ? String(props.product.id) : ''))
+const compareActive = computed(() => !!compareId.value && inCompare(compareId.value))
 </script>
 
 <template>
@@ -113,6 +122,21 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
         :alt="product.title"
         :container-class="cn('rounded-[20px]', imageClass)"
       />
+
+      <!-- Compare toggle: top-inline-start corner -->
+      <button
+        v-if="showCompare && compareId"
+        type="button"
+        class="absolute top-2 start-2 z-10 flex size-8 items-center justify-center rounded-full border bg-T-50/90 transition-colors"
+        :class="compareActive
+          ? 'border-primary text-primary'
+          : 'border-T-400 text-T-600 hover:border-primary hover:text-primary'"
+        :aria-pressed="compareActive"
+        aria-label="افزودن به مقایسه"
+        @click.stop.prevent="toggleCompare(compareId)"
+      >
+        <IconArrowsLeftRight class="size-4" />
+      </button>
 
       <!-- Colors: top-inline-end corner, stacked vertically -->
       <div
@@ -210,6 +234,18 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
         :show-discount="showDiscount"
         :tone="tone"
       />
+
+      <div v-if="showColors && colors.length" class="flex flex-wrap items-center gap-1.5">
+        <span
+          v-for="(color, ci) in colors"
+          :key="`${color.value}-${ci}`"
+          class="size-3 rounded-[3px] border"
+          :class="cn(swatchBorder, selectedColor === color.value && 'ring-1 ring-primary ring-offset-1')"
+          :style="{ backgroundColor: color.value }"
+          role="img"
+          :aria-label="color.name ?? 'رنگ محصول'"
+        />
+      </div>
 
       <ProductCountdown
         v-if="showCountdown && product.discountExpiresAt"
