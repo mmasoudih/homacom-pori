@@ -97,7 +97,7 @@ const onResend = async () => {
         </Button>
       </div>
 
-      <div class="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-8 px-6 pb-16 sm:px-12 lg:px-16">
+      <div class="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-8 px-6 pb-16 lg:px-16">
         <div class="flex flex-col items-center gap-4 text-center">
           <img
             src="/homacom-logo.png"

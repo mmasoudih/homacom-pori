@@ -42,7 +42,7 @@ function confirm() {
 }
 
 const sheetShell
-  = 'top-auto! bottom-0! start-0! end-0! translate-x-0! rtl:translate-x-0! translate-y-0! w-full! max-w-full! sm:max-w-full! max-h-[90dvh]! gap-0! rounded-t-2xl! rounded-b-none! p-0! flex! flex-col! overflow-hidden!'
+  = 'top-auto! bottom-0! start-0! end-0! translate-x-0! rtl:translate-x-0! translate-y-0! w-full! max-w-full! lg:max-w-full! max-h-[90dvh]! gap-0! rounded-t-2xl! rounded-b-none! p-0! flex! flex-col! overflow-hidden!'
 </script>
 
 <template>

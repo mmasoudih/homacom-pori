@@ -62,12 +62,12 @@ function submit() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-[20px] p-6 sm:max-w-[560px]">
+    <DialogContent class="rounded-[20px] p-6 lg:max-w-[560px]">
       <DialogTitle class="text-start text-[15px] font-bold text-T-900">
         ایجاد تیکت جدید
       </DialogTitle>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="flex flex-col gap-2">
           <span class="text-[12px] font-medium text-T-700">عنوان تیکت</span>
           <Input

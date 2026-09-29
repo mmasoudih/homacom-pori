@@ -4,7 +4,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 md:px-0 md:py-6">
+  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6">
     <LandingSectionTitle title="وبلاگ" variant="row" />
 
     <!-- Mobile: horizontal scroll -->
@@ -46,7 +46,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     </Carousel>
 
     <!-- Desktop: grid -->
-    <div class="mt-[18px] hidden grid-cols-1 gap-[18px] sm:grid-cols-2 md:grid-cols-4 lg:grid">
+    <div class="mt-[18px] hidden grid-cols-1 gap-[18px] lg:grid lg:grid-cols-4">
       <article
         v-for="(post, i) in blogPosts"
         :key="i"

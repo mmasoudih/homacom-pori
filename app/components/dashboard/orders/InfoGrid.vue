@@ -17,7 +17,7 @@ withDefaults(defineProps<{
 <template>
   <div
     class="grid gap-x-6 gap-y-6"
-    :class="cols === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2'"
+    :class="cols === 3 ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-2'"
   >
     <div v-for="item in items" :key="item.label" class="flex flex-col items-center gap-2 text-center">
       <span class="text-[12px] text-T-600">{{ item.label }}</span>

@@ -20,3 +20,19 @@ non-code files, or when codegraph returns nothing useful.
 
 Keep the index fresh: run `codegraph sync` (or `codegraph status` to check
 staleness) after significant edits.
+
+## Responsive breakpoints: mobile + desktop only
+
+The app has exactly **two** responsive tiers:
+
+- **mobile** — base styles (no Tailwind variant)
+- **desktop** — `lg:` (and its `max-lg:` counter-variant), 64rem / 1024px
+
+`sm:` / `md:` / `xl:` / `2xl:` (and their `max-*` forms) are deliberately
+disabled via `--breakpoint-*: initial` in `app/assets/css/tailwind.css`, so using
+them is a silent no-op. To add a tier later, define one breakpoint in that file
+(e.g. `--breakpoint-md: 48rem;`) and update `app/utils/breakpoints.ts`.
+
+Use `DESKTOP_MEDIA_QUERY` from `~/utils/breakpoints` for JS media-query checks —
+never hard-code widths. Run `pnpm lint:breakpoints` (also wired into the
+pre-commit hook) to verify no other tiers have crept back in.

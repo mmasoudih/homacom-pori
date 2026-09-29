@@ -22,12 +22,12 @@ const forwarded = useForwardProps(delegatedProps)
 <template>
   <PaginationPrev
     data-slot="pagination-previous"
-    :class="cn(buttonVariants({ variant: 'ghost', size }), 'gap-1 px-2.5 sm:pe-2.5', props.class)"
+    :class="cn(buttonVariants({ variant: 'ghost', size }), 'gap-1 px-2.5 lg:pe-2.5', props.class)"
     v-bind="forwarded"
   >
     <slot>
       <IconChevronLeft />
-      <span class="hidden sm:block">Previous</span>
+      <span class="hidden lg:block">Previous</span>
     </slot>
   </PaginationPrev>
 </template>

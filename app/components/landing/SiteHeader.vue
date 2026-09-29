@@ -2,6 +2,7 @@
 import { useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
+import type { SearchCategoryTile } from '~/data/search'
 import { unreadNotifications } from '~/data/dashboard'
 import coinsFront from '../../../public/icons/coins-front.svg?raw'
 import userCheckCircleAlt from '../../../public/icons/user-check-circle-alt.svg?raw'
@@ -46,10 +47,66 @@ function handleMegaClose() {
   megaTriggerEl.value?.focus()
 }
 
+// --- Header search ---------------------------------------------------------
+const {
+  query: searchQuery,
+  status: searchStatus,
+  results: searchResults,
+  categories: searchCategories,
+  run: runSearch,
+} = useProductSearch()
+
+const {
+  items: recentSearches,
+  add: addRecentSearch,
+  remove: removeRecentSearch,
+  clear: clearRecentSearches,
+} = useRecentSearches()
+
+const searchOpen = ref(false)
+const searchBoxEl = ref<HTMLElement | null>(null)
+
+function openSearch() {
+  megaOpen.value = false
+  searchOpen.value = true
+}
+
+function closeSearch() {
+  searchOpen.value = false
+}
+
+function onSearchInput(value: string) {
+  searchQuery.value = value
+  searchOpen.value = true
+  // `runSearch('')` resets the panel back to the suggestion state.
+  runSearch(value)
+}
+
+/** Run a term in place (recent / popular suggestion chips). */
+function selectSearchTerm(term: string) {
+  searchQuery.value = term
+  searchOpen.value = true
+  runSearch(term)
+}
+
+/** Navigate to the full results page for a term. */
+function goToResults(term: string) {
+  const value = term.trim()
+  if (!value) return
+  addRecentSearch(value)
+  closeSearch()
+  navigateTo({ path: '/search', query: { q: value } })
+}
+
+function selectSearchCategory(tile: SearchCategoryTile) {
+  goToResults(tile.title)
+}
+
 watch(
   () => route.fullPath,
   () => {
     megaOpen.value = false
+    searchOpen.value = false
   },
 )
 
@@ -92,6 +149,7 @@ function toggleMega() {
   // Measure before opening so the panel/backdrop mount at their final position
   // instead of flashing at the fallback offset and jumping.
   if (!megaOpen.value) syncMegaPosition()
+  searchOpen.value = false
   megaOpen.value = !megaOpen.value
 }
 
@@ -121,8 +179,8 @@ onMounted(() => {
   <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50" :class="{'pb-2' : rowHidden || megaOpen}">
     <LandingTopBar />
 
-    <!-- Desktop (≥1280px) -->
-    <div class="mx-auto hidden max-w-[1440px] xl:block">
+    <!-- Desktop (≥1024px) -->
+    <div class="mx-auto hidden max-w-[1440px] lg:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->
@@ -168,15 +226,16 @@ onMounted(() => {
         </div>
 
         <!-- Search -->
-        <div class="col-start-2 row-start-1 mt-[22px] flex h-11 w-[480px] items-center justify-self-start gap-3 rounded-full border border-T-300 bg-T-200 px-4">
-          <input
-            type="text"
-            placeholder="جستجو در محصولات ..."
-            class="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-T-600"
-          >
-          <span
-            class="size-5 shrink-0 bg-T-800 [mask-image:url(/icons/search.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            aria-hidden="true"
+        <div
+          ref="searchBoxEl"
+          class="col-start-2 row-start-1 mt-[22px] flex h-11 w-[480px] items-center justify-self-start"
+        >
+          <SearchInput
+            :model-value="searchQuery"
+            @update:model-value="onSearchInput"
+            @focus="openSearch"
+            @submit="goToResults"
+            @escape="closeSearch"
           />
         </div>
 
@@ -247,19 +306,24 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Mobile / Tablet (<1280px) -->
-    <div class="xl:hidden">
+    <!-- Mobile (<1024px) -->
+    <div class="lg:hidden">
       <div class="flex h-[73px] items-center justify-between px-4">
         <!-- Logo (right in RTL) -->
         <a href="#" class="shrink-0">
           <img src="/homacom-logo.png" alt="هماکام" class="h-[52px] w-[70px] object-contain">
         </a>
 
-        <!-- Search pill (left in RTL) -->
-        <div class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4">
-          <span class="flex-1 text-[15px] text-T-600">جستجو در</span>
+        <!-- Search pill (left in RTL) — opens the full-screen search -->
+        <button
+          type="button"
+          class="mr-4 flex h-11 flex-1 items-center gap-3 rounded-full border border-T-400 bg-T-200 px-4"
+          aria-label="جستجو در محصولات"
+          @click="openSearch"
+        >
+          <span class="flex-1 text-start text-[15px] text-T-600">جستجو در محصولات ...</span>
           <IconSearch class="size-5 shrink-0 text-T-600" />
-        </div>
+        </button>
 
         <NuxtLink
           v-if="authed"
@@ -287,5 +351,40 @@ onMounted(() => {
     </div>
 
     <CategoriesCategoryMegaMenu :open="megaOpen" @close="handleMegaClose" />
+
+    <!-- Desktop search dropdown (anchored under the header search box) -->
+    <SearchDropdown
+      :open="searchOpen"
+      :anchor="searchBoxEl"
+      :query="searchQuery"
+      :status="searchStatus"
+      :results="searchResults"
+      :categories="searchCategories"
+      :recent="recentSearches"
+      @close="closeSearch"
+      @select="selectSearchTerm"
+      @remove-recent="removeRecentSearch"
+      @clear-recent="clearRecentSearches"
+      @select-category="selectSearchCategory"
+      @view-all="goToResults(searchQuery)"
+    />
+
+    <!-- Mobile full-screen search -->
+    <SearchOverlay
+      :open="searchOpen"
+      :query="searchQuery"
+      :status="searchStatus"
+      :results="searchResults"
+      :categories="searchCategories"
+      :recent="recentSearches"
+      @close="closeSearch"
+      @update:query="onSearchInput"
+      @submit="goToResults"
+      @select="selectSearchTerm"
+      @remove-recent="removeRecentSearch"
+      @clear-recent="clearRecentSearches"
+      @select-category="selectSearchCategory"
+      @view-all="goToResults(searchQuery)"
+    />
   </header>
 </template>

@@ -41,7 +41,7 @@ function close() {
         class="relative flex h-12 items-center justify-center bg-P-500 px-12 text-white"
         :class="animate ? 'animate-topbar-in' : ''"
       >
-        <p class="text-center text-[13px] font-medium sm:text-[14px]">
+        <p class="text-center text-[13px] font-medium lg:text-[14px]">
           موبایلت رو با بهترین قیمت از هماکام بخر
         </p>
         <button

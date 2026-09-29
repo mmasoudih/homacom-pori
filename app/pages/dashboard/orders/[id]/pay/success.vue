@@ -49,7 +49,7 @@ useHead({
       </div>
 
       <!-- Remaining -->
-      <div class="mt-4 flex flex-col items-center justify-center gap-6 rounded-xl border border-T-400 p-4 sm:flex-row">
+      <div class="mt-4 flex flex-col items-center justify-center gap-6 rounded-xl border border-T-400 p-4 lg:flex-row">
         <DashboardOrdersProgressRing :percent="order.payment?.percent ?? 45" label="پرداخت شده" />
 
         <div class="flex w-full flex-col gap-3 text-start text-[12px] text-T-600">
@@ -78,7 +78,7 @@ useHead({
         باقی مانده را کامل کنید.
       </p>
 
-      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
+      <div class="mt-6 flex flex-col gap-3 lg:flex-row lg:justify-between">
         <NuxtLink
           :to="`/dashboard/orders/${id}`"
           class="flex h-11 flex-1 items-center justify-center rounded-xl border border-T-400 bg-T-50 text-[13px] font-semibold text-T-800 transition-colors hover:border-T-500"

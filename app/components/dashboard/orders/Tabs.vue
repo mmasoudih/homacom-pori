@@ -22,7 +22,7 @@ function select(key: string) {
       v-for="tab in tabs"
       :key="tab.key"
       type="button"
-      class="relative flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[13px] font-semibold transition-colors sm:text-[13.5px]"
+      class="relative flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[13px] font-semibold transition-colors lg:text-[13.5px]"
       :class="tab.key === modelValue ? 'text-primary' : 'text-T-600 hover:text-T-800'"
       @click="select(tab.key)"
     >

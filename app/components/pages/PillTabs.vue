@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    :class="cn('flex flex-nowrap items-center justify-start gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:justify-center lg:overflow-visible', props.class)"
+    :class="cn('flex w-full flex-nowrap items-center justify-start gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:justify-center lg:overflow-visible', props.class)"
   >
     <button
       v-for="(tab, i) in tabs"

@@ -45,7 +45,7 @@ function scrollTop() {
 
 <template>
   <footer
-    class="relative isolate overflow-hidden bg-T-200 pt-10 max-w-[1440px] mx-auto rounded-3xl p-10"
+    class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden rounded-3xl bg-T-200 p-10 pt-10"
   >
     <!-- Watermark texture -->
     <div
@@ -107,7 +107,7 @@ function scrollTop() {
       </div>
 
       <!-- ============================ Desktop =========================== -->
-      <div class="hidden lg:grid lg:grid-cols-[290px_290px_290px_1fr_auto]">
+      <div class="site-footer-desktop hidden lg:grid">
         <!-- Link columns -->
         <div v-for="col in footerData.columns" :key="col.title">
           <h4 class="flex items-center gap-[11px]">
@@ -188,7 +188,7 @@ function scrollTop() {
 
         <!-- Trust badges -->
         <div
-          class="ms-[92px] flex w-[96px] flex-col items-center justify-evenly gap-[7px] rounded-2xl bg-T-300 py-1.5"
+          class="ms-[92px] flex w-[96px] shrink-0 flex-col items-center justify-evenly gap-[7px] rounded-2xl bg-T-300 py-1.5"
         >
           <div v-for="(badge, i) in footerData.badges" :key="i">
             <div class="bg-white rounded-lg p-1">
@@ -257,3 +257,26 @@ function scrollTop() {
     </div>
   </footer>
 </template>
+
+<style scoped>
+/*
+ * The footer's 5-column desktop grid has a fixed minimum width (3 × 290px link
+ * columns + contact + trust badges). Below the 1440px design width those fixed
+ * columns used to force the whole document wider than the viewport and cause a
+ * horizontal scrollbar on every page. Keep the exact design at ≥1440px and let
+ * the columns shrink fluidly in the 1024–1439px range instead.
+ *
+ * NOTE: this is a container/design-width constraint, not one of the app's two
+ * responsive tiers (mobile base + `lg` desktop) — it is intentionally left as a
+ * raw media query.
+ */
+.site-footer-desktop {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.6fr) auto;
+}
+
+@media (min-width: 1440px) {
+  .site-footer-desktop {
+    grid-template-columns: 290px 290px 290px 1fr auto;
+  }
+}
+</style>

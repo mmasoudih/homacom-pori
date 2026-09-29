@@ -123,7 +123,7 @@ const categoryIcons = {
           {{ installmentPage.stepsTitle }}
         </h2>
 
-        <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-6">
+        <div class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-5 lg:gap-6">
           <div
             v-for="(step, i) in installmentPage.steps"
             :key="step.label"
@@ -218,7 +218,7 @@ const categoryIcons = {
           {{ installmentPage.benefitsIntro }}
         </p>
 
-        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-4">
           <article
             v-for="benefit in installmentPage.benefits"
             :key="benefit.title"
@@ -262,7 +262,7 @@ const categoryIcons = {
           {{ installmentPage.categoriesTitle }}
         </h2>
 
-        <div class="mt-8 grid grid-cols-4 gap-4 sm:grid-cols-8">
+        <div class="mt-8 grid grid-cols-4 gap-4 lg:grid-cols-8">
           <button
             v-for="(category, ci) in installmentPage.categories"
             :key="category"

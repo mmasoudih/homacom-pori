@@ -4,6 +4,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 import type { Order, OrderStatus } from '~/data/orders'
 import { findOrder, orderStatusMeta } from '~/data/orders'
+import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const route = useRoute()
@@ -35,7 +36,7 @@ function onInvoice() {
   toast.info('فاکتور سفارش در حال آماده‌سازی است.')
 }
 
-const isDesktop = useMediaQuery('(min-width: 1280px)')
+const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
 
 const mobileStatus = computed(() => (order.value ? orderStatusMeta[order.value.status] : undefined))
 

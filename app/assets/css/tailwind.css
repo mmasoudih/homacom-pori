@@ -77,6 +77,46 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Breakpoints — mobile + desktop only.
+ *
+ * Mobile  = base styles (no variant).
+ * Desktop = `lg:` (64rem / 1024px).
+ *
+ * Default Tailwind breakpoints (sm/md/xl/2xl) are intentionally removed so only
+ * these two tiers can be used. When a tablet tier is needed later, add a single
+ * breakpoint here (e.g. `--breakpoint-md: 48rem;`) instead of reintroducing the
+ * Tailwind defaults.
+ */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-lg: 64rem;
+}
+
+/*
+ * Slim, theme-aware scrollbar for overlay panels (search results, etc.).
+ * Hides the chunky native scrollbar without removing scrollability.
+ */
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--T-500) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--T-500);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--T-600);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

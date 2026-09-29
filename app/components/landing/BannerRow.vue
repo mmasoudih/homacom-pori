@@ -10,7 +10,7 @@ withDefaults(defineProps<{
 
 <template>
   <div
-    class="mx-auto w-full max-w-[1440px] px-4 py-5 md:px-0 md:py-6"
+    class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6"
     :class="
       columns > 1
         ? 'grid grid-cols-1 gap-[18px] ' +

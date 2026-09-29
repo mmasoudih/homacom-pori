@@ -38,23 +38,23 @@ const statHref: Record<OrderStatTone, string> = {
       </NuxtLink>
     </div>
 
-    <div class="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+    <div class="mt-4 grid grid-cols-3 gap-2 lg:gap-3">
       <NuxtLink
         v-for="stat in orderStats"
         :key="stat.key"
         :to="statHref[stat.key]"
-        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center transition-colors hover:border-T-500 sm:flex-row sm:justify-between sm:p-4 sm:text-start"
+        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center transition-colors hover:border-T-500 lg:flex-row lg:justify-between lg:p-4 lg:text-start"
       >
-        <div class="order-2 flex flex-col gap-1 sm:order-1">
-          <span class="text-lg font-extrabold leading-none text-T-900 sm:text-2xl">{{ stat.count }}</span>
-          <span class="text-[10px] leading-tight text-T-600 sm:text-[13px]">{{ stat.label }}</span>
+        <div class="order-2 flex flex-col gap-1 lg:order-1">
+          <span class="text-lg font-extrabold leading-none text-T-900 lg:text-2xl">{{ stat.count }}</span>
+          <span class="text-[10px] leading-tight text-T-600 lg:text-[13px]">{{ stat.label }}</span>
         </div>
 
         <span
-          class="order-1 flex size-9 shrink-0 items-center justify-center rounded-xl sm:order-2 sm:size-11"
+          class="order-1 flex size-9 shrink-0 items-center justify-center rounded-xl lg:order-2 lg:size-11"
           :class="toneClass[stat.key]"
         >
-          <IconShoppingBag class="size-5 sm:size-6" />
+          <IconShoppingBag class="size-5 lg:size-6" />
         </span>
       </NuxtLink>
     </div>

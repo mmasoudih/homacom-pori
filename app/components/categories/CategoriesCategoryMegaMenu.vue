@@ -103,11 +103,11 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
     <!-- Backdrop gets its own fade so it appears smoothly (it animates its own
          opacity rather than relying on the parent's opacity transition). -->
     <Transition name="mega-backdrop">
-      <CategoriesMegaMenuBackdrop v-if="open" class="hidden xl:block" @close="emit('close')" />
+      <CategoriesMegaMenuBackdrop v-if="open" class="hidden lg:block" @close="emit('close')" />
     </Transition>
 
     <Transition name="mega">
-      <div v-if="open" class="relative z-[101] hidden xl:block">
+      <div v-if="open" class="relative z-[101] hidden lg:block">
         <nav
           ref="panelRoot"
           class="mega-panel bg-T-50 shadow-[0_16px_48px_rgba(0,0,0,0.08)]"

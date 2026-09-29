@@ -10,7 +10,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-T-50 xl:hidden">
+  <div class="flex min-h-dvh flex-col bg-T-50 lg:hidden">
     <DashboardOrdersMobileHeader :title="title" :align="align" :back-to="backTo">
       <template #action>
         <slot name="action" />

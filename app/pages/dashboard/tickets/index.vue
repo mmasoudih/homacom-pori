@@ -3,10 +3,11 @@ import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 import type { NewTicketPayload, Ticket } from '~/data/tickets'
 import { tickets as initialTickets } from '~/data/tickets'
+import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 
 const route = useRoute()
 const router = useRouter()
-const isDesktop = useMediaQuery('(min-width: 1280px)')
+const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
 
 const items = ref<Ticket[]>([...initialTickets])
 const dialogOpen = ref(false)

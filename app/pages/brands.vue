@@ -56,7 +56,7 @@ const paginationItems = computed(() => {
       </div>
 
       <!-- Brand grid -->
-      <div class="mt-10 grid w-full max-w-[1440px] grid-cols-3 gap-3 px-4 sm:grid-cols-4 md:grid-cols-5 lg:mt-12 lg:grid-cols-8 lg:gap-4 lg:px-0">
+      <div class="mt-10 grid w-full max-w-[1440px] grid-cols-3 gap-3 px-4 lg:mt-12 lg:grid-cols-8 lg:gap-4 lg:px-0">
         <div
           v-for="(brand, i) in visibleBrands"
           :key="`${brand.name}-${i}`"
@@ -74,7 +74,7 @@ const paginationItems = computed(() => {
       </div>
 
       <!-- Pagination -->
-      <nav class="mt-10 flex items-center gap-2 lg:mt-12" aria-label="صفحه‌بندی برندها">
+      <nav class="mt-10 flex flex-wrap items-center justify-center gap-2 lg:mt-12" aria-label="صفحه‌بندی برندها">
         <button
           class="flex size-9 items-center justify-center rounded-full border border-T-400 bg-T-50 text-T-700 transition-colors hover:text-primary disabled:opacity-40"
           :disabled="currentPage === 1"

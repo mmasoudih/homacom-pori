@@ -42,7 +42,7 @@ const props = withDefaults(
     </div>
 
     <!-- ============================== Desktop ============================= -->
-    <div class="hidden flex-col gap-6 lg:flex">
+    <div class="hidden flex-col gap-6 overflow-x-clip lg:flex">
       <!-- Breadcrumb -->
       <UiSkeleton class="h-[11px] w-[628px] rounded-full" />
 
@@ -79,7 +79,7 @@ const props = withDefaults(
         <!-- Gallery skeleton -->
         <div class="flex w-full flex-col items-center gap-4">
           <UiSkeleton class="aspect-square w-full rounded-2xl" />
-          <div class="flex items-center gap-3">
+          <div class="flex w-full items-center justify-center gap-3">
             <UiSkeleton v-for="i in 5" :key="i" class="size-[68px] rounded-xl" />
           </div>
         </div>

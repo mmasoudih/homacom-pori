@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-T-50 xl:hidden">
+  <div class="flex min-h-dvh flex-col bg-T-50 lg:hidden">
     <DashboardTicketsMobileHeader :title="title" :back-to="backTo">
       <template #action>
         <slot name="action" />
@@ -32,7 +32,7 @@ const emit = defineEmits<{
     <button
       v-if="showFab"
       type="button"
-      class="fixed bottom-[106px] end-4 z-40 flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-[12.5px] font-bold text-white shadow-lg transition-colors hover:bg-primary/90 xl:hidden"
+      class="fixed bottom-[106px] end-4 z-40 flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-[12.5px] font-bold text-white shadow-lg transition-colors hover:bg-primary/90 lg:hidden"
       @click="emit('create')"
     >
       <IconPlus class="size-4" />
