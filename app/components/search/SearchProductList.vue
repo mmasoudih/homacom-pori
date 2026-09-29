@@ -33,6 +33,7 @@ withDefaults(
         :product="product"
         :href="`/product/${DEMO_PRODUCT_ID}`"
         :show-colors="false"
+        show-compare
         class="h-full"
       />
     </li>
