@@ -29,7 +29,7 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
     </div>
 
     <!-- Meta -->
-    <div class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12.5px] text-T-600 sm:justify-between">
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12.5px] text-T-600 lg:justify-between">
       <span>مبلغ: <b class="font-bold text-T-900">{{ formatPriceFa(order.amount) }}</b> تومان</span>
       <span>تاریخ: <b class="font-bold text-T-900">{{ order.date }}</b></span>
       <span class="inline-flex items-center gap-1.5">
@@ -62,7 +62,7 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
     <!-- Footer -->
     <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
       <template v-if="isAwaitingPayment">
-        <DashboardOrdersAlertNote class="w-full sm:max-w-[460px]">
+        <DashboardOrdersAlertNote class="w-full lg:max-w-[460px]">
           پرداخت شما کامل نشده و ۳۰ ساعت دیگر مهلت دارید. برای ثبت نهایی، پرداخت خود را کامل کنید.
         </DashboardOrdersAlertNote>
 

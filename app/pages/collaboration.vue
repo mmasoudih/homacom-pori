@@ -155,7 +155,7 @@ const productIcons = {
           {{ collaborationPage.audiencesIntro }}
         </p>
 
-        <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <article
             v-for="audience in collaborationPage.audiences"
             :key="audience.title"
@@ -232,7 +232,7 @@ const productIcons = {
           {{ collaborationPage.productsIntro }}
         </p>
 
-        <div class="mt-10 grid grid-cols-4 gap-6 sm:grid-cols-8">
+        <div class="mt-10 grid grid-cols-4 gap-6 lg:grid-cols-8">
           <div
             v-for="product in collaborationPage.products"
             :key="product"

@@ -121,8 +121,8 @@ onMounted(() => {
   <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50" :class="{'pb-2' : rowHidden || megaOpen}">
     <LandingTopBar />
 
-    <!-- Desktop (≥1280px) -->
-    <div class="mx-auto hidden max-w-[1440px] xl:block">
+    <!-- Desktop (≥1024px) -->
+    <div class="mx-auto hidden max-w-[1440px] lg:block">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->
@@ -247,8 +247,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Mobile / Tablet (<1280px) -->
-    <div class="xl:hidden">
+    <!-- Mobile (<1024px) -->
+    <div class="lg:hidden">
       <div class="flex h-[73px] items-center justify-between px-4">
         <!-- Logo (right in RTL) -->
         <a href="#" class="shrink-0">

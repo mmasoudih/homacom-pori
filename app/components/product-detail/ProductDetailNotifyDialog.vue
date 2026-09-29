@@ -43,7 +43,7 @@ function submit() {
 }
 
 const dialogShell
-  = 'max-sm:top-auto! max-sm:bottom-0! max-sm:start-0! max-sm:translate-x-0! max-sm:translate-y-0! max-sm:w-full! max-sm:max-w-full! max-sm:rounded-b-none! max-sm:rounded-t-2xl! max-sm:pb-[env(safe-area-inset-bottom)] max-sm:data-[state=open]:slide-in-from-bottom-full! max-sm:data-[state=closed]:slide-out-to-bottom-full! max-sm:data-[state=open]:zoom-in-100! max-sm:data-[state=closed]:zoom-out-100! max-sm:data-[state=open]:fade-in-100! max-sm:data-[state=closed]:fade-out-100! max-sm:duration-300!'
+  = 'max-lg:top-auto! max-lg:bottom-0! max-lg:start-0! max-lg:translate-x-0! max-lg:translate-y-0! max-lg:w-full! max-lg:max-w-full! max-lg:rounded-b-none! max-lg:rounded-t-2xl! max-lg:pb-[env(safe-area-inset-bottom)] max-lg:data-[state=open]:slide-in-from-bottom-full! max-lg:data-[state=closed]:slide-out-to-bottom-full! max-lg:data-[state=open]:zoom-in-100! max-lg:data-[state=closed]:zoom-out-100! max-lg:data-[state=open]:fade-in-100! max-lg:data-[state=closed]:fade-out-100! max-lg:duration-300!'
 </script>
 
 <template>
@@ -51,7 +51,7 @@ const dialogShell
     <UiDialogContent
       :class="dialogShell"
       :show-close-button="false"
-      class="max-w-[420px] gap-0 rounded-2xl p-0 sm:max-w-[420px]"
+      class="max-w-[420px] gap-0 rounded-2xl p-0 lg:max-w-[420px]"
     >
       <!-- Header -->
       <div class="flex flex-col gap-3.5 px-6 pt-5">

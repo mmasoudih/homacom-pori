@@ -4,7 +4,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] px-4 pt-5 pb-24 md:px-0 md:py-6">
+  <section class="mx-auto w-full max-w-[1440px] px-4 pt-5 pb-24 lg:px-0 lg:py-6">
     <LandingSectionTitle title="محبوب‌ترین برندها" variant="row" />
 
     <!-- Mobile: horizontal scroll logo boxes -->

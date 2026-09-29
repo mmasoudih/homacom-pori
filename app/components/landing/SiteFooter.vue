@@ -55,7 +55,7 @@ function scrollTop() {
 
     <div class="mx-auto max-w-[1440px] px-4">
       <!-- ============================= Mobile =========================== -->
-      <div class="-mx-4 xl:hidden">
+      <div class="-mx-4 lg:hidden">
         <div
           v-for="row in accordionRows"
           :key="row.title"
@@ -107,7 +107,7 @@ function scrollTop() {
       </div>
 
       <!-- ============================ Desktop =========================== -->
-      <div class="site-footer-desktop hidden xl:grid">
+      <div class="site-footer-desktop hidden lg:grid">
         <!-- Link columns -->
         <div v-for="col in footerData.columns" :key="col.title">
           <h4 class="flex items-center gap-[11px]">
@@ -264,7 +264,11 @@ function scrollTop() {
  * columns + contact + trust badges). Below the 1440px design width those fixed
  * columns used to force the whole document wider than the viewport and cause a
  * horizontal scrollbar on every page. Keep the exact design at ≥1440px and let
- * the columns shrink fluidly in the 1280–1439px range instead.
+ * the columns shrink fluidly in the 1024–1439px range instead.
+ *
+ * NOTE: this is a container/design-width constraint, not one of the app's two
+ * responsive tiers (mobile base + `lg` desktop) — it is intentionally left as a
+ * raw media query.
  */
 .site-footer-desktop {
   grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.6fr) auto;

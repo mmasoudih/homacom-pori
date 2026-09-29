@@ -51,7 +51,7 @@ function go(dir: 1 | -1) {
 <template>
   <section class="relative mx-auto w-full max-w-[1440px]">
     <Carousel
-      class="flex aspect-[402/291] w-full md:aspect-[1440/342]"
+      class="flex aspect-[402/291] w-full lg:aspect-[1440/342]"
       :opts="{ direction: 'rtl', loop: true, align: 'start' }"
       :plugins="plugins"
       @init-api="onInit"
@@ -72,14 +72,14 @@ function go(dir: 1 | -1) {
 
       <!-- Arrows (desktop only) -->
       <button
-        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary xl:flex"
+        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary lg:flex"
         aria-label="قبلی"
         @click="go(-1)"
       >
         <IconChevronLeft class="size-[18px] text-T-700" />
       </button>
       <button
-        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary xl:flex"
+        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary lg:flex"
         aria-label="بعدی"
         @click="go(1)"
       >
@@ -87,7 +87,7 @@ function go(dir: 1 | -1) {
       </button>
 
       <!-- Dots (mobile: inside bottom) -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 xl:hidden">
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 lg:hidden">
         <div
           class="flex items-center justify-center gap-[2px] rounded-[50px] bg-T-50/65 px-[20px] py-2 shadow-[0_0_6px_rgba(0,0,0,0.08)] backdrop-blur-[75px]"
         >
@@ -114,7 +114,7 @@ function go(dir: 1 | -1) {
     </Carousel>
 
     <!-- Dots (desktop: below) -->
-    <div class="mt-[18px] hidden justify-center gap-[3px] xl:flex">
+    <div class="mt-[18px] hidden justify-center gap-[3px] lg:flex">
       <button
         v-for="i in total"
         :key="i"

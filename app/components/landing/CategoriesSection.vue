@@ -23,11 +23,11 @@ const iconMap: Record<string, string> = {
 </script>
 
 <template>
-  <section id="categories" class="mx-auto w-full max-w-[1440px] px-4 py-5 md:px-0 md:py-10">
+  <section id="categories" class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-10">
     <LandingSectionTitle title="دسته‌بندی‌ها" variant="centered" class="mb-8" />
 
     <!-- Mobile: circular icon grid -->
-    <div class="mt-[18px] grid grid-cols-4 gap-y-[13px] md:hidden">
+    <div class="mt-[18px] grid grid-cols-4 gap-y-[13px] lg:hidden">
       <a
         v-for="cat in categories"
         :key="cat.title"
@@ -52,7 +52,7 @@ const iconMap: Record<string, string> = {
     </div>
 
     <!-- Desktop: card grid -->
-    <div class="mt-[18px] hidden grid-cols-2 gap-x-[18px] gap-y-[13px] md:grid md:grid-cols-4 md:pr-[63px]">
+    <div class="mt-[18px] hidden grid-cols-2 gap-x-[18px] gap-y-[13px] lg:grid lg:grid-cols-4 lg:pr-[63px]">
       <article
         v-for="cat in categories"
         :key="cat.title"

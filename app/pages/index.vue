@@ -24,7 +24,7 @@ useHead({
       Desktop keeps DOM order via lg:order-none.
     -->
     <main class="flex flex-col items-center">
-      <LandingHeroCarousel class=" pb-5 md:pb-6" />
+      <LandingHeroCarousel class=" pb-5 lg:pb-6" />
 
       <LandingCategoriesSection id="categories" class="order-1 w-full lg:order-none" />
 

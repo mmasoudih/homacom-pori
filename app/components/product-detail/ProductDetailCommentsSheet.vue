@@ -78,7 +78,7 @@ const dialogShell
     <UiDialogContent
       :class="dialogShell"
       :show-close-button="false"
-      class="max-w-[402px] gap-0 rounded-2xl p-0 sm:max-w-[402px]"
+      class="max-w-[402px] gap-0 rounded-2xl p-0 lg:max-w-[402px]"
     >
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-T-300 px-4 py-3.5">

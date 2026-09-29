@@ -77,6 +77,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Breakpoints — mobile + desktop only.
+ *
+ * Mobile  = base styles (no variant).
+ * Desktop = `lg:` (64rem / 1024px).
+ *
+ * Default Tailwind breakpoints (sm/md/xl/2xl) are intentionally removed so only
+ * these two tiers can be used. When a tablet tier is needed later, add a single
+ * breakpoint here (e.g. `--breakpoint-md: 48rem;`) instead of reintroducing the
+ * Tailwind defaults.
+ */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-lg: 64rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

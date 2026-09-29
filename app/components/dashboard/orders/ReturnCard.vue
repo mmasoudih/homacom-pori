@@ -19,7 +19,7 @@ const meta = computed(() => returnStatusMeta[props.request.status])
       variant="soft"
     />
 
-    <div class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12.5px] text-T-600 sm:justify-between">
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12.5px] text-T-600 lg:justify-between">
       <span>مبلغ: <b class="font-bold text-T-900">{{ formatPriceFa(request.amount) }}</b> تومان</span>
       <span>تاریخ: <b class="font-bold text-T-900">{{ request.date }}</b></span>
       <span class="inline-flex items-center gap-1.5">
@@ -28,7 +28,7 @@ const meta = computed(() => returnStatusMeta[props.request.status])
       </span>
     </div>
 
-    <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 border-t border-T-300 pt-4 sm:grid-cols-2">
+    <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 border-t border-T-300 pt-4 lg:grid-cols-2">
       <div
         v-for="item in request.items"
         :key="item.id"

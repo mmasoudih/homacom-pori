@@ -24,18 +24,18 @@ const props = withDefaults(defineProps<{
 
 // Desktop basis per supported viewport count. Kept literal so Tailwind emits them.
 const basisByCount: Record<number, string> = {
-  2: 'md:basis-1/2',
-  3: 'md:basis-1/3',
-  4: 'md:basis-1/4',
-  5: 'md:basis-1/5',
-  6: 'md:basis-1/6',
+  2: 'lg:basis-1/2',
+  3: 'lg:basis-1/3',
+  4: 'lg:basis-1/4',
+  5: 'lg:basis-1/5',
+  6: 'lg:basis-1/6',
 }
 
 // `basis-1/5` overrides the item width on desktop; mobile keeps fixed 180px cards.
 const itemBasisClass = computed(() =>
   props.perView != null && basisByCount[props.perView]
     ? basisByCount[props.perView]
-    : 'md:w-[259px]',
+    : 'lg:w-[259px]',
 )
 
 const catIcons: Record<string, typeof IconLayoutGrid> = {
@@ -46,8 +46,8 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 md:py-6">
-    <div class="px-4 md:px-6">
+  <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 lg:py-6">
+    <div class="px-4 lg:px-6">
       <!-- Title row -->
       <LandingSectionTitle :title="title" variant="row" :indicator="'right'" />
 
@@ -98,7 +98,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
       class="relative mt-6 overflow-x-clip px-4 [overflow-clip-margin:24px]"
-      :class="perView ? 'md:px-6' : 'md:px-0'"
+      :class="perView ? 'lg:px-6' : 'lg:px-0'"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="ms-0">

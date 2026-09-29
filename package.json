@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:breakpoints": "node scripts/check-breakpoints.mjs",
     "typecheck": "nuxt typecheck",
     "build": "nuxt build",
     "dev": "nuxt dev",

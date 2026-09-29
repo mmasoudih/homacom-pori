@@ -8,7 +8,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-T-50 xl:hidden">
+  <div class="flex min-h-dvh flex-col bg-T-50 lg:hidden">
     <DashboardAccountMobileHeader :title="title" :back-to="backTo" />
 
     <main class="flex flex-1 flex-col pb-28">

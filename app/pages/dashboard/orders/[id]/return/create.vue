@@ -120,7 +120,7 @@ useHead({
           />
         </div>
 
-        <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div class="flex flex-col gap-2">
             <span class="text-[12px] font-medium text-T-700">تعداد مرجوعی</span>
             <div class="flex h-11 items-center justify-between rounded-xl border border-T-400 px-3">

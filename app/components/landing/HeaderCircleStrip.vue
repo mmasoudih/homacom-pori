@@ -23,14 +23,14 @@ import {
       <CarouselItem
         v-for="(item, i) in headerCircles"
         :key="i"
-        class="basis-auto ps-0 pe-5 md:pe-7"
+        class="basis-auto ps-0 pe-5 lg:pe-7"
       >
         <a
           :href="item.href"
-          class="group flex w-[78px] flex-col items-center gap-2 md:w-[96px]"
+          class="group flex w-[78px] flex-col items-center gap-2 lg:w-[96px]"
         >
           <span
-            class="border-R-300 relative flex size-[78px] items-center justify-center overflow-hidden rounded-full border-[2px] p-1 transition-colors md:size-[96px]"
+            class="border-R-300 relative flex size-[78px] items-center justify-center overflow-hidden rounded-full border-[2px] p-1 transition-colors lg:size-[96px]"
             :class="
               item.accent
                 ? 'group-hover:border-primary'
@@ -59,7 +59,7 @@ import {
     <button
       v-if="canScrollNext"
       type="button"
-      class="absolute left-0 top-[39px] z-20 hidden size-[34px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground shadow-sm transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 md:flex md:top-[48px] xl:-left-4"
+      class="absolute left-0 top-[39px] z-20 hidden size-[34px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground shadow-sm transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex lg:top-[48px] lg:-left-4"
       aria-label="قبلی"
       :disabled="!canScrollNext"
       @click="scrollNext"
@@ -69,7 +69,7 @@ import {
     <button
       v-if="canScrollPrev"
       type="button"
-      class="absolute -right-4 top-[39px] z-20 hidden size-[34px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground shadow-sm transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 md:flex md:top-[48px]"
+      class="absolute -right-4 top-[39px] z-20 hidden size-[34px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground shadow-sm transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex lg:top-[48px]"
       aria-label="بعدی"
       :disabled="!canScrollPrev"
       @click="scrollPrev"

@@ -89,7 +89,7 @@ const items = computed(() => [
         پرداخت شما کامل نشده و ۳۰ ساعت دیگر مهلت دارید. برای ثبت نهایی، پرداخت خود را کامل کنید.
       </DashboardOrdersAlertNote>
 
-      <div class="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+      <div class="flex flex-col items-center gap-6 lg:flex-row lg:justify-center">
         <DashboardOrdersProgressRing :percent="order.payment.percent" label="پرداخت شده" />
 
         <div class="flex flex-col gap-3 text-[12.5px] text-T-600">
