@@ -52,7 +52,7 @@ const dimColor = computed(() =>
   <!-- Inline: current price (start), old price, discount badge (end) — one row -->
   <div
     v-if="layout === 'inline'"
-    :class="cn('flex w-full items-center justify-between gap-2', props.class)"
+    :class="cn('flex w-full flex-wrap items-center justify-between gap-2', props.class)"
   >
     <div class="flex items-baseline gap-1">
       <span

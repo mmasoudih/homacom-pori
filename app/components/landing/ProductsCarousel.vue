@@ -97,7 +97,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
     <!-- Products row -->
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-      class="relative mt-6 px-4"
+      class="relative mt-6 overflow-x-clip px-4 [overflow-clip-margin:24px]"
       :class="perView ? 'md:px-6' : 'md:px-0'"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >

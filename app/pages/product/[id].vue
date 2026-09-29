@@ -174,7 +174,7 @@ function navigateToSection(target: 'specs' | 'comments') {
           />
 
           <!-- ======================= Desktop hero ======================= -->
-          <div class="mt-12 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid">
+          <div class="mt-12 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid [&>*]:min-w-0">
             <ProductDetailGallery
               :images="product.images"
               :alt="product.title"

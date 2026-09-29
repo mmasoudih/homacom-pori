@@ -145,7 +145,7 @@ const inlineDiscount = computed(() => props.discountPlacement === 'inline')
     <!-- Inline: discount badge on the right, price on the left -->
     <div
       v-if="inlineDiscount"
-      class="mt-auto flex items-start gap-2 pt-2"
+      class="mt-auto flex flex-wrap items-start gap-2 pt-2"
     >
       <span
         v-if="showDiscount && hasDiscount"

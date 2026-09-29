@@ -11,7 +11,7 @@ import {
 <template>
   <Carousel
     v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-    class="relative w-full"
+    class="relative w-full overflow-x-clip [overflow-clip-margin:24px]"
     :opts="{
       direction: 'rtl',
       align: 'start',
