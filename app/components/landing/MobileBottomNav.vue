@@ -35,7 +35,7 @@ function isActive(href: string) {
 
 <template>
   <nav
-    class="fixed bottom-4 inset-x-4 z-50 grid grid-cols-5 rounded-full border border-T-400 bg-T-50/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] lg:hidden"
+    class="fixed bottom-4 inset-x-4 z-[67] grid grid-cols-5 rounded-full border border-T-400 bg-T-50/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] lg:hidden"
     dir="rtl"
   >
     <template v-for="item in items" :key="item.label">
