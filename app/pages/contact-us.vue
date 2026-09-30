@@ -65,7 +65,7 @@ const socialIcons = {
   <div class="flex min-h-dvh flex-col bg-T-100">
     <LandingSiteHeader />
 
-    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-0">
+    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
       <!-- Page hero -->
       <div class="flex flex-col items-center pt-10 lg:pt-14">
         <div class="flex items-center gap-3">

@@ -150,7 +150,7 @@ function navigateToSection(target: 'specs' | 'comments') {
     <!-- Mobile action header -->
     <ProductDetailMobileHeader @back="goBack" />
 
-    <main class="flex flex-col items-center lg:pb-14">
+    <main class="flex w-full flex-col items-center lg:px-6 lg:pb-14">
       <!-- Product not found -->
       <ProductDetailNotFound v-if="!loading && notFound" class="mt-10 w-full max-w-[1440px] px-4 lg:mt-16 lg:px-0" />
 
@@ -277,7 +277,7 @@ function navigateToSection(target: 'specs' | 'comments') {
           <ProductDetailInPersonBenefits
             :title="product.inPersonBenefits.title"
             :text="product.inPersonBenefits.text"
-            class="mt-6 w-full max-w-[1440px] px-4"
+            class="mt-6 w-full max-w-[1440px] px-4 lg:px-0"
           />
         </template>
       </template>

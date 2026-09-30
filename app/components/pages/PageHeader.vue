@@ -16,7 +16,7 @@ const parts = computed(() => props.breadcrumb ?? [])
 </script>
 
 <template>
-  <div :class="cn('flex flex-col items-center px-4', props.class)">
+  <div :class="cn('flex flex-col items-center px-4 lg:px-6', props.class)">
     <ProductDetailBreadcrumb
       v-if="parts.length"
       :trail="parts"

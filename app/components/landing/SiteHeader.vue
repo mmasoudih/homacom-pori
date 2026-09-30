@@ -179,8 +179,8 @@ onMounted(() => {
   <header ref="headerEl" class="sticky top-0 z-[60] w-full border-b border-T-400 bg-T-50" :class="{'pb-2' : rowHidden || megaOpen}">
     <LandingTopBar />
 
-    <!-- Desktop (≥1024px) -->
-    <div class="mx-auto hidden max-w-[1440px] lg:block">
+    <!-- Desktop (≥1024px) — `lg:px-6` keeps the canvas off the browser edge. -->
+    <div class="mx-auto hidden max-w-[1440px] lg:block lg:px-6">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->
