@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 
 <template>
   <section class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6">
-    <LandingSectionTitle title="وبلاگ" variant="row" />
+    <LandingSectionTitle title="وبلاگ" variant="row" to="/blog" />
 
     <!-- Mobile: horizontal scroll -->
     <Carousel
@@ -18,7 +18,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
           :key="i"
           class="w-[222px] shrink-0 basis-auto ps-3"
         >
-          <article class="overflow-hidden rounded-2xl border border-T-400 bg-T-50">
+          <NuxtLink to="/blog" class="group block overflow-hidden rounded-2xl border border-T-400 bg-T-50">
             <!-- Image -->
             <div class="aspect-[210/151] w-full overflow-hidden">
               <img
@@ -35,19 +35,19 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
               </h3>
               <div class="flex items-center justify-between border-t border-T-400 pt-3">
                 <span class="text-[12px] text-T-600">{{ post.date }}</span>
-                <a href="#" class="text-[12px] font-medium text-foreground transition-colors hover:text-primary">
+                <span class="text-[12px] font-medium text-foreground transition-colors group-hover:text-primary">
                   ادامه مطلب
-                </a>
+                </span>
               </div>
             </div>
-          </article>
+          </NuxtLink>
         </CarouselItem>
       </CarouselContent>
     </Carousel>
 
     <!-- Desktop: grid -->
     <div class="mt-[18px] hidden grid-cols-1 gap-[18px] lg:grid lg:grid-cols-4">
-      <article
+      <NuxtLink
         v-for="(post, i) in blogPosts"
         :key="i"
         class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50"
@@ -68,12 +68,12 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
           </h3>
           <div class="flex items-center justify-between pt-3">
             <span class="text-[14px] text-T-800">{{ post.date }}</span>
-            <a href="#" class="text-[14px] text-R-300  font-medium transition-colors hover:text-primary group-hover:underline">
+            <span class="text-[14px] text-R-300 font-medium transition-colors group-hover:underline">
               ادامه مطلب
-            </a>
+            </span>
           </div>
         </div>
-      </article>
+      </NuxtLink>
     </div>
   </section>
 </template>
