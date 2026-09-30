@@ -56,7 +56,7 @@ const paginationItems = computed(() => {
       </div>
 
       <!-- Brand grid -->
-      <div class="mt-10 grid w-full max-w-[1440px] grid-cols-3 gap-3 px-4 lg:mt-12 lg:grid-cols-8 lg:gap-4 lg:px-0">
+      <div class="mt-10 grid w-full max-w-[1440px] grid-cols-3 gap-3 px-4 lg:mt-12 lg:grid-cols-8 lg:gap-4 lg:px-6">
         <div
           v-for="(brand, i) in visibleBrands"
           :key="`${brand.name}-${i}`"

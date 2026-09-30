@@ -11,7 +11,7 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-T-100">
     <LandingSiteHeader />
 
-    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-0">
+    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
       <!-- Hero card -->
       <section class="mt-10 w-full max-w-[1440px] rounded-[16px] border border-T-400 bg-T-50 p-6 lg:mt-14 lg:grid lg:grid-cols-[240px_1fr] lg:gap-10 lg:p-10">
         <!-- Right rail -->

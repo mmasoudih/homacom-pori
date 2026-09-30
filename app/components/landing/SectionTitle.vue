@@ -8,11 +8,14 @@ const props = withDefaults(defineProps<{
   light?: boolean
   indicator?: 'both' | 'right'
   indicatorColor?: 'primary' | 'white'
+  /** Target of the «مشاهده همه» link. */
+  to?: string
 }>(), {
   variant: 'row',
   light: false,
   indicator: 'both',
   indicatorColor: 'primary',
+  to: '#',
 })
 
 const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' : 'bg-primary'))
@@ -61,8 +64,8 @@ const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' :
         <span class="absolute inset-y-[20%] left-2 w-[4.65px] rounded-[8px] opacity-25" :class="barClass" />
       </span>
     </div>
-    <a
-      href="#"
+    <NuxtLink
+      :to="to"
       class="flex items-center gap-1 rounded-full px-4 h-[38px] transition-colors"
       :class="light ? 'text-white hover:bg-white/10' : 'hover:bg-secondary'"
     >
@@ -74,6 +77,6 @@ const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' :
         class="size-4"
         :class="light ? 'text-white' : 'text-primary'"
       />
-    </a>
+    </NuxtLink>
   </div>
 </template>

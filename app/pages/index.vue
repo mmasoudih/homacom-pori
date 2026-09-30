@@ -23,7 +23,12 @@ useHead({
       categories → هما آف → strip → جدیدترین → بهترینها → banner(2) → پرفروش → پیشنهادها → وبلاگ → برندها.
       Desktop keeps DOM order via lg:order-none.
     -->
-    <main class="flex flex-col items-center">
+    <!--
+      Desktop gutter: `lg:px-6` on the content wrapper keeps the 1440px canvas
+      off the browser edge. The sections below stay `lg:px-0` so the padding is
+      applied exactly once.
+    -->
+    <main class="flex w-full flex-col items-center lg:px-6">
       <LandingHeroCarousel class=" pb-5 lg:pb-6" />
 
       <LandingCategoriesSection id="categories" class="order-1 w-full lg:order-none" />

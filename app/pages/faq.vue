@@ -54,12 +54,12 @@ const filteredItems = computed(() => {
       <PagesChipRow
         :active="activeCategory"
         :items="faqPage.categories"
-        class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10"
+        class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
         @select="(i: number) => (activeCategory = i)"
       />
 
       <!-- FAQ accordion -->
-      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14">
+      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14 lg:px-6">
         <PagesFaqAccordion :items="filteredItems" :default-open="2" />
       </div>
     </main>

@@ -32,12 +32,12 @@ const activeChip = ref(0)
       <PagesPillTabs
         :tabs="guaranteePage.tabs"
         :active="activeTab"
-        class="mt-8 px-4 lg:mt-10"
+        class="mt-8 px-4 lg:mt-10 lg:px-6"
         @select="(i: number) => (activeTab = i)"
       />
 
       <!-- Sections -->
-      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14">
+      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14 lg:px-6">
         <!-- First section: warranty guide + product chips -->
         <section class="flex flex-col items-center text-center lg:items-start lg:text-start">
           <h2 class="text-[20px] font-bold leading-[30px] text-foreground">

@@ -16,7 +16,7 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pb-28 pt-6 lg:px-0 lg:pb-16 lg:pt-10">
+    <main class="mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pb-28 pt-6 lg:px-6 lg:pb-16 lg:pt-10">
       <h1 class="text-end text-[18px] font-bold text-T-900 lg:text-[20px]">
         مقایسه محصولات
       </h1>
