@@ -75,8 +75,8 @@ const dialogShell
     <UiDialogContent
       :class="dialogShell"
       :show-close-button="false"
-      overlay-class="z-[110]! bg-black/40! backdrop-blur-[6px]!"
-      class="z-[111]! flex! max-h-[100dvh]! flex-col! gap-0 overflow-hidden rounded-none! bg-T-50 p-0! lg:max-h-[88vh]! lg:max-w-[870px]! lg:rounded-2xl!"
+      overlay-class="z-[200]! bg-black/40! backdrop-blur-[6px]!"
+      class="z-[201]! flex! max-h-[100dvh]! flex-col! gap-0 overflow-hidden rounded-none! bg-T-50 p-0! lg:max-h-[88vh]! lg:max-w-[870px]! lg:rounded-2xl!"
     >
       <!-- Header -->
       <div class="flex shrink-0 items-center justify-between border-b border-T-300 px-4 py-4 lg:px-6">
