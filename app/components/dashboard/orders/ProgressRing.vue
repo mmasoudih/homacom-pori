@@ -17,9 +17,9 @@ const radius = 42
 const circumference = 2 * Math.PI * radius
 
 const toneStroke: Record<StatusTone, string> = {
-  amber: 'text-amber-400',
-  sky: 'text-sky-500',
-  emerald: 'text-emerald-500',
+  amber: 'text-[#FF9800]',
+  sky: 'text-[#4E60FF]',
+  emerald: 'text-[#2EC144]',
   red: 'text-primary',
 }
 

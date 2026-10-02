@@ -218,8 +218,8 @@ function makeOrder(
     code,
     status,
     amount: 7_500_000,
-    date: '۱۴۰۵/۰۵/۰۶',
-    deliveredAt: 'چهارشنبه ۲۹ مرداد',
+    date: '۲۸ بهمن ۱۴۰۳',
+    deliveredAt: 'چهارشنبه ۲۸ مرداد',
     items: [
       { ...baseItem(`${id}-1`, IMG.headset), rating: 'happy' },
       { ...baseItem(`${id}-2`, IMG.phone), commented: true },
@@ -234,8 +234,8 @@ function makeOrder(
 
 export const orders: Order[] = [
   makeOrder('ord-processing', 'processing', '9240052789'),
-  makeOrder('ord-awaiting', 'awaiting_payment', '9630062789', {
-    payment: { total: 350_000_000, paid: 100_000_000, percent: 35 },
+  makeOrder('ord-awaiting', 'awaiting_payment', '9240052789', {
+    payment: { total: 450_000_000, paid: 100_000_000, percent: 35 },
   }),
   makeOrder('ord-shipping', 'shipping', '9240052789', {
     deliveryCode: '52462',

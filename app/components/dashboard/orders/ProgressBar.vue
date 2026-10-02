@@ -6,16 +6,18 @@ const props = withDefaults(defineProps<{
   tone: StatusTone
   percent: number
   label?: string
+  showDot?: boolean
   class?: string
 }>(), {
   label: '',
+  showDot: true,
   class: '',
 })
 
 const toneBg: Record<StatusTone, string> = {
-  amber: 'bg-amber-400',
-  sky: 'bg-sky-500',
-  emerald: 'bg-emerald-500',
+  amber: 'bg-[#FF9800]',
+  sky: 'bg-[#4E60FF]',
+  emerald: 'bg-[#2EC144]',
   red: 'bg-primary',
 }
 
@@ -33,6 +35,7 @@ const clamped = computed(() => Math.min(100, Math.max(0, props.percent)))
         :style="{ width: `${clamped}%` }"
       />
       <span
+        v-if="showDot"
         class="absolute top-1/2 size-[11px] -translate-y-1/2 rounded-full border-2 border-T-50 transition-[inset-inline-start] duration-500"
         :class="toneBg[tone]"
         :style="{ insetInlineStart: `calc(${clamped}% - 5.5px)` }"

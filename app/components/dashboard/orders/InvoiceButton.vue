@@ -16,7 +16,7 @@ function open() {
 <template>
   <button
     type="button"
-    class="inline-flex h-9 items-center gap-2 rounded-lg border border-T-400 bg-T-50 px-3 text-[12.5px] font-semibold text-T-800 transition-colors hover:border-T-500"
+    class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[#4E60FF] transition-opacity hover:opacity-80"
     @click="open"
   >
     <IconFileInvoice class="size-4" />

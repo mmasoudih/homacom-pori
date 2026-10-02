@@ -31,16 +31,16 @@ const icons: Record<StatusIcon, Component> = {
 }
 
 const toneText: Record<StatusTone, string> = {
-  amber: 'text-amber-500',
-  sky: 'text-sky-500',
-  emerald: 'text-emerald-500',
+  amber: 'text-[#FF9800]',
+  sky: 'text-[#4E60FF]',
+  emerald: 'text-[#2EC144]',
   red: 'text-primary',
 }
 
 const toneSoft: Record<StatusTone, string> = {
-  amber: 'bg-amber-50 text-amber-500',
-  sky: 'bg-sky-50 text-sky-500',
-  emerald: 'bg-emerald-50 text-emerald-500',
+  amber: 'bg-[#FFF4E5] text-[#FF9800]',
+  sky: 'bg-[#EEF0FF] text-[#4E60FF]',
+  emerald: 'bg-[#E9F9ED] text-[#2EC144]',
   red: 'bg-R-50 text-primary',
 }
 

@@ -27,12 +27,7 @@ function select(key: string) {
       @click="select(tab.key)"
     >
       {{ tab.label }}
-      <span
-        class="rounded-md px-1.5 py-0.5 text-[10.5px] font-bold"
-        :class="tab.key === modelValue ? 'bg-R-50 text-primary' : 'bg-T-200 text-T-600'"
-      >
-        {{ toPersianDigits(tab.count) }}
-      </span>
+      <span class="text-[11.5px]">({{ toPersianDigits(tab.count) }})</span>
       <span
         v-if="tab.key === modelValue"
         class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
