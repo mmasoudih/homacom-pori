@@ -4,6 +4,7 @@ import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconHourglassHigh,
+  IconRefresh,
   IconTruck,
   IconWallet,
 } from '@tabler/icons-vue'
@@ -28,6 +29,7 @@ const icons: Record<StatusIcon, Component> = {
   truck: IconTruck,
   check: IconCircleCheckFilled,
   x: IconCircleXFilled,
+  refresh: IconRefresh,
 }
 
 const toneText: Record<StatusTone, string> = {

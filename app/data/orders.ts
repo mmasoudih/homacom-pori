@@ -16,7 +16,7 @@ export type ReturnItemStatus = 'review' | 'approved' | 'rejected'
 
 export type StatusTone = 'amber' | 'sky' | 'emerald' | 'red'
 
-export type StatusIcon = 'hourglass' | 'wallet' | 'truck' | 'check' | 'x'
+export type StatusIcon = 'hourglass' | 'wallet' | 'truck' | 'check' | 'x' | 'refresh'
 
 export interface StatusMeta {
   label: string
@@ -130,8 +130,8 @@ export const orderStatusMeta: Record<OrderStatus, StatusMeta> = {
 }
 
 export const returnStatusMeta: Record<ReturnStatus, StatusMeta> = {
-  review: { label: 'در حال بررسی درخواست مرجوعی', tone: 'amber', icon: 'hourglass', progress: 20, hideProgress: false },
-  approved: { label: 'موافقت با مرجوعی', tone: 'sky', icon: 'check', progress: 60, hideProgress: false },
+  review: { label: 'در حال بررسی درخواست مرجوعی', tone: 'amber', icon: 'refresh', progress: 20, hideProgress: false },
+  approved: { label: 'با درخواست مرجوعی موافقت شد', tone: 'emerald', icon: 'check', progress: 60, hideProgress: false },
   rejected: { label: 'با درخواست مرجوعی موافقت نشد', tone: 'red', icon: 'x', progress: 100, hideProgress: true },
   completed: { label: 'مرجوعی با موفقیت انجام شد', tone: 'emerald', icon: 'check', progress: 100, hideProgress: false },
 }
@@ -173,6 +173,12 @@ const IMG = {
   headset: '/figma/fill-bcf7fdbe4840c6f2.png',
   phone: '/figma/fill-e393cbb3afd42faa.png',
   laptop: '/figma/fill-f9dec0064052dff9.png',
+  watch: '/figma/fill-c06409733faa2563.png',
+  headset2: '/figma/fill-a3b65327303691bb.png',
+  samsung: '/figma/fill-ff65a9033ba49cd4.png',
+  laptop2: '/figma/fill-6df25cd971d272b0.png',
+  laptop3: '/figma/fill-faa4a8621953f105.png',
+  p39: '/figma/fill-603959b7e3e05165.png',
 }
 
 function baseItem(id: string, image: string): OrderItem {
@@ -189,7 +195,7 @@ function baseItem(id: string, image: string): OrderItem {
   }
 }
 
-const REASON_MISMATCH = 'مغایرت با اطلاعات درج شده در سایت با کالای انتخابی من'
+const REASON_MISMATCH = 'مغایرت با اطلاعات درج شده در سایت یا با کالای انتخابی من'
 
 /* ------------------------------------------------------------------ *
  * Demo orders — one per status
@@ -253,16 +259,92 @@ export function findOrder(id: string): Order | undefined {
  * Demo returns — one per status
  * ------------------------------------------------------------------ */
 
-function makeReturnItem(id: string, image: string, status: ReturnItemStatus): ReturnItem {
-  return {
-    id,
-    title: 'لپ تاپ 15.6 اینچی لنوو مدل N4500 8GB 256GB',
-    image,
+/** Product catalogue used to build the demo return requests. */
+const RETURN_PRODUCTS = [
+  {
+    title: 'هدست بی‌سیم سونی مدل WH-CH520',
+    image: IMG.headset,
+    color: 'مشکی',
+    colorHex: '#1d1d1f',
+    warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 4_500_000,
+  },
+  {
+    title: 'گوشی موبایل سامسونگ مدل Galaxy A55 ظرفیت 256 گیگابایت',
+    image: IMG.phone,
     color: 'آبی',
     colorHex: '#5d5dff',
     warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 18_000_000,
+  },
+  {
+    title: 'لپ تاپ 15.6 اینچی لنوو مدل IdeaPad 1 15IJL7 Celeron N4500 8GB 256GB',
+    image: IMG.laptop,
+    color: 'خاکستری',
+    colorHex: '#4b5563',
+    warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 22_000_000,
+  },
+  {
+    title: 'ساعت هوشمند سامسونگ مدل Galaxy Watch 7',
+    image: IMG.watch,
+    color: 'نقره‌ای',
+    colorHex: '#a4b7c8',
+    warranty: 'گارانتی ۱۲ ماهه مهرسرستان',
+    amount: 9_800_000,
+  },
+  {
+    title: 'هدفون بلوتوثی مدل P39 کد 2021',
+    image: IMG.p39,
+    color: 'مشکی',
+    colorHex: '#1d1d1f',
+    warranty: 'گارانتی ۶ ماهه مهرسرستان',
+    amount: 1_200_000,
+  },
+  {
+    title: 'گوشی موبایل سامسونگ مدل Galaxy S24 FE ظرفیت 256 گیگابایت',
+    image: IMG.samsung,
+    color: 'سبز',
+    colorHex: '#56dd1c',
+    warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 35_000_000,
+  },
+  {
+    title: 'لپ تاپ 15.6 اینچی ایسوس مدل Vivobook 15',
+    image: IMG.laptop3,
+    color: 'خاکستری',
+    colorHex: '#4b5563',
+    warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 28_000_000,
+  },
+  {
+    title: 'هدفون بی‌سیم بیت مدل Galaxy Buds',
+    image: IMG.headset2,
+    color: 'قرمز',
+    colorHex: '#ef233c',
+    warranty: 'گارانتی ۱۲ ماهه مهرسرستان',
+    amount: 3_400_000,
+  },
+  {
+    title: 'لپ تاپ 14 اینچی ایسوس مدل Zenbook 14 OLED',
+    image: IMG.laptop2,
+    color: 'مشکی',
+    colorHex: '#1d1d1f',
+    warranty: 'گارانتی ۱۸ ماهه مهرسرستان',
+    amount: 41_000_000,
+  },
+] as const
+
+function makeReturnItem(id: string, product: (typeof RETURN_PRODUCTS)[number], status: ReturnItemStatus): ReturnItem {
+  return {
+    id,
+    title: product.title,
+    image: product.image,
+    color: product.color,
+    colorHex: product.colorHex,
+    warranty: product.warranty,
     quantity: 1,
-    amount: 89_000_000,
+    amount: product.amount,
     status,
     reason: REASON_MISMATCH,
   }
@@ -275,25 +357,24 @@ function makeReturn(
   code: string,
   extra: Partial<ReturnRequest> = {},
 ): ReturnRequest {
-  const images = [IMG.headset, IMG.phone, IMG.headset]
   return {
     id,
     orderCode: code,
     trackingCode: code,
     status,
-    date: '۱۴۰۵/۰۵/۰۶',
-    amount: 7_500_000,
+    date: '۲۸ بهمن ۱۴۰۳',
+    amount: 7_600_000,
     postalCode: '1874553322',
-    items: itemStatuses.map((s, i) => makeReturnItem(`${id}-${i}`, images[i]!, s)),
+    items: itemStatuses.map((s, i) => makeReturnItem(`${id}-${i}`, RETURN_PRODUCTS[i % RETURN_PRODUCTS.length]!, s)),
     ...extra,
   }
 }
 
 export const returns: ReturnRequest[] = [
-  makeReturn('ret-review', 'review', ['review', 'review', 'review'], '9240052789'),
-  makeReturn('ret-approved', 'approved', ['approved', 'approved', 'rejected'], '9240052789'),
-  makeReturn('ret-rejected', 'rejected', ['rejected', 'rejected', 'rejected'], '4835002789'),
-  makeReturn('ret-completed', 'completed', ['approved', 'approved', 'rejected'], '9240052789'),
+  makeReturn('ret-review', 'review', ['review', 'review', 'review', 'review', 'review'], '9240052789'),
+  makeReturn('ret-approved', 'approved', ['approved', 'approved', 'rejected', 'approved', 'review'], '9240052789'),
+  makeReturn('ret-rejected', 'rejected', ['rejected', 'rejected', 'rejected', 'rejected', 'rejected'], '4835002789'),
+  makeReturn('ret-completed', 'completed', ['approved', 'approved', 'rejected', 'approved', 'rejected'], '9240052789'),
 ]
 
 /** Returns shown in the "مرجوع شده" tab (completed requests are historical). */

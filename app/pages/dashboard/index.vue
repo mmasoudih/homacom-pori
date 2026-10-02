@@ -8,8 +8,8 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-T-50">
     <LandingSiteHeader />
 
-    <main class="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
-      <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <main class="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 lg:px-0 lg:py-8">
+      <div class="flex flex-col gap-6 lg:mx-[159px] lg:flex-row lg:items-start">
         <!-- Desktop sidebar -->
         <DashboardSidebar class="hidden lg:block lg:w-[340px] lg:shrink-0" />
 
