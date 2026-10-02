@@ -98,7 +98,7 @@ export interface Seller {
 }
 
 export interface StickyLink {
-  icon: 'installment' | 'insurance' | 'delivery'
+  icon: 'delivery' | 'return' | 'inPerson'
   title: string
   subtitle: string
 }
@@ -430,9 +430,9 @@ const INSURANCE_TEXT = {
 }
 
 const STICKY_LINKS: StickyLink[] = [
-  { icon: 'installment', title: 'خرید اقساطی', subtitle: 'اعتباری و بدون ضامن، بازگشت وجه' },
-  { icon: 'insurance', title: 'بیمه محصول', subtitle: 'بیمه‌ی تجهیزات دیجیتال' },
-  { icon: 'delivery', title: 'تحویل حضوری', subtitle: 'تحویل درب منزل، ارسال امروز' },
+  { icon: 'delivery', title: 'نحوه ارسال کالا', subtitle: 'تحویل فوری بدون هزینه' },
+  { icon: 'return', title: 'شرایط مرجوعی', subtitle: 'تحویل فوری بدون هزینه' },
+  { icon: 'inPerson', title: 'تحویل حضوری', subtitle: 'تحویل فوری بدون هزینه' },
 ]
 
 const RELATED: ProductDetail['related'] = [

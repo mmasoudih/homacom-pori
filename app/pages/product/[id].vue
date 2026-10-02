@@ -129,9 +129,15 @@ onUnmounted(() => {
     window.removeEventListener('scroll', scrollHandler)
 })
 
-function navigateToSection(target: 'specs' | 'comments') {
-  document.getElementById(target === 'specs' ? 'product-specs' : 'product-comments')
-    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+const sectionIds = {
+  review: 'product-review',
+  specs: 'product-specs',
+  comments: 'product-comments',
+} as const
+
+function navigateToSection(target: 'review' | 'specs' | 'comments') {
+  activeTab.value = target
+  document.getElementById(sectionIds[target])?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 </script>
 
@@ -219,11 +225,16 @@ function navigateToSection(target: 'specs' | 'comments') {
           <!-- ============== Review + specs + comments + related ============== -->
           <div class="mt-8 flex w-full max-w-[1440px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
             <div class="flex min-w-0 flex-col gap-10 lg:gap-12">
+              <ProductDetailTabs
+                :active="activeTab"
+                class="hidden lg:flex"
+                @change="navigateToSection"
+              />
+
               <ProductDetailReviewSection
                 id="product-review"
                 :review="product.review"
                 :show-more-count="1"
-                @navigate="navigateToSection"
                 @show-more="openDetailSheet('review')"
               />
 
@@ -247,6 +258,8 @@ function navigateToSection(target: 'specs' | 'comments') {
               <ProductDetailStickyCard
                 :product="product"
                 :links="product.stickyLinks"
+                :selected-color="selectedColor"
+                :selected-warranty="selectedWarranty"
               />
             </div>
           </div>
