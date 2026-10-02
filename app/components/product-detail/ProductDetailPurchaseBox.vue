@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import {
-  IconChevronDown,
-  IconBuildingStore,
-  IconCirclePlus,
   IconBell,
-  IconX,
+  IconChevronLeft,
+  IconShoppingCart,
+  IconShieldCheck,
+  IconTag,
+  IconPencil,
+  IconShoppingBag,
 } from '@tabler/icons-vue'
 import type { ProductDetail, ServiceCatalogItem, WarrantyOption } from '~/data/product'
-import { formatPrice } from '~/utils/format'
+import { formatPriceFa } from '~/utils/format'
+import { getDiscountPercent } from '~/utils/product'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(
   defineProps<{
     product: ProductDetail
     selectedWarranty: WarrantyOption
+    selectedColor: string
     selectedInsuranceId: string | null
     addedServices: ServiceCatalogItem[]
     servicesPrice: number
@@ -24,32 +28,31 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'update:selectedWarrantyId': [value: string]
-  'update:selectedInsuranceId': [value: string | null]
   'open-services': []
-  'remove-service': [id: string]
+  'open-insurance': []
   'notify-me': []
 }>()
 
 const isAvailable = computed(() => props.product.stockStatus === 'available')
 
-const insuranceOptions = computed(() => [
-  { id: null, label: 'بدون بیمه', price: 0 },
-  ...props.product.servicePackages.map(p => ({ id: p.id, label: p.name, price: p.price })),
-])
+const selectedColor = computed(() =>
+  props.product.colors.find(c => c.value === props.selectedColor),
+)
 
-const selectedInsurance = computed(
-  () =>
-    insuranceOptions.value.find(o => o.id === props.selectedInsuranceId)
-    ?? { id: null as string | null, label: 'بدون بیمه', price: 0 },
+const selectedInsurance = computed(() =>
+  props.product.insuranceOptions.find(i => i.id === props.selectedInsuranceId) ?? null,
 )
 
 const discountAmount = computed(() =>
   props.product.oldPrice ? props.product.oldPrice - props.product.price : 0,
 )
 
+const discountPercent = computed(() =>
+  getDiscountPercent(props.product.price, props.product.oldPrice ?? 0),
+)
+
 const payable = computed(
-  () => props.product.price + props.servicesPrice + selectedInsurance.value.price,
+  () => props.product.price + props.servicesPrice + (selectedInsurance.value?.price ?? 0),
 )
 </script>
 
@@ -92,171 +95,145 @@ const payable = computed(
   </div>
 
   <!-- =============================================== -->
-  <!-- Purchase box                                     -->
+  <!-- Summary / purchase box                           -->
   <!-- =============================================== -->
   <div
     v-else
     :class="cn('flex w-full flex-col gap-4 rounded-2xl border border-T-300 bg-T-50 p-5', props.class)"
   >
-    <!-- Seller -->
-    <div class="flex items-center justify-between">
-      <span class="text-[12.5px] text-T-700">{{ product.seller.label }}:</span>
-      <span class="flex items-center gap-1.5 text-[12.5px] font-medium text-T-900">
-        <IconBuildingStore class="size-4 text-T-600" />
-        {{ product.seller.name }}
-      </span>
-    </div>
+    <div class="flex flex-col">
+      <!-- Product price -->
+      <div class="flex items-center justify-between gap-3 py-3">
+        <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
+          <IconTag class="size-4 text-T-600" />
+          قیمت کالا:
+        </span>
+        <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
+          {{ formatPriceFa(product.price) }}
+          <span class="text-[11px] font-normal text-T-700">تومان</span>
+        </span>
+      </div>
+      <div class="h-px w-full bg-T-300" />
 
-    <!-- Warranty selector -->
-    <div class="flex items-center justify-between">
-      <span class="text-[12.5px] text-T-700">گارانتی:</span>
-      <UiDropdownMenu>
-        <UiDropdownMenuTrigger
-          class="flex items-center gap-1 text-[12.5px] font-medium text-T-900 outline-none"
-        >
-          {{ selectedWarranty.label }}
-          <IconChevronDown class="size-3.5 text-T-600" />
-        </UiDropdownMenuTrigger>
-        <UiDropdownMenuContent align="start" class="min-w-[240px]">
-          <UiDropdownMenuRadioGroup
-            :model-value="selectedWarranty.id"
-            @update:model-value="emit('update:selectedWarrantyId', $event as string)"
+      <!-- Discount -->
+      <div v-if="discountAmount > 0" class="flex items-center justify-between gap-3 py-3">
+        <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
+          <IconPencil class="size-4 text-R-300" />
+          تخفیف:
+        </span>
+        <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
+          {{ formatPriceFa(discountAmount) }}
+          <span class="text-[11px] font-normal text-T-700">تومان</span>
+        </span>
+      </div>
+      <div v-if="discountAmount > 0" class="h-px w-full bg-T-300" />
+
+      <!-- Insurance -->
+      <div v-if="selectedInsurance" class="flex flex-col gap-1.5 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
+            <IconShieldCheck class="size-4 text-T-600" />
+            مبلغ بیمه:
+          </span>
+          <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
+            {{ formatPriceFa(selectedInsurance.price) }}
+            <span class="text-[11px] font-normal text-T-700">تومان</span>
+          </span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span class="truncate text-[11.5px] text-T-700">({{ selectedInsurance.name }})</span>
+          <button
+            type="button"
+            class="flex shrink-0 items-center gap-0.5 text-[11.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+            @click="emit('open-insurance')"
           >
-            <UiDropdownMenuRadioItem
-              v-for="option in product.warrantyOptions"
-              :key="option.id"
-              :value="option.id"
-              class="text-[12.5px]"
-            >
-              {{ option.label }}
-            </UiDropdownMenuRadioItem>
-          </UiDropdownMenuRadioGroup>
-        </UiDropdownMenuContent>
-      </UiDropdownMenu>
-    </div>
+            جزئیات
+            <IconChevronLeft class="size-3.5" />
+          </button>
+        </div>
+      </div>
+      <div v-if="selectedInsurance" class="h-px w-full bg-T-300" />
 
-    <!-- Insurance selector -->
-    <div class="flex items-center justify-between">
-      <span class="text-[12.5px] text-T-700">بیمه‌ها:</span>
-      <UiDropdownMenu>
-        <UiDropdownMenuTrigger
-          class="flex items-center gap-1 text-[12.5px] font-medium text-T-900 outline-none"
-        >
-          {{ selectedInsurance.label }}
-          <IconChevronDown class="size-3.5 text-T-600" />
-        </UiDropdownMenuTrigger>
-        <UiDropdownMenuContent align="start" class="min-w-[260px]">
-          <UiDropdownMenuRadioGroup
-            :model-value="selectedInsuranceId ?? 'none'"
-            @update:model-value="emit('update:selectedInsuranceId', $event === 'none' ? null : ($event as string))"
-          >
-            <UiDropdownMenuRadioItem
-              v-for="option in insuranceOptions"
-              :key="option.id ?? 'none'"
-              :value="option.id ?? 'none'"
-              class="text-[12.5px]"
-            >
-              {{ option.label }}
-              <span v-if="option.price" class="ms-2 text-[11px] text-T-700">+ {{ formatPrice(option.price) }} تومان</span>
-            </UiDropdownMenuRadioItem>
-          </UiDropdownMenuRadioGroup>
-        </UiDropdownMenuContent>
-      </UiDropdownMenu>
-    </div>
-
-    <div class="h-px w-full bg-T-300" />
-
-    <!-- Services shortcut -->
-    <div class="flex items-center justify-between">
-      <span class="text-[12.5px] text-T-700">خدمات و لوازم جانبی:</span>
-      <button
-        type="button"
-        class="flex items-center gap-1 text-[12.5px] font-medium text-R-300 transition-colors hover:text-R-400"
-        @click="emit('open-services')"
-      >
-        افزودن خدمات پیشنهادی
-        <IconCirclePlus class="size-4" />
-      </button>
-    </div>
-
-    <!-- Added services -->
-    <ul v-if="addedServices.length" class="flex flex-col gap-2">
-      <li
-        v-for="service in addedServices"
-        :key="service.id"
-        class="flex items-center justify-between gap-2"
-      >
-        <span class="text-[12.5px] text-T-900">{{ service.label }}</span>
-        <span class="flex items-center gap-2">
-          <span class="text-[12.5px] text-T-700">
-            {{ service.price ? `${formatPrice(service.price)} تومان` : 'رایگان' }}
+      <!-- Services -->
+      <div v-if="addedServices.length" class="flex flex-col gap-1.5 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
+            <IconShoppingBag class="size-4 text-T-600" />
+            خدمات:
+          </span>
+          <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
+            {{ formatPriceFa(servicesPrice) }}
+            <span class="text-[11px] font-normal text-T-700">تومان</span>
+          </span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span class="truncate text-[11.5px] text-T-700">
+            ({{ addedServices.length }} مورد)
           </span>
           <button
             type="button"
-            class="text-T-600 transition-colors hover:text-R-300"
-            :aria-label="`حذف ${service.label}`"
-            @click="emit('remove-service', service.id)"
+            class="flex shrink-0 items-center gap-0.5 text-[11.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+            @click="emit('open-services')"
           >
-            <IconX class="size-4" />
+            جزئیات
+            <IconChevronLeft class="size-3.5" />
           </button>
-        </span>
-      </li>
-    </ul>
-
-    <div class="h-px w-full bg-T-300" />
-
-    <!-- Price rows -->
-    <div class="flex flex-col gap-2.5">
-      <div v-if="product.oldPrice" class="flex items-center justify-between">
-        <span class="text-[12.5px] text-T-700">قیمت کالا:</span>
-        <span class="flex items-center gap-1 text-[12.5px] text-T-600 line-through">
-          {{ formatPrice(product.oldPrice) }}
-          <span class="text-[11px]">تومان</span>
-        </span>
-      </div>
-
-      <div v-if="discountAmount > 0" class="flex items-center justify-between">
-        <span class="text-[12.5px] text-R-300">تخفیف:</span>
-        <span class="flex items-center gap-1 text-[12.5px] font-medium text-R-300">
-          {{ formatPrice(discountAmount) }}
-          <span class="text-[11px]">تومان</span>
-        </span>
-      </div>
-
-      <div v-if="selectedInsurance.price" class="flex items-center justify-between">
-        <span class="text-[12.5px] text-T-700">مبلغ بیمه:</span>
-        <span class="flex items-center gap-1 text-[12.5px] text-T-900">
-          {{ formatPrice(selectedInsurance.price) }}
-          <span class="text-[11px]">تومان</span>
-        </span>
-      </div>
-
-      <div class="mt-1 flex items-end justify-between">
-        <span class="text-[13px] text-T-700">قیمت نهایی:</span>
-        <span class="flex items-baseline gap-1">
-          <span class="text-[22px] font-extrabold text-T-900">{{ formatPrice(payable) }}</span>
-          <span class="text-[12px] text-T-700">تومان</span>
-        </span>
+        </div>
       </div>
     </div>
 
-    <!-- Add to cart (no-op until cart phase) -->
+    <!-- Total -->
+    <div class="flex items-end justify-between gap-3 border-t border-T-300 pt-4">
+      <span class="text-[13px] text-T-700">جمع کل</span>
+      <span class="flex flex-col items-end gap-1">
+        <span v-if="product.oldPrice" class="flex items-center gap-2">
+          <span class="text-[12px] text-T-600 line-through">{{ formatPriceFa(product.oldPrice) }}</span>
+          <span
+            v-if="discountPercent"
+            class="flex h-[21px] items-center rounded-full bg-R-300 px-2 text-[10.5px] font-extrabold text-white"
+          >
+            ٪{{ discountPercent }}
+          </span>
+        </span>
+        <span class="flex items-baseline gap-1">
+          <span class="text-[22px] font-extrabold text-T-900">{{ formatPriceFa(payable) }}</span>
+          <span class="text-[12px] text-T-700">تومان</span>
+        </span>
+      </span>
+    </div>
+
+    <!-- Add to cart -->
     <button
       type="button"
-      class="flex h-[42px] w-full items-center justify-center rounded-xl bg-R-300 text-[14px] font-bold text-white transition-colors hover:bg-R-400"
+      class="flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-R-300 text-[14px] font-bold text-white transition-colors hover:bg-R-400"
     >
+      <IconShoppingCart class="size-5" />
       افزودن به سبد خرید
     </button>
 
-    <div class="flex flex-col gap-2">
-      <label class="flex cursor-pointer items-center gap-2 text-[12.5px] text-T-700">
-        <UiCheckbox class="size-[18px]" />
-        اکنون خدمات و لوازم جانبی به سبد اضافه شود
-      </label>
-      <label class="flex cursor-pointer items-center gap-2 text-[12.5px] text-T-700">
-        <UiCheckbox class="size-[18px]" />
-        در کنارش خدمات سبد خرید شما اضافه شود
-      </label>
+    <!-- Selected color + warranty -->
+    <div class="flex flex-col gap-2.5">
+      <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
+        <span class="text-[12.5px] text-T-700">رنگ:</span>
+        <span class="flex items-center gap-2">
+          <span
+            v-if="selectedColor"
+            class="size-[18px] shrink-0 rounded-full border border-T-500"
+            :style="{ backgroundColor: selectedColor.value }"
+          />
+          <span class="text-[12.5px] font-medium text-T-900">
+            {{ selectedColor?.name || 'انتخاب نشده' }}
+          </span>
+        </span>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
+        <span class="text-[12.5px] text-T-700">گارانتی:</span>
+        <span class="flex items-center gap-1.5">
+          <IconShieldCheck class="size-4 text-R-300" />
+          <span class="text-[12.5px] font-medium text-T-900">{{ selectedWarranty.label }}</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>

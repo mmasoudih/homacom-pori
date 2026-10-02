@@ -29,7 +29,6 @@ useHead({
 // --- Selection state --------------------------------------------------------
 
 const selectedWarrantyId = ref('')
-const selectedStorageId = ref('')
 const selectedColor = ref('')
 const selectedInsuranceId = ref<string | null>(null)
 const addedServiceIds = ref<string[]>([])
@@ -60,11 +59,6 @@ const selectedInsurancePrice = computed(() =>
 /** Services + insurance, added on top of the product price (mobile bar). */
 const extraPrice = computed(() => servicesPrice.value + selectedInsurancePrice.value)
 
-function addServiceById(serviceId: string) {
-  if (!addedServiceIds.value.includes(serviceId))
-    addedServiceIds.value = [...addedServiceIds.value, serviceId]
-}
-
 function removeServiceById(serviceId: string) {
   addedServiceIds.value = addedServiceIds.value.filter(i => i !== serviceId)
 }
@@ -75,7 +69,6 @@ watch(
   () => {
     loading.value = true
     selectedWarrantyId.value = product.value?.defaultWarrantyId ?? ''
-    selectedStorageId.value = product.value?.storageOptions[0]?.id ?? ''
     selectedColor.value = ''
     selectedInsuranceId.value = null
     addedServiceIds.value = []
@@ -174,8 +167,14 @@ function navigateToSection(target: 'specs' | 'comments') {
             @remove-service="removeServiceById"
           />
 
+          <!-- ==================== Desktop breadcrumb ==================== -->
+          <ProductDetailBreadcrumb
+            :trail="product.breadcrumb"
+            class="mx-auto mt-6 hidden w-full max-w-[1440px] lg:flex"
+          />
+
           <!-- ======================= Desktop hero ======================= -->
-          <div class="mt-12 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid [&>*]:min-w-0">
+          <div class="mt-6 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid [&>*]:min-w-0">
             <ProductDetailGallery
               :images="product.images"
               :alt="product.title"
@@ -184,50 +183,38 @@ function navigateToSection(target: 'specs' | 'comments') {
 
             <ProductDetailInfoBox
               v-model:selected-warranty-id="selectedWarrantyId"
-              v-model:selected-storage-id="selectedStorageId"
               v-model:selected-color="selectedColor"
+              v-model:selected-insurance-id="selectedInsuranceId"
               :product="product"
+              :added-services="addedServices"
               @open-services="dialogs.services = true"
               @open-comment="dialogs.comment = true"
               @open-insurance="dialogs.insurance = true"
+              @remove-service="removeServiceById"
             />
 
             <ProductDetailPurchaseBox
-              v-model:selected-insurance-id="selectedInsuranceId"
               :product="product"
               :selected-warranty="selectedWarranty!"
+              :selected-color="selectedColor"
+              :selected-insurance-id="selectedInsuranceId"
               :added-services="addedServices"
               :services-price="servicesPrice"
-              @update:selected-warranty-id="selectedWarrantyId = $event"
               @open-services="dialogs.services = true"
-              @remove-service="removeServiceById"
+              @open-insurance="dialogs.insurance = true"
               @notify-me="dialogs.notify = true"
             />
-          </div>
 
-          <!-- ================== Desktop-only sections =================== -->
-          <ProductDetailTrustStrip class="mt-12 hidden w-full max-w-[1440px] lg:flex" />
-
-          <div
-            v-if="product.stockStatus === 'available'"
-            class="mt-12 hidden w-full max-w-[1440px] flex-col gap-10 lg:flex"
-          >
-            <ProductDetailFeaturesSection
-              :rows="product.features.rows"
-              :more-count="product.features.moreCount"
-            />
-
-            <ProductDetailQuestionsSection :questions="product.questions" />
-
-            <ProductDetailServicesSection
-              :packages="product.servicePackages"
-              :added-services="addedServices"
-              :show-added-services="addedServices.length > 0"
-              @add-package="addServiceById"
-              @open-details="dialogs.insurance = true"
-              @remove-service="removeServiceById"
+            <!-- Sellers span the gallery + info columns (not the whole page) -->
+            <ProductDetailSellersSection
+              v-if="product.stockStatus === 'available'"
+              class="lg:col-span-2"
+              :sellers="product.sellers"
             />
           </div>
+
+          <!-- ================== Desktop trust strip =================== -->
+          <ProductDetailTrustStrip class="mt-8 hidden w-full max-w-[1440px] lg:flex" />
 
           <!-- ============== Review + specs + comments + related ============== -->
           <div class="mt-8 flex w-full max-w-[1440px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">

@@ -16,16 +16,21 @@ const items = [
 </script>
 
 <template>
-  <div :class="cn('grid w-full grid-cols-4 gap-3', props.class)">
+  <div
+    :class="cn(
+      'grid w-full grid-cols-4 rounded-2xl border border-T-300 bg-T-50 px-4 py-5',
+      props.class,
+    )"
+  >
     <div
       v-for="item in items"
       :key="item.title"
-      class="flex items-center gap-3 rounded-2xl border border-T-300 bg-T-50 px-4 py-3.5"
+      class="flex items-center gap-3 px-5"
     >
-      <component :is="item.icon" class="size-8 shrink-0 text-T-600" stroke-width="1.5" />
+      <component :is="item.icon" class="size-9 shrink-0 text-T-600" stroke-width="1.5" />
       <div class="flex flex-col gap-1">
         <span class="text-[13px] font-bold text-T-900">{{ item.title }}</span>
-        <span class="text-[12px] leading-[17px] text-T-700">{{ item.description }}</span>
+        <span class="text-[12px] leading-[18px] text-T-700">{{ item.description }}</span>
       </div>
     </div>
   </div>

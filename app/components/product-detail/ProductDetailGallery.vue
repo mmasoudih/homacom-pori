@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { IconHeart, IconArrowsLeftRight, IconShare, IconVideo, IconRefresh } from '@tabler/icons-vue'
+import {
+  IconHeart,
+  IconArrowsLeftRight,
+  IconShare,
+  IconVideo,
+  IconRefresh,
+  IconCircleCheckFilled,
+} from '@tabler/icons-vue'
 import type { GalleryItem } from '~/data/product'
 import { cn } from '~/lib/utils'
 
@@ -42,26 +49,28 @@ function isActionActive(label: string) {
     <!-- Main image + action rail -->
     <div class="relative w-full">
       <!-- Action rail -->
-      <div class="absolute end-1 top-1 z-10 flex flex-col gap-3 text-T-600">
+      <div
+        class="absolute start-3 top-3 z-10 flex flex-col gap-0.5 rounded-full bg-T-200 p-0.5 text-T-900"
+      >
         <button
           v-for="action in actionRail"
           :key="action.label"
           type="button"
-          class="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-T-200 hover:text-T-900"
-          :class="isActionActive(action.label) ? 'text-primary' : ''"
+          class="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-T-300 hover:text-T-900"
+          :class="isActionActive(action.label) ? 'text-primary' : 'text-T-900'"
           :aria-label="action.label"
           @click="onAction(action.label)"
         >
-          <component :is="action.icon" class="size-5" />
+          <component :is="action.icon" class="size-4.5" />
         </button>
       </div>
 
-      <div class="group relative flex aspect-square w-full items-center justify-center overflow-hidden bg-T-100">
+      <div class="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-T-300 bg-T-50">
         <ProductImage
           :src="current?.src"
           :alt="alt"
           container-class="rounded-none bg-transparent"
-          image-class="max-h-[85%] max-w-[85%]"
+          image-class="max-h-[70%] max-w-[70%]"
         />
 
         <!-- Video / 360 overlay icon on the main stage -->
@@ -99,6 +108,12 @@ function isActionActive(label: string) {
           class="size-5 text-T-600"
         />
       </button>
+    </div>
+
+    <!-- Registered / activation assurance strip -->
+    <div class="mt-4 flex items-center justify-center gap-2.5 rounded-xl bg-[#EAECFF] px-4 py-3.5">
+      <IconCircleCheckFilled class="size-5 shrink-0 text-[#3D7BFA]" />
+      <span class="text-[12.5px] font-medium text-T-900">رجیسترشده - به همراه کد فعال سازی</span>
     </div>
   </div>
 </template>
