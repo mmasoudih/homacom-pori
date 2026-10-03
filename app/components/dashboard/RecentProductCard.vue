@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconShoppingBag } from '@tabler/icons-vue'
 import type { Product } from '~/utils/product'
 import { normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 
@@ -18,30 +17,37 @@ const discount = computed(() =>
 </script>
 
 <template>
-  <article class="group relative flex w-full flex-col rounded-2xl border border-T-400 bg-T-50 p-2.5 lg:p-3">
-    <div class="relative">
-      <ProductImage
-        :src="product.image"
-        :alt="product.title"
-        container-class="rounded-[16px]"
-      />
-
+  <article class="group relative flex w-full flex-col bg-T-50 p-2.5 lg:h-[328px] lg:p-3">
+    <div
+      v-if="colors.length"
+      class="absolute top-2 end-2 flex flex-col gap-1"
+    >
       <span
-        v-if="colors.length"
-        class="absolute top-2 end-2 size-[10px] rounded-[3px] border border-T-500"
-        :style="{ backgroundColor: colors[0]?.value }"
+        v-for="(color, ci) in colors"
+        :key="`${color.value}-${ci}`"
+        class="size-3 rounded-[3px] border border-T-500"
+        :style="{ backgroundColor: color.value }"
         role="img"
-        :aria-label="colors[0]?.name ?? 'رنگ محصول'"
+        :aria-label="color.name ?? 'رنگ محصول'"
       />
     </div>
 
-    <h3 class="mt-3 line-clamp-2 h-10 text-[12px] font-bold leading-[20px] text-T-900 lg:text-[13px]">
+    <div class="relative lg:flex lg:min-h-0 lg:flex-1 lg:items-center lg:justify-center">
+      <ProductImage
+        :src="product.image"
+        :alt="product.title"
+        container-class="rounded-[16px] lg:aspect-auto lg:size-[120px] lg:shrink-0"
+      />
+    </div>
+
+    <UiTypography as="h3" size="lg" weight="regular" class="mt-3 line-clamp-2 h-10 leading-[20px]">
       {{ product.title }}
-    </h3>
+    </UiTypography>
 
     <ProductPrice
-      class="mt-2"
+      class="mt-2 items-end"
       price-class="text-T-900"
+      :discount-in-price-row="true"
       :price="price"
       :original-price="originalPrice"
       :discount="discount"
@@ -49,10 +55,15 @@ const discount = computed(() =>
 
     <button
       type="button"
-      class="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-T-400 text-[12px] font-medium text-T-800 transition-colors hover:border-primary hover:text-primary lg:h-10 lg:text-[13px]"
+      class="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-T-400 text-T-900 transition-colors hover:border-primary hover:text-primary lg:h-10"
     >
-      <IconShoppingBag class="size-4" />
-      افزودن به سبد
+      <span
+        class="h-[15.52px] w-[15.6px] shrink-0 bg-current [mask-image:url(/icons/shopping-bag.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        aria-hidden="true"
+      />
+      <UiTypography as="span" size="md" weight="medium" color="inherit">
+        افزودن به سبد
+      </UiTypography>
     </button>
   </article>
 </template>

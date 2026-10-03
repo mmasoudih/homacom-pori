@@ -11,6 +11,11 @@ const props = withDefaults(
     discount?: number | null;
     showOriginalPrice?: boolean;
     showDiscount?: boolean;
+    /**
+     * Stacked only: render the discount chip inside the price row (on the
+     * start/right side) and leave only the old price in the second row.
+     */
+    discountInPriceRow?: boolean;
     /** Stacked (default): price above old-price/badge. Inline: all on one row. */
     layout?: "stacked" | "inline";
     /** Overrides the current-price text color (unit and old price are unaffected). */
@@ -25,6 +30,7 @@ const props = withDefaults(
     discount: null,
     showOriginalPrice: true,
     showDiscount: true,
+    discountInPriceRow: false,
     layout: "stacked",
     priceClass: "",
     badgeSize: "lg",
@@ -101,20 +107,35 @@ const badgeSizeClass = computed(() =>
 
   <!-- Stacked: price above old-price/badge -->
   <div v-else :class="cn('flex flex-col gap-1', props.class)">
-    <!-- New / discounted price -->
-    <div class="flex items-baseline gap-1">
+    <!-- New / discounted price (chip moves into this row when discountInPriceRow) -->
+    <div
+      :class="discountInPriceRow
+        ? 'flex w-full items-center gap-1'
+        : 'flex items-baseline gap-1'"
+    >
       <UiTypography
-        size="xl"
-        weight="medium"
-        leading="none"
-        :class="cn(priceColor, props.priceClass)"
+        v-if="discountInPriceRow && showDiscount && hasDiscount"
+        as="span"
+        size="md"
+        weight="bold"
+        :class="cn('flex shrink-0 items-center justify-center', badgeSizeClass, discountBadgeClass(tone))"
       >
-        {{ formatPriceFa(price) }}
+        {{ toPersianDigits(discount!) }}٪
       </UiTypography>
-      <UiTypography size="sm" weight="semibold" :class="dimColor">تومان</UiTypography>
+      <div :class="cn('flex items-baseline gap-1', discountInPriceRow && 'ms-auto')">
+        <UiTypography
+          size="xl"
+          weight="medium"
+          leading="none"
+          :class="cn(priceColor, props.priceClass)"
+        >
+          {{ formatPriceFa(price) }}
+        </UiTypography>
+        <UiTypography size="sm" weight="semibold" :class="dimColor">تومان</UiTypography>
+      </div>
     </div>
 
-    <!-- Original price + discount badge -->
+    <!-- Original price (+ discount badge unless it moved into the price row) -->
     <div class="flex min-h-4 items-center gap-1.5">
       <UiTypography
         v-if="showOldPrice"
@@ -126,7 +147,7 @@ const badgeSizeClass = computed(() =>
         {{ formatPriceFa(originalPrice!) }}
       </UiTypography>
       <UiTypography
-        v-if="showDiscount && hasDiscount"
+        v-if="!discountInPriceRow && showDiscount && hasDiscount"
         as="span"
         size="md"
         weight="bold"
