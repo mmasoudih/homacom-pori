@@ -64,7 +64,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
             class="flex h-[38px] items-center gap-2 rounded-full px-4 transition-colors lg:h-9"
             :class="
               (pills.activeCat === c.label)
-                ? 'border border-T-400 bg-T-50 text-foreground'
+                ? 'bg-T-50 text-foreground lg:h-[38px] lg:w-[113px] lg:justify-center'
                 : 'text-T-700 hover:bg-T-50/50'
             "
           >
@@ -86,7 +86,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
             class="flex h-[38px] items-center rounded-full px-4 transition-colors lg:h-9"
             :class="
               (pills.activePrice === p)
-                ? 'border border-T-400 bg-T-50 text-foreground'
+                ? 'bg-T-50 text-foreground lg:h-[38px] lg:w-[128px] lg:justify-center'
                 : 'text-T-700 hover:bg-T-50/50'
             "
           >

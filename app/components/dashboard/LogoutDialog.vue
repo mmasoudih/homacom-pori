@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconLogout } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -28,26 +27,28 @@ async function confirm() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 text-center max-lg:top-auto max-lg:bottom-0 max-lg:max-w-none max-lg:translate-y-0 max-lg:rounded-b-none max-lg:rounded-t-3xl max-lg:border-x-0 max-lg:border-b-0 max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=closed]:slide-out-to-bottom lg:max-w-[400px]">
+    <DialogContent
+      class="rounded-2xl p-6 text-center max-lg:top-auto max-lg:bottom-0 max-lg:max-w-none max-lg:translate-y-0 max-lg:rounded-b-none max-lg:rounded-t-3xl max-lg:border-x-0 max-lg:border-b-0 max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=closed]:slide-out-to-bottom lg:max-w-[450px]"
+    >
       <div class="flex flex-col items-center gap-4">
-        <span class="flex size-16 items-center justify-center rounded-full bg-R-50 text-primary">
-          <IconLogout class="size-7" />
+        <span class="flex size-[76px] items-center justify-center rounded-full bg-R-10 text-R-300">
+          <img src="/icons/logout.svg" alt="" class="size-7">
         </span>
 
         <div class="flex flex-col gap-2">
-          <h2 class="text-[15px] font-bold text-T-900">خروج از حساب کاربری</h2>
-          <p class="text-[13px] leading-[22px] text-T-600">
+          <UiTypography as="h2" size="xl" weight="bold">خروج از حساب کاربری</UiTypography>
+          <UiTypography as="p" size="lg" weight="regular" color="muted" class="leading-[22px]">
             آیا مطمئن هستید؟ سبد خرید و اطلاعات شما محفوظ می‌ماند و هر زمان می‌توانید دوباره وارد شوید.
-          </p>
+          </UiTypography>
         </div>
       </div>
 
       <div class="mt-2 flex gap-3">
-        <Button class="h-11 flex-1 rounded-xl" @click="confirm">
-          خروج از حساب
-        </Button>
-        <Button variant="secondary" class="h-11 flex-1 rounded-xl" @click="close">
+        <Button variant="secondary" class="h-[42px] flex-1 rounded-xl bg-T-300" @click="close">
           انصراف
+        </Button>
+        <Button class="h-[42px] flex-1 rounded-xl" @click="confirm">
+          خروج از حساب
         </Button>
       </div>
     </DialogContent>

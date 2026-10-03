@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconPencil, IconUser, IconWallet } from '@tabler/icons-vue'
+import { IconChevronLeft } from '@tabler/icons-vue'
 import { dashboardUser, wallet } from '~/data/dashboard'
-import { formatPriceFa } from '~/utils/format'
+import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const balance = ref(wallet.balance)
 const fundsOpen = ref(false)
@@ -15,37 +15,35 @@ function onCharged(amount: number) {
   <div class="relative">
     <!-- Profile -->
     <div class="relative flex items-center gap-3">
-      <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600">
-        <IconUser class="size-6" />
-      </span>
+      <img src="/icons/user-avatar.svg" alt="" class="size-11 shrink-0 rounded-full">
       <div class="flex min-w-0 flex-col gap-0.5">
-        <span class="truncate text-[14px] font-bold text-T-900">{{ dashboardUser.name }}</span>
-        <span class="truncate text-[11px] text-T-600" dir="ltr">{{ dashboardUser.email }}</span>
+        <UiTypography as="span" size="lg" weight="semibold" class="truncate">{{ dashboardUser.name }}</UiTypography>
+        <span class="truncate text-[11px] text-T-600" dir="ltr">{{ toPersianDigits(dashboardUser.mobile) }}</span>
       </div>
       <button
         type="button"
         class="absolute top-0 end-0 flex size-8 items-center justify-center rounded-full text-T-600 transition-colors hover:bg-T-100 hover:text-primary"
         aria-label="ویرایش اطلاعات"
       >
-        <IconPencil class="size-4" />
+        <img src="/icons/edit-pencil.svg" alt="" class="size-4">
       </button>
     </div>
 
     <!-- Wallet -->
-    <div class="mt-4 flex items-center justify-between rounded-xl border border-T-400 px-4 py-3">
-      <IconWallet class="size-5 shrink-0 text-T-800" />
-      <span class="text-[14px] font-bold text-T-900">
-        {{ formatPriceFa(balance) }}
-        <span class="text-[11px] font-normal text-T-600">تومان</span>
+    <div class="mt-4 flex h-14 w-full items-center justify-between rounded-[16px] border border-T-400 px-4">
+      <img src="/icons/wallet-simple.svg" alt="" class="size-5 shrink-0">
+      <span class="flex items-center gap-1">
+        <UiTypography as="span" size="lg" weight="bold">{{ formatPriceFa(balance) }}</UiTypography>
+        <UiTypography as="span" size="sm" weight="semibold" color="subtle">تومان</UiTypography>
       </span>
     </div>
 
     <button
       type="button"
-      class="mt-3 flex w-full items-center justify-center gap-1 text-[13px] font-medium text-primary transition-colors hover:text-R-400"
+      class="mt-3 flex w-full items-center justify-start gap-1 text-[#5A6AFF] transition-colors"
       @click="fundsOpen = true"
     >
-      افزایش موجودی کیف پول
+      <UiTypography as="span" size="md" weight="medium" color="inherit">افزایش موجودی کیف پول</UiTypography>
       <IconChevronLeft class="size-4" />
     </button>
 
