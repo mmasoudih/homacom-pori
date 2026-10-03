@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
 
 const toneSoft: Record<StatusTone, string> = {
   amber: 'border border-[#F2DDB4] bg-[#FFF4E5] text-[#B26A00]',
+  gold: 'border border-[#F2DDB4] bg-[#FFF4E5] text-[#CF982C]',
   sky: 'bg-[#EEF0FF] text-[#4E60FF]',
   emerald: 'bg-[#E9F9ED] text-[#2EC144]',
   red: 'bg-R-50 text-primary',

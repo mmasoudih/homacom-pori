@@ -142,43 +142,54 @@ const items = computed(() => [
       class="mt-6 flex flex-col gap-5"
     >
       <DashboardOrdersAlertNote>
-        پرداخت شما کامل نشده و ۳۰ ساعت دیگر مهلت دارید. برای ثبت نهایی، پرداخت
-        خود را کامل کنید.
+        پرداخت شما کامل نشده و تا
+        <span class="underline">۲۴ ساعت</span> دیگر رزرو می‌ماند. برای ثبت
+        نهایی، پرداخت خود را کامل کنید.
       </DashboardOrdersAlertNote>
 
       <div
-        class="flex flex-col items-center gap-6 lg:flex-row lg:justify-center"
+        class="flex flex-col gap-6 rounded-[12px] border border-T-300 bg-T-100 p-4 lg:p-6"
       >
-        <DashboardOrdersProgressRing
-          :percent="order.payment.percent"
-          label="پرداخت شده"
-        />
+        <div
+          class="flex flex-col items-center gap-6 lg:flex-row lg:justify-center"
+        >
+          <div
+            class="flex w-full flex-1 flex-col gap-3 text-[12.5px] text-T-600"
+          >
+            <div class="flex w-full items-center justify-between gap-3">
+              <span>مبلغ سفارش:</span>
+              <span>
+                <b class="font-bold text-T-900">{{
+                  formatPriceFa(order.payment.total)
+                }}</b>
+                تومان
+              </span>
+            </div>
+            <div class="flex w-full items-center justify-between gap-3">
+              <span>مبلغ پرداخت‌شده:</span>
+              <span>
+                <b class="font-bold text-T-900">{{
+                  formatPriceFa(order.payment.paid)
+                }}</b>
+                تومان
+              </span>
+            </div>
+          </div>
 
-        <div class="flex flex-col gap-3 text-[12.5px] text-T-600">
-          <span>
-            مبلغ سفارش:
-            <b class="font-bold text-T-900">{{
-              formatPriceFa(order.payment.total)
-            }}</b>
-            تومان
-          </span>
-          <span>
-            مبلغ پرداخت‌شده:
-            <b class="font-bold text-T-900">{{
-              formatPriceFa(order.payment.paid)
-            }}</b>
-            تومان
-          </span>
+          <DashboardOrdersProgressRing
+            :percent="order.payment.percent"
+            label="پرداخت شده"
+          />
         </div>
-      </div>
 
-      <NuxtLink
-        :to="`/dashboard/orders/${order.id}/pay`"
-        class="inline-flex h-10 w-fit items-center gap-2 rounded-lg border border-primary bg-T-50 px-5 text-[12.5px] font-bold text-primary transition-colors hover:bg-R-50"
-      >
-        ادامه پرداخت
-        <IconArrowLeft class="size-4" />
-      </NuxtLink>
+        <NuxtLink
+          :to="`/dashboard/orders/${order.id}/pay`"
+          class="inline-flex h-10 w-fit items-center gap-2 rounded-lg border border-primary bg-T-50 px-5 text-[12.5px] font-bold text-primary transition-colors hover:bg-R-50"
+        >
+          ادامه پرداخت
+          <IconArrowLeft class="size-4" />
+        </NuxtLink>
+      </div>
     </div>
 
     <slot />

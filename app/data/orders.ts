@@ -14,7 +14,7 @@ export type OrderStatus =
 export type ReturnStatus = 'review' | 'approved' | 'rejected' | 'completed'
 export type ReturnItemStatus = 'review' | 'approved' | 'rejected'
 
-export type StatusTone = 'amber' | 'sky' | 'emerald' | 'red'
+export type StatusTone = 'amber' | 'gold' | 'sky' | 'emerald' | 'red'
 
 export type StatusIcon = 'hourglass' | 'wallet' | 'truck' | 'check' | 'x' | 'refresh'
 
@@ -122,7 +122,7 @@ export interface CreditWallet {
  * ------------------------------------------------------------------ */
 
 export const orderStatusMeta: Record<OrderStatus, StatusMeta> = {
-  awaiting_payment: { label: 'در انتظار پرداخت', tone: 'amber', icon: 'wallet', progress: 15, hideProgress: false },
+  awaiting_payment: { label: 'در انتظار پرداخت', tone: 'gold', icon: 'wallet', progress: 15, hideProgress: false },
   processing: { label: 'در حال بررسی سفارش', tone: 'amber', icon: 'hourglass', progress: 20, hideProgress: false },
   shipping: { label: 'در حال ارسال', tone: 'sky', icon: 'truck', progress: 55, hideProgress: false },
   delivered: { label: 'تحویل داده شده', tone: 'emerald', icon: 'check', progress: 100, hideProgress: true },

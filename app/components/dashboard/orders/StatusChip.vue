@@ -18,11 +18,14 @@ const props = withDefaults(defineProps<{
   variant?: 'plain' | 'soft'
   /** Render only the status icon, without the label or pill background. */
   iconOnly?: boolean
+  /** Optional override for the plain status image (falls back to the shared mapping). */
+  imgSrc?: string
   class?: string
 }>(), {
   icon: undefined,
   variant: 'plain',
   iconOnly: false,
+  imgSrc: undefined,
   class: '',
 })
 
@@ -37,6 +40,7 @@ const icons: Record<StatusIcon, Component> = {
 
 const toneText: Record<StatusTone, string> = {
   amber: 'text-[#FF9800]',
+  gold: 'text-[#CF982C]',
   sky: 'text-[#4E60FF]',
   emerald: 'text-[#2EC144]',
   red: 'text-primary',
@@ -44,6 +48,7 @@ const toneText: Record<StatusTone, string> = {
 
 const toneSoft: Record<StatusTone, string> = {
   amber: 'bg-[#FFF4E5] text-[#FF9800]',
+  gold: 'bg-[#FFF4E5] text-[#CF982C]',
   sky: 'bg-[#EEF0FF] text-[#4E60FF]',
   emerald: 'bg-[#E9F9ED] text-[#2EC144]',
   red: 'bg-R-50 text-primary',
@@ -98,7 +103,7 @@ const iconComponent = computed<Component | null>(() => (props.icon ? icons[props
 
     <img
       v-if="plain"
-      :src="plain.src"
+      :src="props.imgSrc ?? plain.src"
       alt=""
       class="size-[32px] shrink-0"
       aria-hidden="true"
