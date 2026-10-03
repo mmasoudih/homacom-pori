@@ -66,13 +66,13 @@ useHead({
           <h1 class="text-xl font-bold text-T-900">سفارش‌های من</h1>
 
           <div class="flex w-full max-w-[260px] items-center gap-2 border-b border-T-400 pb-1.5">
+            <IconSearch class="size-4 shrink-0 text-T-500" />
             <input
               v-model="search"
               type="search"
               placeholder="جستجو در سفارش‌ها..."
               class="min-w-0 flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-500"
             >
-            <IconSearch class="size-4 shrink-0 text-T-500" />
           </div>
         </div>
 

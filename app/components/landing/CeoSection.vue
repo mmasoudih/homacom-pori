@@ -15,17 +15,26 @@ function segmentClass(tone?: 'strong' | 'accent') {
 <template>
   <section class="w-full bg-T-200 max-w-[1440px] my-14 rounded-3xl">
     <div class="mx-auto w-full max-w-[1440px] px-6 py-8">
-      <h2 class="text-[18px] font-bold leading-[32px] text-T-900">
+      <UiTypography as="h2" size="lg" weight="bold" class="leading-[32px] text-T-900">
         {{ ceoSection.title }}
-      </h2>
+      </UiTypography>
 
-      <p class="mt-2 text-[16px] leading-[32px] text-T-700">
-        <span
+      <UiTypography
+        as="p"
+        size="md"
+        weight="regular"
+        class="mt-2 leading-[32px] text-T-700"
+      >
+        <UiTypography
           v-for="(segment, i) in ceoSection.intro"
           :key="i"
+          as="span"
+          size="md"
+          :weight="segment.tone ? 'bold' : 'regular'"
+          :color="segment.tone ? 'default' : 'muted'"
           :class="segmentClass(segment.tone)"
-        >{{ segment.text }}</span>
-      </p>
+        >{{ segment.text }}</UiTypography>
+      </UiTypography>
 
       <template v-if="expanded">
         <div
@@ -33,34 +42,46 @@ function segmentClass(tone?: 'strong' | 'accent') {
           :key="ti"
           :class="topic.heading ? 'mt-[30px]' : ''"
         >
-          <h3
+          <UiTypography
             v-if="topic.heading"
-            class="mb-1 text-[18px] font-bold leading-[32px] text-T-900"
+            as="h3"
+            size="lg"
+            weight="bold"
+            class="mb-1 leading-[32px] text-T-900"
           >
             {{ topic.heading }}
-          </h3>
+          </UiTypography>
 
-          <p
+          <UiTypography
             v-for="(paragraph, pi) in topic.paragraphs"
             :key="pi"
-            class="text-[16px] leading-[32px] text-T-700"
+            as="p"
+            size="md"
+            weight="regular"
+            class="leading-[32px] text-T-700"
           >
-            <span
+            <UiTypography
               v-for="(segment, si) in paragraph"
               :key="si"
+              as="span"
+              size="md"
+              :weight="segment.tone ? 'bold' : 'regular'"
+              :color="segment.tone ? 'default' : 'muted'"
               :class="segmentClass(segment.tone)"
-            >{{ segment.text }}</span>
-          </p>
+            >{{ segment.text }}</UiTypography>
+          </UiTypography>
         </div>
       </template>
 
       <button
         type="button"
-        class="ms-auto mt-6 flex items-center gap-2 text-[16px] font-semibold text-primary transition-opacity hover:opacity-80"
+        class="ms-auto mt-6 flex items-center gap-2 text-primary transition-opacity hover:opacity-80"
         :aria-expanded="expanded"
         @click="expanded = !expanded"
       >
-        {{ expanded ? 'نمایش کمتر' : 'نمایش بیشتر' }}
+        <UiTypography as="span" size="lg" weight="semibold" color="primary">
+          {{ expanded ? 'نمایش کمتر' : 'نمایش بیشتر' }}
+        </UiTypography>
         <IconChevronDown
           class="size-6 transition-transform duration-200"
           :class="expanded ? 'rotate-180' : ''"

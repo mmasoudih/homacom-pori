@@ -63,9 +63,20 @@ onUnmounted(stop)
     role="timer"
     :aria-label="label ? `${label} ${parts.hours}:${parts.minutes}:${parts.seconds}` : undefined"
   >
-    <span v-if="label" class="relative top-0.5 text-[14px] font-extrabold text-R-300">{{ label }}</span>
-    <span class="relative top-0.5 text-[14px] font-extrabold tabular-nums text-R-300" dir="ltr">
+    <img
+      v-if="label"
+      src="/icons/homa-off.svg"
+      alt=""
+      class="relative top-0.5 h-[18px] w-[35px]"
+    >
+    <UiTypography
+      as="span"
+      size="lg"
+      weight="medium"
+      class="relative top-0.5 tabular-nums text-R-300"
+      dir="ltr"
+    >
       {{ toPersianDigits(parts.hours) }}:{{ toPersianDigits(parts.minutes) }}:{{ toPersianDigits(parts.seconds) }}
-    </span>
+    </UiTypography>
   </div>
 </template>

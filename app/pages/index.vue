@@ -47,12 +47,12 @@ useHead({
       <!-- Strip banner -->
       <a
         :href="stripBanner.href"
-        class="order-3 block w-full max-w-[1440px] py-5 lg:order-none lg:mx-auto lg:py-6"
+        class="order-3 block w-full max-w-[1440px] py-5 lg:order-none lg:mx-auto lg:max-w-[1350px] lg:py-6"
       >
         <img
           :src="stripBanner.image"
           :alt="stripBanner.alt"
-          class="h-auto w-full rounded-none object-cover lg:rounded-2xl"
+          class="h-auto w-full rounded-none lg:rounded-[20px]"
         >
       </a>
 

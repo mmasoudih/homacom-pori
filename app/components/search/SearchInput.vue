@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IconX } from '@tabler/icons-vue'
 import { cn } from '~/lib/utils'
+import { typographyVariants } from '~/components/ui/typography'
 
 const props = withDefaults(
   defineProps<{
@@ -67,7 +68,10 @@ defineExpose({ focus: () => inputEl.value?.focus() })
       inputmode="search"
       autocomplete="off"
       enterkeyhint="search"
-      class="w-full bg-transparent text-start text-[15px] text-foreground outline-none placeholder:text-T-600"
+      :class="cn(
+        'w-full bg-transparent text-start text-foreground outline-none placeholder:text-T-600',
+        typographyVariants({ size: 'lg', weight: 'regular' }),
+      )"
       @input="onInput"
       @keydown="onKeydown"
       @focus="emit('focus')"
@@ -84,7 +88,7 @@ defineExpose({ focus: () => inputEl.value?.focus() })
     </button>
 
     <span
-      v-if="icon"
+      v-if="icon && !showClear"
       class="size-5 shrink-0 bg-T-800 [mask-image:url(/icons/search.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
       aria-hidden="true"
     />

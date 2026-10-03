@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconShoppingBag } from '@tabler/icons-vue'
+import { IconChevronLeft } from '@tabler/icons-vue'
 import type { OrderStatTone } from '~/data/dashboard'
 import { orderStats } from '~/data/dashboard'
+import { toPersianDigits } from '~/utils/format'
 
-const toneClass: Record<OrderStatTone, string> = {
-  current: 'bg-R-50 text-primary',
-  delivered: 'bg-emerald-50 text-emerald-500',
-  returned: 'bg-sky-50 text-sky-500',
+const statIcon: Record<OrderStatTone, string> = {
+  current: '/icons/truck-colour.svg',
+  delivered: '/icons/box-check.svg',
+  returned: '/icons/box-return.svg',
 }
 
 const statHref: Record<OrderStatTone, string> = {
@@ -43,19 +44,18 @@ const statHref: Record<OrderStatTone, string> = {
         v-for="stat in orderStats"
         :key="stat.key"
         :to="statHref[stat.key]"
-        class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-T-400 bg-T-50 p-3 text-center transition-colors hover:border-T-500 lg:flex-row lg:justify-between lg:p-4 lg:text-start"
+        class="flex items-center justify-center gap-3 rounded-2xl border border-T-400 bg-T-50 p-4 text-start transition-colors hover:border-T-500 lg:gap-5 lg:px-4 lg:py-6"
       >
-        <div class="order-2 flex flex-col gap-1 lg:order-1">
-          <span class="text-lg font-extrabold leading-none text-T-900 lg:text-2xl">{{ stat.count }}</span>
-          <span class="text-[10px] leading-tight text-T-600 lg:text-[13px]">{{ stat.label }}</span>
-        </div>
-
-        <span
-          class="order-1 flex size-9 shrink-0 items-center justify-center rounded-xl lg:order-2 lg:size-11"
-          :class="toneClass[stat.key]"
+        <img
+          :src="statIcon[stat.key]"
+          :alt="stat.label"
+          class="size-11 shrink-0 object-contain lg:size-13"
         >
-          <IconShoppingBag class="size-5 lg:size-6" />
-        </span>
+
+        <div class="flex min-w-0 flex-col gap-1 lg:gap-1.5">
+          <span class="text-xl font-extrabold leading-none text-T-900 lg:text-[18px]">{{ toPersianDigits(stat.count) }}</span>
+          <span class="text-[13px] font-medium leading-tight text-T-800 lg:text-[12.5px]">{{ stat.label }}</span>
+        </div>
       </NuxtLink>
     </div>
   </section>

@@ -45,14 +45,14 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
         >
           <a
             href="#"
-            class="px-14 flex w-full flex-col items-center justify-center gap-0 rounded-[20px] border border-T-400 bg-T-50 py-2 transition-shadow"
+            class="px-14 flex w-full flex-col items-center justify-center gap-0 rounded-[20px] border border-T-400 bg-T-50 py-2 transition-shadow lg:h-[96px] lg:w-[166px]"
           >
             <img
               :src="brand.logo"
               :alt="brand.name"
-              class="h-[50px] w-[65px] object-contain"
+              class="h-[49px] w-[65px] object-contain"
             >
-            <span class="text-[16px] text-foreground">{{ brand.name }}</span>
+            <UiTypography as="span" size="xl" weight="regular" class="text-foreground">{{ brand.name }}</UiTypography>
           </a>
         </CarouselItem>
       </CarouselContent>

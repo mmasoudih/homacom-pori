@@ -1,16 +1,24 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   items: Array<{ image: string, alt?: string, href?: string }>
   columns: 1 | 2 | 3 | 4
   centered?: boolean
 }>(), {
   centered: false,
 })
+
+// Fixed desktop banners already sit in a 1350px row with 18px gaps, so each
+// column is exactly 666 / 438 / 324 wide and only the height needs pinning.
+const heightClass = computed(() => {
+  if (props.columns === 2 || props.columns === 3) return 'lg:h-[212px]'
+  if (props.columns === 4) return 'lg:h-[243px]'
+  return ''
+})
 </script>
 
 <template>
   <div
-    class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6"
+    class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:max-w-[1350px] lg:px-0 lg:py-6"
     :class="
       columns > 1
         ? 'grid grid-cols-1 gap-[18px] ' +
@@ -30,7 +38,7 @@ withDefaults(defineProps<{
         class="h-full w-full object-cover"
         :class="
           columns > 1
-            ? 'aspect-[370/136] lg:aspect-auto'
+            ? `aspect-[370/136] lg:aspect-auto ${heightClass}`
             : centered
               ? 'aspect-[278/212]'
               : ''

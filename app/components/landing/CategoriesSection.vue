@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { categories } from '~/data/landing'
+import { toPersianDigits } from '~/utils/format'
 import mobileIcon from '../../../public/icons/mobile.svg?raw'
 import laptopIcon from '../../../public/icons/laptop.svg?raw'
 import smartWatchIcon from '../../../public/icons/smart-watch.svg?raw'
@@ -66,12 +67,17 @@ const iconMap: Record<string, string> = {
           dir="rtl"
         >
           <div class="flex flex-col gap-[2px]">
-            <h3 class="text-[16px] font-bold leading-[24px] text-foreground">
+            <UiTypography
+              as="h3"
+              size="xl"
+              weight="semibold"
+              class="leading-[24px] text-foreground"
+            >
               {{ cat.title }}
-            </h3>
+            </UiTypography>
             <p class="flex flex-row-reverse items-center gap-1 text-[12.5px] text-T-600">
               <span>محصول موجود است</span>
-              <span class="text-[14px] font-bold text-foreground">{{ cat.count }}</span>
+              <span class="text-[14px] font-bold text-foreground">{{ toPersianDigits(cat.count) }}</span>
             </p>
           </div>
         </a>

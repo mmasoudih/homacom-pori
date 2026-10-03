@@ -114,12 +114,12 @@ function scrollTop() {
             <h4 class="flex items-center gap-[11px]">
               <span class="h-[22px] w-[6px] rounded-[2px] bg-primary" />
               <span class="h-[14px] w-[6px] rounded-[2px] bg-primary/25" />
-              <span class="text-[18px] font-bold leading-[28px]">
+              <UiTypography as="span" size="xl" weight="bold" class="leading-[28px]">
                 <span class="text-T-900">{{ titleParts(col.title).lead }} &nbsp;</span>
                 <span class="text-primary">{{
                   titleParts(col.title).accent
                 }}</span>
-              </span>
+              </UiTypography>
             </h4>
 
             <nav class="mt-7 flex flex-col gap-3">
@@ -127,10 +127,12 @@ function scrollTop() {
                 v-for="link in col.links"
                 :key="typeof link === 'string' ? link : link.label"
                 :to="typeof link === 'string' ? '#' : link.href"
-                class="flex h-6 items-center gap-2 text-[15px] text-T-700 transition-colors hover:text-primary"
+                class="flex h-6 items-center gap-2 text-T-700 transition-colors hover:text-primary"
               >
                 <span class="size-[7px] shrink-0 rounded-full bg-primary" />
-                {{ typeof link === "string" ? link : link.label }}
+                <UiTypography as="span" size="lg" weight="regular" color="inherit">
+                  {{ typeof link === "string" ? link : link.label }}
+                </UiTypography>
               </NuxtLink>
             </nav>
           </div>
@@ -140,21 +142,21 @@ function scrollTop() {
             <h4 class="flex items-center gap-[11px]">
               <span class="h-[22px] w-[6px] rounded-[2px] bg-primary" />
               <span class="h-[14px] w-[6px] rounded-[2px] bg-primary/25" />
-              <span class="text-[18px] font-bold leading-[28px]">
+              <UiTypography as="span" size="xl" weight="bold" class="leading-[28px]">
                 <span class="text-T-900">{{
                   titleParts(footerData.contactTitle).lead
-                }}</span>
+                }}&nbsp;</span>
                 <span class="text-primary">{{
                   titleParts(footerData.contactTitle).accent
                 }}</span>
-              </span>
+              </UiTypography>
             </h4>
 
             <!-- Phones -->
             <div class="flex items-start gap-2">
               <img src="/icons/phone-call.svg" alt="" class="size-5 shrink-0" >
-              <span class="text-[15px] font-medium text-T-700">تماس:</span>
-              <span class="flex items-center gap-2.5 text-[15px] text-T-700">
+              <UiTypography as="span" size="lg" weight="regular" color="muted">تماس:</UiTypography>
+              <UiTypography as="span" size="lg" weight="regular" color="muted" class="flex items-center gap-2.5">
                 <template v-for="(phone, pi) in footerData.phones" :key="phone">
                   <span v-if="pi > 0" class="h-[14px] w-px bg-primary" />
                   <span
@@ -164,35 +166,39 @@ function scrollTop() {
                     >{{ toPersianDigits(phoneParts(phone).rest) }}</span
                   >
                 </template>
-              </span>
+              </UiTypography>
             </div>
 
             <!-- Email -->
             <div class="flex items-start gap-2">
-              <img src="/icons/mail.svg" alt="" class="size-5 shrink-0" >
-              <span class="text-[15px] font-medium text-T-700">ایمیل:</span>
-              <span dir="ltr" class="text-[15px] text-T-700">{{
+              <img src="/icons/envelope-open-empty.svg" alt="" class="size-5 shrink-0" >
+              <UiTypography as="span" size="lg" weight="regular" color="muted">ایمیل:</UiTypography>
+              <UiTypography as="span" size="lg" weight="regular" color="muted" dir="ltr">{{
                 footerData.email
-              }}</span>
+              }}</UiTypography>
             </div>
 
             <!-- Address -->
             <div class="flex items-start gap-2">
-              <img src="/assets/map-pin.svg" alt="" class="size-5 shrink-0" >
-              <span class="text-[15px] font-medium text-T-700">آدرس:</span>
-              <span
-                class="min-w-0 flex-1 text-right text-[15px] leading-[24px] text-T-700"
-                >{{ footerData.address }}</span
+              <img src="/icons/location-pin-line.svg" alt="" class="size-5 shrink-0" >
+              <UiTypography as="span" size="lg" weight="regular" color="muted">آدرس:</UiTypography>
+              <UiTypography
+                as="span"
+                size="lg"
+                weight="regular"
+                color="muted"
+                class="min-w-0 flex-1 text-right leading-[24px]"
+                >{{ footerData.address }}</UiTypography
               >
             </div>
           </div>
 
           <!-- Trust badges -->
           <div
-            class="ms-[92px] flex w-[96px] shrink-0 flex-col items-center justify-evenly gap-[7px] rounded-2xl bg-T-300 py-1.5"
+            class="ms-[92px] flex w-[87px] h-[195px] shrink-0 flex-col items-center justify-evenly gap-[7px] rounded-[16px] bg-T-300 py-1.5"
           >
             <div v-for="(badge, i) in footerData.badges" :key="i">
-              <div class="bg-white rounded-lg p-1">
+              <div class="bg-white rounded-[16px] p-1">
                 <img
                   :src="badge.image"
                   :alt="badge.alt"
@@ -211,19 +217,25 @@ function scrollTop() {
             <img
               src="/homacom-logo.png"
               alt="هماکام"
-              class="h-[54px] w-[60px] object-contain lg:h-[67px] lg:w-[74px]"
+              class="h-[54px] w-[60px] object-contain lg:h-[86px] lg:w-[91px]"
             >
           </a>
-          <p
-            class="flex-1 text-right text-[13px] leading-[26px] text-T-700 lg:text-[14px] lg:leading-[28px]"
+          <UiTypography
+            as="p"
+            size="md"
+            weight="regular"
+            class="flex-1 text-right leading-[26px] text-T-700"
           >
-            <span
+            <UiTypography
               v-for="(segment, i) in footerData.about"
               :key="i"
+              as="span"
+              size="md"
+              :weight="segment.tone ? 'bold' : 'regular'"
+              :color="segment.tone ? 'default' : 'muted'"
               :class="segmentClass(segment.tone)"
-              >{{ segment.text }}</span
-            >
-          </p>
+            >{{ segment.text }}</UiTypography>
+          </UiTypography>
         </div>
 
         <!-- ======================== Divider + to top ====================== -->
@@ -234,12 +246,12 @@ function scrollTop() {
           />
           <button
             type="button"
-            class="relative flex items-center gap-3 rounded-full bg-primary py-2 ps-2 pe-4 text-[15px] font-bold text-T-50 transition-opacity hover:opacity-90 lg:gap-[17px] lg:py-[9px] lg:ps-[9px] lg:pe-[17px]"
+            class="relative flex items-center justify-center gap-3 whitespace-nowrap rounded-full bg-primary py-2 ps-2 pe-4 transition-opacity hover:opacity-90 lg:h-[46px] lg:min-w-[140px] lg:gap-[17px] lg:rounded-[20px] lg:py-[9px] lg:ps-[9px] lg:pe-[17px]"
             @click="scrollTop"
           >
-            بازگشت به بالا
+            <UiTypography as="span" size="lg" weight="semibold" color="white">بازگشت به بالا</UiTypography>
             <span
-              class="flex size-[30px] items-center justify-center rounded-[10px] bg-T-50 lg:size-[33px]"
+              class="flex size-[30px] items-center justify-center rounded-[10px] bg-T-50"
             >
               <IconArrowUp class="size-[18px] text-primary" />
             </span>
@@ -247,14 +259,22 @@ function scrollTop() {
         </div>
 
         <!-- =========================== Copyright ========================== -->
-        <p class="mt-5 pb-10 text-right text-[13px] text-T-700 lg:text-[15px]">
-          <span
+        <UiTypography
+          as="p"
+          size="lg"
+          weight="regular"
+          class="mt-5 pb-10 text-right text-T-700"
+        >
+          <UiTypography
             v-for="(segment, i) in footerData.copyright"
             :key="i"
+            as="span"
+            size="lg"
+            :weight="segment.tone ? 'bold' : 'regular'"
+            :color="segment.tone ? 'default' : 'muted'"
             :class="segmentClass(segment.tone)"
-            >{{ segment.text }}</span
-          >
-        </p>
+          >{{ segment.text }}</UiTypography>
+        </UiTypography>
       </div>
     </div>
   </footer>

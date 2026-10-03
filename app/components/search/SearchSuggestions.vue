@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconHistory, IconTrash, IconTrendingUp, IconX } from '@tabler/icons-vue'
+import { IconTrash, IconX } from '@tabler/icons-vue'
 import { popularSearches } from '~/data/search'
 
 defineProps<{
@@ -18,10 +18,10 @@ const emit = defineEmits<{
     <!-- «جستجوهای اخیر شما» -->
     <section v-if="recent.length" class="flex flex-col gap-4">
       <div class="flex items-center justify-between gap-4">
-        <h3 class="flex items-center gap-2 text-[14px] font-bold text-T-900">
-          <IconHistory class="size-5 text-T-700" />
+        <UiTypography as="h3" size="lg" weight="medium" color="default" class="flex items-center gap-2">
+          <img src="/icons/clock-history.svg" alt="" class="size-5">
           جستجوهای اخیر شما
-        </h3>
+        </UiTypography>
 
         <button
           type="button"
@@ -35,7 +35,7 @@ const emit = defineEmits<{
 
       <ul class="flex flex-wrap gap-3">
         <li v-for="term in recent" :key="term">
-          <span class="flex items-center gap-1 rounded-full bg-T-200 py-1 pe-1.5 ps-4 text-[13px] font-medium text-T-800">
+          <UiTypography as="span" size="md" weight="regular" class="flex h-[34px] items-center gap-1 rounded-full border border-T-500 bg-T-200 pe-1.5 ps-4">
             <button
               type="button"
               class="py-1.5 transition-colors hover:text-primary"
@@ -51,26 +51,28 @@ const emit = defineEmits<{
             >
               <IconX class="size-3.5" />
             </button>
-          </span>
+          </UiTypography>
         </li>
       </ul>
     </section>
 
     <!-- «محبوب‌ترین جستجوها» -->
     <section class="flex flex-col gap-4">
-      <h3 class="flex items-center gap-2 text-[14px] font-bold text-T-900">
-        <IconTrendingUp class="size-5 text-T-700" />
+      <UiTypography as="h3" size="lg" weight="medium" color="default" class="flex items-center gap-2">
+        <img src="/icons/trending-up.svg" alt="" class="size-5">
         محبوب‌ترین جستجوها
-      </h3>
+      </UiTypography>
 
       <ul class="flex flex-wrap gap-3">
         <li v-for="term in popularSearches" :key="term">
           <button
             type="button"
-            class="rounded-full bg-T-200 px-4 py-2.5 text-[13px] font-medium text-T-800 transition-colors hover:bg-T-300"
+            class="inline-flex h-[38px] items-center rounded-full border border-T-500 bg-T-200 px-4 text-T-800 transition-colors hover:bg-T-300"
             @click="emit('select', term)"
           >
-            {{ term }}
+            <UiTypography as="span" size="md" weight="regular" color="inherit">
+              {{ term }}
+            </UiTypography>
           </button>
         </li>
       </ul>

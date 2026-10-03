@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { blogPosts } from '~/data/landing'
+import { toPersianDigits } from '~/utils/format'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 </script>
 
@@ -46,14 +47,14 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     </Carousel>
 
     <!-- Desktop: grid -->
-    <div class="mt-[18px] hidden grid-cols-1 gap-[18px] lg:grid lg:grid-cols-4">
+    <div class="mt-[18px] hidden grid-cols-1 gap-[18px] lg:mx-auto lg:grid lg:max-w-[1350px] lg:grid-cols-4">
       <NuxtLink
         v-for="(post, i) in blogPosts"
         :key="i"
-        class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50"
+        class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50 lg:h-[327px]"
       >
         <!-- Image -->
-        <div class="aspect-[324/180] w-full overflow-hidden">
+        <div class="aspect-[324/216] w-full overflow-hidden">
           <img
             :src="post.image"
             :alt="post.title"
@@ -63,14 +64,26 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 
         <!-- Content -->
         <div class="flex flex-col gap-3 px-4 py-3">
-          <h3 class="line-clamp-2 min-h-[44px] text-[16px] leading-[22px] text-foreground">
+          <UiTypography
+            as="h3"
+            size="lg"
+            weight="medium"
+            class="line-clamp-2 min-h-[44px] leading-[22px] text-foreground"
+          >
             {{ post.title }}
-          </h3>
+          </UiTypography>
           <div class="flex items-center justify-between pt-3">
-            <span class="text-[14px] text-T-800">{{ post.date }}</span>
-            <span class="text-[14px] text-R-300 font-medium transition-colors group-hover:underline">
+            <UiTypography as="span" size="md" weight="regular" class="text-T-800">
+              {{ toPersianDigits(post.date) }}
+            </UiTypography>
+            <UiTypography
+              as="span"
+              size="md"
+              weight="regular"
+              class="text-R-300 transition-colors group-hover:underline"
+            >
               ادامه مطلب
-            </span>
+            </UiTypography>
           </div>
         </div>
       </NuxtLink>

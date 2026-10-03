@@ -18,9 +18,9 @@ const props = withDefaults(defineProps<{
 })
 
 const toneSoft: Record<StatusTone, string> = {
-  amber: 'bg-amber-50 text-amber-600',
-  sky: 'bg-sky-50 text-sky-600',
-  emerald: 'bg-emerald-50 text-emerald-600',
+  amber: 'bg-[#FFF4E5] text-[#B26A00]',
+  sky: 'bg-[#EEF0FF] text-[#4E60FF]',
+  emerald: 'bg-[#E9F9ED] text-[#2EC144]',
   red: 'bg-R-50 text-primary',
 }
 
