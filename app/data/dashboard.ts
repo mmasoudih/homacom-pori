@@ -47,7 +47,7 @@ export interface DashboardNavItem {
 export const dashboardUser: DashboardUser = {
   name: 'پوریا قنبری',
   email: 'komaicom@info.com',
-  mobile: '۰۹۱۲-۳۲۵۰۷۸۹',
+  mobile: '09393206066',
 }
 
 export const wallet: WalletInfo = {

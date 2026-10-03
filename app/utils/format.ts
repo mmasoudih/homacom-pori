@@ -9,6 +9,11 @@ export function toPersianDigits(value: string | number): string {
   return String(value).replace(/\d/g, d => PERSIAN_DIGITS[Number(d)]!)
 }
 
+/** Convert every Persian-Indic digit in a value back to its ASCII counterpart. */
+export function toEnglishDigits(value: string): string {
+  return value.replace(/[۰-۹]/g, d => String(PERSIAN_DIGITS.indexOf(d)))
+}
+
 /** `۷,۵۰۰,۰۰۰` — price grouped with commas, rendered in Persian digits. */
 export function formatPriceFa(value: number): string {
   return toPersianDigits(formatPrice(value))

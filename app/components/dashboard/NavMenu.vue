@@ -1,30 +1,18 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import {
-  IconBell,
-  IconHeadset,
-  IconHeart,
-  IconLayoutDashboard,
-  IconLogout,
-  IconMapPin,
-  IconMessageCircle,
-  IconShoppingBag,
-  IconUserCircle,
-} from '@tabler/icons-vue'
 import type { DashboardNavIcon } from '~/data/dashboard'
 import { dashboardNav } from '~/data/dashboard'
 import { toPersianDigits } from '~/utils/format'
 
-const navIcons: Record<DashboardNavIcon, Component> = {
-  dashboard: IconLayoutDashboard,
-  orders: IconShoppingBag,
-  favorites: IconHeart,
-  addresses: IconMapPin,
-  comments: IconMessageCircle,
-  notifications: IconBell,
-  support: IconHeadset,
-  account: IconUserCircle,
-  logout: IconLogout,
+const navIcons: Record<DashboardNavIcon, string> = {
+  dashboard: '/icons/layout-dashboard.svg',
+  orders: '/icons/package.svg',
+  favorites: '/icons/heart-simple.svg',
+  addresses: '/icons/signs-post.svg',
+  comments: '/icons/message-text.svg',
+  notifications: '/icons/bell.svg',
+  support: '/icons/headphones-simple.svg',
+  account: '/icons/user-circle.svg',
+  logout: '/icons/logout.svg',
 }
 
 const route = useRoute()
@@ -65,18 +53,19 @@ function onNavClick(item: typeof dashboardNav[number]) {
         "
         @click="onNavClick(item)"
       >
-        <component
-          :is="navIcons[item.icon]"
-          class="size-5 shrink-0"
-          :class="item.danger ? 'text-primary' : 'text-T-700'"
-        />
+        <img :src="navIcons[item.icon]" alt="" class="size-5 shrink-0">
         {{ item.label }}
-        <span
+        <UiTypography
           v-if="item.badge"
-          class="ms-auto flex size-[18px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold leading-none text-white"
+          as="span"
+          size="md"
+          weight="bold"
+          tracking="wide"
+          color="white"
+          class="ms-auto flex h-[25px] w-[29px] shrink-0 items-center justify-center rounded-[50px] bg-primary"
         >
           {{ toPersianDigits(item.badge) }}
-        </span>
+        </UiTypography>
       </button>
     </nav>
 

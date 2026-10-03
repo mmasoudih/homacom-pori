@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconWallet } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { formatPrice } from '~/utils/format'
+import { formatPrice, formatPriceFa, toEnglishDigits } from '~/utils/format'
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -28,9 +27,9 @@ const emit = defineEmits<{
 const amount = ref<number | null>(null)
 
 const display = computed({
-  get: () => (amount.value ? formatPrice(amount.value) : ''),
+  get: () => (amount.value ? formatPriceFa(amount.value) : ''),
   set: (value: string) => {
-    const digits = value.replace(/\D/g, '')
+    const digits = toEnglishDigits(value).replace(/\D/g, '')
     amount.value = digits ? Number(digits) : null
   },
 })
@@ -63,31 +62,33 @@ watch(
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-2xl p-6 max-lg:top-auto max-lg:bottom-0 max-lg:max-w-none max-lg:translate-y-0 max-lg:rounded-b-none max-lg:rounded-t-3xl max-lg:border-x-0 max-lg:border-b-0 max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=closed]:slide-out-to-bottom lg:max-w-[400px]">
+    <DialogContent class="rounded-2xl p-6 max-lg:top-auto max-lg:bottom-0 max-lg:max-w-none max-lg:translate-y-0 max-lg:rounded-b-none max-lg:rounded-t-3xl max-lg:border-x-0 max-lg:border-b-0 max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=closed]:slide-out-to-bottom lg:max-w-[450px]">
       <DialogHeader>
-        <DialogTitle class="text-center text-[15px] font-bold text-T-900 lg:text-start">
+        <DialogTitle class="text-center text-[16px] font-bold text-T-900 lg:text-start">
           افزایش موجودی کیف پول
         </DialogTitle>
       </DialogHeader>
 
+      <UiSeparator class="bg-T-400" />
+
       <!-- Current balance -->
-      <div class="flex items-center justify-between rounded-xl border border-T-400 px-4 py-3">
+      <div class="flex items-center gap-[13.15px] rounded-[16px] border border-T-400 bg-T-100 px-4 py-3">
+        <img src="/icons/wallet-simple.svg" alt="" class="size-6 shrink-0">
         <span class="flex flex-col gap-1">
           <span class="text-[12px] text-T-600">موجودی فعلی کیف پول</span>
-          <span class="text-[15px] font-bold text-T-900">
-            {{ formatPrice(balance) }}
-            <span class="text-[11px] font-normal text-T-600">تومان</span>
+          <span class="flex items-center gap-1">
+            <UiTypography as="span" size="lg" weight="bold">{{ formatPriceFa(balance) }}</UiTypography>
+            <UiTypography as="span" size="sm" weight="semibold" color="subtle">تومان</UiTypography>
           </span>
         </span>
-        <IconWallet class="size-6 shrink-0 text-T-800" />
       </div>
 
       <!-- Amount -->
       <div class="flex flex-col gap-2">
-        <label for="add-funds-amount" class="text-[13px] font-bold text-T-900">
+        <UiTypography as="label" for="add-funds-amount" size="lg" weight="regular" class="mt-[18px] mb-[6px]">
           مبلغ شارژ کیف پول
-        </label>
-        <div class="flex h-11 items-center gap-3 rounded-xl border border-T-400 px-3 transition-colors focus-within:border-primary">
+        </UiTypography>
+        <div class="flex h-[50px] items-center gap-3 rounded-[16px] border border-T-500 px-3 transition-colors focus-within:border-primary">
           <input
             id="add-funds-amount"
             v-model="display"
@@ -96,27 +97,27 @@ watch(
             placeholder="مبلغ مورد نظر خود را وارد کنید"
             class="min-w-0 flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-600"
           >
-          <span class="shrink-0 text-[12px] text-T-600">تومان</span>
+          <UiTypography as="span" size="md" weight="regular" color="muted" class="shrink-0">تومان</UiTypography>
         </div>
-        <p class="text-[11px] text-T-600">
-          حداقل {{ formatPrice(min) }} و حداکثر {{ formatPrice(max) }} تومان
+        <p class="text-end text-[11px] text-T-600">
+          حداقل {{ formatPriceFa(min) }} و حداکثر {{ formatPriceFa(max) }} تومان
         </p>
       </div>
 
       <div class="flex gap-3">
         <Button
+          variant="secondary"
+          class="h-11 flex-1 rounded-xl bg-T-300 text-T-900"
+          @click="close"
+        >
+          <UiTypography as="span" size="lg" weight="semibold" color="inherit">انصراف</UiTypography>
+        </Button>
+        <Button
           class="h-11 flex-1 rounded-xl"
           :disabled="!isValid"
           @click="submit"
         >
-          پرداخت
-        </Button>
-        <Button
-          variant="secondary"
-          class="h-11 flex-1 rounded-xl"
-          @click="close"
-        >
-          انصراف
+          <UiTypography as="span" size="lg" weight="bold" color="inherit">پرداخت</UiTypography>
         </Button>
       </div>
     </DialogContent>
