@@ -45,10 +45,10 @@ function go(page: number) {
 </script>
 
 <template>
-  <nav class="flex items-center justify-center gap-1.5">
+  <nav class="flex items-center justify-center gap-4">
     <button
       type="button"
-      class="flex size-9 items-center justify-center rounded-lg border border-T-400 text-T-600 transition-colors hover:border-T-500 disabled:opacity-40"
+      class="flex size-[38px] items-center justify-center rounded-md border border-T-400 text-T-600 transition-colors hover:border-T-500 disabled:opacity-40"
       :disabled="page <= 1"
       aria-label="صفحه قبل"
       @click="go(page - 1)"
@@ -56,27 +56,31 @@ function go(page: number) {
       <IconChevronRight class="size-4" />
     </button>
 
-    <template v-for="(p, i) in visiblePages" :key="`${p}-${i}`">
-      <span
-        v-if="p === 'ellipsis'"
-        class="flex size-9 items-center justify-center text-[13px] font-bold text-T-500"
-      >
-        …
-      </span>
-      <button
-        v-else
-        type="button"
-        class="flex size-9 items-center justify-center rounded-lg text-[13px] font-bold transition-colors"
-        :class="p === page ? 'bg-primary text-white' : 'text-T-700 hover:bg-T-100'"
-        @click="go(p)"
-      >
-        {{ toPersianDigits(p) }}
-      </button>
-    </template>
+    <div class="flex items-center gap-1.5">
+      <template v-for="(p, i) in visiblePages" :key="`page-${p}-${i}`">
+        <span
+          v-if="p === 'ellipsis'"
+          class="flex size-[38px] items-center justify-center text-T-500"
+        >
+          <UiTypography as="span" size="xl" weight="medium" color="inherit">…</UiTypography>
+        </span>
+        <button
+          v-else
+          type="button"
+          class="flex size-[38px] items-center justify-center rounded-md border border-T-400 transition-colors"
+          :class="p === page ? 'text-T-900' : 'text-T-700 hover:bg-T-100'"
+          @click="go(p)"
+        >
+          <UiTypography as="span" size="xl" weight="medium" color="inherit">
+            {{ toPersianDigits(p) }}
+          </UiTypography>
+        </button>
+      </template>
+    </div>
 
     <button
       type="button"
-      class="flex size-9 items-center justify-center rounded-lg border border-T-400 text-T-600 transition-colors hover:border-T-500 disabled:opacity-40"
+      class="flex size-[38px] items-center justify-center rounded-md border border-T-400 text-T-600 transition-colors hover:border-T-500 disabled:opacity-40"
       :disabled="page >= pages"
       aria-label="صفحه بعد"
       @click="go(page + 1)"

@@ -17,21 +17,27 @@ function select(key: string) {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-3 overflow-x-auto border-b border-T-400">
+  <UiTypography
+    as="div"
+    size="lg"
+    weight="medium"
+    color="inherit"
+    class="flex items-center justify-start gap-8 overflow-x-auto border-b border-T-400"
+  >
     <button
       v-for="tab in tabs"
       :key="tab.key"
       type="button"
-      class="relative flex shrink-0 items-center gap-1.5 pb-3 pt-1 text-[13px] font-semibold transition-colors lg:text-[13.5px]"
+      class="relative flex shrink-0 items-center gap-1.5 pb-3 pt-1 transition-colors"
       :class="tab.key === modelValue ? 'text-primary' : 'text-T-600 hover:text-T-800'"
       @click="select(tab.key)"
     >
       {{ tab.label }}
-      <span class="text-[11.5px]">({{ toPersianDigits(tab.count) }})</span>
+      <UiTypography as="span" size="sm" weight="semibold" color="inherit">({{ toPersianDigits(tab.count) }})</UiTypography>
       <span
         v-if="tab.key === modelValue"
         class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
       />
     </button>
-  </div>
+  </UiTypography>
 </template>

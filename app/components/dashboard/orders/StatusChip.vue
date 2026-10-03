@@ -46,19 +46,57 @@ const toneSoft: Record<StatusTone, string> = {
   red: 'bg-R-50 text-primary',
 }
 
+/**
+ * Plain order-status chips use the dedicated coloured icons shipped in
+ * `/public/icons`, each with its own label colour and weight.
+ */
+const plainIcons: Partial<Record<StatusIcon, { src: string, text: string, weight: 'semibold' | 'bold' }>> = {
+  hourglass: { src: '/icons/status-hourglass.svg', text: 'text-[#FF9E02]', weight: 'semibold' },
+  wallet: { src: '/icons/status-wallet.svg', text: 'text-[#CF982C]', weight: 'semibold' },
+  truck: { src: '/icons/status-truck.svg', text: 'text-[#4E60FF]', weight: 'bold' },
+  check: { src: '/icons/status-check.svg', text: 'text-[#2EC144]', weight: 'bold' },
+  x: { src: '/icons/status-x.svg', text: 'text-primary', weight: 'semibold' },
+}
+
+const plain = computed(() => (props.variant === 'plain' && props.icon ? plainIcons[props.icon] : undefined))
+
+const colorClass = computed(() => {
+  if (plain.value) return plain.value.text
+  return props.variant === 'soft' ? toneSoft[props.tone] : toneText[props.tone]
+})
+
 const iconComponent = computed<Component | null>(() => (props.icon ? icons[props.icon] : null))
 </script>
 
 <template>
   <span
     :class="cn(
-      'inline-flex items-center gap-1.5 text-[12.5px] font-semibold',
+      'inline-flex items-center gap-1.5',
       variant === 'soft' && 'rounded-full px-3 py-1.5',
-      variant === 'soft' ? toneSoft[tone] : toneText[tone],
+      colorClass,
       props.class,
     )"
   >
-    <component :is="iconComponent" v-if="iconComponent" class="size-4 shrink-0" />
-    {{ label }}
+    <img
+      v-if="plain"
+      :src="plain.src"
+      alt=""
+      class="size-5 shrink-0"
+      aria-hidden="true"
+    >
+    <component
+      :is="iconComponent"
+      v-else-if="iconComponent"
+      class="size-4 shrink-0"
+    />
+
+    <UiTypography
+      as="span"
+      :size="variant === 'soft' ? 'md' : 'lg'"
+      :weight="plain?.weight ?? 'semibold'"
+      color="inherit"
+    >
+      {{ label }}
+    </UiTypography>
   </span>
 </template>
