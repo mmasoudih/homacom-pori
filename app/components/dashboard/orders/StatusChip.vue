@@ -56,6 +56,7 @@ const plainIcons: Partial<Record<StatusIcon, { src: string, text: string, weight
   truck: { src: '/icons/status-truck.svg', text: 'text-[#4E60FF]', weight: 'bold' },
   check: { src: '/icons/status-check.svg', text: 'text-[#2EC144]', weight: 'bold' },
   x: { src: '/icons/status-x.svg', text: 'text-primary', weight: 'semibold' },
+  refresh: { src: '/icons/status-refresh.svg', text: 'text-[#FF9E02]', weight: 'semibold' },
 }
 
 const plain = computed(() => (props.variant === 'plain' && props.icon ? plainIcons[props.icon] : undefined))
