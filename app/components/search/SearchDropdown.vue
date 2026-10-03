@@ -93,7 +93,12 @@ useEventListener(
   { capture: true },
 )
 
-const scrimStyle = computed<CSSProperties>(() => ({ top: panelStyle.value.top }))
+const scrimStyle = computed<CSSProperties>(() => ({
+  // Start the scrim below the sticky header (its height is exposed as a CSS
+  // variable) so the whole header stays visible and undimmed while the search
+  // dropdown is open.
+  top: 'var(--site-header-offset, 142px)',
+}))
 </script>
 
 <template>
@@ -121,19 +126,23 @@ const scrimStyle = computed<CSSProperties>(() => ({ top: panelStyle.value.top })
         :style="panelStyle"
         role="dialog"
         aria-label="نتایج جستجو"
+        dir="ltr"
       >
-        <SearchPanel
-          :query="query"
-          :status="status"
-          :results="results"
-          :categories="categories"
-          :recent="recent"
-          @select="emit('select', $event)"
-          @remove-recent="emit('removeRecent', $event)"
-          @clear-recent="emit('clearRecent')"
-          @select-category="emit('selectCategory', $event)"
-          @view-all="emit('viewAll')"
-        />
+        <!-- `dir="ltr"` keeps the scrollbar on the right; inner content stays RTL. -->
+        <div dir="rtl">
+          <SearchPanel
+            :query="query"
+            :status="status"
+            :results="results"
+            :categories="categories"
+            :recent="recent"
+            @select="emit('select', $event)"
+            @remove-recent="emit('removeRecent', $event)"
+            @clear-recent="emit('clearRecent')"
+            @select-category="emit('selectCategory', $event)"
+            @view-all="emit('viewAll')"
+          />
+        </div>
       </div>
     </Transition>
   </Teleport>

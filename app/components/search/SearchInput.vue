@@ -88,7 +88,7 @@ defineExpose({ focus: () => inputEl.value?.focus() })
     </button>
 
     <span
-      v-if="icon"
+      v-if="icon && !showClear"
       class="size-5 shrink-0 bg-T-800 [mask-image:url(/icons/search.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
       aria-hidden="true"
     />
