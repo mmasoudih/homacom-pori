@@ -28,7 +28,7 @@ const clamped = computed(() => Math.min(100, Math.max(0, props.percent)))
   <div :class="cn('flex flex-col gap-2', props.class)">
     <span v-if="label" class="text-[11.5px] text-T-600">{{ label }}</span>
 
-    <div class="relative h-[6px] w-full rounded-full bg-T-300">
+    <div class="relative h-[8px] w-full rounded-full bg-T-300">
       <div
         class="absolute inset-y-0 start-0 rounded-full transition-[width] duration-500"
         :class="toneBg[tone]"

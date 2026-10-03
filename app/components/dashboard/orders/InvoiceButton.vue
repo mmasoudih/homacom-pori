@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconFileInvoice } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 
 withDefaults(defineProps<{
@@ -16,10 +15,10 @@ function open() {
 <template>
   <button
     type="button"
-    class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[#4E60FF] transition-opacity hover:opacity-80"
+    class="inline-flex items-center gap-1.5 text-[#4E60FF] transition-opacity hover:opacity-80"
     @click="open"
   >
-    <IconFileInvoice class="size-4" />
-    {{ label }}
+    <img src="/icons/file-invoice-18.svg" alt="" class="size-[18px]" aria-hidden="true">
+    <UiTypography as="span" size="md" weight="medium" color="inherit">{{ label }}</UiTypography>
   </button>
 </template>

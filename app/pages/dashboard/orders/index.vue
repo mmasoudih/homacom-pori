@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { IconSearch } from '@tabler/icons-vue'
+import { typographyVariants } from '~/components/ui/typography'
 import { orderTabs, orders, returnRequests } from '~/data/orders'
 
 const route = useRoute()
@@ -63,15 +64,16 @@ useHead({
       <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
         <!-- Header -->
         <div class="flex flex-wrap items-center justify-between gap-4 pb-4">
-          <h1 class="text-xl font-bold text-T-900">سفارش‌های من</h1>
+          <UiTypography as="h1" size="2xl" weight="semibold">سفارش‌های من</UiTypography>
 
           <div class="flex w-full max-w-[260px] items-center gap-2 border-b border-T-400 pb-1.5">
-            <IconSearch class="size-4 shrink-0 text-T-500" />
+            <img src="/icons/search-18.svg" alt="" class="size-[18px] shrink-0" aria-hidden="true">
             <input
               v-model="search"
               type="search"
               placeholder="جستجو در سفارش‌ها..."
-              class="min-w-0 flex-1 bg-transparent text-[13px] text-T-900 outline-none placeholder:text-T-500"
+              class="min-w-0 flex-1 bg-transparent text-T-900 outline-none placeholder:text-T-500"
+              :class="typographyVariants({ size: 'md', weight: 'medium' })"
             >
           </div>
         </div>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  IconAlertTriangle,
   IconCircleCheckFilled,
   IconInfoCircle,
 } from '@tabler/icons-vue'
@@ -18,7 +17,7 @@ const props = withDefaults(defineProps<{
 })
 
 const toneSoft: Record<StatusTone, string> = {
-  amber: 'bg-[#FFF4E5] text-[#B26A00]',
+  amber: 'border border-[#F2DDB4] bg-[#FFF4E5] text-[#B26A00]',
   sky: 'bg-[#EEF0FF] text-[#4E60FF]',
   emerald: 'bg-[#E9F9ED] text-[#2EC144]',
   red: 'bg-R-50 text-primary',
@@ -27,13 +26,24 @@ const toneSoft: Record<StatusTone, string> = {
 const iconComponent = computed(() => {
   if (props.variant === 'check') return IconCircleCheckFilled
   if (props.variant === 'info') return IconInfoCircle
-  return IconAlertTriangle
+  return null
 })
 </script>
 
 <template>
-  <div :class="cn('flex items-start gap-2 rounded-xl px-4 py-3 text-[12px] leading-[22px]', toneSoft[tone], props.class)">
-    <component :is="iconComponent" class="mt-0.5 size-4 shrink-0" />
+  <div :class="cn('flex min-h-9 items-center gap-2 rounded-[12px] px-4 text-[12px] leading-[22px]', toneSoft[tone], props.class)">
+    <img
+      v-if="variant === 'exclamation'"
+      src="/icons/alert-amber.svg"
+      alt=""
+      class="size-4 shrink-0"
+      aria-hidden="true"
+    >
+    <component
+      :is="iconComponent"
+      v-else-if="iconComponent"
+      class="size-4 shrink-0"
+    />
     <div class="min-w-0 flex-1">
       <slot />
     </div>

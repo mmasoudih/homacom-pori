@@ -5,8 +5,10 @@ import { toast } from 'vue-sonner'
 const props = withDefaults(defineProps<{
   value: string
   copyValue?: string
+  showCopy?: boolean
 }>(), {
   copyValue: undefined,
+  showCopy: true,
 })
 
 const copied = ref(false)
@@ -26,8 +28,9 @@ async function copy() {
 
 <template>
   <span class="inline-flex items-center gap-1.5">
-    <span dir="ltr" class="font-bold text-T-900">{{ value }}</span>
+    <UiTypography as="span" size="lg" weight="medium" dir="ltr">{{ value }}</UiTypography>
     <button
+      v-if="showCopy"
       type="button"
       class="text-T-500 transition-colors hover:text-primary"
       aria-label="کپی"
