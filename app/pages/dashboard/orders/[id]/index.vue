@@ -68,19 +68,25 @@ useHead({
 <template>
   <div>
   <DashboardOrdersShell>
-    <DashboardOrdersDetailHeader
+    <div
       v-if="order"
-      title="جزئیات سفارش"
-      :code="order.code"
-      back-to="/dashboard/orders"
-    />
+      class="flex flex-col gap-6 rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6"
+    >
+      <DashboardOrdersDetailHeader
+        title="جزئیات سفارش"
+        :code="order.code"
+        back-to="/dashboard/orders"
+      />
 
-    <template v-if="order">
       <DashboardOrdersDetailInfo :order="order" />
-      <DashboardOrdersDetailShipping :order="order" @cancel="cancelOpen = true" />
-      <DashboardOrdersDetailTransactions :transactions="order.transactions" />
+      <DashboardOrdersDetailShipping :order="order" @cancel="cancelOpen = true">
+        <DashboardOrdersDetailTransactions
+          :transactions="order.transactions"
+          class="mt-6"
+        />
+      </DashboardOrdersDetailShipping>
       <DashboardOrdersDetailItems :items="order.items" />
-    </template>
+    </div>
 
     <div
       v-else-if="notFound"

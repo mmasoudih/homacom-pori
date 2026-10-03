@@ -11,9 +11,9 @@ const count = computed(() => toPersianDigits(props.items.length))
 
 <template>
   <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
-    <h2 class="text-center text-[14px] font-bold text-T-900">
+    <UiTypography as="h2" size="xl" weight="semibold" class="text-center">
       اطلاعات کالاها: ({{ count }})
-    </h2>
+    </UiTypography>
 
     <div class="mt-6 divide-y divide-T-300">
       <article

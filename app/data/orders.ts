@@ -202,9 +202,9 @@ const REASON_MISMATCH = 'مغایرت با اطلاعات درج شده در س�
  * ------------------------------------------------------------------ */
 
 const sharedTransactions: OrderTransaction[] = [
-  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
-  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
-  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 800_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 800_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
 ]
 
 const sharedReceiver = {

@@ -16,10 +16,13 @@ const props = withDefaults(defineProps<{
   tone: StatusTone
   icon?: StatusIcon
   variant?: 'plain' | 'soft'
+  /** Render only the status icon, without the label or pill background. */
+  iconOnly?: boolean
   class?: string
 }>(), {
   icon: undefined,
   variant: 'plain',
+  iconOnly: false,
   class: '',
 })
 
@@ -51,7 +54,7 @@ const toneSoft: Record<StatusTone, string> = {
  * `/public/icons`, each with its own label colour and weight.
  */
 const plainIcons: Partial<Record<StatusIcon, { src: string, text: string, weight: 'semibold' | 'bold' }>> = {
-  hourglass: { src: '/icons/status-hourglass.svg', text: 'text-[#FF9E02]', weight: 'semibold' },
+  hourglass: { src: '/icons/status-processing.svg', text: 'text-[#FF9E02]', weight: 'semibold' },
   wallet: { src: '/icons/status-wallet.svg', text: 'text-[#CF982C]', weight: 'semibold' },
   truck: { src: '/icons/status-truck.svg', text: 'text-[#4E60FF]', weight: 'bold' },
   check: { src: '/icons/status-check.svg', text: 'text-[#2EC144]', weight: 'bold' },
@@ -61,7 +64,12 @@ const plainIcons: Partial<Record<StatusIcon, { src: string, text: string, weight
 
 const plain = computed(() => (props.variant === 'plain' && props.icon ? plainIcons[props.icon] : undefined))
 
+const iconOnlyImage = computed(() =>
+  props.iconOnly && props.icon ? plainIcons[props.icon]?.src : undefined,
+)
+
 const colorClass = computed(() => {
+  if (props.iconOnly) return toneText[props.tone]
   if (plain.value) return plain.value.text
   return props.variant === 'soft' ? toneSoft[props.tone] : toneText[props.tone]
 })
@@ -73,16 +81,33 @@ const iconComponent = computed<Component | null>(() => (props.icon ? icons[props
   <span
     :class="cn(
       'inline-flex items-center gap-1.5',
-      variant === 'soft' && 'rounded-full px-3 py-1.5',
+      variant === 'soft' && !iconOnly && 'rounded-full px-3 py-1.5',
       colorClass,
       props.class,
     )"
   >
+    <UiTypography
+      v-if="!iconOnly"
+      as="span"
+      size="md"
+      :weight="plain?.weight ?? 'semibold'"
+      color="inherit"
+    >
+      {{ label }}
+    </UiTypography>
+
     <img
       v-if="plain"
       :src="plain.src"
       alt=""
-      class="size-5 shrink-0"
+      class="size-[32px] shrink-0"
+      aria-hidden="true"
+    >
+    <img
+      v-else-if="iconOnlyImage"
+      :src="iconOnlyImage"
+      alt=""
+      class="size-[18px] shrink-0"
       aria-hidden="true"
     >
     <component
@@ -90,14 +115,5 @@ const iconComponent = computed<Component | null>(() => (props.icon ? icons[props
       v-else-if="iconComponent"
       class="size-4 shrink-0"
     />
-
-    <UiTypography
-      as="span"
-      :size="variant === 'soft' ? 'md' : 'lg'"
-      :weight="plain?.weight ?? 'semibold'"
-      color="inherit"
-    >
-      {{ label }}
-    </UiTypography>
   </span>
 </template>
