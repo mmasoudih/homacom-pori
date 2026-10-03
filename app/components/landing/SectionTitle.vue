@@ -8,6 +8,8 @@ const props = withDefaults(defineProps<{
   light?: boolean
   indicator?: 'both' | 'right'
   indicatorColor?: 'primary' | 'white'
+  /** Desktop title size: 20px (default) or 22px. */
+  titleSize?: '20' | '22'
   /** Target of the «مشاهده همه» link. */
   to?: string
 }>(), {
@@ -15,10 +17,12 @@ const props = withDefaults(defineProps<{
   light: false,
   indicator: 'both',
   indicatorColor: 'primary',
+  titleSize: '20',
   to: '#',
 })
 
 const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' : 'bg-primary'))
+const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl'))
 </script>
 
 <template>
@@ -31,12 +35,15 @@ const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' :
       <span class="absolute inset-y-[20%] left-2 w-[4.65px] rounded-[8px] opacity-25" :class="barClass" />
       <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />
     </span>
-    <h2
-      class="text-xl font-bold leading-[29px]"
+    <UiTypography
+      as="h2"
+      :size="titleSizeVariant"
+      weight="bold"
+      class="leading-[29px]"
       :class="light ? 'text-white' : 'text-foreground'"
     >
       {{ title }}
-    </h2>
+    </UiTypography>
     <!-- Figma node 764:64355 as designed -->
     <span class="relative block h-4 w-[17px]">
       <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />
@@ -53,12 +60,15 @@ const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' :
         <span class="absolute inset-y-[20%] left-2 w-[4.65px] rounded-[8px] opacity-25" :class="barClass" />
         <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />
       </span>
-      <h2
-        class="text-xl font-bold leading-[29px]"
+      <UiTypography
+        as="h2"
+        :size="titleSizeVariant"
+        weight="bold"
+        class="leading-[29px]"
         :class="light ? 'text-white' : 'text-foreground'"
       >
         {{ title }}
-      </h2>
+      </UiTypography>
       <span v-if="indicator === 'both'" class="relative block h-4 w-[17px]">
         <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />
         <span class="absolute inset-y-[20%] left-2 w-[4.65px] rounded-[8px] opacity-25" :class="barClass" />
@@ -69,10 +79,12 @@ const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' :
       class="flex items-center gap-1 rounded-full px-4 h-[38px] transition-colors"
       :class="light ? 'text-white hover:bg-white/10' : 'hover:bg-secondary'"
     >
-      <span
-        class="text-sm font-semibold"
+      <UiTypography
+        as="span"
+        size="md"
+        weight="bold"
         :class="light ? 'text-white' : 'text-primary'"
-      >مشاهده همه</span>
+      >مشاهده همه</UiTypography>
       <IconChevronLeft
         class="size-4"
         :class="light ? 'text-white' : 'text-primary'"

@@ -72,7 +72,9 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
                 variant="vertical"
                 :show-title="false"
                 discount-placement="inline"
-                image-class="bg-transparent"
+                badge-size="lg"
+                image-class="bg-transparent lg:w-[170px] lg:h-[170px] lg:mx-auto"
+                class="lg:w-[202px] lg:h-[252px] lg:rounded-[12px]"
               />
             </div>
           </CarouselItem>

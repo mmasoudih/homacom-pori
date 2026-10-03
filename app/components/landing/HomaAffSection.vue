@@ -31,7 +31,7 @@ const cardRounding = (i: number) => [
 
     <!-- Desktop title row -->
     <div class="mb-[21px] hidden lg:block">
-      <LandingSectionTitle title="هما آف" variant="row" light indicator="right" indicator-color="white" />
+      <LandingSectionTitle title="هما آف" variant="row" light indicator="right" indicator-color="white" title-size="22" />
     </div>
 
     <!-- Mobile products row -->
@@ -76,7 +76,7 @@ const cardRounding = (i: number) => [
             variant="vertical"
             show-countdown
             countdown-label="هما آف"
-            image-class="bg-T-50"
+            image-class="bg-T-50 lg:w-[190px] lg:h-[190px] lg:mx-auto"
             discount-placement="inline"
             :href="product.id ? `/product/${product.id}` : ''"
             class="w-full rounded-none"

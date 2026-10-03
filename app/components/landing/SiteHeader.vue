@@ -2,6 +2,7 @@
 import { useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
+import { toPersianDigits } from '~/utils/format'
 import type { SearchCategoryTile } from '~/data/search'
 import { unreadNotifications } from '~/data/dashboard'
 import coinsFront from '../../../public/icons/coins-front.svg?raw'
@@ -189,7 +190,14 @@ onMounted(() => {
           aria-label="سبد خرید"
         >
           <img src="/icons/shopping-bag.svg" alt="" class="size-6">
-          <span class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">4</span>
+          <UiTypography
+            as="span"
+            size="md"
+            weight="bold"
+            tracking="wide"
+            color="white"
+            class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary"
+          >{{ toPersianDigits('4') }}</UiTypography>
         </button>
 
         <!-- Auth: logged-in cluster or login pill -->
@@ -216,12 +224,16 @@ onMounted(() => {
 
           <div
             v-else
-            class="flex h-12 items-center gap-1 rounded-full border border-T-400 px-4 text-[15px] font-medium text-T-900"
+            class="flex h-12 items-center gap-1 rounded-full border border-T-400 px-4 text-T-900"
             dir="rtl"
           >
-            <NuxtLink to="/auth/login" class="hover:text-primary">ورود</NuxtLink>
+            <NuxtLink to="/auth/login" class="hover:text-primary">
+              <UiTypography as="span" size="lg" weight="medium" color="inherit">ورود</UiTypography>
+            </NuxtLink>
             <span class="text-T-500">|</span>
-            <NuxtLink to="/auth/register" class="hover:text-primary">ثبت‌نام</NuxtLink>
+            <NuxtLink to="/auth/register" class="hover:text-primary">
+              <UiTypography as="span" size="lg" weight="medium" color="inherit">ثبت‌نام</UiTypography>
+            </NuxtLink>
           </div>
         </div>
 
@@ -290,11 +302,13 @@ onMounted(() => {
             <!-- Phone -->
             <a
               href="tel:0121-3250789"
-              class="flex items-center gap-2 text-[15px] font-semibold text-foreground"
+              class="flex items-center gap-2 text-foreground"
               dir="ltr"
             >
               <img src="/icons/phone-call.svg" alt="" class="size-5">
-              <span><span class="text-R-300">0121</span>-3250789</span>
+              <UiTypography as="span" size="lg" weight="bold" tracking="wide">
+                <span class="text-R-300">{{ toPersianDigits('0121') }}</span>{{ toPersianDigits('-3250789') }}
+              </UiTypography>
             </a>
           </div>
 

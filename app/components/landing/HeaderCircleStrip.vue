@@ -45,12 +45,15 @@ import {
             >
           </span>
 
-          <span
-            class="text-center text-[12.5px] font-medium leading-[17px] text-foreground"
+          <UiTypography
+            as="span"
+            size="md"
+            weight="regular"
+            class="text-center leading-[17px] text-foreground"
           >
             {{ item.title }}
             <span class="block">{{ item.subtitle }}</span>
-          </span>
+          </UiTypography>
         </a>
       </CarouselItem>
     </CarouselContent>

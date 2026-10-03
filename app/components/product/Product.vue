@@ -19,6 +19,8 @@ const props = withDefaults(
     countdownLabel?: string
     /** Where the discount badge renders: over the image (default) or inline beside the price. */
     discountPlacement?: 'image' | 'inline'
+    /** Inline discount chip size. `lg`: 42×25, `sm`: 30×16.5. */
+    badgeSize?: 'sm' | 'lg'
     showColors?: boolean
     showTitle?: boolean
     showDiscount?: boolean
@@ -37,6 +39,7 @@ const props = withDefaults(
     selectedColor: '',
     countdownLabel: '',
     discountPlacement: 'image',
+    badgeSize: 'lg',
     showColors: undefined,
     showTitle: undefined,
     showDiscount: undefined,
@@ -101,6 +104,13 @@ const cardSurface = computed(() =>
 )
 // When true, the discount badge moves out of the image into a row beside the price.
 const inlineDiscount = computed(() => props.discountPlacement === 'inline')
+// Inline discount chip sizing (desktop-only per the review; the base chip keeps
+// its previous padding so mobile is unchanged).
+const inlineBadgeSizeClass = computed(() =>
+  props.badgeSize === 'sm'
+    ? 'lg:w-[30px] lg:h-[16.5px] lg:rounded-full'
+    : 'lg:w-[42px] lg:h-[25px] lg:rounded-[16px]',
+)
 
 // --- Compare toggle (vertical variant) ------------------------------------
 const { has: inCompare, toggle: toggleCompare } = useCompare()
@@ -146,7 +156,7 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
         <span
           v-for="(color, ci) in colors"
           :key="`${color.value}-${ci}`"
-          class="size-3.5 rounded-[3px] border"
+          class="size-3.5 rounded-[3px] border lg:size-3"
           :class="cn(swatchBorder, selectedColor === color.value && 'ring-1 ring-primary ring-offset-1')"
           :style="{ backgroundColor: color.value }"
           role="img"
@@ -162,20 +172,29 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
       >{{ toPersianDigits(discount!) }}٪</span>
     </div>
 
-    <h3 v-if="showTitle" class="line-clamp-2 mt-3 h-14 text-[16px] leading-[26px]">
+    <UiTypography
+      v-if="showTitle"
+      as="h3"
+      size="lg"
+      weight="regular"
+      class="line-clamp-2 mt-3 h-14 leading-[26px]"
+    >
       {{ product.title }}
-    </h3>
+    </UiTypography>
 
     <!-- Inline: discount badge on the right, price on the left -->
     <div
       v-if="inlineDiscount"
       class="mt-auto flex flex-wrap items-start gap-2 pt-2"
     >
-      <span
+      <UiTypography
         v-if="showDiscount && hasDiscount"
-        class="flex shrink-0 items-center justify-center rounded-full text-[14px] font-extrabold py-0.5 px-2.5"
-        :class="discountBadgeClass(tone)"
-      >{{ toPersianDigits(discount!) }}٪</span>
+        as="span"
+        size="md"
+        weight="bold"
+        class="flex shrink-0 items-center justify-center rounded-full py-0.5 px-2.5 leading-none lg:px-0"
+        :class="[inlineBadgeSizeClass, discountBadgeClass(tone)]"
+      >{{ toPersianDigits(discount!) }}٪</UiTypography>
       <ProductPrice
         class="ms-auto items-end"
         price-class="text-T-900"
@@ -221,12 +240,21 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
     />
 
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-      <h4 v-if="showTitle" class="line-clamp-2 text-[16px] leading-[26px] text-T-800">
+      <UiTypography
+        v-if="showTitle"
+        as="h4"
+        size="lg"
+        weight="regular"
+        class="line-clamp-2 leading-[26px] text-T-800"
+      >
         {{ product.title }}
-      </h4>
+      </UiTypography>
 
       <ProductPrice
         :layout="inlineDiscount ? 'inline' : 'stacked'"
+        price-class="text-T-900"
+        :badge-size="badgeSize"
+        class="lg:mt-4"
         :price="price"
         :original-price="originalPrice"
         :discount="discount"

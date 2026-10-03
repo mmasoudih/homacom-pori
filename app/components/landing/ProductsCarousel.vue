@@ -56,19 +56,21 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
         v-if="pills"
         class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
       >
-        <!-- Category pills -->
-        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1">
+        <!-- Category pills (reversed on desktop: «همه» sits on the right) -->
+        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1 lg:h-11 lg:w-[399px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400">
           <button
             v-for="c in pills.cats"
             :key="c.label"
-            class="flex h-[38px] items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors"
+            class="flex h-[38px] items-center gap-2 rounded-full px-4 transition-colors lg:h-9"
             :class="
               (pills.activeCat === c.label)
-                ? 'border border-T-400 bg-T-50 text-foreground shadow-sm'
+                ? 'border border-T-400 bg-T-50 text-foreground'
                 : 'text-T-700 hover:bg-T-50/50'
             "
           >
-            {{ c.label }}
+            <UiTypography as="span" size="md" weight="semibold" color="inherit">
+              {{ c.label }}
+            </UiTypography>
             <component
               :is="catIcons[c.icon]"
               class="size-5"
@@ -76,19 +78,21 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
           </button>
         </div>
 
-        <!-- Price pills -->
-        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1">
+        <!-- Price pills (reversed on desktop: «تا ۱۰۰ میلیون» first) -->
+        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1 lg:h-11 lg:w-[391px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400">
           <button
             v-for="p in pills.prices"
             :key="p"
-            class="flex h-[38px] items-center rounded-full px-4 text-[13px] font-medium transition-colors"
+            class="flex h-[38px] items-center rounded-full px-4 transition-colors lg:h-9"
             :class="
               (pills.activePrice === p)
-                ? 'border border-T-400 bg-T-50 text-foreground shadow-sm'
+                ? 'border border-T-400 bg-T-50 text-foreground'
                 : 'text-T-700 hover:bg-T-50/50'
             "
           >
-            {{ toPersianDigits(p) }}
+            <UiTypography as="span" size="md" weight="semibold" color="inherit">
+              {{ toPersianDigits(p) }}
+            </UiTypography>
           </button>
         </div>
       </div>
@@ -122,7 +126,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
       <!-- Arrows (desktop only) -->
       <button
         v-if="canScrollNext"
-        class="absolute -left-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+        class="absolute -left-[19px] top-1/2 z-20 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="محصولات قبلی"
         :disabled="!canScrollNext"
         @click="scrollNext"
@@ -131,7 +135,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
       </button>
       <button
         v-if="canScrollPrev"
-        class="absolute -right-[19px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+        class="absolute -right-[19px] top-1/2 z-20 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         aria-label="محصولات بعدی"
         :disabled="!canScrollPrev"
         @click="scrollPrev"

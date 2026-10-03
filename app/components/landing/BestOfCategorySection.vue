@@ -82,7 +82,12 @@ const activeItems = computed(() => {
                 aria-hidden="true"
                 v-html="iconMap[col.icon]"
               />
-              <h3 class="text-[18px] font-bold text-foreground">{{ col.category }}</h3>
+              <UiTypography
+                as="h3"
+                size="xl"
+                weight="semibold"
+                class="text-foreground"
+              >{{ col.category }}</UiTypography>
             </div>
 
             <!-- Mini cards -->
@@ -92,9 +97,10 @@ const activeItems = computed(() => {
               :product="item"
               variant="horizontal"
               discount-placement="inline"
+              badge-size="lg"
               :href="item.id ? `/product/${item.id}` : ''"
               class="h-[150px] border-b-0 border-T-400 px-4 last:border-b-0 rounded-none transition-colors hover:bg-secondary/30"
-              image-class="w-[96px] bg-transparent"
+              image-class="w-[96px] lg:w-[123px] lg:h-[123px] bg-transparent"
             />
           </div>
         </CarouselItem>

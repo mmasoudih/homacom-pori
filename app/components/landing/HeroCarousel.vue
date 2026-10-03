@@ -51,7 +51,7 @@ function go(dir: 1 | -1) {
 <template>
   <section class="relative mx-auto w-full max-w-[1440px]">
     <Carousel
-      class="flex aspect-[402/291] w-full lg:aspect-[1440/342]"
+      class="flex aspect-[402/291] w-full lg:aspect-auto lg:h-[342px]"
       :opts="{ direction: 'rtl', loop: true, align: 'start' }"
       :plugins="plugins"
       @init-api="onInit"
