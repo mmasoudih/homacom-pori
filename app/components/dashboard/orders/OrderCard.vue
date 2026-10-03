@@ -15,6 +15,7 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
 
 const toneText: Record<StatusTone, string> = {
   amber: 'text-[#FF9800]',
+  gold: 'text-[#CF982C]',
   sky: 'text-[#4E60FF]',
   emerald: 'text-[#2EC144]',
   red: 'text-primary',
@@ -28,7 +29,15 @@ const toneText: Record<StatusTone, string> = {
       <div class="flex min-w-0 flex-1 flex-col gap-4">
         <!-- Status -->
         <div class="flex items-center justify-start">
-          <DashboardOrdersStatusChip :label="meta.label" :tone="meta.tone" :icon="meta.icon" />
+          <!-- Scoped override: small leading (right in RTL) status icon, and a
+               dedicated hourglass asset for processing (detail page keeps the shared one). -->
+          <DashboardOrdersStatusChip
+            :label="meta.label"
+            :tone="meta.tone"
+            :icon="meta.icon"
+            :img-src="order.status === 'processing' ? '/icons/status-processing-hourglass.svg' : undefined"
+            class="[&>img]:order-first [&>img]:size-[18px]"
+          />
         </div>
 
         <!-- Meta -->

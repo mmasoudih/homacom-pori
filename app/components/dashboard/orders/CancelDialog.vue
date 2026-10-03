@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { typographyVariants } from '~/components/ui/typography'
 
 const props = defineProps<{
   open: boolean
@@ -48,11 +49,11 @@ function confirm() {
         با لغو سفارش، اقلام از سبد شما آزاد می‌شوند و این عملیات قابل بازگشت نیست
       </DashboardOrdersAlertNote>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 text-T-600">
         <span class="text-[13px] font-bold text-T-900">دلیل لغو سفارش</span>
         <Textarea
           v-model="reason"
-          class="min-h-[120px] rounded-xl border-T-400 text-[13px]"
+          :class="[typographyVariants({ size: 'lg', weight: 'regular', color: 'inherit' }), 'min-h-[120px] rounded-xl border-[1px] border-T-400 px-3 py-4']"
           placeholder="لطفا دلیل لغو سفارش را بنویسید"
         />
       </div>

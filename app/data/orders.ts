@@ -14,7 +14,7 @@ export type OrderStatus =
 export type ReturnStatus = 'review' | 'approved' | 'rejected' | 'completed'
 export type ReturnItemStatus = 'review' | 'approved' | 'rejected'
 
-export type StatusTone = 'amber' | 'sky' | 'emerald' | 'red'
+export type StatusTone = 'amber' | 'gold' | 'sky' | 'emerald' | 'red'
 
 export type StatusIcon = 'hourglass' | 'wallet' | 'truck' | 'check' | 'x' | 'refresh'
 
@@ -122,7 +122,7 @@ export interface CreditWallet {
  * ------------------------------------------------------------------ */
 
 export const orderStatusMeta: Record<OrderStatus, StatusMeta> = {
-  awaiting_payment: { label: 'در انتظار پرداخت', tone: 'amber', icon: 'wallet', progress: 15, hideProgress: false },
+  awaiting_payment: { label: 'در انتظار پرداخت', tone: 'gold', icon: 'wallet', progress: 15, hideProgress: false },
   processing: { label: 'در حال بررسی سفارش', tone: 'amber', icon: 'hourglass', progress: 20, hideProgress: false },
   shipping: { label: 'در حال ارسال', tone: 'sky', icon: 'truck', progress: 55, hideProgress: false },
   delivered: { label: 'تحویل داده شده', tone: 'emerald', icon: 'check', progress: 100, hideProgress: true },
@@ -202,9 +202,9 @@ const REASON_MISMATCH = 'مغایرت با اطلاعات درج شده در س�
  * ------------------------------------------------------------------ */
 
 const sharedTransactions: OrderTransaction[] = [
-  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
-  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
-  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 800_000, method: 'اقساطی - اسنپیاد', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-1', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-2', status: 'failed', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 1_700_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
+  { id: 'txn-3', status: 'success', bank: 'بانک ملت - ۱۰۸۲/۰۸/۱۴', trackingCode: '125847369', amount: 800_000, method: 'اقساطی - اسنپ‌پی', datetime: '۱۴۰۳/۰۸/۱۵ - ۱۳:۳۵' },
 ]
 
 const sharedReceiver = {

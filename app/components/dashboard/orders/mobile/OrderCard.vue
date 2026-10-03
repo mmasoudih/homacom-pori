@@ -18,7 +18,15 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
   <article class="rounded-2xl border border-T-300 bg-T-50 p-4">
     <!-- Status + open -->
     <div class="flex items-center justify-between gap-3">
-      <DashboardOrdersStatusChip :label="meta.label" :tone="meta.tone" :icon="meta.icon" />
+      <!-- Scoped override: small leading (right in RTL) status icon, and a
+           dedicated hourglass asset for processing (detail page keeps the shared one). -->
+      <DashboardOrdersStatusChip
+        :label="meta.label"
+        :tone="meta.tone"
+        :icon="meta.icon"
+        :img-src="order.status === 'processing' ? '/icons/status-processing-hourglass.svg' : undefined"
+        class="[&>img]:order-first [&>img]:size-[18px]"
+      />
 
       <NuxtLink
         :to="detailHref"

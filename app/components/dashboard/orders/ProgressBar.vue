@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
 
 const toneBg: Record<StatusTone, string> = {
   amber: 'bg-[#FF9800]',
+  gold: 'bg-[#CF982C]',
   sky: 'bg-[#4E60FF]',
   emerald: 'bg-[#2EC144]',
   red: 'bg-primary',
