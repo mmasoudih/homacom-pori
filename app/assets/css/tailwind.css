@@ -117,6 +117,20 @@
   }
 }
 
+/*
+ * Fully hidden scrollbar for touch-first (mobile) overlay panels, where a
+ * visible track would clash with the reference design — the area stays
+ * scrollable, just without a drawn scrollbar.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
