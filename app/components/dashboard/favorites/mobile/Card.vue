@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconTrash } from '@tabler/icons-vue'
 import type { Product } from '~/utils/product'
 import { normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
@@ -74,7 +73,20 @@ const discountLabel = computed(() => `%${toPersianDigits(discount.value ?? 0)}`)
         aria-label="حذف از علاقه‌مندی‌ها"
         @click="emit('remove', product.id)"
       >
-        <IconTrash class="size-4" />
+        <span
+          class="size-[18px] shrink-0 bg-current"
+          :style="{
+            maskImage: 'url(/icons/favorites-trash.svg)',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            maskSize: 'contain',
+            WebkitMaskImage: 'url(/icons/favorites-trash.svg)',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            WebkitMaskSize: 'contain',
+          }"
+          aria-hidden="true"
+        />
       </button>
       <button
         type="button"

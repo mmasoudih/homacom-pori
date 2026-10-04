@@ -21,9 +21,9 @@ useHead({
   <div>
     <DashboardFavoritesShell>
       <section class="rounded-[20px] border border-T-400 bg-T-50">
-        <h1 class="px-4 pt-4 text-xl font-bold text-T-900 lg:px-6 lg:pt-6">
+        <UiTypography as="h1" size="2xl" weight="semibold" class="px-4 pt-4 lg:px-6 lg:pt-6">
           مورد علاقه‌ها
-        </h1>
+        </UiTypography>
 
         <DashboardFavoritesEmptyState v-if="isEmpty" />
 
