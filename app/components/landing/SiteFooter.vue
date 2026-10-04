@@ -46,7 +46,7 @@ function scrollTop() {
 <template>
   <footer class="w-full lg:px-6">
     <div
-      class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden rounded-3xl bg-T-200 p-10 pt-10"
+      class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden rounded-3xl bg-T-200 p-4 pt-4 lg:p-10 lg:pt-10 pb-25 lg:pb-0"
     >
       <!-- Watermark texture -->
       <div
@@ -70,7 +70,7 @@ function scrollTop() {
                 <span class="h-[18px] w-[5px] rounded-[2px] bg-primary" />
                 <span class="h-[11px] w-[5px] rounded-[2px] bg-primary/25" />
                 <span class="text-[16px] font-bold">
-                  <span class="text-T-900">{{ titleParts(row.title).lead }}</span>
+                  <span class="text-T-900">{{ titleParts(row.title).lead }}&nbsp;</span>
                   <span class="text-primary">{{
                     titleParts(row.title).accent
                   }}</span>
@@ -93,17 +93,6 @@ function scrollTop() {
                 {{ typeof link === "string" ? link : link.label }}
               </NuxtLink>
             </div>
-          </div>
-
-          <!-- Trust badges -->
-          <div class="flex items-center justify-center gap-6 px-4 py-6">
-            <img
-              v-for="(badge, i) in footerData.badges"
-              :key="i"
-              :src="badge.image"
-              :alt="badge.alt"
-              class="size-[66px] object-contain"
-            >
           </div>
         </div>
 
@@ -211,7 +200,7 @@ function scrollTop() {
 
         <!-- ============================== About ============================ -->
         <div
-          class="mt-6 flex items-center gap-6 rounded-2xl bg-T-50 p-6 lg:mt-[34px] lg:gap-[46px] lg:p-[36px]"
+          class="mt-6 flex flex-col gap-6 rounded-2xl bg-T-50 p-6 lg:mt-[34px] lg:gap-[46px] lg:p-[36px]"
         >
           <a href="#" class="shrink-0">
             <img

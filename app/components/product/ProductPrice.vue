@@ -71,12 +71,12 @@ const badgeSizeClass = computed(() =>
   >
     <!-- Unit on the right, price on the left (RTL) with a 6px gap. -->
     <div class="flex items-baseline gap-[6px]">
-      <UiTypography size="sm" weight="semibold" :class="dimColor">تومان</UiTypography>
+      <UiTypography size="sm" weight="semibold" :class="cn(dimColor, 'text-[10px]')">تومان</UiTypography>
       <UiTypography
         size="xl"
         weight="medium"
         leading="none"
-        :class="cn(priceColor, props.priceClass)"
+        :class="cn(priceColor, props.priceClass, 'text-[14px]')"
       >
         {{ formatPriceFa(price) }}
       </UiTypography>
@@ -88,7 +88,7 @@ const badgeSizeClass = computed(() =>
         size="xl"
         weight="medium"
         leading="none"
-        :class="cn(dimColor, 'line-through')"
+        :class="cn(dimColor, 'line-through', 'text-[14px]')"
       >
         {{ formatPriceFa(originalPrice!) }}
       </UiTypography>

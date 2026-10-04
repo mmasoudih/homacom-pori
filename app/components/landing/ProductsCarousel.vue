@@ -46,7 +46,7 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 lg:py-6">
+  <section class="mx-auto w-full max-w-[1440px] rounded-[20px] border border-T-400 py-5 max-lg:rounded-none max-lg:border-x-0 lg:py-6">
     <div class="px-4 lg:px-6">
       <!-- Title row -->
       <LandingSectionTitle :title="title" variant="row" :indicator="'right'" />
@@ -57,11 +57,11 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
         class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
       >
         <!-- Category pills (reversed on desktop: «همه» sits on the right) -->
-        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1 lg:h-11 lg:w-[399px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400">
+        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1 max-lg:flex-row-reverse max-lg:border max-lg:border-T-400 lg:h-11 lg:w-[399px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400">
           <button
             v-for="c in pills.cats"
             :key="c.label"
-            class="flex h-[38px] items-center gap-2 rounded-full px-4 transition-colors lg:h-9"
+            class="flex h-[38px] items-center gap-2 rounded-full max-lg:px-2 lg:px-4 transition-colors max-lg:flex-1 max-lg:justify-center lg:h-9"
             :class="
               (pills.activeCat === c.label)
                 ? 'bg-T-50 text-foreground lg:h-[38px] lg:w-[113px] lg:justify-center'
@@ -79,18 +79,18 @@ const catIcons: Record<string, typeof IconLayoutGrid> = {
         </div>
 
         <!-- Price pills (reversed on desktop: «تا ۱۰۰ میلیون» first) -->
-        <div class="flex items-center gap-1 rounded-full bg-T-200 p-1 lg:h-11 lg:w-[391px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400">
+        <div class="flex items-center gap-1 rounded-full p-1 max-lg:flex-row-reverse lg:h-11 lg:w-[391px] lg:flex-row-reverse lg:justify-between lg:border lg:border-T-400 lg:bg-T-200">
           <button
             v-for="p in pills.prices"
             :key="p"
-            class="flex h-[38px] items-center rounded-full px-4 transition-colors lg:h-9"
+            class="flex h-[38px] items-center rounded-full max-lg:px-2 lg:px-4 transition-colors max-lg:flex-1 max-lg:justify-center lg:h-9"
             :class="
               (pills.activePrice === p)
-                ? 'bg-T-50 text-foreground lg:h-[38px] lg:w-[128px] lg:justify-center'
-                : 'text-T-700 hover:bg-T-50/50'
+                ? 'bg-T-50 text-foreground max-lg:border max-lg:border-R-300 max-lg:bg-R-50 max-lg:text-R-300 lg:h-[38px] lg:w-[128px] lg:justify-center'
+                : 'text-T-700 hover:bg-T-50/50 max-lg:border max-lg:border-T-300'
             "
           >
-            <UiTypography as="span" size="md" weight="semibold" color="inherit">
+            <UiTypography as="span" size="md" weight="semibold" color="inherit" class="max-lg:text-[11.25px]">
               {{ toPersianDigits(p) }}
             </UiTypography>
           </button>

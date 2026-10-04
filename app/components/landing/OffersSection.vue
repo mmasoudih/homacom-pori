@@ -35,22 +35,32 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6">
-    <div class="relative rounded-3xl border border-T-400 bg-T-50 px-4 py-5 lg:px-6 lg:py-6">
-      <LandingSectionTitle title="پیشنهاد‌های هماکام" variant="centered" />
+  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 max-lg:mt-[42px] max-lg:border-y max-lg:border-T-400 lg:px-0 lg:py-6">
+    <div class="relative rounded-3xl border border-T-400 bg-T-50 px-4 py-5 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:p-0 lg:px-6 lg:py-6">
+      <LandingSectionTitle title="پیشنهاد‌های" accent=" هماکام" accent-always variant="centered" />
 
-      <!-- Mobile: 2-col grid -->
-      <div class="mt-[18px] grid grid-cols-2 gap-3 lg:hidden">
-        <Product
-          v-for="(product, i) in offerProducts"
-          :key="i"
-          :product="product"
-          variant="vertical"
-          :show-title="false"
-          discount-placement="inline"
-          image-class="bg-transparent"
-        />
-      </div>
+      <!-- Mobile: single-row carousel -->
+      <Carousel
+        class="offers-cards relative mt-[18px] overflow-x-clip lg:hidden"
+        :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
+      >
+        <CarouselContent class="ms-0 gap-2.5">
+          <CarouselItem
+            v-for="(product, i) in offerProducts"
+            :key="i"
+            class="w-[164px] shrink-0 basis-auto ps-0"
+          >
+            <Product
+              :product="product"
+              variant="vertical"
+              :show-title="false"
+              discount-placement="inline"
+              image-class="max-lg:w-[132px] max-lg:h-[132px] bg-transparent"
+              class="max-lg:h-[209px]"
+            />
+          </CarouselItem>
+        </CarouselContent>
+      </Carousel>
 
       <!-- Desktop: 6 columns × 2 rows -->
       <Carousel
@@ -103,3 +113,21 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
     </div>
   </section>
 </template>
+
+<style scoped>
+@media (width < 64rem) {
+  .offers-cards :deep(article > .mt-auto > span) {
+    width: 38px;
+    height: 21px;
+  }
+  .offers-cards :deep(article > .mt-auto > div > div:first-child > div > span:first-child) {
+    font-size: 14px;
+  }
+  .offers-cards :deep(article > .mt-auto > div > div:first-child > div > span:last-child) {
+    font-size: 10px;
+  }
+  .offers-cards :deep(article > .mt-auto > div > div:last-child > span) {
+    font-size: 14px;
+  }
+}
+</style>

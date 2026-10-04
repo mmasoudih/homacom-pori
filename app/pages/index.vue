@@ -20,7 +20,7 @@ useHead({
 
     <!--
       Mobile section order follows the Figma "Landing Mobile" frame:
-      categories → هما آف → strip → جدیدترین → بهترینها → banner(2) → پرفروش → پیشنهادها → وبلاگ → برندها.
+      categories → هما آف → banner(2) → strip → جدیدترین → بهترینها → banner(4) → پرفروش → پیشنهادها → وبلاگ → برندها.
       Desktop keeps DOM order via lg:order-none.
     -->
     <!--
@@ -35,7 +35,7 @@ useHead({
 
       <LandingHomaAffSection class="order-2 py-5 lg:order-none lg:py-6" />
 
-      <LandingBannerRow :items="banners2" :columns="2" class="order-6 w-full lg:order-none lg:max-w-[1440px]" />
+      <LandingBannerRow :items="banners2" :columns="2" class="order-3 w-full lg:order-none lg:max-w-[1440px]" />
 
       <LandingProductsCarousel
         title="جدیدترین محصولات"
@@ -61,7 +61,8 @@ useHead({
       <LandingBannerRow
         :items="banners4"
         :columns="4"
-        class="order-7 hidden w-full lg:order-none lg:grid"
+        :mobile-columns="2"
+        class="order-7 w-full lg:order-none"
       />
 
       <LandingProductsCarousel
