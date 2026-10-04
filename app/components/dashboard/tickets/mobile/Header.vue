@@ -25,7 +25,7 @@ function goBack() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 flex h-14 w-full shrink-0 items-center justify-between border-b border-T-300 bg-T-50 px-4">
+  <header class="sticky top-0 z-40 flex h-14 w-full shrink-0 items-center justify-between border-b border-T-300 bg-T-50 px-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
     <div class="flex items-center gap-2">
       <button type="button" class="flex size-8 shrink-0 items-center justify-center text-T-900" aria-label="بازگشت" @click="goBack">
         <IconArrowRight class="size-5" />
