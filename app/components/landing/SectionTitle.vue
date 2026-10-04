@@ -71,7 +71,7 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
         :size="titleSizeVariant"
         weight="bold"
         class="leading-[29px] max-lg:text-[16px]"
-        :class="light ? 'text-white' : 'text-foreground'"
+        :class="light ? 'text-white' : 'text-foreground max-lg:text-T-900'"
       >
         {{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span>
       </UiTypography>
@@ -89,6 +89,7 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
         as="span"
         size="md"
         weight="bold"
+        class="max-lg:text-[11.25px]"
         :class="light ? 'text-white' : 'text-primary'"
       >مشاهده همه</UiTypography>
       <IconChevronLeft

@@ -35,7 +35,7 @@ const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 max-lg:border-y max-lg:border-T-400 lg:px-0 lg:py-6">
+  <section class="mx-auto w-full max-w-[1440px] px-4 py-5 max-lg:mt-[42px] max-lg:border-y max-lg:border-T-400 lg:px-0 lg:py-6">
     <div class="relative rounded-3xl border border-T-400 bg-T-50 px-4 py-5 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:p-0 lg:px-6 lg:py-6">
       <LandingSectionTitle title="پیشنهاد‌های" accent=" هماکام" accent-always variant="centered" />
 

@@ -20,13 +20,16 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
         >
           <a
             href="#"
-            class="flex h-[78px] w-full items-center justify-center rounded-[20px] border border-T-400 bg-T-50"
+            class="flex h-[78px] w-[130px] flex-col items-center justify-center rounded-[8px] border border-T-400 bg-T-50"
           >
             <img
               :src="brand.logo"
               :alt="brand.name"
               class="h-[49px] w-[65px] object-contain"
             >
+            <UiTypography as="span" size="lg" weight="regular" class="text-foreground">
+              {{ brand.name }}
+            </UiTypography>
           </a>
         </CarouselItem>
       </CarouselContent>

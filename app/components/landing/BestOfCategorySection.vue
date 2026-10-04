@@ -1,108 +1,34 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconDeviceLaptop, IconDeviceMobile } from '@tabler/icons-vue'
+import { IconChevronLeft } from '@tabler/icons-vue'
 import { bestOfCategories } from '~/data/landing'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import mobileIcon from '../../../public/icons/mobile.svg?raw'
-import laptopIcon from '../../../public/icons/laptop.svg?raw'
-import headphonesIcon from '../../../public/icons/headphones-waveform.svg?raw'
-
-const activeTab = ref('لپ‌تاپ')
-
-const tabs = [
-  { label: 'لپ‌تاپ', icon: IconDeviceLaptop },
-  { label: 'گوشی موبایل', icon: IconDeviceMobile },
-]
-
-const iconMap: Record<string, string> = {
-  mobile: mobileIcon,
-  laptop: laptopIcon,
-  headphones: headphonesIcon,
-}
-
-const activeItems = computed(() => {
-  const col = bestOfCategories.find((c) => c.category === activeTab.value)
-  return col?.items ?? []
-})
 </script>
 
 <template>
   <section class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6">
     <LandingSectionTitle title="بهترین‌های" accent=" هر دسته‌بندی" variant="centered" />
 
-    <!-- Mobile: tabs + list -->
-    <div class="mt-[18px] lg:hidden">
-      <!-- Tab bar -->
-      <div class="flex border-b border-T-400">
-        <button
-          v-for="tab in tabs"
-          :key="tab.label"
-          class="flex h-[60px] flex-1 items-center justify-center gap-2 border-b-2 text-[15px] font-bold transition-colors"
-          :class="
-            activeTab === tab.label
-              ? 'border-primary text-foreground'
-              : 'border-transparent text-T-600'
-          "
-          @click="activeTab = tab.label"
-        >
-          <component :is="tab.icon" class="size-[22px]" />
-          {{ tab.label }}
-        </button>
-      </div>
-
-      <!-- Items -->
-      <Product
-        v-for="(item, i) in activeItems"
-        :key="i"
-        :product="item"
-        variant="horizontal"
-        discount-placement="inline"
-        :href="item.id ? `/product/${item.id}` : ''"
-        class="h-[122px] border-b border-T-400 px-4"
-        image-class="w-[84px] bg-transparent"
-      />
-    </div>
-
-    <!-- Desktop: 3-column carousel -->
+    <!--
+      Category panels carousel — shown on every breakpoint so mobile uses the
+      same desktop panels instead of a separate stacked list. Mobile shows one
+      panel per view (with a peek of the next); desktop fits three per view.
+    -->
     <Carousel
       v-slot="{ canScrollNext, canScrollPrev, scrollNext, scrollPrev }"
-      class="relative mt-[18px] hidden lg:block"
+      class="relative mt-[18px]"
       :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
       <CarouselContent class="-ms-[10px]">
         <CarouselItem
           v-for="col in bestOfCategories"
           :key="col.category"
-          class="basis-1/3 ps-[10px]"
+          class="basis-[86%] ps-[10px] lg:basis-1/3"
         >
-          <div class="flex flex-col overflow-hidden rounded-3xl border border-T-400 bg-T-50">
-            <!-- Column header -->
-            <div class="flex h-[70px] items-center justify-center gap-2 bg-T-200 px-4">
-              <span
-                class="[&>svg]:block [&>svg]:size-[32px] text-T-700"
-                aria-hidden="true"
-                v-html="iconMap[col.icon]"
-              />
-              <UiTypography
-                as="h3"
-                size="xl"
-                weight="semibold"
-                class="text-foreground"
-              >{{ col.category }}</UiTypography>
-            </div>
-
-            <!-- Mini cards -->
-            <Product
-              v-for="(item, i) in col.items"
-              :key="i"
-              :product="item"
-              variant="horizontal"
-              discount-placement="inline"
-              badge-size="lg"
-              :href="item.id ? `/product/${item.id}` : ''"
-              class="h-[150px] border-b-0 border-T-400 px-4 last:border-b-0 rounded-none transition-colors hover:bg-secondary/30"
-              image-class="w-[96px] lg:w-[123px] lg:h-[123px] bg-transparent"
-            />
-          </div>
+          <LandingBestOfCategoryColumn
+            :category="col.category"
+            :icon="col.icon"
+            :items="col.items"
+          />
         </CarouselItem>
       </CarouselContent>
 

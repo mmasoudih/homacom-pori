@@ -31,14 +31,26 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 
             <!-- Content -->
             <div class="flex flex-col gap-3 px-4 py-3">
-              <h3 class="line-clamp-2 min-h-[44px] text-[14px] font-bold leading-[22px] text-foreground">
+              <UiTypography
+                as="h3"
+                size="md"
+                weight="medium"
+                class="line-clamp-2 min-h-[44px] leading-[22px] text-[#2C2C3B]"
+              >
                 {{ post.title }}
-              </h3>
+              </UiTypography>
               <div class="flex items-center justify-between border-t border-T-400 pt-3">
-                <span class="text-[12px] text-T-600">{{ post.date }}</span>
-                <span class="text-[12px] font-medium text-foreground transition-colors group-hover:text-primary">
+                <UiTypography as="span" size="xs" weight="regular" class="text-[#7A7A7A]">
+                  {{ toPersianDigits(post.date) }}
+                </UiTypography>
+                <UiTypography
+                  as="span"
+                  size="2xs"
+                  weight="medium"
+                  class="text-R-300 transition-colors group-hover:underline"
+                >
                   ادامه مطلب
-                </span>
+                </UiTypography>
               </div>
             </div>
           </NuxtLink>

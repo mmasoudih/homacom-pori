@@ -104,12 +104,12 @@ const cardSurface = computed(() =>
 )
 // When true, the discount badge moves out of the image into a row beside the price.
 const inlineDiscount = computed(() => props.discountPlacement === 'inline')
-// Inline discount chip sizing (desktop-only per the review; the base chip keeps
-// its previous padding so mobile is unchanged).
+// Inline discount chip sizing: 38×21 on mobile, with the reviewed desktop
+// dimensions (42×25, and 30×16.5 for the small variant) restored at `lg`.
 const inlineBadgeSizeClass = computed(() =>
   props.badgeSize === 'sm'
     ? 'lg:w-[30px] lg:h-[16.5px] lg:rounded-full'
-    : 'lg:w-[42px] lg:h-[25px] lg:rounded-[16px]',
+    : 'w-[38px] h-[21px] lg:w-[42px] lg:h-[25px] lg:rounded-[16px]',
 )
 
 // --- Compare toggle (vertical variant) ------------------------------------
@@ -245,7 +245,7 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
         as="h4"
         size="lg"
         weight="regular"
-        class="line-clamp-2 leading-[26px] text-T-800"
+        class="line-clamp-2 leading-[26px] text-T-900 lg:text-T-800"
       >
         {{ product.title }}
       </UiTypography>
