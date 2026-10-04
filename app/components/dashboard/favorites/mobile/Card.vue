@@ -27,10 +27,10 @@ const discountLabel = computed(() => `%${toPersianDigits(discount.value ?? 0)}`)
 </script>
 
 <template>
-  <article class="group relative flex w-full flex-col bg-T-50 p-3">
-    <div class="relative">
-      <ProductImage :src="product.image" :alt="product.title" container-class="rounded-[16px] bg-transparent" />
-      <div v-if="colors.length" class="absolute top-2 end-2 flex flex-col gap-[4px]">
+  <article class="group relative flex w-full flex-col border-b border-T-300 bg-T-50 p-3">
+    <div class="relative mx-auto w-fit">
+      <ProductImage :src="product.image" :alt="product.title" container-class="size-[120px] rounded-[16px] bg-transparent" />
+      <div v-if="colors.length" class="absolute top-2 -end-2 flex flex-col gap-[4px]">
         <span
           v-for="(color, i) in colors"
           :key="i"
@@ -42,19 +42,23 @@ const discountLabel = computed(() => `%${toPersianDigits(discount.value ?? 0)}`)
       </div>
     </div>
 
-    <h3 class="line-clamp-2 mt-3 h-10 text-[12.5px] font-bold leading-[20px] text-T-900">
+    <UiTypography as="h3" size="lg" weight="regular" class="line-clamp-2 mt-3 h-10 leading-[20px]">
       {{ product.title }}
-    </h3>
+    </UiTypography>
 
     <div class="mt-2 flex items-center justify-between gap-2">
-      <span
+      <UiTypography
         v-if="hasDiscount"
-        class="flex h-[21px] shrink-0 items-center justify-center rounded-lg bg-R-300 px-1.5 text-[12px] font-extrabold text-white"
-      >{{ discountLabel }}</span>
-      <div class="flex flex-col items-end gap-1">
+        as="span"
+        size="xs"
+        weight="bold"
+        color="white"
+        class="flex h-[21px] shrink-0 items-center justify-center rounded-lg bg-R-300 px-1.5"
+      >{{ discountLabel }}</UiTypography>
+      <div class="ms-auto flex flex-col items-end gap-1">
         <div class="flex items-baseline gap-1">
-          <span class="text-[14px] font-extrabold leading-none text-T-900">{{ priceLabel }}</span>
-          <span class="text-[10px] text-T-600">تومان</span>
+          <UiTypography as="span" size="lg" weight="medium" color="default" class="leading-none">{{ priceLabel }}</UiTypography>
+          <UiTypography as="span" size="3xs" weight="semibold" color="subtle">تومان</UiTypography>
         </div>
         <span
           v-if="originalPrice"
@@ -63,7 +67,7 @@ const discountLabel = computed(() => `%${toPersianDigits(discount.value ?? 0)}`)
       </div>
     </div>
 
-    <div class="mt-3 flex items-center gap-2">
+    <div class="mt-auto flex items-center gap-2 pt-3">
       <button
         type="button"
         class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-T-400 text-T-600 transition-colors hover:border-primary hover:text-primary"

@@ -11,11 +11,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-px bg-T-300">
+  <div class="grid grid-cols-2 border-x border-T-300">
     <DashboardFavoritesMobileCard
-      v-for="product in products"
+      v-for="(product, index) in products"
       :key="product.id"
       :product="product"
+      :class="index % 2 === 0 ? 'border-e border-T-300' : ''"
       @remove="emit('remove', $event)"
     />
   </div>

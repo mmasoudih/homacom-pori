@@ -30,6 +30,6 @@ function goBack() {
       <IconArrowRight class="size-5" />
     </button>
 
-    <h1 class="text-[16px] font-bold text-T-900">{{ title }}</h1>
+    <UiTypography as="h1" size="xl" weight="bold">{{ title }}</UiTypography>
   </header>
 </template>
