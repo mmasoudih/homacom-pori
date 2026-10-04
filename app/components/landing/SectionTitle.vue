@@ -4,6 +4,10 @@ import { IconChevronLeft } from '@tabler/icons-vue'
 
 const props = withDefaults(defineProps<{
   title: string
+  /** Optional trailing phrase highlighted in the brand red on mobile. */
+  accent?: string
+  /** Highlight the accent phrase on desktop too (defaults to mobile only). */
+  accentAlways?: boolean
   variant?: 'centered' | 'row'
   light?: boolean
   indicator?: 'both' | 'right'
@@ -13,6 +17,8 @@ const props = withDefaults(defineProps<{
   /** Target of the «مشاهده همه» link. */
   to?: string
 }>(), {
+  accent: undefined,
+  accentAlways: false,
   variant: 'row',
   light: false,
   indicator: 'both',
@@ -39,10 +45,10 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
       as="h2"
       :size="titleSizeVariant"
       weight="bold"
-      class="leading-[29px]"
+      class="leading-[29px] max-lg:text-[16px]"
       :class="light ? 'text-white' : 'text-foreground'"
     >
-      {{ title }}
+      {{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span>
     </UiTypography>
     <!-- Figma node 764:64355 as designed -->
     <span class="relative block h-4 w-[17px]">
@@ -64,10 +70,10 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
         as="h2"
         :size="titleSizeVariant"
         weight="bold"
-        class="leading-[29px]"
+        class="leading-[29px] max-lg:text-[16px]"
         :class="light ? 'text-white' : 'text-foreground'"
       >
-        {{ title }}
+        {{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span>
       </UiTypography>
       <span v-if="indicator === 'both'" class="relative block h-4 w-[17px]">
         <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />

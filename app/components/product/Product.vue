@@ -130,7 +130,7 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
       <ProductImage
         :src="product.image"
         :alt="product.title"
-        :container-class="cn('rounded-[20px]', imageClass)"
+        :container-class="cn('rounded-[20px] mx-auto w-[140px] h-[140px] lg:w-full lg:h-auto lg:aspect-square', imageClass)"
       />
 
       <!-- Compare toggle: top-inline-start corner -->
@@ -156,7 +156,7 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
         <span
           v-for="(color, ci) in colors"
           :key="`${color.value}-${ci}`"
-          class="size-3.5 rounded-[3px] border lg:size-3"
+          class="size-[10px] rounded-[3px] border lg:size-3"
           :class="cn(swatchBorder, selectedColor === color.value && 'ring-1 ring-primary ring-offset-1')"
           :style="{ backgroundColor: color.value }"
           role="img"

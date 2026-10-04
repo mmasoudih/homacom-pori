@@ -23,14 +23,14 @@ import {
       <CarouselItem
         v-for="(item, i) in headerCircles"
         :key="i"
-        class="basis-auto ps-0 pe-5 lg:pe-7"
+        class="basis-auto ps-0 pe-[11px] lg:pe-7"
       >
         <a
           :href="item.href"
-          class="group flex w-[78px] flex-col items-center gap-2 lg:w-[96px]"
+          class="group flex w-[76px] flex-col items-center gap-2 lg:w-[96px]"
         >
           <span
-            class="border-R-300 relative flex size-[78px] items-center justify-center overflow-hidden rounded-full border-[2px] p-1 transition-colors lg:size-[96px]"
+            class="border-R-300 relative flex size-[76px] items-center justify-center overflow-hidden rounded-full border-[2px] p-1 transition-colors lg:size-[96px]"
             :class="
               item.accent
                 ? 'group-hover:border-primary'

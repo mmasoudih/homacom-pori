@@ -27,7 +27,7 @@ const activeItems = computed(() => {
 
 <template>
   <section class="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-0 lg:py-6">
-    <LandingSectionTitle title="بهترین‌های هر دسته‌بندی" variant="centered" />
+    <LandingSectionTitle title="بهترین‌های" accent=" هر دسته‌بندی" variant="centered" />
 
     <!-- Mobile: tabs + list -->
     <div class="mt-[18px] lg:hidden">

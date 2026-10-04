@@ -14,19 +14,21 @@ const cardRounding = (i: number) => [
   <section class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden bg-R-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[url(/icons/texture.svg)] before:bg-repeat before:opacity-[0.05] before:content-[''] lg:rounded-3xl lg:px-[25px] lg:py-[25px]">
     <!-- Mobile title row -->
     <div class="flex items-center justify-between px-4 pt-[25px] lg:hidden">
+      <div class="flex items-center gap-[9px]">
+        <span class="relative block h-4 w-[17px] rotate-180">
+          <span class="absolute inset-y-[20%] left-2 w-[4.65px] rounded-[8px] bg-white opacity-25" />
+          <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px] bg-white" />
+        </span>
+        <h2 class="text-[16px] font-bold leading-[23px] text-white">هما آف</h2>
+      </div>
       <a
         href="#"
-        class="flex items-center gap-1 rounded-full border border-white/30 px-4"
+        class="flex items-center gap-1 px-0"
         style="height: 32px"
       >
         <span class="text-[13px] font-semibold text-white">مشاهده همه</span>
         <IconChevronLeft class="size-[14px] text-white" />
       </a>
-      <h2 class="text-[16px] font-bold leading-[23px] text-white">هما آف</h2>
-      <span class="flex w-[61px] justify-end gap-[3px] text-white">
-        <IconChevronLeft class="size-[10px]" />
-        <IconChevronLeft class="size-[10px]" />
-      </span>
     </div>
 
     <!-- Desktop title row -->
@@ -50,6 +52,7 @@ const cardRounding = (i: number) => [
             variant="vertical"
             show-countdown
             countdown-label="هما آف"
+            discount-placement="inline"
             image-class="bg-T-50"
             :href="product.id ? `/product/${product.id}` : ''"
             class="w-full rounded-none"
