@@ -23,6 +23,16 @@ export const typographyVariants = cva("font-sans", {
       "sm": "text-[11.5px] lg:text-[11.5px]",
       "xs": "text-[11.25px] lg:text-[11.25px]",
       "2xs": "text-[10.5px] lg:text-[10.5px]",
+      "3xs": "text-[10px] lg:text-[10px]",
+      /*
+       * Responsive pairs — mobile value first, desktop (`lg`) second, named
+       * `<mobile>Lg<desktop>` (e.g. `lgXl` = 14px mobile, 16px desktop).
+       * Use these where the Figma spec steps the size up on desktop.
+       */
+      "lgXl": "text-[14px] lg:text-[16px]",
+      "xl2xl": "text-[16px] lg:text-[18px]",
+      "xsMd": "text-[11.25px] lg:text-[12.5px]",
+      "3xsSm": "text-[10px] lg:text-[11.5px]",
     },
     weight: {
       regular: "font-normal",

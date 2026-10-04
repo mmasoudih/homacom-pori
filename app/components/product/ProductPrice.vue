@@ -59,7 +59,7 @@ const dimColor = computed(() =>
 const badgeSizeClass = computed(() =>
   props.badgeSize === "sm"
     ? "w-[30px] h-[16.5px] rounded-full"
-    : "w-[42px] h-[25px] rounded-[16px]",
+    : "w-[38px] h-[21px] rounded-[16px] lg:w-[42px] lg:h-[25px]",
 );
 </script>
 
@@ -71,12 +71,12 @@ const badgeSizeClass = computed(() =>
   >
     <!-- Unit on the right, price on the left (RTL) with a 6px gap. -->
     <div class="flex items-baseline gap-[6px]">
-      <UiTypography size="sm" weight="semibold" :class="cn(dimColor, 'text-[10px]')">تومان</UiTypography>
+      <UiTypography size="3xs" weight="semibold" :class="dimColor">تومان</UiTypography>
       <UiTypography
-        size="xl"
+        size="lg"
         weight="medium"
         leading="none"
-        :class="cn(priceColor, props.priceClass, 'text-[14px]')"
+        :class="cn(priceColor, props.priceClass)"
       >
         {{ formatPriceFa(price) }}
       </UiTypography>
@@ -85,10 +85,10 @@ const badgeSizeClass = computed(() =>
     <div class="flex items-center gap-2">
       <UiTypography
         v-if="showOldPrice"
-        size="xl"
+        size="lg"
         weight="medium"
         leading="none"
-        :class="cn(dimColor, 'line-through', 'text-[14px]')"
+        :class="cn(dimColor, 'line-through')"
       >
         {{ formatPriceFa(originalPrice!) }}
       </UiTypography>
@@ -124,14 +124,14 @@ const badgeSizeClass = computed(() =>
       </UiTypography>
       <div :class="cn('flex items-baseline gap-1', discountInPriceRow && 'ms-auto')">
         <UiTypography
-          size="xl"
+          size="lgXl"
           weight="medium"
           leading="none"
           :class="cn(priceColor, props.priceClass)"
         >
           {{ formatPriceFa(price) }}
         </UiTypography>
-        <UiTypography size="sm" weight="semibold" :class="dimColor">تومان</UiTypography>
+        <UiTypography size="3xsSm" weight="semibold" :class="dimColor">تومان</UiTypography>
       </div>
     </div>
 
