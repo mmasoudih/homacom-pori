@@ -115,6 +115,13 @@ const iconComponent = computed<Component | null>(() => (props.icon ? icons[props
       class="size-[18px] shrink-0"
       aria-hidden="true"
     >
+    <img
+      v-else-if="props.imgSrc"
+      :src="props.imgSrc"
+      alt=""
+      class="size-[18px] shrink-0"
+      aria-hidden="true"
+    >
     <component
       :is="iconComponent"
       v-else-if="iconComponent"

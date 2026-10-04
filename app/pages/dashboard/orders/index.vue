@@ -130,7 +130,7 @@ useHead({
       <DashboardOrdersMobileEmptyState v-if="showEmpty" />
 
       <template v-if="isReturnTab">
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col">
           <DashboardOrdersMobileReturnCard
             v-for="request in filteredReturns"
             :key="request.id"
