@@ -28,25 +28,41 @@ function goBack() {
 
 <template>
   <header class="sticky top-0 z-40 flex h-14 w-full shrink-0 items-center justify-between border-b border-T-300 bg-T-50 px-4">
-    <div class="flex items-center gap-2">
+    <div v-if="align === 'start'" class="flex items-center gap-2">
+      <button
+        type="button"
+        class="flex size-8 shrink-0 items-center justify-center text-T-900"
+        aria-label="بازگشت"
+        @click="goBack"
+      >
+        <IconArrowRight class="size-5" />
+      </button>
       <slot name="action" />
-      <h1 v-if="align === 'start'" class="text-[16px] font-bold text-T-900">{{ title }}</h1>
+      <UiTypography as="h1" size="xl" weight="bold">{{ title }}</UiTypography>
     </div>
 
-    <h1
-      v-if="align === 'center'"
-      class="pointer-events-none absolute inset-x-0 text-center text-[16px] font-bold text-T-900"
-    >
-      {{ title }}
-    </h1>
+    <template v-else>
+      <div class="flex items-center gap-2">
+        <slot name="action" />
+      </div>
 
-    <button
-      type="button"
-      class="flex size-8 shrink-0 items-center justify-center text-T-900"
-      aria-label="بازگشت"
-      @click="goBack"
-    >
-      <IconArrowRight class="size-5" />
-    </button>
+      <UiTypography
+        as="h1"
+        size="xl"
+        weight="bold"
+        class="pointer-events-none absolute inset-x-0 text-center"
+      >
+        {{ title }}
+      </UiTypography>
+
+      <button
+        type="button"
+        class="flex size-8 shrink-0 items-center justify-center text-T-900"
+        aria-label="بازگشت"
+        @click="goBack"
+      >
+        <IconArrowRight class="size-5" />
+      </button>
+    </template>
   </header>
 </template>

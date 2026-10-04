@@ -111,7 +111,7 @@ useHead({
 
     <DashboardOrdersMobileShell title="سفارش‌های من" align="start">
       <!-- Search -->
-      <div class="mb-4 flex h-11 items-center gap-3 rounded-full border border-T-300 bg-T-100 px-4">
+      <div class="mb-4 flex h-11 items-center gap-3 rounded-[12px] border border-T-300 bg-T-200 px-4">
         <input
           v-model="search"
           type="search"
@@ -129,21 +129,21 @@ useHead({
       <!-- List -->
       <DashboardOrdersMobileEmptyState v-if="showEmpty" />
 
-      <div v-else class="flex flex-col gap-3">
-        <template v-if="isReturnTab">
+      <template v-if="isReturnTab">
+        <div class="flex flex-col gap-3">
           <DashboardOrdersMobileReturnCard
             v-for="request in filteredReturns"
             :key="request.id"
             :request="request"
           />
-        </template>
-        <template v-else>
-          <DashboardOrdersMobileOrderCard
-            v-for="order in filteredOrders"
-            :key="order.id"
-            :order="order"
-          />
-        </template>
+        </div>
+      </template>
+      <div v-else class="flex flex-col">
+        <DashboardOrdersMobileOrderCard
+          v-for="order in filteredOrders"
+          :key="order.id"
+          :order="order"
+        />
       </div>
     </DashboardOrdersMobileShell>
   </div>
