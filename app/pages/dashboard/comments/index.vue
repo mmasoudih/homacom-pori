@@ -50,14 +50,16 @@ useHead({
   <div>
     <DashboardCommentsShell>
       <section class="rounded-3xl border border-T-400 bg-T-50 p-4 lg:p-6">
-        <h1 class="mb-5 text-xl font-bold text-T-900">دیدگاه‌های من</h1>
+        <UiTypography as="h1" size="2xl" weight="semibold" color="default" class="mb-5">
+          دیدگاه‌های من
+        </UiTypography>
 
         <DashboardCommentsTabs v-model="activeTab" :tabs="tabs" />
 
         <DashboardCommentsEmptyState v-if="showEmpty" class="mt-2" />
 
         <template v-else>
-          <div v-if="activeTab === 'mine'" class="mt-6 flex flex-col gap-10">
+          <div v-if="activeTab === 'mine'" class="mt-6 flex flex-col gap-3">
             <DashboardCommentsCard
               v-for="comment in mine"
               :key="comment.id"
@@ -67,7 +69,7 @@ useHead({
             />
           </div>
 
-          <div v-else class="mt-6 flex flex-col gap-10">
+          <div v-else class="mt-6 flex flex-col gap-3">
             <DashboardCommentsPendingCard
               v-for="comment in pending"
               :key="comment.id"
@@ -100,7 +102,6 @@ useHead({
             v-for="comment in pending"
             :key="comment.id"
             :comment="comment"
-            @add="openDialog"
           />
         </div>
       </template>
