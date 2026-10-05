@@ -21,7 +21,9 @@ useHead({
   <div>
     <DashboardNotificationsShell>
       <section class="rounded-2xl border border-T-400 bg-T-50 p-6">
-        <h1 class="mb-6 text-xl font-bold text-T-900">اعلان‌ها</h1>
+        <UiTypography as="h1" size="2xl" weight="semibold" color="default" class="mb-6">
+          اعلان‌ها
+        </UiTypography>
 
         <DashboardNotificationsEmptyState v-if="showEmpty" />
 

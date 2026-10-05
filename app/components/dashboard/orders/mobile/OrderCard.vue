@@ -15,7 +15,7 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
 </script>
 
 <template>
-  <article class="rounded-2xl border border-T-300 bg-T-50 p-4">
+  <article class="-mx-4 border-b border-T-300 px-4 py-4 last:border-b-0">
     <!-- Status + open -->
     <div class="flex items-center justify-between gap-3">
       <!-- Scoped override: small leading (right in RTL) status icon, and a
@@ -37,37 +37,37 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
       </NuxtLink>
     </div>
 
-    <!-- Status progress -->
-    <DashboardOrdersProgressBar class="mt-3" :tone="meta.tone" :percent="meta.progress" />
-
     <!-- Awaiting payment total -->
-    <div v-if="isAwaitingPayment" class="mt-4 text-center text-[12px]">
+    <div v-if="isAwaitingPayment" class="mt-3 text-start text-[12px]">
       <span class="text-T-600">مبلغ قابل پرداخت: </span>
-      <span class="font-semibold text-T-900">{{ formatPriceFa(order.payment?.total ?? order.amount) }} تومان</span>
+      <span class="font-semibold text-T-900">({{ formatPriceFa(order.payment?.total ?? order.amount) }} تومان)</span>
     </div>
 
+    <!-- Status progress -->
+    <DashboardOrdersProgressBar class="mt-3" :tone="meta.tone" :percent="meta.progress" :show-dot="false" />
+
     <!-- Meta -->
-    <div class="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-      <div class="flex items-center gap-1">
+    <div class="mt-4 grid grid-cols-[max-content_max-content] justify-start gap-x-4 gap-y-2 text-[12px] [&>*:nth-child(even)]:border-s [&>*:nth-child(even)]:border-T-300 [&>*:nth-child(even)]:ps-4">
+      <div class="flex items-center gap-0.5">
         <span class="text-T-600">تاریخ:</span>
         <span class="font-semibold text-T-900">{{ order.date }}</span>
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-0.5">
         <span class="text-T-600">کد سفارش:</span>
-        <DashboardOrdersCopyValue :value="toPersianDigits(order.code)" :copy-value="order.code" />
+        <DashboardOrdersCopyValue :value="toPersianDigits(order.code)" :copy-value="order.code" :show-copy="false" />
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-0.5">
         <span class="text-T-600">مبلغ:</span>
         <span class="font-semibold text-T-900">{{ formatPriceFa(order.amount) }} تومان</span>
       </div>
-      <div v-if="showDelivered" class="flex items-center gap-1">
+      <div v-if="showDelivered" class="flex items-center gap-0.5">
         <span class="text-T-600">تحویل:</span>
         <span class="font-semibold text-T-900">{{ order.deliveredAt }}</span>
       </div>
     </div>
 
     <!-- Products -->
-    <div class="mt-4 flex items-center justify-center gap-4">
+    <div class="mt-4 flex items-center justify-start gap-4">
       <ProductImage
         v-for="item in order.items"
         :key="item.id"
@@ -79,7 +79,7 @@ const detailHref = computed(() => `/dashboard/orders/${props.order.id}`)
 
     <!-- Awaiting payment note -->
     <DashboardOrdersAlertNote v-if="isAwaitingPayment" class="mt-4 w-full">
-      پرداخت شما کامل نشده و ۳۴ ساعت دیگر مهلت دارید. برای ثبت نهایی، پرداخت خود را کامل کنید.
+      پرداخت شما کامل نشده و تا <span class="underline">۲۴ ساعت</span> دیگر رزرو می‌ماند. برای ثبت نهایی، پرداخت خود را کامل کنید.
     </DashboardOrdersAlertNote>
   </article>
 </template>

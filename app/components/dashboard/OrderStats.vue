@@ -18,7 +18,7 @@ const statHref: Record<OrderStatTone, string> = {
 </script>
 
 <template>
-  <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
+  <section class="rounded-[20px] bg-T-50 p-4 lg:border lg:border-T-400 lg:p-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-[9px]">
         <span class="relative block h-4 w-[17px] rotate-180">
@@ -44,7 +44,7 @@ const statHref: Record<OrderStatTone, string> = {
         v-for="stat in orderStats"
         :key="stat.key"
         :to="statHref[stat.key]"
-        class="flex items-center justify-center gap-3 rounded-2xl border border-T-400 bg-T-50 p-4 text-start transition-colors hover:border-T-500 lg:h-[104px] lg:gap-5 lg:px-4 lg:py-6"
+        class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-T-50 p-4 text-center transition-colors lg:h-[104px] lg:flex-row lg:items-center lg:gap-5 lg:border lg:border-T-400 lg:px-4 lg:py-6"
       >
         <img
           :src="statIcon[stat.key]"
@@ -52,9 +52,9 @@ const statHref: Record<OrderStatTone, string> = {
           class="size-11 shrink-0 object-contain lg:size-13"
         >
 
-        <div class="flex min-w-0 flex-col gap-1 lg:gap-1.5">
-          <span class="text-xl font-extrabold leading-none text-T-900 lg:text-[18px]">{{ toPersianDigits(stat.count) }}</span>
-          <span class="text-[13px] font-medium leading-tight text-T-800 lg:text-[12.5px]">{{ stat.label }}</span>
+        <div class="flex min-w-0 flex-col items-center gap-1 lg:items-start lg:gap-1.5 lg:text-start">
+          <UiTypography as="span" size="xl2xl" weight="semibold" leading="none">{{ toPersianDigits(stat.count) }}</UiTypography>
+          <UiTypography as="span" size="xsMd" weight="medium" leading="tight" class="whitespace-nowrap text-T-800">{{ stat.label }}</UiTypography>
         </div>
       </NuxtLink>
     </div>

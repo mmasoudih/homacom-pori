@@ -18,6 +18,7 @@ const detailHref = computed(() => `/dashboard/returns/${props.request.id}`)
       :label="meta.label"
       :tone="meta.tone"
       :icon="meta.icon"
+      class="[&>img]:order-first [&>img]:size-5"
     />
 
     <UiTypography

@@ -36,7 +36,7 @@ const discount = computed(() =>
       <ProductImage
         :src="product.image"
         :alt="product.title"
-        container-class="rounded-[16px] lg:aspect-auto lg:size-[120px] lg:shrink-0"
+        container-class="mx-auto size-[120px] shrink-0 rounded-[16px]"
       />
     </div>
 
@@ -61,7 +61,7 @@ const discount = computed(() =>
         class="h-[15.52px] w-[15.6px] shrink-0 bg-current [mask-image:url(/icons/shopping-bag.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
         aria-hidden="true"
       />
-      <UiTypography as="span" size="md" weight="medium" color="inherit">
+      <UiTypography as="span" size="xsMd" weight="medium" color="inherit">
         افزودن به سبد
       </UiTypography>
     </button>

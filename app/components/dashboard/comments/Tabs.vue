@@ -18,11 +18,13 @@ const emit = defineEmits<{
       v-for="tab in tabs"
       :key="tab.key"
       type="button"
-      class="relative shrink-0 pb-3 pt-1 text-[14px] font-semibold transition-colors"
-      :class="tab.key === modelValue ? 'text-primary' : 'text-T-500 hover:text-T-700'"
+      class="relative shrink-0 pb-3 pt-1 transition-colors"
+      :class="tab.key === modelValue ? 'text-primary' : 'text-T-600 hover:text-T-700'"
       @click="emit('update:modelValue', tab.key)"
     >
-      {{ tab.label }} ({{ toPersianDigits(tab.count) }})
+      <UiTypography as="span" size="lg" weight="medium" color="inherit">
+        {{ tab.label }} ({{ toPersianDigits(tab.count) }})
+      </UiTypography>
       <span
         v-if="tab.key === modelValue"
         class="absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-primary"
