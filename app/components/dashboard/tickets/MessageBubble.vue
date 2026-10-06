@@ -21,7 +21,7 @@ const isUser = computed(() => props.message.author === 'user')
       size="lg"
       weight="regular"
       color="default"
-      class="whitespace-pre-line leading-[22px] max-lg:text-[12.5px]"
+      class="whitespace-pre-line leading-[22px]"
     >
       {{ message.body }}
     </UiTypography>

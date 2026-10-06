@@ -78,10 +78,10 @@ useHead({ title: 'جزئیات تیکت | هماکام' })
         <button
           v-if="ticket && !closed"
           type="button"
-          class="flex h-8 items-center justify-center rounded-lg border border-T-400 px-3 text-[12px] font-semibold text-T-800"
+          class="flex h-9 items-center justify-center rounded-lg border border-T-400 px-[38px]"
           @click="closeTicket"
         >
-          بستن تیکت
+          <UiTypography as="span" size="md" weight="medium" color="default">بستن تیکت</UiTypography>
         </button>
         <span v-else-if="ticket" class="text-[12px] font-semibold text-T-500">بسته شده</span>
       </template>

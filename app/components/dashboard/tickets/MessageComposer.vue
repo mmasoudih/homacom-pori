@@ -17,10 +17,10 @@ function submit() {
 </script>
 
 <template>
-  <div class="flex items-center gap-3 bg-T-100 lg:rounded-b-2xl lg:px-6 lg:py-5">
+  <div class="flex w-full items-center gap-3 bg-T-100 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] lg:rounded-b-2xl lg:px-6 lg:py-5">
     <button
       type="button"
-      class="flex size-8 shrink-0 items-center justify-center rounded-[12px] border border-T-300 bg-T-50 text-T-500 transition-colors hover:bg-T-100 hover:text-T-800 lg:size-12"
+      class="flex size-12 shrink-0 items-center justify-center rounded-[12px] border border-T-300 bg-T-50 text-T-500 transition-colors hover:bg-T-100 hover:text-T-800"
       aria-label="پیوست فایل"
       @click="emit('attach')"
     >
@@ -44,7 +44,7 @@ function submit() {
 
     <button
       type="button"
-      class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary/90 lg:rounded-[12px]"
+      class="flex size-12 shrink-0 items-center justify-center rounded-[12px] bg-primary text-white transition-colors hover:bg-primary/90"
       aria-label="ارسال پیام"
       @click="submit"
     >

@@ -30,7 +30,7 @@ function goBack() {
       <button type="button" class="flex size-8 shrink-0 items-center justify-center text-T-900" aria-label="بازگشت" @click="goBack">
         <IconArrowRight class="size-5" />
       </button>
-      <h1 class="text-[16px] font-bold text-T-900">{{ title }}</h1>
+      <UiTypography as="h1" size="xl" weight="bold" color="default">{{ title }}</UiTypography>
     </div>
     <div class="flex items-center gap-2">
       <slot name="action" />

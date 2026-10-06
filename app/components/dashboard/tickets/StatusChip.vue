@@ -22,7 +22,7 @@ const meta = computed(() => ticketStatusMeta[props.status])
 <template>
   <span
     :class="cn(
-      'inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold lg:h-[26px] lg:rounded-lg',
+      'inline-flex h-[26px] items-center rounded-[8px] px-3 py-1.5 text-[12px] font-semibold lg:rounded-lg',
       toneClass[meta.tone],
       props.class,
     )"
