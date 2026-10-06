@@ -20,7 +20,7 @@ const parts = computed(() => props.breadcrumb ?? [])
     <ProductDetailBreadcrumb
       v-if="parts.length"
       :trail="parts"
-      class="mb-6 justify-center"
+      class="-mt-2 mb-6 justify-start"
     />
 
     <!-- Icon slot (optional) -->
@@ -28,15 +28,25 @@ const parts = computed(() => props.breadcrumb ?? [])
       <slot name="icon" />
     </div>
 
-    <h1 class="text-center text-[26px] font-bold leading-[38px] text-foreground lg:text-[30px] lg:leading-[44px]">
+    <UiTypography
+      as="h1"
+      size="3xl"
+      weight="medium"
+      color="default"
+      class="text-center"
+    >
       {{ title }}
-    </h1>
+    </UiTypography>
 
-    <p
+    <UiTypography
       v-if="subtitle"
-      class="mt-3 max-w-[620px] text-center text-[15px] leading-[26px] text-T-700"
+      as="p"
+      size="lg"
+      weight="regular"
+      color="muted"
+      class="mt-3 max-w-[620px] text-center leading-[26px]"
     >
       {{ subtitle }}
-    </p>
+    </UiTypography>
   </div>
 </template>

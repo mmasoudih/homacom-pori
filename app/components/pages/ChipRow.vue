@@ -74,10 +74,10 @@ function select(i: number) {
       v-for="(item, i) in items"
       :key="item.label"
       type="button"
-      class="flex min-w-[112px] shrink-0 flex-col items-center gap-2 rounded-[14px] border px-4 py-4 transition-colors lg:min-w-0"
+      class="flex h-[97px] min-w-[112px] shrink-0 flex-col items-center justify-center gap-2 rounded-[20px] border px-4 py-4 transition-colors lg:min-w-0"
       :class="
         i === active
-          ? 'border-primary bg-R-10 text-primary'
+          ? 'border-primary bg-R-50 text-primary'
           : 'border-T-400 bg-T-50 text-T-700 hover:border-T-500'
       "
       @click="select(i)"
@@ -86,9 +86,9 @@ function select(i: number) {
         :is="iconMap[item.icon] ?? IconPackage"
         class="size-6"
       />
-      <span class="text-[13px] font-medium leading-[18px]">
+      <UiTypography as="span" size="lg" weight="medium" color="inherit" class="leading-[18px]">
         {{ item.label }}
-      </span>
+      </UiTypography>
     </button>
   </div>
 </template>
