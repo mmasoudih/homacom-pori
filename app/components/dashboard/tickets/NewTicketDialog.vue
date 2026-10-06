@@ -62,23 +62,25 @@ function submit() {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="rounded-[20px] p-6 lg:max-w-[560px]">
-      <DialogTitle class="text-start text-[15px] font-bold text-T-900">
-        ایجاد تیکت جدید
+    <DialogContent class="rounded-[20px] p-6 shadow-none lg:max-w-[560px]">
+      <DialogTitle class="text-start">
+        <UiTypography as="span" size="xl" weight="bold" color="default">ایجاد تیکت جدید</UiTypography>
       </DialogTitle>
+
+      <div class="h-px w-full bg-T-400" />
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="flex flex-col gap-2">
-          <span class="text-[12px] font-medium text-T-700">عنوان تیکت</span>
+          <UiTypography as="span" size="lg" weight="regular" color="default">عنوان تیکت</UiTypography>
           <Input
             v-model="subject"
             placeholder="عنوان تیکت"
-            class="h-11 rounded-xl border-T-400 text-[13px]"
+            class="h-11 rounded-xl border-T-400 text-[13px] shadow-none"
           />
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-[12px] font-medium text-T-700">موضوع</span>
+          <UiTypography as="span" size="lg" weight="regular" color="default">موضوع</UiTypography>
           <div class="relative">
             <select
               v-model="topic"
@@ -95,17 +97,17 @@ function submit() {
       </div>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[12px] font-medium text-T-700">توضیحات</span>
+        <UiTypography as="span" size="lg" weight="regular" color="default">توضیحات</UiTypography>
         <Textarea
           v-model="description"
-          class="min-h-[150px] rounded-xl border-T-400 text-[13px]"
+          class="min-h-[150px] rounded-xl border-T-400 text-[13px] shadow-none"
           placeholder="لطفا جزئیات مشکل را شرح دهید"
         />
       </div>
 
       <div class="flex flex-col gap-2">
-        <span class="text-[12px] font-medium text-T-700">پیوست فایل (اختیاری)</span>
-        <div class="flex h-11 items-center justify-between gap-3 rounded-xl border border-T-400 px-3 text-[12.5px]">
+        <UiTypography as="span" size="lg" weight="regular" color="default">پیوست فایل (اختیاری)</UiTypography>
+        <div class="flex h-11 items-center justify-between gap-3 rounded-xl border border-T-400 ps-3 text-[12.5px]">
           <span class="truncate text-T-600">{{ attachment || 'فایلی انتخاب نشد' }}</span>
           <input
             id="ticket-file"
@@ -115,9 +117,9 @@ function submit() {
           >
           <label
             for="ticket-file"
-            class="flex h-8 shrink-0 cursor-pointer items-center rounded-lg bg-T-100 px-3 font-semibold text-T-800 hover:bg-T-200"
+            class="flex h-full shrink-0 cursor-pointer items-center rounded-e-xl rounded-s-none border border-T-400 bg-T-300 px-3 text-T-900 hover:bg-T-200"
           >
-            انتخاب فایل
+            <UiTypography as="span" size="lg" weight="regular" color="inherit">انتخاب فایل</UiTypography>
           </label>
         </div>
       </div>
@@ -125,17 +127,17 @@ function submit() {
       <div class="mt-2 flex gap-3">
         <button
           type="button"
-          class="h-11 flex-1 rounded-xl bg-T-100 text-[13px] font-semibold text-T-800 transition-colors hover:bg-T-200"
+          class="h-[42px] flex-1 rounded-xl bg-T-100 text-T-800 transition-colors hover:bg-T-200"
           @click="close"
         >
-          انصراف
+          <UiTypography as="span" size="lg" weight="bold" color="inherit">انصراف</UiTypography>
         </button>
         <button
           type="button"
-          class="h-11 flex-1 rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90"
+          class="h-[42px] flex-1 rounded-xl bg-primary text-white transition-colors hover:bg-primary/90"
           @click="submit"
         >
-          ایجاد تیکت
+          <UiTypography as="span" size="lg" weight="bold" color="inherit">ایجاد تیکت</UiTypography>
         </button>
       </div>
     </DialogContent>

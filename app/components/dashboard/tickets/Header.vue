@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { IconPlus } from '@tabler/icons-vue'
-
 const emit = defineEmits<{
   create: []
 }>()
@@ -8,15 +6,21 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex items-center justify-between gap-4">
-    <h1 class="text-xl font-bold text-T-900">پشتیبانی</h1>
+    <UiTypography as="h1" size="2xl" weight="semibold" color="default">
+      تیکت پشتیبانی
+    </UiTypography>
 
     <button
       type="button"
-      class="flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-T-400 bg-T-50 px-4 text-[12.5px] font-semibold text-T-800 transition-colors hover:border-T-500"
+      class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-xl border border-T-400 bg-T-50 px-4 transition-colors hover:border-T-500"
       @click="emit('create')"
     >
-      <IconPlus class="size-4" />
-      ایجاد تیکت جدید
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.25 15C8.25 15.4142 8.58579 15.75 9 15.75C9.41421 15.75 9.75 15.4142 9.75 15V9.75H15C15.4142 9.75 15.75 9.41421 15.75 9C15.75 8.58579 15.4142 8.25 15 8.25H9.75V3C9.75 2.58579 9.41421 2.25 9 2.25C8.58579 2.25 8.25 2.58579 8.25 3V8.25H3C2.58579 8.25 2.25 8.58579 2.25 9C2.25 9.41421 2.58579 9.75 3 9.75H8.25V15Z" fill="#1D1D1F" />
+      </svg>
+      <UiTypography as="span" size="md" weight="medium" color="default">
+        ایجاد تیکت جدید
+      </UiTypography>
     </button>
   </div>
 </template>

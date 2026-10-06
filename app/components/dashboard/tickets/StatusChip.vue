@@ -11,9 +11,9 @@ const props = withDefaults(defineProps<{
 })
 
 const toneClass: Record<TicketTone, string> = {
-  emerald: 'bg-[#DCFCE7] text-[#16A34A]',
-  indigo: 'bg-[#EAECFF] text-[#5A66FC]',
-  red: 'bg-R-50 text-primary',
+  emerald: 'bg-[#DAFFE0] text-[#35CD4C]',
+  indigo: 'bg-[#EAECFF] text-[#5A6AFF]',
+  red: 'bg-R-50 text-R-300',
 }
 
 const meta = computed(() => ticketStatusMeta[props.status])
@@ -22,7 +22,7 @@ const meta = computed(() => ticketStatusMeta[props.status])
 <template>
   <span
     :class="cn(
-      'inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold',
+      'inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold lg:h-[26px] lg:rounded-lg',
       toneClass[meta.tone],
       props.class,
     )"

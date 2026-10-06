@@ -10,26 +10,34 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="overflow-x-auto">
-    <table class="w-full min-w-[760px] border-separate border-spacing-0 text-right">
-      <thead>
-        <tr>
-          <th class="rounded-s-xl bg-T-100 px-5 py-4 text-start text-[12.5px] font-semibold text-T-700">عنوان تیکت</th>
-          <th class="bg-T-100 px-5 py-4 text-[12.5px] font-semibold text-T-700">شماره</th>
-          <th class="bg-T-100 px-5 py-4 text-[12.5px] font-semibold text-T-700">وضعیت</th>
-          <th class="bg-T-100 px-5 py-4 text-[12.5px] font-semibold text-T-700">تاریخ</th>
-          <th class="rounded-e-xl bg-T-100 px-5 py-4 text-[12.5px] font-semibold text-T-700">عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <DashboardTicketsRow
-          v-for="ticket in tickets"
-          :key="ticket.id"
-          :ticket="ticket"
-          @view="emit('view', $event)"
-          @remove="emit('remove', $event)"
-        />
-      </tbody>
-    </table>
-  </div>
+  <table class="w-full border-separate border-spacing-0 text-right">
+    <thead>
+      <tr>
+        <UiTypography as="th" size="lg" weight="medium" color="muted" class="rounded-s-xl bg-T-200 px-3 py-4 text-start">
+          عنوان تیکت
+        </UiTypography>
+        <UiTypography as="th" size="lg" weight="medium" color="muted" class="bg-T-200 px-3 py-4">
+          شماره
+        </UiTypography>
+        <UiTypography as="th" size="lg" weight="medium" color="muted" class="bg-T-200 px-3 py-4">
+          وضعیت
+        </UiTypography>
+        <UiTypography as="th" size="lg" weight="medium" color="muted" class="bg-T-200 px-3 py-4">
+          تاریخ
+        </UiTypography>
+        <UiTypography as="th" size="lg" weight="medium" color="muted" class="rounded-e-xl bg-T-200 px-3 py-4">
+          عملیات
+        </UiTypography>
+      </tr>
+    </thead>
+    <tbody>
+      <DashboardTicketsRow
+        v-for="ticket in tickets"
+        :key="ticket.id"
+        :ticket="ticket"
+        @view="emit('view', $event)"
+        @remove="emit('remove', $event)"
+      />
+    </tbody>
+  </table>
 </template>
