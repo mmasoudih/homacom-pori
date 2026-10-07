@@ -2,16 +2,19 @@ export interface ContactPageData {
   title: string
   subtitle: string
   guideTitle: string
+  guideSubtitle: string
   guideRows: Array<{ title: string, subtitle: string }>
   phone: {
     title: string
-    subtitle: string
+    /** Availability line, split so key times can be emphasized. */
+    subtitle: Array<{ text: string, bold?: boolean }>
+    note: string
     number: string
-    socials: string[]
   }
   email: {
     title: string
-    subtitle: string
+    /** Body copy, split so key phrases can be emphasized. */
+    subtitle: Array<{ text: string, bold?: boolean }>
     address: string
   }
   store: {
@@ -36,6 +39,7 @@ export const contactPage: ContactPageData = {
   title: 'تماس با ما',
   subtitle: 'تیم پشتیبانی هماکام ۲۴ ساعته آماده پاسخگویی به سوالات و درخواست‌های شماست',
   guideTitle: 'راهنمای آنلاین',
+  guideSubtitle: 'قبل از ارتباط با پشتیبانی، راهنمای آنلاین و سوالات متداول را مشاهده کنید؛\nجواب بیشتر سوال‌ها همان‌جاست.',
   guideRows: [
     {
       title: 'راهنمای آنلاین',
@@ -47,14 +51,24 @@ export const contactPage: ContactPageData = {
     },
   ],
   phone: {
-    title: 'تماس تلفنی',
-    subtitle: 'پاسخگویی از ۸ صبح تا ۵ عصر، در چندین استان',
-    number: '۰۲۱-۳۲۵۰۷۸۹',
-    socials: ['telegram', 'x', 'youtube', 'instagram'],
+    title: 'تماس تلفنی و شبکه‌های اجتماعی',
+    subtitle: [
+      { text: 'پاسخگویی از ' },
+      { text: '۸ صبح', bold: true },
+      { text: ' تا ' },
+      { text: '۵ عصر', bold: true },
+      { text: ' در چت آنلاین، تلفن و شبکه‌های اجتماعی.' },
+    ],
+    note: 'در صورت نیاز با پشتیبانی هما‌کام تماس بگیرید.',
+    number: '0121-3250789',
   },
   email: {
     title: 'آدرس ایمیل',
-    subtitle: 'برای امور همکاری، انتقاد و پیشنهاد با پیگیری مکتوب، ایمیل بزنید',
+    subtitle: [
+      { text: 'برای امور همکاری، انتقاد و پیشنهاد یا پیگیری مکتوب، ایمیل بزنید؛ پاسخ در کمتر از ' },
+      { text: '۲۴ ساعت', bold: true },
+      { text: ' در روزهای غیر تعطیل.' },
+    ],
     address: 'Homacom@info.mail',
   },
   store: {
