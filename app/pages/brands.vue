@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight, IconSearch } from '@tabler/icons-vue'
+import { IconSearch } from '@tabler/icons-vue'
 import { brandsPage } from '~/data/pages/brands'
 
 useHead({
@@ -16,12 +16,6 @@ const visibleBrands = computed(() => {
     return brandsPage.items
   return brandsPage.items.filter(item => item.name.includes(q))
 })
-
-const paginationItems = computed(() => {
-  const items: Array<number | 'ellipsis'> = []
-  items.push(1, 2, 3, 4, 'ellipsis', totalPages)
-  return items
-})
 </script>
 
 <template>
@@ -29,93 +23,70 @@ const paginationItems = computed(() => {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+      <UiBreadcrumb
+        :trail="['همکام', 'برندها']"
+        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      />
+
       <PagesPageHeader
-        class="pt-10 lg:pt-16"
+        class="pt-10 lg:pt-0"
         :title="brandsPage.title"
         :subtitle="brandsPage.subtitle"
-        :breadcrumb="['همکام', 'برندها']"
+        title-size="3xl"
       >
         <template #icon>
-          <img
-            src="/assets/medal-color.svg"
-            alt="مدال طلایی برندها"
-            class="size-[88px] object-contain"
-          >
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_463_727)">
+              <path d="M17.7456 25.9395L4.64258 50.626L16.5413 49.5268L22.3002 59.9979L35.4032 35.3113L17.7456 25.9395Z" fill="#E95454" />
+              <path d="M19.2457 52.81C19.6134 52.0203 19.2288 51.0767 18.4597 50.6678L17.7056 50.2663C16.9515 49.8368 16.6645 48.8819 17.0753 48.1091C17.4918 47.3231 18.471 47.0229 19.257 47.4394L21.388 48.5706C22.0464 48.9195 22.8718 48.6662 23.2113 48.004L23.2639 47.9027C23.654 47.2781 23.4233 46.4527 22.7743 46.1094L16.4 42.7272C15.6234 42.3145 15.2426 41.3747 15.6046 40.5831C16.0042 39.7408 17.0134 39.4088 17.8257 39.8402L23.7385 42.9786C24.3969 43.3275 25.2223 43.0742 25.5712 42.4158L25.605 42.3295L25.6143 42.3107C25.9914 41.6204 25.7269 40.7538 25.0309 40.3842L21.7144 38.6246C20.9378 38.2119 20.557 37.2721 20.9246 36.4711C21.3204 35.6382 22.3334 35.2968 23.1457 35.7283L26.8093 37.6736C27.494 38.0375 28.3118 37.7336 28.6664 37.0433C28.672 37.0339 28.672 37.0339 28.6758 37.0245C28.6814 37.0151 28.6814 37.0151 28.6852 37.0058C29.0584 36.3248 28.8521 35.4769 28.1655 35.1149L24.2131 33.0176C23.4458 32.6106 23.065 31.6708 23.4271 30.8791C23.8266 30.0369 24.8358 29.7048 25.6481 30.1363L35.3989 35.3118L22.2959 59.9984L18.6848 53.4347C18.9174 53.2771 19.12 53.082 19.2457 52.81Z" fill="#ED6362" />
+              <path d="M42.2553 25.9395L55.3583 50.626L43.4596 49.5268L37.7007 59.9979L24.5977 35.3113L42.2553 25.9395Z" fill="#ED6362" />
+              <path d="M40.7547 52.8101C40.387 52.0204 40.7716 51.0768 41.5407 50.6679L42.2948 50.2664C43.0489 49.8368 43.3359 48.882 42.9251 48.1092C42.5086 47.3232 41.5294 47.023 40.7434 47.4395L38.6124 48.5706C37.954 48.9195 37.1286 48.6663 36.7891 48.0041L36.7365 47.9028C36.3464 47.2781 36.5771 46.4528 37.2262 46.1095L43.6023 42.7254C44.3789 42.3127 44.7597 41.3729 44.3976 40.5813C43.9981 39.739 42.9889 39.407 42.1766 39.8384L36.2638 42.9768C35.6054 43.3257 34.78 43.0724 34.4311 42.414L34.3973 42.3277L34.3879 42.3089C34.0109 41.6186 34.2754 40.752 34.9713 40.3824L38.2879 38.6228C39.0645 38.2101 39.4453 37.2703 39.0776 36.4693C38.6818 35.6364 37.6689 35.295 36.8566 35.7265L33.1893 37.6755C32.5046 38.0394 31.6867 37.7355 31.3321 37.0452C31.3265 37.0358 31.3265 37.0358 31.3228 37.0265C31.3171 37.0171 31.3171 37.0171 31.3134 37.0077C30.9401 36.3268 31.1464 35.4789 31.833 35.1168L35.7855 33.0196C36.5527 32.6125 36.9335 31.6727 36.5715 30.8811C36.1719 30.0388 35.1627 29.7068 34.3504 30.1382L24.5996 35.3138L37.7026 60.0004L41.3137 53.4367C41.083 53.2772 40.8804 53.0821 40.7547 52.8101Z" fill="#E95454" />
+              <path d="M30.0008 43.7868C42.0922 43.7868 51.8942 33.9848 51.8942 21.8934C51.8942 9.802 42.0922 0 30.0008 0C17.9094 0 8.10742 9.802 8.10742 21.8934C8.10742 33.9848 17.9094 43.7868 30.0008 43.7868Z" fill="#FFCC5B" />
+              <path d="M32.971 19.3819H19.097C18.0184 19.3819 17.1329 18.4965 17.1329 17.4178L17.148 17.2828V17.2527C17.133 16.1141 18.0615 15.1837 19.202 15.1837H28.8178C30.0915 15.1837 31.2171 14.2401 31.2921 12.9645C31.3521 11.6307 30.2885 10.5052 28.9529 10.5052H18.7668C17.6432 10.5052 16.8028 9.56164 16.8178 8.43611V8.37609C16.8028 7.25243 17.6413 6.30699 18.7668 6.30699H29.4256C30.6843 6.30699 31.8098 5.36342 31.8849 4.10283C31.9449 2.75408 30.8813 1.64355 29.5456 1.64355H21.7401C13.7808 4.92447 8.17188 12.7506 8.17188 21.8937C8.17188 31.0367 13.7808 38.861 21.742 42.1382H31.6523C32.911 42.1382 34.0365 41.1946 34.1115 39.934C34.1716 38.5852 33.1079 37.4766 31.7723 37.4766L20.4983 37.4747C19.1683 37.4747 18.0972 36.3623 18.1684 35.0154C18.2341 33.7549 19.3671 32.8075 20.6296 32.8075H25.0004C26.2572 32.7719 27.2721 31.742 27.2721 30.4758C27.2721 29.1871 26.2235 28.1366 24.9329 28.1366H18.3073C17.2286 28.1366 16.3432 27.2531 16.3582 26.1726V26.0075C16.2832 24.9439 17.1386 24.0434 18.2022 24.0434H32.8359C34.1097 24.0434 35.2352 23.0999 35.3102 21.8393C35.3703 20.4924 34.3048 19.3819 32.971 19.3819Z" fill="#FDBC4B" />
+              <path d="M30.001 37.5197C21.3832 37.5197 14.373 30.5076 14.373 21.8917C14.373 13.2758 21.3832 6.26562 30.001 6.26562C38.6188 6.26562 45.6289 13.2777 45.6289 21.8936C45.6289 30.5095 38.6188 37.5197 30.001 37.5197Z" fill="#FFDB70" />
+              <path opacity="0.2" d="M30.8972 6.31055C39.0967 6.77952 45.6285 13.5796 45.6285 21.8935C45.6285 29.4158 40.2841 35.7131 33.1877 37.1913H31.0435C30.0249 37.1913 29.2146 36.3453 29.2596 35.3154C29.3177 34.3549 30.175 33.6346 31.1355 33.6346H39.2636C40.1209 33.6346 40.7606 32.9143 40.7493 32.057V32.012C40.7606 31.1547 40.1209 30.4344 39.2636 30.4344H31.4956C30.477 30.4344 29.6666 29.5752 29.7117 28.5585C29.7698 27.5868 30.6271 26.8664 31.5988 26.8664H38.9335C39.802 26.8664 40.5111 26.1574 40.4998 25.2888V25.2663L40.5111 25.1631C40.5111 24.3415 39.8377 23.6662 39.0141 23.6662H28.4342C27.4156 23.6662 26.6052 22.8183 26.6502 21.7903C26.7084 20.8299 27.5657 20.1095 28.5374 20.1095H39.697C40.5092 20.1095 41.1602 19.4248 41.1039 18.6126V18.4888C41.1151 17.6671 40.4417 16.9918 39.6182 16.9918H34.5646C33.5816 16.9918 32.7806 16.1908 32.7806 15.2078C32.7806 14.2418 33.5553 13.4576 34.5139 13.4295H37.8474C38.8116 13.4295 39.6745 12.7073 39.7251 11.745C39.7795 10.717 38.9635 9.86909 37.9486 9.86909L29.3496 9.86721C28.331 9.86721 27.5206 9.01932 27.5657 7.99134C27.6238 7.03088 28.4811 6.31055 29.4415 6.31055H30.8972Z" fill="black" />
+              <path d="M40.9114 18.4319H33.3103L30.9598 11.2023C30.6578 10.2737 29.3428 10.2737 29.0408 11.2023L26.6922 18.4319H19.0912C18.1138 18.4319 17.7068 19.6831 18.4984 20.2571L24.6475 24.7255L22.2989 31.9551C21.9969 32.8837 23.0605 33.6566 23.8521 33.0825L30.0013 28.6142L36.1504 33.0825C36.942 33.6566 38.0056 32.8837 37.7036 31.9551L35.355 24.7255L41.5042 20.2571C42.2939 19.6831 41.8887 18.4319 40.9114 18.4319Z" fill="#EC9922" />
+            </g>
+            <defs>
+              <clipPath id="clip0_463_727">
+                <rect width="60" height="60" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
         </template>
       </PagesPageHeader>
 
       <!-- Search -->
-      <div class="mt-8 flex h-12 w-full max-w-[660px] items-center gap-3 rounded-full border border-T-400 bg-T-50 px-5 focus-within:ring-2 focus-within:ring-primary/30">
-        <IconSearch class="size-5 shrink-0 text-T-600" />
+      <div class="mx-4 mt-8 flex h-[47px] w-[462px] max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-T-400 bg-T-50 px-5 focus-within:ring-2 focus-within:ring-primary/30">
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="brandsPage.searchPlaceholder"
-          class="w-full bg-transparent text-[15px] text-foreground placeholder:text-T-600 focus:outline-none"
+          class="w-full bg-transparent text-[14px] font-normal text-foreground placeholder:text-T-600 focus:outline-none"
         >
+        <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
 
       <!-- Brand grid -->
       <div class="mt-10 grid w-full max-w-[1440px] grid-cols-3 gap-3 px-4 lg:mt-12 lg:grid-cols-8 lg:gap-4 lg:px-6">
-        <div
+        <BrandBox
           v-for="(brand, i) in visibleBrands"
           :key="`${brand.name}-${i}`"
-          class="flex aspect-[1.65] flex-col items-center justify-center gap-2 rounded-[12px] border border-T-400 bg-T-50 px-3 transition-shadow hover:shadow-md"
-        >
-          <img
-            :src="brand.logo"
-            :alt="brand.name"
-            class="h-[34px] max-w-[75%] object-contain lg:h-[42px]"
-          >
-          <span class="text-[13px] font-medium leading-[18px] text-T-700">
-            {{ brand.name }}
-          </span>
-        </div>
+          :name="brand.name"
+          :logo="brand.logo"
+        />
       </div>
 
       <!-- Pagination -->
-      <nav class="mt-10 flex flex-wrap items-center justify-center gap-2 lg:mt-12" aria-label="صفحه‌بندی برندها">
-        <button
-          class="flex size-9 items-center justify-center rounded-full border border-T-400 bg-T-50 text-T-700 transition-colors hover:text-primary disabled:opacity-40"
-          :disabled="currentPage === 1"
-          aria-label="صفحه قبل"
-          @click="currentPage = Math.max(1, currentPage - 1)"
-        >
-          <IconChevronRight class="size-4" />
-        </button>
-
-        <template v-for="(item, i) in paginationItems" :key="i">
-          <button
-            v-if="item === 'ellipsis'"
-            class="flex h-9 items-center px-1 text-T-600"
-            disabled
-          >
-            …
-          </button>
-          <button
-            v-else
-            class="flex size-9 items-center justify-center rounded-full text-[13px] font-medium transition-colors"
-            :class="item === currentPage
-              ? 'border border-T-400 bg-T-50 text-foreground'
-              : 'border border-T-400 bg-T-50 text-T-600 hover:text-primary'"
-            @click="currentPage = item"
-          >
-            {{ item }}
-          </button>
-        </template>
-
-        <button
-          class="flex size-9 items-center justify-center rounded-full border border-T-400 bg-T-50 text-T-700 transition-colors hover:text-primary disabled:opacity-40"
-          :disabled="currentPage === totalPages"
-          aria-label="صفحه بعد"
-          @click="currentPage = Math.min(totalPages, currentPage + 1)"
-        >
-          <IconChevronLeft class="size-4" />
-        </button>
-      </nav>
+      <AppPagination
+        v-model:page="currentPage"
+        :pages="totalPages"
+        class="mt-10 lg:mt-12"
+      />
     </main>
 
-    <PagesAboutBand class="mt-auto" />
+    <LandingCeoSection />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />

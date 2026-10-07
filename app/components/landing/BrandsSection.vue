@@ -18,19 +18,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
           :key="brand.name + brand.logo"
           class="w-[138px] shrink-0 basis-auto ps-2"
         >
-          <a
-            href="#"
-            class="flex h-[78px] w-[130px] flex-col items-center justify-center rounded-[8px] border border-T-400 bg-T-50"
-          >
-            <img
-              :src="brand.logo"
-              :alt="brand.name"
-              class="h-[49px] w-[65px] object-contain"
-            >
-            <UiTypography as="span" size="lg" weight="regular" class="text-foreground">
-              {{ brand.name }}
-            </UiTypography>
-          </a>
+          <BrandBox :name="brand.name" :logo="brand.logo" href="#" />
         </CarouselItem>
       </CarouselContent>
     </Carousel>
@@ -46,17 +34,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
           :key="brand.name + brand.logo"
           class="shrink-0 basis-auto ps-2 py-2"
         >
-          <a
-            href="#"
-            class="px-14 flex w-full flex-col items-center justify-center gap-0 rounded-[20px] border border-T-400 bg-T-50 py-2 transition-shadow lg:h-[96px] lg:w-[166px]"
-          >
-            <img
-              :src="brand.logo"
-              :alt="brand.name"
-              class="h-[49px] w-[65px] object-contain"
-            >
-            <UiTypography as="span" size="xl" weight="regular" class="text-foreground">{{ brand.name }}</UiTypography>
-          </a>
+          <BrandBox :name="brand.name" :logo="brand.logo" href="#" class="lg:w-[166px]" />
         </CarouselItem>
       </CarouselContent>
     </Carousel>

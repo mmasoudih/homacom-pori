@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TypographyVariants } from '~/components/ui/typography'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
@@ -7,11 +8,17 @@ const props = withDefaults(defineProps<{
   titleDesktop?: string
   subtitle?: string
   breadcrumb?: string[]
+  /** Title typography size. Defaults to responsive `xl3xl` (16px mobile → 20px desktop). */
+  titleSize?: TypographyVariants['size']
+  /** Subtitle typography size. Defaults to responsive `mdLg` (12.5px mobile → 14px desktop). */
+  subtitleSize?: TypographyVariants['size']
   class?: string
 }>(), {
   titleDesktop: undefined,
   subtitle: '',
   breadcrumb: undefined,
+  titleSize: 'xl3xl',
+  subtitleSize: 'mdLg',
   class: '',
 })
 
@@ -20,7 +27,7 @@ const parts = computed(() => props.breadcrumb ?? [])
 
 <template>
   <div :class="cn('flex flex-col items-center px-4 lg:px-6', props.class)">
-    <ProductDetailBreadcrumb
+    <UiBreadcrumb
       v-if="parts.length"
       :trail="parts"
       class="-mt-2 mb-6 justify-start"
@@ -33,7 +40,7 @@ const parts = computed(() => props.breadcrumb ?? [])
 
     <UiTypography
       as="h1"
-      size="xl3xl"
+      :size="titleSize"
       weight="medium"
       color="default"
       class="text-center"
@@ -48,10 +55,10 @@ const parts = computed(() => props.breadcrumb ?? [])
     <UiTypography
       v-if="subtitle"
       as="p"
-      size="md"
+      :size="subtitleSize"
       weight="regular"
       color="muted"
-      class="mt-3 max-w-[620px] text-center leading-[26px] lg:text-[14px]"
+      class="mt-3 max-w-[620px] text-center leading-[26px]"
     >
       {{ subtitle }}
     </UiTypography>

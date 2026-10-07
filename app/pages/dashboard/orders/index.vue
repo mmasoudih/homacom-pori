@@ -104,7 +104,7 @@ useHead({
             </template>
           </div>
 
-          <DashboardOrdersPagination v-model:page="page" :pages="pages" class="mt-6" />
+          <AppPagination v-model:page="page" :pages="pages" class="mt-6" />
         </template>
       </section>
     </DashboardOrdersShell>

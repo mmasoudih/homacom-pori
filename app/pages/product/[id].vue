@@ -174,7 +174,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           />
 
           <!-- ==================== Desktop breadcrumb ==================== -->
-          <ProductDetailBreadcrumb
+          <UiBreadcrumb
             :trail="product.breadcrumb"
             class="mx-auto mt-6 hidden w-full max-w-[1440px] lg:flex"
           />

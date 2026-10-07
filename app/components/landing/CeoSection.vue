@@ -13,7 +13,7 @@ function segmentClass(tone?: 'strong' | 'accent') {
 </script>
 
 <template>
-  <section class="mx-auto w-full bg-T-200 max-w-[1440px] my-14 lg:rounded-3xl">
+  <section class="mx-auto w-full bg-T-200 max-w-[1440px] lg:rounded-3xl">
     <div class="mx-auto w-full max-w-[1440px] px-6 py-8">
       <UiTypography as="h2" size="lg" weight="bold" class="leading-[32px] text-T-900">
         {{ ceoSection.title }}

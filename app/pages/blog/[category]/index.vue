@@ -51,7 +51,7 @@ const crumbs = computed(() => [
           />
         </div>
 
-        <BlogPagination v-model:page="page" :total="125" class="mt-10 lg:mt-[42px]" />
+        <AppPagination v-model:page="page" :pages="125" class="mt-10 lg:mt-[42px]" />
       </div>
     </div>
   </BlogShell>

@@ -27,7 +27,7 @@ const filteredItems = computed(() => {
 
     <main class="flex flex-col items-center pb-16">
       <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
-      <ProductDetailBreadcrumb
+      <UiBreadcrumb
         :trail="['هماکام', 'سوالات متداول']"
         class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
