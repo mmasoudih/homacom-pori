@@ -5,13 +5,10 @@ const props = withDefaults(defineProps<{
   title: string
   subtitle?: string
   breadcrumb?: string[]
-  /** Render the in-header breadcrumb on mobile only (`lg:hidden`). */
-  hideBreadcrumbOnDesktop?: boolean
   class?: string
 }>(), {
   subtitle: '',
   breadcrumb: undefined,
-  hideBreadcrumbOnDesktop: false,
   class: '',
 })
 
@@ -23,20 +20,20 @@ const parts = computed(() => props.breadcrumb ?? [])
     <ProductDetailBreadcrumb
       v-if="parts.length"
       :trail="parts"
-      :class="cn('-mt-2 mb-6 justify-start', hideBreadcrumbOnDesktop && 'lg:hidden')"
+      class="-mt-2 mb-6 justify-start"
     />
 
     <!-- Icon slot (optional) -->
-    <div v-if="$slots.icon" class="mb-6">
+    <div v-if="$slots.icon" class="mb-3 lg:mb-6">
       <slot name="icon" />
     </div>
 
     <UiTypography
       as="h1"
-      size="3xl"
+      size="xl"
       weight="medium"
       color="default"
-      class="text-center"
+      class="text-center lg:text-[20px]"
     >
       {{ title }}
     </UiTypography>
@@ -44,10 +41,10 @@ const parts = computed(() => props.breadcrumb ?? [])
     <UiTypography
       v-if="subtitle"
       as="p"
-      size="lg"
+      size="md"
       weight="regular"
       color="muted"
-      class="mt-3 max-w-[620px] text-center leading-[26px]"
+      class="mt-3 max-w-[620px] text-center leading-[26px] lg:text-[14px]"
     >
       {{ subtitle }}
     </UiTypography>

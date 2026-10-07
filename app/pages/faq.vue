@@ -26,8 +26,7 @@ const filteredItems = computed(() => {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
-      <!-- Desktop breadcrumb: configured directly on the shared breadcrumb component.
-           Hidden on mobile, where PageHeader renders the in-header breadcrumb. -->
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
       <ProductDetailBreadcrumb
         :trail="['هماکام', 'سوالات متداول']"
         class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
@@ -37,8 +36,6 @@ const filteredItems = computed(() => {
         class="pt-10 lg:pt-0"
         :title="faqPage.title"
         :subtitle="faqPage.subtitle"
-        :breadcrumb="['هماکام', 'سوالات متداول']"
-        hide-breadcrumb-on-desktop
       >
         <template #icon>
           <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +48,7 @@ const filteredItems = computed(() => {
       </PagesPageHeader>
 
       <!-- Search -->
-      <div class="mt-8 flex h-12 w-full max-w-[560px] items-center gap-3 rounded-[50px] border border-T-500 bg-T-50 px-5 focus-within:ring-2 focus-within:ring-primary/30 lg:mt-10">
+      <div class="mt-8 mx-4 flex h-12 w-[calc(100%-2rem)] max-w-[560px] items-center gap-3 rounded-[50px] border border-T-500 bg-T-50 px-5 focus-within:ring-2 focus-within:ring-primary/30 lg:mx-0 lg:mt-10 lg:w-full">
         <input
           v-model="searchQuery"
           type="text"

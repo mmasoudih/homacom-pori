@@ -44,14 +44,14 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
       :value="`item-${i}`"
       class="border-T-400"
     >
-      <AccordionTrigger :class="cn('group py-5 hover:no-underline', !props.flush && 'px-1')">
+      <AccordionTrigger :class="cn('group py-5 hover:no-underline', props.flush ? 'px-4 lg:px-0' : 'px-1')">
         <div class="flex flex-1 items-center justify-between gap-4">
           <UiTypography
             as="span"
-            size="xl"
+            size="lg"
             weight="semibold"
             color="default"
-            class="leading-[24px]"
+            class="leading-[24px] font-medium lg:text-[16px] lg:font-semibold"
           >
             {{ item.question }}
           </UiTypography>
@@ -59,7 +59,7 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
 
         <template #icon>
           <span
-            class="flex size-8 shrink-0 items-center justify-center text-T-700"
+            class="flex size-8 shrink-0 items-center justify-center text-T-900"
           >
             <span
               class="[&>svg]:block [&>svg]:size-5 group-data-[state=open]:hidden"
@@ -74,13 +74,13 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
           </span>
         </template>
       </AccordionTrigger>
-      <AccordionContent :class="!props.flush ? 'px-1' : undefined">
+      <AccordionContent :class="props.flush ? 'px-4 lg:px-0' : 'px-1'">
         <UiTypography
           as="p"
-          size="lg"
+          size="md"
           weight="regular"
           color="emphasis"
-          class="max-w-[860px] pb-5 leading-[26px]"
+          class="max-w-[860px] pb-5 leading-[26px] lg:text-[14px]"
         >
           {{ item.answer }}
         </UiTypography>
