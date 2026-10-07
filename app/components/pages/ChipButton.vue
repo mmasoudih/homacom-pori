@@ -23,15 +23,25 @@ import returnArrowIcon from '../../../public/icons/faq-return-arrow.svg?raw'
 import accountUserIcon from '../../../public/icons/faq-account-user.svg?raw'
 import warrantyTagIcon from '../../../public/icons/faq-warranty-tag.svg?raw'
 import productsBoxIcon from '../../../public/icons/faq-products-box.svg?raw'
+import guaranteeMobileIcon from '../../../public/icons/guarantee-mobile.svg?raw'
+import guaranteeLaptopIcon from '../../../public/icons/guarantee-laptop.svg?raw'
+import guaranteeWatchIcon from '../../../public/icons/guarantee-watch.svg?raw'
+import guaranteeHeadphonesIcon from '../../../public/icons/guarantee-headphones.svg?raw'
+import guaranteeGamepadIcon from '../../../public/icons/guarantee-gamepad.svg?raw'
+import guaranteeDisplayIcon from '../../../public/icons/guarantee-display.svg?raw'
+import guaranteeSpeakersIcon from '../../../public/icons/guarantee-speakers.svg?raw'
 import type { ChipItem } from './ChipRow.vue'
 
 const props = withDefaults(defineProps<{
   item: ChipItem
   active?: boolean
+  /** Fill the parent cell (used by the desktop grid so the gap is the true grid gap). */
+  fill?: boolean
   /** Color applied to the chip label and icon. Defaults to inheriting the button state color. */
   contentColor?: 'inherit' | 'default'
 }>(), {
   active: false,
+  fill: false,
   contentColor: 'inherit',
 })
 
@@ -66,14 +76,22 @@ const svgIconMap: Record<string, string> = {
   user: accountUserIcon,
   tag: warrantyTagIcon,
   products: productsBoxIcon,
+  mobile: guaranteeMobileIcon,
+  laptop: guaranteeLaptopIcon,
+  watch: guaranteeWatchIcon,
+  headphones: guaranteeHeadphonesIcon,
+  gamepad: guaranteeGamepadIcon,
+  display: guaranteeDisplayIcon,
+  speakers: guaranteeSpeakersIcon,
 }
 </script>
 
 <template>
   <button
     type="button"
-    class="flex h-[70px] w-[112px] shrink-0 flex-col items-center justify-center gap-2 rounded-[20px] border px-4 py-4 transition-colors lg:h-[97px] lg:w-[135.43px]"
+    class="flex h-[70px] w-[112px] shrink-0 flex-col items-center justify-center gap-2 rounded-[20px] border px-4 py-4 transition-colors lg:h-[97px]"
     :class="[
+      props.fill ? 'lg:w-full' : 'lg:w-[135.43px]',
       props.active
         ? 'border-primary bg-R-50'
         : 'border-T-400 bg-T-50 hover:border-T-500',

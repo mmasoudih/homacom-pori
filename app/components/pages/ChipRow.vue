@@ -72,6 +72,7 @@ const mobileItems = computed(() =>
         v-for="(item, i) in props.items"
         :key="item.label"
         :item="item"
+        :fill="props.desktopGrid"
         :active="i === props.active"
         :content-color="props.contentColor"
         @select="emit('select', i)"

@@ -3,10 +3,13 @@ import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
   title: string
+  /** Desktop-only title override (below `lg` the `title` value is used). */
+  titleDesktop?: string
   subtitle?: string
   breadcrumb?: string[]
   class?: string
 }>(), {
+  titleDesktop: undefined,
   subtitle: '',
   breadcrumb: undefined,
   class: '',
@@ -35,7 +38,11 @@ const parts = computed(() => props.breadcrumb ?? [])
       color="default"
       class="text-center"
     >
-      {{ title }}
+      <template v-if="titleDesktop">
+        <span class="lg:hidden">{{ title }}</span>
+        <span class="hidden lg:inline">{{ titleDesktop }}</span>
+      </template>
+      <template v-else>{{ title }}</template>
     </UiTypography>
 
     <UiTypography
