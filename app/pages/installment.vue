@@ -58,91 +58,107 @@ const categoryIcons = {
 
     <main class="flex flex-col items-center pb-16">
       <!-- Hero -->
-      <section class="mt-10 grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-4 lg:mt-16 lg:grid-cols-[1fr_380px] lg:gap-16 lg:px-6">
-        <div class="flex flex-col items-center text-center lg:items-start lg:text-start">
-          <span class="text-[14px] font-semibold text-primary">خرید اقساطی</span>
-          <h1 class="mt-2 text-[28px] font-bold leading-[42px] text-foreground lg:text-[34px] lg:leading-[50px]">
-            {{ installmentPage.title }}
-          </h1>
-          <p class="mt-4 max-w-[620px] text-[15px] leading-[28px] text-T-700">
-            {{ installmentPage.intro }}
-          </p>
-
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <a
-              href="#"
-              class="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-primary/90"
+      <section
+        class="relative w-full max-w-[1440px] overflow-hidden bg-[url(/images/installment-bg-hero.png)] bg-cover bg-center bg-no-repeat lg:h-[668px]"
+      >
+        <div class="relative z-10 flex h-full w-full flex-col bg-white/60 px-4 py-10 backdrop-blur-[45px] lg:px-8 lg:py-14">
+          <div class="grid flex-1 grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_380px] lg:gap-16">
+          <div class="flex flex-col items-center text-center lg:items-start lg:text-start">
+            <UiTypography
+              as="h1"
+              size="4xl"
+              weight="bold"
+              color="default"
+              class="text-[26px] leading-[38px] lg:text-[26px]"
             >
-              {{ installmentPage.applyCta }}
-              <IconArrowLeft class="size-4" />
-            </a>
-            <a
-              href="#"
-              class="flex items-center gap-2 rounded-full border border-T-400 bg-T-50 px-6 py-3 text-[14px] font-medium text-T-700 transition-colors hover:border-T-500"
+              {{ installmentPage.title.replace(installmentPage.titleAccent, '') }}<span class="text-R-300">{{ installmentPage.titleAccent }}</span>
+            </UiTypography>
+            <UiTypography
+              as="p"
+              size="lg"
+              weight="regular"
+              color="muted"
+              class="mt-4 max-w-[620px] leading-[28px]"
             >
-              {{ installmentPage.complaintsCta }}
-            </a>
-          </div>
-        </div>
+              {{ installmentPage.intro }}
+            </UiTypography>
 
-        <!-- Credit card graphic -->
-        <div class="mx-auto w-full max-w-[380px]">
-          <div class="relative aspect-[16/10] w-full overflow-hidden rounded-[20px] bg-gradient-to-br from-[#D32F3C] to-[#A7192A] shadow-[0_18px_40px_rgba(239,35,60,0.35)]">
-            <div class="absolute inset-x-0 top-5 flex items-center justify-between px-6">
-              <img
-                src="/homacom-logo.png"
-                alt="هماکام"
-                class="h-[26px] w-[36px] object-contain"
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <a
+                href="#"
+                class="flex h-[47px] items-center rounded-[12px] bg-R-300 px-6 text-[14px] font-semibold text-white transition-colors hover:bg-primary/90"
               >
-              <span class="text-[13px] font-semibold text-white/90">{{ installmentPage.cardBadge }}</span>
+                {{ installmentPage.applyCta }}
+              </a>
+              <a
+                href="#"
+                class="flex h-[47px] items-center rounded-[12px] border border-T-400 bg-white px-6 text-[14px] font-medium text-T-700 transition-colors hover:border-T-500"
+              >
+                {{ installmentPage.complaintsCta }}
+              </a>
             </div>
+          </div>
 
-            <div class="absolute inset-x-6 top-[46%] flex items-center gap-3">
-              <div class="relative h-8 w-11 rounded-md bg-gradient-to-br from-[#E8B84B] to-[#C79A34]">
-                <div class="absolute inset-0 m-auto h-3 w-6 rounded-sm border border-[#A67C24]/40" />
+          <!-- Credit card graphic -->
+          <div class="mx-auto w-full max-w-[380px]">
+            <div class="relative aspect-[16/10] w-full overflow-hidden rounded-[20px] bg-gradient-to-br from-[#D32F3C] to-[#A7192A] shadow-[0_18px_40px_rgba(239,35,60,0.35)]">
+              <div class="absolute inset-x-0 top-5 flex items-center justify-between px-6">
+                <img
+                  src="/homacom-logo.png"
+                  alt="هماکام"
+                  class="h-[26px] w-[36px] object-contain"
+                >
+                <span class="text-[13px] font-semibold text-white/90">{{ installmentPage.cardBadge }}</span>
               </div>
-            </div>
 
-            <div class="absolute inset-x-6 bottom-5 flex items-end justify-between">
-              <div class="flex flex-col">
-                <span class="text-[13px] text-white/70">هماکام</span>
-                <span class="text-[16px] font-bold tracking-wider text-white" dir="ltr">۵۶۰۰ •••• •••• ۰۴۲۱</span>
+              <div class="absolute inset-x-6 top-[46%] flex items-center gap-3">
+                <div class="relative h-8 w-11 rounded-md bg-gradient-to-br from-[#E8B84B] to-[#C79A34]">
+                  <div class="absolute inset-0 m-auto h-3 w-6 rounded-sm border border-[#A67C24]/40" />
+                </div>
               </div>
-              <div class="flex flex-col items-end">
-                <span class="text-[11px] text-white/70">اعتبار</span>
-                <span class="text-[15px] font-bold text-white" dir="ltr">۲۵/۰۹/۰۱</span>
+
+              <div class="absolute inset-x-6 bottom-5 flex items-end justify-between">
+                <div class="flex flex-col">
+                  <span class="text-[13px] text-white/70">هماکام</span>
+                  <span class="text-[16px] font-bold tracking-wider text-white" dir="ltr">۵۶۰۰ •••• •••• ۰۴۲۱</span>
+                </div>
+                <div class="flex flex-col items-end">
+                  <span class="text-[11px] text-white/70">اعتبار</span>
+                  <span class="text-[15px] font-bold text-white" dir="ltr">۲۵/۰۹/۰۱</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+          </div>
 
-      <!-- Steps -->
-      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-6">
-        <h2 class="text-center text-[22px] font-bold leading-[32px] text-foreground lg:text-start">
-          {{ installmentPage.stepsTitle }}
-        </h2>
+          <!-- Steps (anchored to the end of the hero) -->
+          <div class="mt-8 shrink-0">
+            <h2 class="text-center text-[22px] font-bold leading-[32px] text-foreground lg:text-start">
+              {{ installmentPage.stepsTitle }}
+            </h2>
 
-        <div class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-5 lg:gap-6">
-          <div
-            v-for="(step, i) in installmentPage.steps"
-            :key="step.label"
-            class="relative flex flex-col items-center gap-4 rounded-[16px] border border-T-400 bg-gradient-to-b from-R-10/70 to-T-50 px-4 py-8 text-center"
-          >
-            <span
-              class="absolute left-4 top-3 flex size-7 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-white"
-            >
-              {{ i + 1 }}
-            </span>
-            <span class="flex size-14 items-center justify-center rounded-full border border-primary bg-T-50">
-              <component
-                :is="stepIcons[step.icon as keyof typeof stepIcons]"
-                class="size-7 text-primary"
-              />
-            </span>
-            <span class="text-[13px] font-semibold leading-[22px] text-foreground">
-              {{ step.label }}
-            </span>
+            <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
+              <div
+                v-for="(step, i) in installmentPage.steps"
+                :key="step.label"
+                class="relative flex flex-col items-center gap-4 rounded-[16px] border border-T-400 bg-gradient-to-b from-R-10/70 to-T-50 px-4 py-6 text-center"
+              >
+                <span
+                  class="absolute left-4 top-3 flex size-7 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-white"
+                >
+                  {{ i + 1 }}
+                </span>
+                <span class="flex size-14 items-center justify-center rounded-full border border-primary bg-T-50">
+                  <component
+                    :is="stepIcons[step.icon as keyof typeof stepIcons]"
+                    class="size-7 text-primary"
+                  />
+                </span>
+                <span class="text-[13px] font-semibold leading-[22px] text-foreground">
+                  {{ step.label }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

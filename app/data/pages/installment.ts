@@ -2,6 +2,8 @@ import type { FaqItem } from '~/components/pages/FaqAccordion.vue'
 
 export interface InstallmentPageData {
   title: string
+  /** Word within `title` rendered in the brand accent color (R-300). */
+  titleAccent: string
   intro: string
   applyCta: string
   complaintsCta: string
@@ -26,6 +28,7 @@ export interface InstallmentPageData {
 
 export const installmentPage: InstallmentPageData = {
   title: 'خرید اقساطی از هماکام',
+  titleAccent: 'هماکام',
   intro:
     'امروز با هماکام می‌توانید بدون پرداخت یکجا، کالای دیجیتال مورد نظر خود را به صورت اقساطی خریداری کنید. ثبت‌نام ساده، تأیید سریع و بدون نیاز به ضامن.',
   applyCta: 'درخواست خرید اقساطی',
