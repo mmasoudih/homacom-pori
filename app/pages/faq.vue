@@ -6,14 +6,18 @@ useHead({
   title: 'سوالات متداول | هماکام',
 })
 
-const activeCategory = ref(0)
+const activeCategory = ref(-1)
 const searchQuery = ref('')
 
 const filteredItems = computed(() => {
   const q = searchQuery.value.trim()
-  if (!q)
-    return faqPage.items
-  return faqPage.items.filter(item => item.question.includes(q) || item.answer.includes(q))
+  const categoryId = faqPage.categories[activeCategory.value]?.id
+
+  return faqPage.items.filter((item) => {
+    const matchesCategory = !categoryId || item.categoryId === categoryId
+    const matchesQuery = !q || item.question.includes(q) || item.answer.includes(q)
+    return matchesCategory && matchesQuery
+  })
 })
 </script>
 
@@ -22,11 +26,19 @@ const filteredItems = computed(() => {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
+      <!-- Desktop breadcrumb: configured directly on the shared breadcrumb component.
+           Hidden on mobile, where PageHeader renders the in-header breadcrumb. -->
+      <ProductDetailBreadcrumb
+        :trail="['هماکام', 'سوالات متداول']"
+        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      />
+
       <PagesPageHeader
-        class="pt-10 lg:pt-16"
+        class="pt-10 lg:pt-0"
         :title="faqPage.title"
         :subtitle="faqPage.subtitle"
         :breadcrumb="['هماکام', 'سوالات متداول']"
+        hide-breadcrumb-on-desktop
       >
         <template #icon>
           <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,12 +66,27 @@ const filteredItems = computed(() => {
         :active="activeCategory"
         :items="faqPage.categories"
         class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
-        @select="(i: number) => (activeCategory = i)"
+        @select="(i: number) => (activeCategory = activeCategory === i ? -1 : i)"
       />
 
       <!-- FAQ accordion -->
-      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14 lg:px-6">
-        <PagesFaqAccordion :items="filteredItems" :default-open="2" />
+      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14 lg:max-w-[1020px] lg:px-6">
+        <PagesFaqAccordion
+          v-if="filteredItems.length"
+          :key="activeCategory"
+          :items="filteredItems"
+          :default-open="2"
+        />
+        <UiTypography
+          v-else
+          as="p"
+          size="lg"
+          weight="regular"
+          color="muted"
+          class="py-10 text-center"
+        >
+          سوالی با این عنوان یافت نشد.
+        </UiTypography>
       </div>
     </main>
 

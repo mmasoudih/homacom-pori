@@ -5,10 +5,13 @@ const props = withDefaults(defineProps<{
   title: string
   subtitle?: string
   breadcrumb?: string[]
+  /** Render the in-header breadcrumb on mobile only (`lg:hidden`). */
+  hideBreadcrumbOnDesktop?: boolean
   class?: string
 }>(), {
   subtitle: '',
   breadcrumb: undefined,
+  hideBreadcrumbOnDesktop: false,
   class: '',
 })
 
@@ -20,7 +23,7 @@ const parts = computed(() => props.breadcrumb ?? [])
     <ProductDetailBreadcrumb
       v-if="parts.length"
       :trail="parts"
-      class="-mt-2 mb-6 justify-start"
+      :class="cn('-mt-2 mb-6 justify-start', hideBreadcrumbOnDesktop && 'lg:hidden')"
     />
 
     <!-- Icon slot (optional) -->

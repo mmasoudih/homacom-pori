@@ -54,6 +54,7 @@ export const typographyVariants = cva("font-sans", {
     },
     color: {
       default: "text-T-900",
+      emphasis: "text-T-800",
       muted: "text-T-700",
       subtle: "text-T-600",
       primary: "text-primary",
