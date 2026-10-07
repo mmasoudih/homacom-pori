@@ -19,9 +19,12 @@ export interface FaqItem {
 const props = withDefaults(defineProps<{
   items: FaqItem[]
   defaultOpen?: number
+  /** Remove the built-in horizontal padding (use when the parent already provides a gutter). */
+  flush?: boolean
   class?: string
 }>(), {
   defaultOpen: -1,
+  flush: false,
   class: '',
 })
 
@@ -41,7 +44,7 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
       :value="`item-${i}`"
       class="border-T-400"
     >
-      <AccordionTrigger class="group px-1 py-5 hover:no-underline">
+      <AccordionTrigger :class="cn('group py-5 hover:no-underline', !props.flush && 'px-1')">
         <div class="flex flex-1 items-center justify-between gap-4">
           <UiTypography
             as="span"
@@ -71,7 +74,7 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
           </span>
         </template>
       </AccordionTrigger>
-      <AccordionContent class="px-1">
+      <AccordionContent :class="!props.flush ? 'px-1' : undefined">
         <UiTypography
           as="p"
           size="lg"

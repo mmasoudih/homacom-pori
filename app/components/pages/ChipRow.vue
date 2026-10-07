@@ -38,10 +38,13 @@ const props = withDefaults(defineProps<{
   items: ChipItem[]
   active?: number
   desktopGrid?: boolean
+  /** Color applied to the chip label and icon. Defaults to inheriting the button state color. */
+  contentColor?: 'inherit' | 'default'
   class?: string
 }>(), {
   active: 0,
   desktopGrid: false,
+  contentColor: 'inherit',
   class: '',
 })
 
@@ -99,8 +102,11 @@ function select(i: number) {
       class="flex h-[97px] min-w-[112px] shrink-0 flex-col items-center justify-center gap-2 rounded-[20px] border px-4 py-4 transition-colors lg:w-[135.43px] lg:min-w-0"
       :class="[
         i === active
-          ? 'border-primary bg-R-50 text-primary'
-          : 'border-T-400 bg-T-50 text-T-700 hover:border-T-500',
+          ? 'border-primary bg-R-50'
+          : 'border-T-400 bg-T-50 hover:border-T-500',
+        props.contentColor === 'default'
+          ? (i === active ? 'text-R-300' : 'text-T-900')
+          : (i === active ? 'text-primary' : 'text-T-700'),
         item.desktopOnly ? 'hidden lg:flex' : '',
       ]"
       @click="select(i)"

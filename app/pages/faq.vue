@@ -66,16 +66,18 @@ const filteredItems = computed(() => {
         :active="activeCategory"
         :items="faqPage.categories"
         class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
+        content-color="default"
         @select="(i: number) => (activeCategory = activeCategory === i ? -1 : i)"
       />
 
       <!-- FAQ accordion -->
-      <div class="mt-10 w-full max-w-[1440px] px-4 lg:mt-14 lg:max-w-[1020px] lg:px-6">
+      <div class="mt-10 w-full max-w-[1440px] lg:mt-14 lg:max-w-[1020px]">
         <PagesFaqAccordion
           v-if="filteredItems.length"
           :key="activeCategory"
           :items="filteredItems"
           :default-open="2"
+          flush
         />
         <UiTypography
           v-else
