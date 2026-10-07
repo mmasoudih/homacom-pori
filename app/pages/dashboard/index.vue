@@ -25,7 +25,7 @@ useHead({
       </div>
     </main>
 
-    <LandingCeoSection class="hidden lg:block" />
+    <LandingCeoSection />
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
   </div>

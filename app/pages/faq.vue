@@ -89,7 +89,7 @@ const filteredItems = computed(() => {
       </div>
     </main>
 
-    <LandingCeoSection class="hidden lg:block" />
+    <LandingCeoSection />
 
     <PagesAboutBand class="mt-auto lg:hidden" />
 
