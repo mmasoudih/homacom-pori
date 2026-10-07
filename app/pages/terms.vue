@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconClock, IconFileText } from '@tabler/icons-vue'
 import { termsPage } from '~/data/pages/terms'
 
 useHead({
@@ -12,58 +11,82 @@ useHead({
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+      <ProductDetailBreadcrumb
+        :trail="['هماکام', 'شرایط و مقررات']"
+        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      />
+
       <PagesPageHeader
-        class="pt-10 lg:pt-16"
+        class="pt-10 lg:pt-0"
         :title="termsPage.title"
-        :subtitle="termsPage.subtitle"
-        :breadcrumb="['کاتالوگ', 'شرایط و مقررات']"
       >
         <template #icon>
-          <div class="flex size-[88px] items-center justify-center rounded-[20px] bg-[#C63A76]">
-            <div class="relative flex flex-col items-center">
-              <IconFileText class="size-9 text-white" />
-              <IconClock class="absolute -bottom-7 size-4 text-white/80" />
-            </div>
-          </div>
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_439_11087)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.6376 35.8527C13.5322 35.8527 13.4267 35.8527 13.3213 35.8175C12.1613 35.4309 10.896 35.3254 9.66573 35.466C9.10334 35.5363 8.61125 35.1497 8.5058 34.5873L4.00668 7.80347C3.97153 7.48713 4.04183 7.20593 4.25272 6.95989C4.42847 6.71384 4.74481 6.57324 5.06116 6.57324H13.6376C14.2351 6.57324 14.6921 7.06533 14.6921 7.62772V34.7982C14.6921 35.1497 14.5515 35.466 14.2703 35.6418C14.0946 35.7824 13.8837 35.8527 13.6376 35.8527Z" fill="#B8B8E6" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M58.9099 59.9649H13.6375C13.0751 59.9649 12.6182 59.4728 12.6182 58.9104V53.2162C12.6182 52.7592 12.8994 52.3374 13.3212 52.1968C16.9415 51.0721 19.3317 47.768 19.3317 44.007C19.3317 40.2461 16.9415 36.942 13.3212 35.8172C12.8994 35.6766 12.6182 35.2548 12.6182 34.7979V1.08964C12.6182 0.492098 13.0751 0.0351562 13.6375 0.0351562H58.9099C59.4723 0.0351562 59.9644 0.492098 59.9644 1.08964V58.9104C59.9644 59.4728 59.4723 59.9649 58.9099 59.9649Z" fill="#CCCCFF" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M46.9592 7.38142H25.6235C25.026 7.38142 24.569 6.88933 24.569 6.32694C24.569 5.7294 25.026 5.27246 25.6235 5.27246H46.9592C47.5216 5.27246 47.9785 5.7294 47.9785 6.32694C47.9785 6.88933 47.5216 7.38142 46.9592 7.38142ZM29.736 29.174H18.9803C18.3827 29.174 17.9258 28.7171 17.9258 28.1196C17.9258 27.522 18.3827 27.0651 18.9803 27.0651H29.736C30.3335 27.0651 30.7905 27.522 30.7905 28.1196C30.7905 28.7171 30.3335 29.174 29.736 29.174ZM29.736 33.1459H18.9803C18.3827 33.1459 17.9258 32.689 17.9258 32.0914C17.9258 31.5291 18.3827 31.037 18.9803 31.037H29.736C30.3335 31.037 30.7905 31.5291 30.7905 32.0914C30.7905 32.689 30.3335 33.1459 29.736 33.1459ZM53.6024 54.7276H18.9803C18.3827 54.7276 17.9258 54.2356 17.9258 53.6732C17.9258 53.0756 18.3827 52.6187 18.9803 52.6187H53.6024C54.1648 52.6187 54.6217 53.0756 54.6217 53.6732C54.6217 54.2356 54.1648 54.7276 53.6024 54.7276ZM53.6024 49.4552H23.9715C23.4091 49.4552 22.917 48.9983 22.917 48.4008C22.917 47.8384 23.4091 47.3463 23.9715 47.3463H53.6024C54.1648 47.3463 54.6217 47.8384 54.6217 48.4008C54.6217 48.9983 54.1648 49.4552 53.6024 49.4552ZM53.6024 44.1828H23.9715C23.4091 44.1828 22.917 43.7259 22.917 43.1283C22.917 42.566 23.4091 42.0739 23.9715 42.0739H53.6024C54.1648 42.0739 54.6217 42.566 54.6217 43.1283C54.6217 43.7259 54.1648 44.1828 53.6024 44.1828ZM53.6024 38.9456H23.9715C23.4091 38.9456 22.917 38.4535 22.917 37.8911C22.917 37.2935 23.4091 36.8366 23.9715 36.8366H53.6024C54.1648 36.8366 54.6217 37.2935 54.6217 37.8911C54.6217 38.4535 54.1648 38.9456 53.6024 38.9456ZM53.6024 23.1635H18.9803C18.3827 23.1635 17.9258 22.6714 17.9258 22.109C17.9258 21.5115 18.3827 21.0545 18.9803 21.0545H53.6024C54.1648 21.0545 54.6217 21.5115 54.6217 22.109C54.6217 22.6714 54.1648 23.1635 53.6024 23.1635Z" fill="#333333" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.7557 54.7273C4.85062 54.7273 0.0351562 49.9118 0.0351562 44.0067C0.0351562 38.1016 4.85062 33.2861 10.7557 33.2861C16.6608 33.2861 21.4411 38.1016 21.4411 44.0067C21.4411 49.9118 16.6608 54.7273 10.7557 54.7273Z" fill="#9999FF" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M8.71713 48.1898C8.43594 48.1898 8.15474 48.0843 7.94385 47.8734L5.76459 45.6942C5.34279 45.2724 5.34279 44.6045 5.76459 44.2179C6.18638 43.7961 6.85422 43.7961 7.24086 44.2179L8.71713 45.659L14.2356 40.1406C14.6574 39.7188 15.3252 39.7188 15.7119 40.1406C16.1337 40.5272 16.1337 41.195 15.7119 41.6168L9.45527 47.8734C9.24438 48.0843 8.96318 48.1898 8.71713 48.1898Z" fill="white" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M53.6024 33.6732H33.8485C33.2861 33.6732 32.794 33.2163 32.794 32.6187V27.5924C32.794 27.03 33.2861 26.5379 33.8485 26.5379H53.6024C54.1648 26.5379 54.6217 27.03 54.6217 27.5924V32.6187C54.6569 33.2163 54.1648 33.6732 53.6024 33.6732ZM53.6024 17.6802H18.9803C18.3827 17.6802 17.9258 17.1882 17.9258 16.6258V11.5994C17.9258 11.0019 18.3827 10.5449 18.9803 10.5449H53.6024C54.1648 10.5449 54.6217 11.0019 54.6217 11.5994V16.6258C54.6569 17.1882 54.1648 17.6802 53.6024 17.6802Z" fill="#8F46DA" />
+            </g>
+            <defs>
+              <clipPath id="clip0_439_11087">
+                <rect width="60" height="60" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
         </template>
       </PagesPageHeader>
 
       <!-- Document sections -->
       <div class="mt-12 w-full max-w-[1440px] px-4 lg:mt-16 lg:px-6">
-        <template v-for="(section, si) in termsPage.sections" :key="si">
-          <section class="py-2">
-            <h2 class="text-[20px] font-bold leading-[30px] text-foreground">
-              {{ section.heading }}
-            </h2>
+        <section v-for="(section, si) in termsPage.sections" :key="si" class="py-2">
+          <UiTypography
+            as="h2"
+            size="lgXl"
+            weight="semibold"
+            color="default"
+            class="leading-[30px]"
+          >
+            {{ section.heading }}
+          </UiTypography>
 
-            <p
-              v-for="(para, pi) in section.paragraphs ?? []"
-              :key="`p-${pi}`"
-              class="mt-4 text-[14.5px] leading-[28px] text-T-700"
+          <UiTypography
+            v-for="(para, pi) in section.paragraphs ?? []"
+            :key="`p-${pi}`"
+            as="p"
+            size="mdLg"
+            weight="regular"
+            color="emphasis"
+            class="mt-4 leading-[28px]"
+          >
+            {{ para }}
+          </UiTypography>
+
+          <ul v-if="section.clauses?.length" class="mt-4 flex flex-col gap-3 ps-5">
+            <li
+              v-for="(clause, ci) in section.clauses"
+              :key="`c-${ci}`"
+              class="flex items-start gap-3"
             >
-              {{ para }}
-            </p>
-
-            <ul v-if="section.clauses?.length" class="mt-4 flex flex-col gap-3">
-              <li
-                v-for="(clause, ci) in section.clauses"
-                :key="`c-${ci}`"
-                class="flex items-start gap-3 text-[14.5px] leading-[28px] text-T-700"
+              <span class="mt-[11px] size-[6px] shrink-0 rounded-full bg-T-800" aria-hidden="true" />
+              <UiTypography
+                size="mdLg"
+                weight="regular"
+                color="emphasis"
+                class="leading-[28px]"
               >
-                <span class="mt-[1px] flex size-6 shrink-0 items-center justify-center rounded-full bg-T-100 text-[12.5px] font-semibold text-primary">
-                  {{ ci + 1 }}
-                </span>
-                <span>{{ clause }}؛</span>
-              </li>
-            </ul>
-          </section>
-
-          <div v-if="si < termsPage.sections.length - 1" class="my-8 h-px w-full bg-T-400" />
-        </template>
+                {{ clause }}
+              </UiTypography>
+            </li>
+          </ul>
+        </section>
       </div>
     </main>
 
-    <PagesAboutBand class="mt-auto" />
+    <LandingCeoSection />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
