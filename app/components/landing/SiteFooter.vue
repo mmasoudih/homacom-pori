@@ -67,8 +67,12 @@ function scrollTop() {
               @click="openRow = openRow === row.title ? '' : row.title"
             >
               <span class="flex items-center gap-[11px]">
-                <span class="h-[18px] w-[5px] rounded-[2px] bg-primary" />
-                <span class="h-[11px] w-[5px] rounded-[2px] bg-primary/25" />
+                <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g opacity="0.25">
+                    <rect y="4" width="5.5" height="12" rx="2.75" fill="#EF233C" />
+                  </g>
+                  <rect x="7.5" width="5.5" height="20" rx="2.75" fill="#EF233C" />
+                </svg>
                 <span class="text-[16px] font-bold">
                   <span class="text-T-900">{{ titleParts(row.title).lead }}&nbsp;</span>
                   <span class="text-primary">{{
@@ -101,8 +105,12 @@ function scrollTop() {
           <!-- Link columns -->
           <div v-for="col in footerData.columns" :key="col.title">
             <h4 class="flex items-center gap-[11px]">
-              <span class="h-[22px] w-[6px] rounded-[2px] bg-primary" />
-              <span class="h-[14px] w-[6px] rounded-[2px] bg-primary/25" />
+              <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g opacity="0.25">
+                  <rect y="4" width="5.5" height="12" rx="2.75" fill="#EF233C" />
+                </g>
+                <rect x="7.5" width="5.5" height="20" rx="2.75" fill="#EF233C" />
+              </svg>
               <UiTypography as="span" size="xl" weight="bold" class="leading-[28px]">
                 <span class="text-T-900">{{ titleParts(col.title).lead }} &nbsp;</span>
                 <span class="text-primary">{{
@@ -129,8 +137,12 @@ function scrollTop() {
           <!-- Contact -->
           <div class="flex flex-col gap-7">
             <h4 class="flex items-center gap-[11px]">
-              <span class="h-[22px] w-[6px] rounded-[2px] bg-primary" />
-              <span class="h-[14px] w-[6px] rounded-[2px] bg-primary/25" />
+              <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g opacity="0.25">
+                  <rect y="4" width="5.5" height="12" rx="2.75" fill="#EF233C" />
+                </g>
+                <rect x="7.5" width="5.5" height="20" rx="2.75" fill="#EF233C" />
+              </svg>
               <UiTypography as="span" size="xl" weight="bold" class="leading-[28px]">
                 <span class="text-T-900">{{
                   titleParts(footerData.contactTitle).lead
