@@ -10,17 +10,17 @@ useHead({
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
-      <UiBreadcrumb
-        :trail="['هماکام', 'درباره ما']"
-        class="mx-auto hidden w-full max-w-[1440px] pt-10 lg:flex lg:pt-4 lg:pb-8"
-      />
+    <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+    <UiBreadcrumb
+      :trail="['هماکام', 'درباره ما']"
+      class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+    />
 
+    <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
       <!-- Hero card -->
-      <section class="mt-10 w-full max-w-[1020px] rounded-[16px] bg-T-50 lg:mt-0 lg:grid lg:grid-cols-[240px_1fr] lg:gap-6 lg:p-8 lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <section class="mt-10 w-full max-w-[1020px] rounded-[16px] bg-T-50 lg:mt-0 lg:grid lg:grid-cols-[209px_1fr] lg:gap-6 lg:p-8 lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
         <!-- Right rail -->
-        <div class="flex flex-col items-center justify-center gap-5 rounded-[25px] bg-T-200 p-6 lg:h-[247px] lg:w-[209px] lg:justify-self-center">
+        <div class="flex flex-col items-center justify-center gap-5 rounded-[25px] bg-T-200 p-6 lg:h-[247px] lg:w-[209px]">
           <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_439_19297)">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M0.28125 13.5C0.28125 6.19949 6.19949 0.28125 13.5 0.28125C20.8005 0.28125 26.7187 6.19949 26.7187 13.5C26.7187 20.8005 20.8005 26.7188 13.5 26.7188C6.19949 26.7188 0.28125 20.8005 0.28125 13.5ZM12.375 8.4375C12.375 7.81618 12.8787 7.3125 13.5 7.3125C14.1213 7.3125 14.6251 7.81618 14.6251 8.4375C14.6251 9.05882 14.1213 9.5625 13.5 9.5625C12.8787 9.5625 12.375 9.05882 12.375 8.4375ZM10.9687 12.375C10.9687 11.909 11.3465 11.5312 11.8125 11.5312H13.5C13.966 11.5312 14.3438 11.909 14.3438 12.375L14.3438 19.125C14.3438 19.591 13.966 19.9688 13.5 19.9688C13.034 19.9688 12.6563 19.591 12.6563 19.125L12.6563 13.2188H11.8125C11.3465 13.2188 10.9687 12.841 10.9687 12.375Z" fill="#C8CCD2" />
@@ -55,10 +55,10 @@ useHead({
 
         <!-- Content -->
         <div class="mt-2 rounded-[25px] bg-T-200 p-6 lg:mt-0">
-          <UiTypography as="p" size="md" weight="regular" color="emphasis" class="leading-[30px]">
+          <UiTypography as="p" size="mdLg" weight="regular" color="emphasis" class="leading-[30px]">
             {{ aboutPage.hero }}
           </UiTypography>
-          <UiTypography as="p" size="md" weight="regular" color="emphasis" class="mt-4 leading-[30px]">
+          <UiTypography as="p" size="mdLg" weight="regular" color="emphasis" class="mt-4 leading-[30px]">
             {{ aboutPage.heroExtra }}
           </UiTypography>
         </div>
@@ -81,7 +81,7 @@ useHead({
             v-for="(para, pi) in section.paragraphs"
             :key="`p-${pi}`"
             as="p"
-            size="md"
+            size="mdLg"
             weight="regular"
             color="emphasis"
             class="mt-4 leading-[30px]"
@@ -90,6 +90,9 @@ useHead({
           </UiTypography>
         </template>
       </section>
+
+      <!-- CEO / store description band (same as the landing page) -->
+      <LandingCeoSection class="mt-10 w-full lg:mt-12" />
     </main>
 
     <LandingSiteFooter class="mt-auto" />
