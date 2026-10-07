@@ -30,10 +30,10 @@ const parts = computed(() => props.breadcrumb ?? [])
 
     <UiTypography
       as="h1"
-      size="xl"
+      size="xl3xl"
       weight="medium"
       color="default"
-      class="text-center lg:text-[20px]"
+      class="text-center"
     >
       {{ title }}
     </UiTypography>

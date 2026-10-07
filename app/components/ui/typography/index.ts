@@ -31,6 +31,8 @@ export const typographyVariants = cva("font-sans", {
        */
       "lgXl": "text-[14px] lg:text-[16px]",
       "xl2xl": "text-[16px] lg:text-[18px]",
+      "xl3xl": "text-[16px] lg:text-[20px]",
+      "mdLg": "text-[12.5px] lg:text-[14px]",
       "xsMd": "text-[11.25px] lg:text-[12.5px]",
       "3xsSm": "text-[10px] lg:text-[11.5px]",
     },
