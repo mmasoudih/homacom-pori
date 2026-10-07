@@ -46,7 +46,7 @@ function scrollTop() {
 <template>
   <footer class="w-full lg:px-6">
     <div
-      class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden rounded-3xl bg-T-200 p-4 pt-4 lg:p-10 lg:pt-10 pb-25 lg:pb-0"
+      class="relative isolate mx-auto w-full max-w-[1440px] overflow-hidden bg-T-200 p-4 pt-4 lg:p-10 lg:pt-10 pb-25 lg:pb-0 lg:rounded-3xl"
     >
       <!-- Watermark texture -->
       <div
@@ -200,7 +200,7 @@ function scrollTop() {
 
         <!-- ============================== About ============================ -->
         <div
-          class="mt-6 flex flex-col gap-6 rounded-2xl bg-T-50 p-6 lg:mt-[34px] lg:gap-[46px] lg:p-[36px]"
+          class="mt-6 flex flex-col gap-6 rounded-2xl bg-T-50 p-6 lg:mt-[34px] lg:flex-row lg:items-start lg:gap-[46px] lg:p-[36px]"
         >
           <a href="#" class="shrink-0">
             <img
