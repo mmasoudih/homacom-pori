@@ -137,24 +137,40 @@ const categoryIcons: Record<string, string> = {
           </div>
 
           <!-- Homacom branded panel -->
-          <div class="mx-auto w-full max-w-[380px]">
-            <div class="relative mx-auto flex h-[280px] w-[232px] flex-col justify-between overflow-hidden rounded-[20px] bg-gradient-to-br from-[#D32F3C] to-[#A7192A] px-6 py-5 shadow-[0_18px_40px_rgba(239,35,60,0.35)]">
-              <div class="flex items-center justify-between">
-                <img
-                  src="/icons/installment/logo-white.svg"
-                  alt="هماکام"
-                  class="h-[27px] w-[35px] object-contain"
-                >
-                <span class="text-[13px] font-semibold text-white/90">{{ installmentPage.cardBadge }}</span>
-              </div>
+          <div class="mx-auto flex w-full max-w-[380px] items-center justify-center py-8">
+            <div class="relative h-[360px] w-[300px]">
+              <!-- Stacked layers behind the card -->
+              <div class="absolute inset-0 -translate-x-2 -translate-y-2 -rotate-[12deg] rounded-[30px] bg-white shadow-[0_30px_60px_-12px_rgba(15,15,20,0.28)]" />
+              <div class="absolute inset-0 -translate-x-1 -translate-y-1 -rotate-[7deg] rounded-[30px] bg-[#F2B7BE]" />
 
-              <div class="flex flex-col items-center gap-1 text-center">
-                <span class="text-[22px] font-bold leading-[32px] text-white">هماکام</span>
-                <span class="text-[13px] leading-[24px] text-white/80">خرید اقساطی بدون ضامن</span>
-              </div>
+              <!-- Front card -->
+              <div class="relative z-10 flex h-full w-full rotate-[5deg] flex-col justify-between rounded-[30px] bg-gradient-to-br from-[#EF233C] to-[#A7192A] px-7 py-8 shadow-[0_30px_55px_-10px_rgba(167,25,42,0.5)]">
+                <div class="flex items-start justify-between">
+                  <span class="text-[19px] font-bold leading-none text-white">هماکام</span>
+                  <img
+                    src="/icons/installment/logo-white.svg"
+                    alt=""
+                    class="h-[26px] w-[34px] object-contain"
+                  >
+                </div>
 
-              <div class="flex items-center justify-center">
-                <span class="text-[13px] font-medium text-white/90">اقساط تا ۲۴ ماه</span>
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="flex flex-col items-start">
+                    <span class="text-[13px] leading-none text-white/80">تا</span>
+                    <span class="text-[56px] font-bold leading-[0.95] text-white">۲۴</span>
+                  </div>
+                  <span class="text-[15px] leading-none text-white/90">ماه اقساط</span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-white/85">۲۴ ماه</span>
+                    <span class="text-[12px] text-white/85">قسط اول</span>
+                  </div>
+                  <div class="h-[6px] w-full overflow-hidden rounded-full bg-white/25">
+                    <div class="h-full w-[55%] rounded-full bg-white" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
