@@ -1,5 +1,22 @@
 import type { FaqItem } from '~/components/pages/FaqAccordion.vue'
 
+export interface InstallmentPartner {
+  name: string
+  logo: string
+  /** Brand color used for the tab border/label tint. */
+  color: string
+  /** Tagline shown beside the logo in the plan panel. */
+  description: string
+  /** نوع ضمانت */
+  guarantee: string
+  /** بازه تسویه */
+  settlement: string
+  /** سقف وام */
+  ceiling: string
+  /** نوع اعتبار (مثلاً وام یا اعتبار) */
+  credit: string
+}
+
 export interface InstallmentPageData {
   title: string
   /** Word within `title` rendered in the brand accent color (R-300). */
@@ -9,13 +26,10 @@ export interface InstallmentPageData {
   complaintsCta: string
   cardBadge: string
   stepsTitle: string
-  steps: Array<{ label: string, icon: string }>
+  steps: Array<{ label: string, subtitle: string, icon: string }>
   partnersTitle: string
   partnersIntro: string
-  partners: Array<{ name: string, color: string }>
-  planTitle: string
-  planOptions: string[]
-  planCta: string
+  partners: InstallmentPartner[]
   benefitsTitle: string
   benefitsIntro: string
   benefits: Array<{ title: string, body: string, icon: string }>
@@ -34,26 +48,68 @@ export const installmentPage: InstallmentPageData = {
   applyCta: 'درخواست خرید اقساطی',
   complaintsCta: 'شکایات اعتباری',
   cardBadge: '۲۴ ساعته',
-  stepsTitle: 'مراحل خرید اقساطی',
+  stepsTitle: 'مراحل خرید اقساطی:',
   steps: [
-    { label: 'ثبت‌نام و احراز هویت', icon: 'user' },
-    { label: 'درخواست سقف خرید', icon: 'credit' },
-    { label: 'تأیید متقاضی', icon: 'check' },
-    { label: 'انتخاب کالا از فروشگاه', icon: 'package' },
-    { label: 'پرداخت اقساط / نهایی‌سازی', icon: 'wallet' },
+    { label: 'ثبت‌نام و دریافت اعتبار', subtitle: 'در یکی از سایت‌های طرف قرارداد ثبت‌نام و اعتبار دریافت کنید.', icon: 'verify' },
+    { label: 'ورود به حساب هماکام', subtitle: 'با همان شماره تلفن وارد حساب کاربری هماکام شوید.', icon: 'account' },
+    { label: 'انتخاب کالا و سبد خرید', subtitle: 'کالای موردنظر را انتخاب و به سبد خرید اضافه کنید.', icon: 'cart' },
+    { label: 'نهایی کردن خرید', subtitle: 'تایید جزئیات خرید و ثبت سفارش در فروشگاه', icon: 'order' },
+    { label: 'پرداخت با اعتبار', subtitle: 'در بخش «روش پرداخت»، گزینه «پرداخت اقساطی» را انتخاب کنید.', icon: 'payment' },
   ],
   partnersTitle: 'شرکای اعتباری هماکام',
-  partnersIntro: 'هماکام با همکاری معتبرترین مؤسسات اعتباری کشور، خرید اقساطی را برای شما فراهم کرده است.',
+  partnersIntro: 'هر شریک اعتباری شرایط پرداخت متفاوتی داره؛ قبل از ثبت درخواست، سقف وام، بازه تسویه و نوع ضمانت هرکدوم رو مقایسه کن.',
   partners: [
-    { name: 'لامیا', color: '#1E63D0' },
-    { name: 'کیمیا', color: '#0FA3A3' },
-    { name: 'تسهیلات', color: '#6C4BD8' },
-    { name: 'مهر اقتصاد', color: '#B0234E' },
-    { name: 'گنجینه', color: '#C96A12' },
+    {
+      name: 'اسنپ‌پی',
+      logo: '/icons/installment/partners/snapp-pay.svg',
+      color: '#007DFA',
+      description: 'اعتبار خرید آنلاین اسنپ‌پی',
+      guarantee: 'چک صیادی بنفش',
+      settlement: '۴ ماه، ۱۸ ماه',
+      ceiling: '۲۰ و ۱۰۰ میلیون تومان',
+      credit: 'وام',
+    },
+    {
+      name: 'تکنوپی',
+      logo: '/icons/installment/partners/techno-pay.svg',
+      color: '#00B7CE',
+      description: 'اعتبار خرید اقساطی تکنوپی',
+      guarantee: 'چک صیادی',
+      settlement: '۶ ماه، ۱۲ ماه',
+      ceiling: '۱۰ و ۵۰ میلیون تومان',
+      credit: 'وام',
+    },
+    {
+      name: 'دیجی‌پی',
+      logo: '/icons/installment/partners/digipay.svg',
+      color: '#003EFF',
+      description: 'اعتبار خرید آنلاین دیجی‌پی',
+      guarantee: 'چک صیادی',
+      settlement: '۴ ماه، ۱۲ ماه',
+      ceiling: '۱۵ و ۸۰ میلیون تومان',
+      credit: 'اعتبار',
+    },
+    {
+      name: 'ازکی وام',
+      logo: '/icons/installment/partners/azki-vam.svg',
+      color: '#364FD9',
+      description: 'وام و اعتبار خرید ازکی وام',
+      guarantee: 'چک صیادی',
+      settlement: '۱۲ ماه، ۲۴ ماه',
+      ceiling: '۵۰ و ۲۰۰ میلیون تومان',
+      credit: 'وام',
+    },
+    {
+      name: 'لندو',
+      logo: '/icons/installment/partners/lendo.svg',
+      color: '#0AC974',
+      description: 'اعتبار خرید آنلاین لندو',
+      guarantee: 'چک صیادی',
+      settlement: '۴ ماه، ۱۸ ماه',
+      ceiling: '۲۰ و ۱۰۰ میلیون تومان',
+      credit: 'وام',
+    },
   ],
-  planTitle: 'انتخاب سقف اعتبار و بازپرداخت',
-  planOptions: ['۱۲', '۲۴', '۳۶'],
-  planCta: 'درخواست اعتبار',
   benefitsTitle: 'مزایای خرید اقساطی هماکام',
   benefitsIntro: 'خرید اقساطی از هماکام مزایای زیادی دارد که زندگی شما را ساده‌تر می‌کند.',
   benefits: [

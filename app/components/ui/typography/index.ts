@@ -14,6 +14,7 @@ export { default as Typography } from "./Typography.vue"
 export const typographyVariants = cva("font-sans", {
   variants: {
     size: {
+      "5xl": "text-[26px] lg:text-[26px]",
       "4xl": "text-[22px] lg:text-[22px]",
       "3xl": "text-[20px] lg:text-[20px]",
       "2xl": "text-[18px] lg:text-[18px]",
