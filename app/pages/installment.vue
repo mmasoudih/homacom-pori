@@ -3,21 +3,17 @@ import {
   IconArrowLeft,
   IconChevronLeft,
   IconChevronRight,
-  IconPackage,
-  IconWallet,
-  IconUserCheck,
-  IconBolt,
-  IconDeviceMobile,
-  IconDeviceLaptop,
-  IconDeviceWatch,
-  IconHeadphones,
-  IconDeviceGamepad2,
-  IconDeviceDesktop,
-  IconUsb,
-  IconSpeakerphone,
 } from '@tabler/icons-vue'
 import { installmentPage } from '~/data/pages/installment'
 import { toPersianDigits } from '~/utils/format'
+import mobileCategoryIcon from '../../public/icons/category-menu/mobile.svg?raw'
+import laptopCategoryIcon from '../../public/icons/category-menu/laptop.svg?raw'
+import watchCategoryIcon from '../../public/icons/category-menu/watch.svg?raw'
+import headphonesCategoryIcon from '../../public/icons/category-menu/headphones.svg?raw'
+import gamepadCategoryIcon from '../../public/icons/category-menu/gamepad.svg?raw'
+import displayCategoryIcon from '../../public/icons/category-menu/display.svg?raw'
+import usbCategoryIcon from '../../public/icons/category-menu/usb.svg?raw'
+import speakersCategoryIcon from '../../public/icons/category-menu/speakers.svg?raw'
 
 useHead({
   title: 'خرید اقساطی | هماکام',
@@ -50,23 +46,26 @@ const stepIcons: Record<string, string> = {
   payment: '/icons/installment/step-5-payment.svg',
 }
 
-const benefitIcons = {
-  package: IconPackage,
-  bolt: IconBolt,
-  user: IconUserCheck,
-  wallet: IconWallet,
-} as const
+const benefitIcons: Record<string, string> = {
+  package: '/icons/installment/benefit-package.svg',
+  bolt: '/icons/installment/benefit-bolt.svg',
+  user: '/icons/installment/benefit-user.svg',
+  wallet: '/icons/installment/benefit-wallet.svg',
+}
 
-const categoryIcons = {
-  'گوشی موبایل': IconDeviceMobile,
-  'لپ‌تاپ و تبلت': IconDeviceLaptop,
-  'ساعت هوشمند': IconDeviceWatch,
-  'هدفون و هندزفری': IconHeadphones,
-  'کنسول بازی': IconDeviceGamepad2,
-  'کامپیوتر': IconDeviceDesktop,
-  'لوازم جانبی': IconUsb,
-  'صوتی و تصویری': IconSpeakerphone,
-} as const
+const withIconSize = (svg: string) =>
+  svg.replace('width="24"', 'width="50"').replace('height="24"', 'height="50"')
+
+const categoryIcons: Record<string, string> = {
+  'گوشی موبایل': withIconSize(mobileCategoryIcon),
+  'لپ‌تاپ و تبلت': withIconSize(laptopCategoryIcon),
+  'ساعت هوشمند': withIconSize(watchCategoryIcon),
+  'هدفون و هندزفری': withIconSize(headphonesCategoryIcon),
+  'کنسول بازی': withIconSize(gamepadCategoryIcon),
+  'کامپیوتر': withIconSize(displayCategoryIcon),
+  'لوازم جانبی': withIconSize(usbCategoryIcon),
+  'صوتی و تصویری': withIconSize(speakersCategoryIcon),
+}
 </script>
 
 <template>
@@ -243,10 +242,7 @@ const categoryIcons = {
             :class="
               pi === selectedPartner
                 ? 'border-R-200 bg-R-50'
-                : 'bg-T-50 hover:border-T-500'
-            "
-            :style="
-              pi === selectedPartner ? undefined : { borderColor: `${partner.color}55` }
+                : 'border-T-400 bg-T-50 hover:border-T-500'
             "
             :aria-pressed="pi === selectedPartner"
             @click="selectedPartner = pi"
@@ -334,25 +330,26 @@ const categoryIcons = {
       </section>
 
       <!-- Benefits -->
-      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-6">
-        <h2 class="text-[22px] font-bold leading-[32px] text-primary">
-          {{ installmentPage.benefitsTitle }}
-        </h2>
-        <p class="mt-2 max-w-[760px] text-[14px] leading-[26px] text-T-700">
+      <section class="mt-16 w-full max-w-[1122px] px-4 lg:mt-20 lg:px-0">
+        <LandingSectionTitle :title="installmentPage.benefitsTitle" variant="centered" />
+        <UiTypography
+          as="p"
+          size="lg"
+          weight="regular"
+          color="muted"
+          class="mx-auto mt-4 max-w-[640px] text-center leading-[26px]"
+        >
           {{ installmentPage.benefitsIntro }}
-        </p>
+        </UiTypography>
 
         <div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-4">
           <article
             v-for="benefit in installmentPage.benefits"
             :key="benefit.title"
-            class="flex flex-col items-center gap-4 rounded-[16px] border border-T-400 bg-T-50 p-6 text-center transition-shadow hover:shadow-md"
+            class="flex flex-col items-start gap-4 rounded-[16px] border border-T-400 bg-T-50 p-6 text-start transition-shadow"
           >
-            <span class="flex size-12 items-center justify-center rounded-full border border-primary bg-R-10">
-              <component
-                :is="benefitIcons[benefit.icon as keyof typeof benefitIcons]"
-                class="size-6 text-primary"
-              />
+            <span class="flex size-12 items-center justify-center rounded-[12px] bg-R-10">
+              <img :src="benefitIcons[benefit.icon]" alt="" class="size-6">
             </span>
             <div class="flex flex-col gap-2">
               <h3 class="text-[15px] font-bold leading-[22px] text-foreground">
@@ -367,13 +364,17 @@ const categoryIcons = {
       </section>
 
       <!-- FAQ -->
-      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-6">
-        <h2 class="text-[22px] font-bold leading-[32px] text-primary">
-          {{ installmentPage.faqTitle }}
-        </h2>
-        <p class="mt-2 text-[14px] leading-[26px] text-T-700">
+      <section class="mt-16 w-full max-w-[1020px] px-4 lg:mt-20 lg:px-0">
+        <LandingSectionTitle :title="installmentPage.faqTitle" variant="centered" />
+        <UiTypography
+          as="p"
+          size="lg"
+          weight="regular"
+          color="muted"
+          class="mx-auto mt-4 max-w-[640px] text-center leading-[26px]"
+        >
           {{ installmentPage.faqSubtitle }}
-        </p>
+        </UiTypography>
 
         <div class="mt-8">
           <PagesFaqAccordion :items="installmentPage.faqItems" />
@@ -381,35 +382,38 @@ const categoryIcons = {
       </section>
 
       <!-- Categories -->
-      <section class="mt-16 w-full max-w-[1440px] px-4 lg:mt-20 lg:px-6">
-        <h2 class="text-[22px] font-bold leading-[32px] text-primary">
-          {{ installmentPage.categoriesTitle }}
-        </h2>
+      <section class="mt-16 w-full max-w-[1020px] px-4 lg:mt-20 lg:px-0">
+        <LandingSectionTitle :title="installmentPage.categoriesTitle" variant="centered" />
 
         <div class="mt-8 grid grid-cols-4 gap-4 lg:grid-cols-8">
           <button
             v-for="(category, ci) in installmentPage.categories"
             :key="category"
-            class="flex flex-col items-center gap-3 rounded-[14px] border py-5 transition-colors"
-            :class="
-              ci === selectedCategory
-                ? 'border-primary bg-R-10'
-                : 'border-T-400 bg-T-50 hover:border-T-500'
-            "
+            type="button"
+            class="flex flex-col items-center gap-3 transition-colors"
+            :class="ci === selectedCategory ? 'text-primary' : 'text-T-700 hover:text-T-800'"
             @click="selectedCategory = ci"
           >
-            <component
-              :is="categoryIcons[category as keyof typeof categoryIcons] ?? IconDeviceMobile"
-              class="size-7"
-              :class="ci === selectedCategory ? 'text-primary' : 'text-T-600'"
+            <span
+              class="[&>svg]:block"
+              aria-hidden="true"
+              v-html="categoryIcons[category]"
             />
-            <span class="text-[11.5px] font-medium leading-[16px] text-T-700">
+            <UiTypography
+              as="span"
+              size="xl"
+              weight="regular"
+              color="inherit"
+              class="leading-[16px]"
+            >
               {{ category }}
-            </span>
+            </UiTypography>
           </button>
         </div>
       </section>
     </main>
+
+    <LandingCeoSection class="mt-16 w-full lg:mt-20" />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />

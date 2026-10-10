@@ -48,10 +48,10 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
         <div class="flex flex-1 items-center justify-between gap-4">
           <UiTypography
             as="span"
-            size="lg"
+            size="xl"
             weight="semibold"
             color="default"
-            class="leading-[24px] font-medium lg:text-[16px] lg:font-semibold"
+            class="leading-[24px]"
           >
             {{ item.question }}
           </UiTypography>
@@ -77,10 +77,10 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
       <AccordionContent :class="props.flush ? 'px-4 lg:px-0' : 'px-1'">
         <UiTypography
           as="p"
-          size="md"
+          size="lg"
           weight="regular"
           color="emphasis"
-          class="max-w-[860px] pb-5 leading-[26px] lg:text-[14px]"
+          class="max-w-[860px] pb-5 leading-[26px]"
         >
           {{ item.answer }}
         </UiTypography>
