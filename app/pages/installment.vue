@@ -138,36 +138,36 @@ const categoryIcons: Record<string, string> = {
 
           <!-- Homacom branded panel -->
           <div class="mx-auto flex w-full max-w-[380px] items-center justify-center py-8">
-            <div class="relative h-[360px] w-[300px]">
+            <div class="relative h-[280px] w-[232px]">
               <!-- Stacked layers behind the card -->
-              <div class="absolute inset-0 -translate-x-2 -translate-y-2 -rotate-[12deg] rounded-[30px] bg-white shadow-[0_30px_60px_-12px_rgba(15,15,20,0.28)]" />
-              <div class="absolute inset-0 -translate-x-1 -translate-y-1 -rotate-[7deg] rounded-[30px] bg-[#F2B7BE]" />
+              <div class="absolute inset-0 -translate-x-1.5 -translate-y-1.5 -rotate-[12deg] rounded-[24px] bg-white shadow-[0_24px_50px_-10px_rgba(15,15,20,0.28)]" />
+              <div class="absolute inset-0 -translate-x-1 -translate-y-1 -rotate-[7deg] rounded-[24px] bg-[#F2B7BE]" />
 
               <!-- Front card -->
-              <div class="relative z-10 flex h-full w-full rotate-[5deg] flex-col justify-between rounded-[30px] bg-gradient-to-br from-[#EF233C] to-[#A7192A] px-7 py-8 shadow-[0_30px_55px_-10px_rgba(167,25,42,0.5)]">
+              <div class="relative z-10 flex h-full w-full rotate-[5deg] flex-col justify-between rounded-[24px] bg-gradient-to-br from-[#EF233C] to-[#A7192A] px-5 py-6 shadow-[0_24px_45px_-8px_rgba(167,25,42,0.5)]">
                 <div class="flex items-start justify-between">
-                  <span class="text-[19px] font-bold leading-none text-white">هماکام</span>
+                  <span class="text-[16px] font-bold leading-none text-white">هماکام</span>
                   <img
                     src="/icons/installment/logo-white.svg"
                     alt=""
-                    class="h-[26px] w-[34px] object-contain"
+                    class="h-[22px] w-[28px] object-contain"
                   >
                 </div>
 
-                <div class="flex flex-col items-center gap-1.5">
+                <div class="flex flex-col items-start gap-1">
                   <div class="flex flex-col items-start">
-                    <span class="text-[13px] leading-none text-white/80">تا</span>
-                    <span class="text-[56px] font-bold leading-[0.95] text-white">۲۴</span>
+                    <span class="text-[11px] leading-none text-white/80">تا</span>
+                    <span class="text-[42px] font-bold leading-[0.95] text-white">24</span>
                   </div>
-                  <span class="text-[15px] leading-none text-white/90">ماه اقساط</span>
+                  <span class="text-[13px] leading-none text-white/90">ماه اقساط</span>
                 </div>
 
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-1.5">
                   <div class="flex items-center justify-between">
-                    <span class="text-[12px] text-white/85">۲۴ ماه</span>
-                    <span class="text-[12px] text-white/85">قسط اول</span>
+                    <span class="text-[11px] text-white/85">24 ماه</span>
+                    <span class="text-[11px] text-white/85">قسط اول</span>
                   </div>
-                  <div class="h-[6px] w-full overflow-hidden rounded-full bg-white/25">
+                  <div class="h-[5px] w-full overflow-hidden rounded-full bg-white/25">
                     <div class="h-full w-[55%] rounded-full bg-white" />
                   </div>
                 </div>
@@ -177,7 +177,7 @@ const categoryIcons: Record<string, string> = {
           </div>
 
           <!-- Steps (anchored to the end of the hero) -->
-          <div class="mt-8 shrink-0">
+          <div class="mt-4 shrink-0">
             <UiTypography
               as="h2"
               size="2xl"
