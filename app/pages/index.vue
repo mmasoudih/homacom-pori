@@ -80,7 +80,7 @@ useHead({
 
       <LandingBlogSection class="order-9 w-full lg:order-none" />
 
-      <LandingCeoSection class="hidden lg:block" />
+      <LandingCeoSection class="order-11 w-full lg:order-none" />
     </main>
 
     <LandingSiteFooter id="contact" class="mt-auto" />

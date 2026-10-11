@@ -188,6 +188,6 @@ function toggleExpanded(id: string) {
       </article>
     </div>
 
-    <BlogPagination v-model:page="page" :total="125" class="mt-4" />
+    <AppPagination v-model:page="page" :pages="125" class="mt-4" />
   </section>
 </template>

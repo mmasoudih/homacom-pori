@@ -1,36 +1,27 @@
 <script setup lang="ts">
-import {
-  IconHeadphones,
-  IconDeviceWatch,
-  IconDeviceLaptop,
-  IconDeviceMobile,
-  IconDeviceDesktop,
-  IconDeviceGamepad2,
-  IconCreditCard,
-  IconTruckDelivery,
-  IconArrowBackUp,
-  IconUser,
-  IconTag,
-  IconPackage,
-  IconSpeakerphone,
-  IconKeyboard,
-  IconWallet,
-} from '@tabler/icons-vue'
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { cn } from '~/lib/utils'
 
 export interface ChipItem {
   label: string
   icon: string
+  /** Stable identifier used to match the chip against content. */
+  id?: string
+  /** Desktop-only chip (hidden below `lg`). */
+  desktopOnly?: boolean
 }
 
 const props = withDefaults(defineProps<{
   items: ChipItem[]
   active?: number
   desktopGrid?: boolean
+  /** Color applied to the chip label and icon. Defaults to inheriting the button state color. */
+  contentColor?: 'inherit' | 'default'
   class?: string
 }>(), {
   active: 0,
   desktopGrid: false,
+  contentColor: 'inherit',
   class: '',
 })
 
@@ -38,57 +29,54 @@ const emit = defineEmits<{
   select: [index: number]
 }>()
 
-const iconMap: Record<string, typeof IconHeadphones> = {
-  headphones: IconHeadphones,
-  watch: IconDeviceWatch,
-  laptop: IconDeviceLaptop,
-  mobile: IconDeviceMobile,
-  display: IconDeviceDesktop,
-  gamepad: IconDeviceGamepad2,
-  credit: IconCreditCard,
-  delivery: IconTruckDelivery,
-  return: IconArrowBackUp,
-  user: IconUser,
-  tag: IconTag,
-  package: IconPackage,
-  speakers: IconSpeakerphone,
-  keyboard: IconKeyboard,
-  wallet: IconWallet,
-}
-
-function select(i: number) {
-  emit('select', i)
-}
+/** Chips shown in the mobile carousel (desktop-only chips are excluded). */
+const mobileItems = computed(() =>
+  props.items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => !item.desktopOnly),
+)
 </script>
 
 <template>
-  <div
-    :class="cn(
-      props.desktopGrid
-        ? 'flex gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-7 lg:gap-3 lg:overflow-visible'
-        : 'flex gap-3 overflow-x-auto pb-1 lg:flex-wrap lg:justify-center lg:overflow-visible',
-      props.class,
-    )"
-  >
-    <button
-      v-for="(item, i) in items"
-      :key="item.label"
-      type="button"
-      class="flex min-w-[112px] shrink-0 flex-col items-center gap-2 rounded-[14px] border px-4 py-4 transition-colors lg:min-w-0"
-      :class="
-        i === active
-          ? 'border-primary bg-R-10 text-primary'
-          : 'border-T-400 bg-T-50 text-T-700 hover:border-T-500'
-      "
-      @click="select(i)"
+  <div :class="props.class">
+    <!-- Mobile: carousel -->
+    <Carousel
+      class="w-full lg:hidden"
+      :opts="{ direction: 'rtl', align: 'start', containScroll: 'trimSnaps', dragFree: true }"
     >
-      <component
-        :is="iconMap[item.icon] ?? IconPackage"
-        class="size-6"
+      <CarouselContent class="-ms-3">
+        <CarouselItem
+          v-for="{ item, index } in mobileItems"
+          :key="item.label"
+          class="basis-auto ps-3"
+        >
+          <PagesChipButton
+            :item="item"
+            :active="index === props.active"
+            :content-color="props.contentColor"
+            @select="emit('select', index)"
+          />
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
+
+    <!-- Desktop: wrapped row -->
+    <div
+      :class="cn(
+        props.desktopGrid
+          ? 'hidden lg:grid lg:grid-cols-7 lg:gap-3'
+          : 'hidden lg:flex lg:flex-wrap lg:justify-center lg:gap-3',
+      )"
+    >
+      <PagesChipButton
+        v-for="(item, i) in props.items"
+        :key="item.label"
+        :item="item"
+        :fill="props.desktopGrid"
+        :active="i === props.active"
+        :content-color="props.contentColor"
+        @select="emit('select', i)"
       />
-      <span class="text-[13px] font-medium leading-[18px]">
-        {{ item.label }}
-      </span>
-    </button>
+    </div>
   </div>
 </template>

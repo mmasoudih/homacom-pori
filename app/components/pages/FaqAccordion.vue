@@ -5,20 +5,26 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { IconMinus, IconPlus } from '@tabler/icons-vue'
 import { cn } from '~/lib/utils'
+import plusIcon from '../../../public/icons/faq-accordion-plus.svg?raw'
+import minusIcon from '../../../public/icons/faq-accordion-minus.svg?raw'
 
 export interface FaqItem {
   question: string
   answer: string
+  /** Matches a `ChipItem.id` so the FAQ list can be filtered by category. */
+  categoryId?: string
 }
 
 const props = withDefaults(defineProps<{
   items: FaqItem[]
   defaultOpen?: number
+  /** Remove the built-in horizontal padding (use when the parent already provides a gutter). */
+  flush?: boolean
   class?: string
 }>(), {
   defaultOpen: -1,
+  flush: false,
   class: '',
 })
 
@@ -38,30 +44,46 @@ const defaultValue = ref(props.defaultOpen >= 0 ? `item-${props.defaultOpen}` : 
       :value="`item-${i}`"
       class="border-T-400"
     >
-      <AccordionTrigger class="group px-1 py-5 hover:no-underline">
+      <AccordionTrigger :class="cn('group py-5 hover:no-underline', props.flush ? 'px-4 lg:px-0' : 'px-1')">
         <div class="flex flex-1 items-center justify-between gap-4">
-          <span class="text-[16px] font-semibold leading-[24px] text-foreground">
+          <UiTypography
+            as="span"
+            size="xl"
+            weight="semibold"
+            color="default"
+            class="leading-[24px]"
+          >
             {{ item.question }}
-          </span>
+          </UiTypography>
         </div>
 
         <template #icon>
           <span
-            class="flex size-8 shrink-0 items-center justify-center rounded-full border border-T-500 bg-T-50 text-T-700 transition-colors group-data-[state=open]:border-primary group-data-[state=open]:bg-primary group-data-[state=open]:text-white"
+            class="flex size-8 shrink-0 items-center justify-center text-T-900"
           >
-            <IconPlus
-              class="size-4 transition-transform duration-200 group-data-[state=open]:hidden"
+            <span
+              class="[&>svg]:block [&>svg]:size-5 group-data-[state=open]:hidden"
+              aria-hidden="true"
+              v-html="plusIcon"
             />
-            <IconMinus
-              class="size-4 hidden transition-transform duration-200 group-data-[state=open]:block"
+            <span
+              class="hidden [&>svg]:block [&>svg]:size-5 group-data-[state=open]:block"
+              aria-hidden="true"
+              v-html="minusIcon"
             />
           </span>
         </template>
       </AccordionTrigger>
-      <AccordionContent class="px-1">
-        <p class="max-w-[860px] pb-5 text-[14px] leading-[26px] text-T-700">
+      <AccordionContent :class="props.flush ? 'px-4 lg:px-0' : 'px-1'">
+        <UiTypography
+          as="p"
+          size="lg"
+          weight="regular"
+          color="emphasis"
+          class="max-w-[860px] pb-5 leading-[26px]"
+        >
           {{ item.answer }}
-        </p>
+        </UiTypography>
       </AccordionContent>
     </AccordionItem>
   </Accordion>

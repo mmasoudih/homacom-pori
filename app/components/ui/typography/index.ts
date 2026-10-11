@@ -14,6 +14,7 @@ export { default as Typography } from "./Typography.vue"
 export const typographyVariants = cva("font-sans", {
   variants: {
     size: {
+      "5xl": "text-[26px] lg:text-[26px]",
       "4xl": "text-[22px] lg:text-[22px]",
       "3xl": "text-[20px] lg:text-[20px]",
       "2xl": "text-[18px] lg:text-[18px]",
@@ -31,6 +32,8 @@ export const typographyVariants = cva("font-sans", {
        */
       "lgXl": "text-[14px] lg:text-[16px]",
       "xl2xl": "text-[16px] lg:text-[18px]",
+      "xl3xl": "text-[16px] lg:text-[20px]",
+      "mdLg": "text-[12.5px] lg:text-[14px]",
       "xsMd": "text-[11.25px] lg:text-[12.5px]",
       "3xsSm": "text-[10px] lg:text-[11.5px]",
     },
@@ -54,6 +57,7 @@ export const typographyVariants = cva("font-sans", {
     },
     color: {
       default: "text-T-900",
+      emphasis: "text-T-800",
       muted: "text-T-700",
       subtle: "text-T-600",
       primary: "text-primary",

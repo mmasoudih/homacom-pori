@@ -48,7 +48,7 @@ useHead({ title: 'جزئیات تیکت | هماکام' })
 <template>
   <div>
     <DashboardTicketsShell>
-      <section v-if="ticket" class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
+      <section v-if="ticket" class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:absolute lg:inset-0 lg:flex lg:flex-col lg:p-6">
         <DashboardTicketsDetailHeader
           :subject="ticket.subject"
           :department="ticket.department"
@@ -56,11 +56,11 @@ useHead({ title: 'جزئیات تیکت | هماکام' })
           @close="closeTicket"
         />
 
-        <div class="mt-5 border-t border-T-300 pt-6">
+        <div class="mt-5 -mx-4 border-t border-T-300 px-4 pt-6 lg:-mx-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:px-6">
           <DashboardTicketsMessageList :messages="ticket.messages" />
         </div>
 
-        <div class="mt-6 border-t border-T-300 pt-4">
+        <div class="mt-6 -mx-4 border-t border-T-300 lg:-mx-6 lg:-mb-6">
           <DashboardTicketsMessageComposer @send="sendMessage" />
         </div>
       </section>
@@ -78,10 +78,10 @@ useHead({ title: 'جزئیات تیکت | هماکام' })
         <button
           v-if="ticket && !closed"
           type="button"
-          class="flex h-8 items-center justify-center rounded-lg border border-T-400 px-3 text-[12px] font-semibold text-T-800"
+          class="flex h-9 items-center justify-center rounded-lg border border-T-400 px-[38px]"
           @click="closeTicket"
         >
-          بستن تیکت
+          <UiTypography as="span" size="md" weight="medium" color="default">بستن تیکت</UiTypography>
         </button>
         <span v-else-if="ticket" class="text-[12px] font-semibold text-T-500">بسته شده</span>
       </template>

@@ -80,45 +80,47 @@ const sheetShell
       </div>
 
       <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-        <p class="text-center text-[12.5px] text-T-600">لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید</p>
+        <UiTypography as="p" size="lg" weight="medium" color="default" class="text-start">لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید</UiTypography>
 
-        <div class="flex flex-col gap-2">
-          <span class="text-[13px] font-bold text-T-900">عنوان تیکت</span>
-          <Input v-model="subject" placeholder="عنوان تیکت" class="h-11 rounded-xl border-T-400 text-[13px]" />
-        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-2">
+            <UiTypography as="span" size="lg" weight="regular" color="default">عنوان تیکت</UiTypography>
+            <Input v-model="subject" placeholder="عنوان تیکت" class="h-11 rounded-xl border-T-400 text-[13px] shadow-none" />
+          </div>
 
-        <div class="flex flex-col gap-2">
-          <span class="text-[13px] font-bold text-T-900">موضوع</span>
-          <div class="relative">
-            <select
-              v-model="topic"
-              class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
-            >
-              <option value="" disabled>انتخاب موضوع</option>
-              <option v-for="item in ticketSubjects" :key="item.value" :value="item.value">
-                {{ item.label }}
-              </option>
-            </select>
-            <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />
+          <div class="flex flex-col gap-2">
+            <UiTypography as="span" size="lg" weight="regular" color="default">موضوع</UiTypography>
+            <div class="relative">
+              <select
+                v-model="topic"
+                class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
+              >
+                <option value="" disabled>انتخاب موضوع</option>
+                <option v-for="item in ticketSubjects" :key="item.value" :value="item.value">
+                  {{ item.label }}
+                </option>
+              </select>
+              <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />
+            </div>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-[13px] font-bold text-T-900">توضیحات</span>
-          <Textarea v-model="description" class="min-h-[150px] rounded-xl border-T-400 text-[13px]" placeholder="لطفا جزئیات مشکل را شرح دهید" />
+          <UiTypography as="span" size="lg" weight="regular" color="default">توضیحات</UiTypography>
+          <Textarea v-model="description" class="min-h-[150px] rounded-xl border-T-400 text-[13px] shadow-none" placeholder="لطفا جزئیات مشکل را شرح دهید" />
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-[13px] font-bold text-T-900">پیوست فایل (اختیاری)</span>
-          <div class="flex items-center gap-3">
+          <UiTypography as="span" size="lg" weight="regular" color="default">پیوست فایل (اختیاری)</UiTypography>
+          <div class="flex h-11 items-center justify-between gap-3 rounded-xl border border-T-400 ps-3 text-[12.5px]">
+            <span class="min-w-0 flex-1 truncate text-T-600">{{ attachment || 'فایلی انتخاب نشد' }}</span>
             <input id="ticket-attachment" type="file" class="hidden" @change="onFileChange">
             <label
               for="ticket-attachment"
-              class="flex h-10 shrink-0 cursor-pointer items-center rounded-xl bg-T-100 px-4 text-[12.5px] font-semibold text-T-800 transition-colors hover:bg-T-200"
+              class="flex h-full shrink-0 cursor-pointer items-center rounded-e-xl rounded-s-none border border-T-400 bg-T-300 px-3 text-T-900 hover:bg-T-200"
             >
-              انتخاب فایل
+              <UiTypography as="span" size="lg" weight="regular" color="inherit">انتخاب فایل</UiTypography>
             </label>
-            <span class="min-w-0 flex-1 truncate text-[12px] text-T-600">{{ attachment || 'فایلی انتخاب نشد' }}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconChevronDown, IconCircleCheck } from '@tabler/icons-vue'
+import { IconChevronDown } from '@tabler/icons-vue'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
@@ -20,9 +20,15 @@ const expanded = ref(false)
   <section :class="cn('w-full bg-T-100', props.class)">
     <div class="mx-auto flex max-w-[1440px] flex-col items-center px-4 py-10 lg:px-6 lg:py-14">
       <div class="flex w-full flex-col items-center gap-4 lg:flex-row lg:items-start lg:gap-8">
-        <h2 class="shrink-0 text-[18px] font-bold leading-[28px] text-foreground lg:pt-0.5">
+        <UiTypography
+          as="h2"
+          size="lg"
+          weight="bold"
+          color="default"
+          class="shrink-0 self-start leading-[28px] lg:pt-0.5 lg:text-[18px]"
+        >
           {{ title }}
-        </h2>
+        </UiTypography>
 
         <div class="flex min-w-0 flex-1 flex-col items-center gap-4 lg:items-start">
           <p
@@ -33,10 +39,9 @@ const expanded = ref(false)
           </p>
 
           <button
-            class="flex items-center gap-1.5 text-[14px] font-semibold text-primary transition-opacity hover:opacity-80"
+            class="flex items-center gap-1.5 self-end text-[14px] font-semibold text-primary transition-opacity hover:opacity-80 lg:self-auto"
             @click="expanded = !expanded"
           >
-            <IconCircleCheck class="size-[18px]" />
             {{ expanded ? 'نمایش کمتر' : 'نمایش بیشتر' }}
             <IconChevronDown
               class="size-4 transition-transform duration-200"

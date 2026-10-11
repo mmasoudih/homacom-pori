@@ -1,14 +1,24 @@
 <script setup lang="ts">
+import type { TypographyVariants } from '~/components/ui/typography'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
   title: string
+  /** Desktop-only title override (below `lg` the `title` value is used). */
+  titleDesktop?: string
   subtitle?: string
   breadcrumb?: string[]
+  /** Title typography size. Defaults to responsive `xl3xl` (16px mobile → 20px desktop). */
+  titleSize?: TypographyVariants['size']
+  /** Subtitle typography size. Defaults to responsive `mdLg` (12.5px mobile → 14px desktop). */
+  subtitleSize?: TypographyVariants['size']
   class?: string
 }>(), {
+  titleDesktop: undefined,
   subtitle: '',
   breadcrumb: undefined,
+  titleSize: 'xl3xl',
+  subtitleSize: 'mdLg',
   class: '',
 })
 
@@ -17,26 +27,40 @@ const parts = computed(() => props.breadcrumb ?? [])
 
 <template>
   <div :class="cn('flex flex-col items-center px-4 lg:px-6', props.class)">
-    <ProductDetailBreadcrumb
+    <UiBreadcrumb
       v-if="parts.length"
       :trail="parts"
-      class="mb-6 justify-center"
+      class="-mt-2 mb-6 justify-start"
     />
 
     <!-- Icon slot (optional) -->
-    <div v-if="$slots.icon" class="mb-6">
+    <div v-if="$slots.icon" class="mb-3 lg:mb-6">
       <slot name="icon" />
     </div>
 
-    <h1 class="text-center text-[26px] font-bold leading-[38px] text-foreground lg:text-[30px] lg:leading-[44px]">
-      {{ title }}
-    </h1>
+    <UiTypography
+      as="h1"
+      :size="titleSize"
+      weight="medium"
+      color="default"
+      class="text-center"
+    >
+      <template v-if="titleDesktop">
+        <span class="lg:hidden">{{ title }}</span>
+        <span class="hidden lg:inline">{{ titleDesktop }}</span>
+      </template>
+      <template v-else>{{ title }}</template>
+    </UiTypography>
 
-    <p
+    <UiTypography
       v-if="subtitle"
-      class="mt-3 max-w-[620px] text-center text-[15px] leading-[26px] text-T-700"
+      as="p"
+      :size="subtitleSize"
+      weight="regular"
+      color="muted"
+      class="mt-3 max-w-[620px] text-center leading-[26px]"
     >
       {{ subtitle }}
-    </p>
+    </UiTypography>
   </div>
 </template>
