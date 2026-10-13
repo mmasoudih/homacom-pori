@@ -52,7 +52,7 @@ const selectedCategory = ref(0)
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="flex flex-col items-center pb-16">
+    <main class="flex flex-col items-center">
       <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
       <UiBreadcrumb
         :trail="collaborationPage.breadcrumb"
@@ -64,7 +64,7 @@ const selectedCategory = ref(0)
         <!-- Chart card (left column in RTL) -->
         <div class="order-2">
           <div class="rounded-[16px] bg-T-50 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] lg:h-[416px]">
-            <UiTypography as="h3" size="xl" weight="bold" color="default" class="text-start">
+            <UiTypography as="h3" size="xl" weight="bold" color="default" class="text-start max-lg:text-[14px]">
               {{ collaborationPage.chartTitle }}
             </UiTypography>
 
@@ -98,7 +98,7 @@ const selectedCategory = ref(0)
               <!-- Floating badge -->
               <div class="absolute right-4 top-4 flex h-[50px] items-center gap-2 rounded-full bg-T-50/70 px-4 shadow-sm backdrop-blur-lg">
                 <span class="text-[13px] font-bold text-primary">30%+</span>
-                <span class="text-[12px] text-T-700">حاشیه سود فروش</span>
+                <UiTypography as="span" size="2xs" weight="regular" color="muted" class="lg:text-[12px]">حاشیه سود فروش</UiTypography>
                 <IconChartLine class="size-4 text-primary" />
               </div>
             </div>
@@ -110,10 +110,10 @@ const selectedCategory = ref(0)
                 :key="stat.label"
                 class="flex flex-col items-center rounded-[20px] bg-T-200 py-4"
               >
-                <UiTypography as="span" size="2xl" weight="bold" color="default" dir="ltr">
+                <UiTypography as="span" size="2xl" weight="bold" color="default" dir="ltr" class="max-lg:text-[16px]">
                   {{ stat.value }}
                 </UiTypography>
-                <UiTypography as="span" size="md" weight="regular" color="subtle" class="mt-1">
+                <UiTypography as="span" size="md" weight="regular" color="subtle" class="mt-1 max-lg:text-[11.25px] max-lg:font-bold">
                   {{ stat.label }}
                 </UiTypography>
               </div>
@@ -122,8 +122,8 @@ const selectedCategory = ref(0)
         </div>
 
         <!-- Headline -->
-        <div class="order-1 flex flex-col items-center text-center lg:items-start lg:text-start">
-          <UiTypography as="h1" size="5xl" weight="bold" color="default" class="max-w-[560px] leading-[40px]">
+        <div class="order-1 flex flex-col items-start text-start">
+          <UiTypography as="h1" size="5xl" weight="bold" color="default" class="max-w-[560px] leading-[40px] max-lg:text-[22px]">
             کالای دیجیتال با قیمت
             <span class="text-primary">عمده</span>
             ؛ سود بیشتر برای کسب‌وکار شما
@@ -135,12 +135,16 @@ const selectedCategory = ref(0)
           <div class="mt-7 flex flex-wrap items-center gap-5">
             <a
               href="#"
-              class="flex h-[47px] w-[188px] items-center justify-center gap-2 rounded-[12px] bg-primary px-8 text-[15px] font-semibold text-white transition-colors hover:bg-primary/90"
+              class="flex h-[47px] w-[188px] items-center justify-center gap-2 rounded-[12px] bg-primary px-8 text-white transition-colors hover:bg-primary/90"
             >
-              {{ collaborationPage.primaryCta }}
+              <UiTypography as="span" size="md" weight="bold" color="white" class="lg:text-[15px] lg:font-semibold">
+                {{ collaborationPage.primaryCta }}
+              </UiTypography>
             </a>
-            <a href="#" class="text-[15px] font-semibold text-foreground underline-offset-4 hover:text-primary hover:underline">
-              {{ collaborationPage.secondaryCta }}
+            <a href="#" class="text-foreground underline-offset-4 hover:text-primary hover:underline">
+              <UiTypography as="span" size="md" weight="semibold" color="inherit" class="lg:text-[15px]">
+                {{ collaborationPage.secondaryCta }}
+              </UiTypography>
             </a>
           </div>
 
@@ -148,12 +152,14 @@ const selectedCategory = ref(0)
             <span
               v-for="item in collaborationPage.trustRow"
               :key="item"
-              class="flex items-center gap-1.5 text-[13.5px] text-foreground"
+              class="flex items-center gap-1.5 text-foreground"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              {{ item }}
+              <UiTypography as="span" size="md" weight="regular" color="inherit" class="lg:text-[13.5px]">
+                {{ item }}
+              </UiTypography>
             </span>
           </div>
         </div>
@@ -212,7 +218,7 @@ const selectedCategory = ref(0)
         <div class="mx-auto grid max-w-[920px] grid-cols-1 gap-5 lg:grid-cols-2">
           <!-- Them (right in RTL) -->
           <div class="rounded-[20px] border border-T-400 bg-T-50 p-8">
-            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start">
+            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
               {{ collaborationPage.compareThemTitle }}
             </UiTypography>
             <ul class="mt-6 flex flex-col gap-4">
@@ -224,7 +230,7 @@ const selectedCategory = ref(0)
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
                   <path d="M13.7197 14.7803C14.0126 15.0732 14.4874 15.0732 14.7803 14.7803C15.0732 14.4874 15.0732 14.0126 14.7803 13.7197L10.0607 9L14.7803 4.28033C15.0732 3.98744 15.0732 3.51256 14.7803 3.21967C14.4874 2.92678 14.0126 2.92678 13.7197 3.21967L9 7.93934L4.28033 3.21967C3.98744 2.92678 3.51256 2.92678 3.21967 3.21967C2.92678 3.51256 2.92678 3.98744 3.21967 4.28033L7.93934 9L3.21967 13.7197C2.92678 14.0126 2.92678 14.4874 3.21967 14.7803C3.51256 15.0732 3.98744 15.0732 4.28033 14.7803L9 10.0607L13.7197 14.7803Z" fill="#9CA3AF"/>
                 </svg>
-                <UiTypography as="span" size="xl" weight="regular" color="muted">
+                <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
                   {{ item }}
                 </UiTypography>
               </li>
@@ -232,8 +238,8 @@ const selectedCategory = ref(0)
           </div>
 
           <!-- Us (left in RTL) -->
-          <div class="rounded-[20px] border border-R-300 bg-R-10 p-8">
-            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start">
+          <div class="max-lg:order-first rounded-[20px] border border-R-300 bg-R-10 p-8">
+            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
               {{ collaborationPage.compareUsTitle }}
             </UiTypography>
             <ul class="mt-6 flex flex-col gap-4">
@@ -245,7 +251,7 @@ const selectedCategory = ref(0)
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
                   <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <UiTypography as="span" size="xl" weight="regular" color="muted">
+                <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
                   {{ item }}
                 </UiTypography>
               </li>
