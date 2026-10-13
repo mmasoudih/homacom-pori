@@ -12,8 +12,8 @@ const props = withDefaults(defineProps<{
   light?: boolean
   indicator?: 'both' | 'right'
   indicatorColor?: 'primary' | 'white'
-  /** Desktop title size: 20px (default) or 22px. */
-  titleSize?: '20' | '22'
+  /** Desktop title size: 16px, 20px (default) or 22px. */
+  titleSize?: '16' | '20' | '22'
   /** Target of the «مشاهده همه» link. */
   to?: string
 }>(), {
@@ -28,7 +28,11 @@ const props = withDefaults(defineProps<{
 })
 
 const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' : 'bg-primary'))
-const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl'))
+const titleSizeVariant = computed(() => {
+  if (props.titleSize === '22') return '4xl'
+  if (props.titleSize === '16') return 'xl'
+  return '3xl'
+})
 </script>
 
 <template>
