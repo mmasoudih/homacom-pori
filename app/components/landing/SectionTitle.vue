@@ -12,8 +12,8 @@ const props = withDefaults(defineProps<{
   light?: boolean
   indicator?: 'both' | 'right'
   indicatorColor?: 'primary' | 'white'
-  /** Desktop title size: 20px (default) or 22px. */
-  titleSize?: '20' | '22'
+  /** Desktop title size: 16px, 20px (default) or 22px. */
+  titleSize?: '16' | '20' | '22'
   /** Target of the «مشاهده همه» link. */
   to?: string
 }>(), {
@@ -28,7 +28,27 @@ const props = withDefaults(defineProps<{
 })
 
 const barClass = computed(() => (props.indicatorColor === 'white' ? 'bg-white' : 'bg-primary'))
-const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl'))
+const titleSizeVariant = computed(() => {
+  if (props.titleSize === '22') return '4xl'
+  if (props.titleSize === '16') return 'xl'
+  return '3xl'
+})
+
+/*
+ * When `accent` appears *inside* `title` (e.g. a brand name mid-sentence) it is
+ * highlighted in place. When it is not part of `title`, it is appended as a
+ * trailing phrase — the original behaviour.
+ */
+const inlineAccent = computed(() => {
+  if (!props.accent) return null
+  const index = props.title.indexOf(props.accent)
+  if (index === -1) return null
+  return {
+    before: props.title.slice(0, index),
+    match: props.accent,
+    after: props.title.slice(index + props.accent.length),
+  }
+})
 </script>
 
 <template>
@@ -48,7 +68,8 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
       class="leading-[29px] max-lg:text-[16px]"
       :class="light ? 'text-white' : 'text-foreground'"
     >
-      {{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span>
+      <template v-if="inlineAccent">{{ inlineAccent.before }}<span :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ inlineAccent.match }}</span>{{ inlineAccent.after }}</template>
+      <template v-else>{{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span></template>
     </UiTypography>
     <!-- Figma node 764:64355 as designed -->
     <span class="relative block h-4 w-[17px]">
@@ -73,7 +94,8 @@ const titleSizeVariant = computed(() => (props.titleSize === '22' ? '4xl' : '3xl
         class="leading-[29px] max-lg:text-[16px]"
         :class="light ? 'text-white' : 'text-foreground max-lg:text-T-900'"
       >
-        {{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span>
+        <template v-if="inlineAccent">{{ inlineAccent.before }}<span :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ inlineAccent.match }}</span>{{ inlineAccent.after }}</template>
+        <template v-else>{{ title }}<span v-if="accent" :class="accentAlways ? 'text-R-300' : 'max-lg:text-R-300'">{{ accent }}</span></template>
       </UiTypography>
       <span v-if="indicator === 'both'" class="relative block h-4 w-[17px]">
         <span class="absolute inset-y-0 left-0 w-[4.65px] rounded-[8px]" :class="barClass" />

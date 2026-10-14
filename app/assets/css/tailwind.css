@@ -118,6 +118,30 @@
 }
 
 /*
+ * Filter-panel scrollbar — a light-grey rounded rail (T-400) with a grey thumb
+ * (T-600), matching the search-results design. WebKit-only on purpose: setting
+ * `scrollbar-width`/`scrollbar-color` makes Chrome ignore the ::-webkit rules,
+ * which are what draw the rounded rail.
+ */
+@utility scrollbar-facet {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 9999px;
+    background-color: var(--T-400);
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--T-600);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--T-700);
+  }
+}
+
+/*
  * Fully hidden scrollbar for touch-first (mobile) overlay panels, where a
  * visible track would clash with the reference design — the area stays
  * scrollable, just without a drawn scrollbar.

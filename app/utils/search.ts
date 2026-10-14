@@ -111,7 +111,7 @@ export function searchCatalog(query: string): CatalogSearchResult {
     if (matchesQuery(tile.title, trimmed)) push(tile)
   }
   for (const product of products) {
-    push(searchCategoryTiles.find(tile => tile.id === product.categoryId))
+    push(searchCategoryTiles.find(tile => tile.id === product.tileId))
   }
   for (const tile of searchCategoryTiles) {
     if (picked.length >= 6) break
@@ -119,4 +119,79 @@ export function searchCatalog(query: string): CatalogSearchResult {
   }
 
   return { products, categories: picked.slice(0, 6) }
+}
+
+// ---------------------------------------------------------------------------
+// Results page — sorting & price bounds
+// ---------------------------------------------------------------------------
+
+export type SearchSortKey
+  = | 'best-selling'
+    | 'most-viewed'
+    | 'newest'
+    | 'oldest'
+    | 'cheapest'
+    | 'most-expensive'
+
+export const searchSortOptions: Array<{ value: SearchSortKey, label: string }> = [
+  { value: 'best-selling', label: 'پرفروش‌ترین' },
+  { value: 'most-viewed', label: 'پربازدیدترین' },
+  { value: 'newest', label: 'جدیدترین' },
+  { value: 'cheapest', label: 'ارزان‌ترین' },
+  { value: 'most-expensive', label: 'گران‌ترین' },
+]
+
+/**
+ * Mobile sort sheet options. Kept separate from `searchSortOptions` so adding
+ * «قدیمی‌ترین» never changes the desktop sort bar.
+ */
+export const searchMobileSortOptions: Array<{ value: SearchSortKey, label: string }> = [
+  { value: 'newest', label: 'جدیدترین' },
+  { value: 'oldest', label: 'قدیمی‌ترین' },
+  { value: 'cheapest', label: 'ارزان‌ترین' },
+  { value: 'most-expensive', label: 'گران‌ترین' },
+]
+
+/**
+ * Mobile sort labels — the mobile toolbar renders the active key (e.g.
+ * «مرتبط‌ترین»), which the desktop bar has no tab for. `best-selling` doubles
+ * as the relevance ranking for the mock catalog.
+ */
+export const searchMobileSortLabels: Record<SearchSortKey, string> = {
+  'best-selling': 'مرتبط‌ترین',
+  'most-viewed': 'پربازدیدترین',
+  'newest': 'جدیدترین',
+  'oldest': 'قدیمی‌ترین',
+  'cheapest': 'ارزان‌ترین',
+  'most-expensive': 'گران‌ترین',
+}
+
+/** Return a new array sorted by the given key (input is never mutated). */
+export function sortSearchProducts(
+  products: SearchProduct[],
+  key: SearchSortKey,
+): SearchProduct[] {
+  const list = [...products]
+  switch (key) {
+    case 'most-viewed':
+      return list.sort((a, b) => b.views - a.views)
+    case 'newest':
+      return list.sort((a, b) => b.addedAt - a.addedAt)
+    case 'oldest':
+      return list.sort((a, b) => a.addedAt - b.addedAt)
+    case 'cheapest':
+      return list.sort((a, b) => a.price - b.price)
+    case 'most-expensive':
+      return list.sort((a, b) => b.price - a.price)
+    case 'best-selling':
+    default:
+      return list.sort((a, b) => b.sales - a.sales)
+  }
+}
+
+/** Upper bound for the price slider, rounded up to the nearest million. */
+export function searchPriceCeiling(products: SearchProduct[]): number {
+  if (!products.length) return 100000000
+  const max = Math.max(...products.map(product => product.price))
+  return Math.ceil(max / 1000000) * 1000000
 }

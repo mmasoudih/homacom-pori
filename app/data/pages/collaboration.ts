@@ -41,8 +41,8 @@ export const collaborationPage: CollaborationPageData = {
   primaryCta: 'درخواست همکاری',
   secondaryCta: 'مشاهده مزایای همکاری',
   trustRow: ['قرارداد رسمی', 'ارسال به سراسر کشور', 'پشتیبانی شرکتی'],
-  audiencesTitle: 'پنل همکار برای چه کسانی است؟',
-  audiencesIntro: 'بسته به نوع کسب‌وکار شما، خدمات متنوعی را با شرایط ویژه در نظر گرفته‌ایم.',
+  audiencesTitle: 'پنل همابیزنس برای چه کسانی است؟',
+  audiencesIntro: 'اگر در یکی از این گروه‌ها هستید، همکاری عمده با هماکام برای شماست',
   audiences: [
     {
       title: 'مغازه‌داران شهرستان',
