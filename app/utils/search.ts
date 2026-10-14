@@ -129,6 +129,7 @@ export type SearchSortKey
   = | 'best-selling'
     | 'most-viewed'
     | 'newest'
+    | 'oldest'
     | 'cheapest'
     | 'most-expensive'
 
@@ -139,6 +140,31 @@ export const searchSortOptions: Array<{ value: SearchSortKey, label: string }> =
   { value: 'cheapest', label: 'ارزان‌ترین' },
   { value: 'most-expensive', label: 'گران‌ترین' },
 ]
+
+/**
+ * Mobile sort sheet options. Kept separate from `searchSortOptions` so adding
+ * «قدیمی‌ترین» never changes the desktop sort bar.
+ */
+export const searchMobileSortOptions: Array<{ value: SearchSortKey, label: string }> = [
+  { value: 'newest', label: 'جدیدترین' },
+  { value: 'oldest', label: 'قدیمی‌ترین' },
+  { value: 'cheapest', label: 'ارزان‌ترین' },
+  { value: 'most-expensive', label: 'گران‌ترین' },
+]
+
+/**
+ * Mobile sort labels — the mobile toolbar renders the active key (e.g.
+ * «مرتبط‌ترین»), which the desktop bar has no tab for. `best-selling` doubles
+ * as the relevance ranking for the mock catalog.
+ */
+export const searchMobileSortLabels: Record<SearchSortKey, string> = {
+  'best-selling': 'مرتبط‌ترین',
+  'most-viewed': 'پربازدیدترین',
+  'newest': 'جدیدترین',
+  'oldest': 'قدیمی‌ترین',
+  'cheapest': 'ارزان‌ترین',
+  'most-expensive': 'گران‌ترین',
+}
 
 /** Return a new array sorted by the given key (input is never mutated). */
 export function sortSearchProducts(
@@ -151,6 +177,8 @@ export function sortSearchProducts(
       return list.sort((a, b) => b.views - a.views)
     case 'newest':
       return list.sort((a, b) => b.addedAt - a.addedAt)
+    case 'oldest':
+      return list.sort((a, b) => a.addedAt - b.addedAt)
     case 'cheapest':
       return list.sort((a, b) => a.price - b.price)
     case 'most-expensive':

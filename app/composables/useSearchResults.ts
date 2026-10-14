@@ -1,5 +1,5 @@
-import type { SearchProduct } from '~/data/search'
-import { searchableProducts } from '~/data/search'
+import type { SearchCategoryTile, SearchProduct } from '~/data/search'
+import { searchCategoryTiles, searchableProducts } from '~/data/search'
 import { searchCatalog } from '~/utils/search'
 
 export type SearchResultsStatus = 'loading' | 'ready'
@@ -21,6 +21,8 @@ export function useSearchResults() {
   const status = ref<SearchResultsStatus>('loading')
   const query = ref('')
   const results = ref<SearchProduct[]>([])
+  /** Category tiles for the mobile «بر اساس دسته‌بندی» row. */
+  const categories = ref<SearchCategoryTile[]>([])
 
   let timer: ReturnType<typeof setTimeout> | undefined
   let requestId = 0
@@ -39,12 +41,20 @@ export function useSearchResults() {
     const id = requestId
     timer = setTimeout(() => {
       if (id !== requestId) return
-      results.value = trimmed ? searchCatalog(trimmed).products : [...searchableProducts]
+      if (trimmed) {
+        const found = searchCatalog(trimmed)
+        results.value = found.products
+        categories.value = found.categories
+      }
+      else {
+        results.value = [...searchableProducts]
+        categories.value = [...searchCategoryTiles]
+      }
       status.value = 'ready'
     }, SEARCH_LATENCY)
   }
 
   onBeforeUnmount(() => clearTimeout(timer))
 
-  return { query, status, results, load }
+  return { query, status, results, categories, load }
 }

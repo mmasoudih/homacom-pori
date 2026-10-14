@@ -33,6 +33,12 @@ export interface SearchProduct {
   inStock: boolean
   /** Drives the «اثر انگشت» facet. */
   hasFingerprint: boolean
+  /**
+   * Internal storage in GB — drives the mobile-only «حافظه داخلی» facet.
+   * Left undefined for products where storage is not a meaningful spec
+   * (watches, earbuds); those drop out of the results while the facet is set.
+   */
+  storageGb?: number
   /** Popularity — «پرفروشترین». */
   sales: number
   /** Views — «پربازدیدترین». */
@@ -135,6 +141,17 @@ export const searchFingerprintOptions: Array<{ value: SearchFingerprintValue, la
   { value: 'none', label: 'ندارد' },
 ]
 
+/**
+ * «حافظه داخلی» facet — mobile-only in the current design. Ids are the storage
+ * capacity in gigabytes so they map straight onto `SearchProduct.storageGb`.
+ */
+export const searchStorageOptions: SearchFacetOption[] = [
+  { id: '64', label: '۶۴ گیگابایت' },
+  { id: '128', label: '۱۲۸ گیگابایت' },
+  { id: '256', label: '۲۵۶ گیگابایت' },
+  { id: '512', label: '۵۱۲ گیگابایت' },
+]
+
 const IMG = {
   samsung: '/figma/fill-ff65a9033ba49cd4.png',
   phone2: '/figma/fill-e393cbb3afd42faa.png',
@@ -167,6 +184,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'silver', 'blue'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 980,
     views: 12400,
     addedAt: 20240401,
@@ -183,6 +201,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'blue'],
     inStock: false,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 640,
     views: 15800,
     addedAt: 20250901,
@@ -201,6 +220,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['silver', 'white', 'green'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 720,
     views: 9800,
     addedAt: 20240910,
@@ -219,6 +239,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'red', 'white'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 64,
     sales: 410,
     views: 5400,
     addedAt: 20230308,
@@ -235,6 +256,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['silver', 'gray', 'black'],
     inStock: true,
     hasFingerprint: false,
+    storageGb: 512,
     sales: 320,
     views: 7600,
     addedAt: 20240304,
@@ -253,6 +275,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['blue', 'purple', 'gray'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 260,
     views: 4300,
     addedAt: 20240201,
@@ -307,6 +330,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'gray', 'yellow'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 890,
     views: 11200,
     addedAt: 20240117,
@@ -325,6 +349,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['green', 'blue', 'gray'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 1450,
     views: 18400,
     addedAt: 20231101,
@@ -343,6 +368,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'blue', 'yellow'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 1230,
     views: 16100,
     addedAt: 20231215,
@@ -361,6 +387,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['purple', 'green', 'black'],
     inStock: false,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 300,
     views: 8200,
     addedAt: 20230811,
@@ -379,6 +406,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['gray', 'black'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 280,
     views: 4700,
     addedAt: 20230804,
@@ -435,6 +463,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['green', 'black'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 460,
     views: 6800,
     addedAt: 20240301,
@@ -453,6 +482,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'orange'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 610,
     views: 8100,
     addedAt: 20231120,
@@ -469,6 +499,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['gray', 'blue'],
     inStock: false,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 190,
     views: 3100,
     addedAt: 20240220,
@@ -507,6 +538,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'white', 'green'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 520,
     views: 7400,
     addedAt: 20240225,
@@ -525,6 +557,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['blue', 'black', 'purple'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 1320,
     views: 17300,
     addedAt: 20240110,
@@ -541,6 +574,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['yellow', 'black'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 880,
     views: 10400,
     addedAt: 20240115,
@@ -559,6 +593,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['gray', 'green'],
     inStock: true,
     hasFingerprint: false,
+    storageGb: 128,
     sales: 430,
     views: 5600,
     addedAt: 20230915,
@@ -597,6 +632,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['blue', 'black', 'white'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 350,
     views: 6200,
     addedAt: 20231004,
@@ -613,6 +649,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['green', 'black', 'blue'],
     inStock: false,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 270,
     views: 4900,
     addedAt: 20240514,
@@ -667,6 +704,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['purple', 'gray'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 128,
     sales: 300,
     views: 3800,
     addedAt: 20230710,
@@ -685,6 +723,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'green'],
     inStock: false,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 120,
     views: 2100,
     addedAt: 20230601,
@@ -705,6 +744,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['black', 'green', 'white'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 480,
     views: 6900,
     addedAt: 20240123,
@@ -723,6 +763,7 @@ export const searchableProducts: SearchProduct[] = [
     colorIds: ['gray', 'green'],
     inStock: true,
     hasFingerprint: true,
+    storageGb: 256,
     sales: 540,
     views: 6300,
     addedAt: 20230705,

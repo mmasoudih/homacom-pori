@@ -5,8 +5,11 @@ const props = withDefaults(defineProps<{
   title: string
   /** Initial open state (desktop expands by default, mobile stays collapsed). */
   defaultOpen?: boolean
+  /** Shows a badge dot beside the title when the section holds active filters. */
+  active?: boolean
 }>(), {
   defaultOpen: false,
+  active: false,
 })
 
 const open = ref(props.defaultOpen)
@@ -25,9 +28,16 @@ watch(() => props.defaultOpen, (value) => {
       :aria-expanded="open"
       @click="open = !open"
     >
-      <UiTypography as="h3" size="lg" weight="regular" color="default">
-        {{ title }}
-      </UiTypography>
+      <span class="flex min-w-0 items-center gap-2">
+        <UiTypography as="h3" size="lg" weight="regular" color="default">
+          {{ title }}
+        </UiTypography>
+        <span
+          v-if="active"
+          class="size-[7px] shrink-0 rounded-full bg-primary"
+          aria-hidden="true"
+        />
+      </span>
       <IconChevronDown
         class="size-5 shrink-0 text-T-500 transition-transform duration-300"
         :class="open && 'rotate-180'"

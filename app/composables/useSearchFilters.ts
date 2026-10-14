@@ -4,6 +4,7 @@ import {
   searchCategoryOptions,
   searchColorOptions,
   searchFingerprintOptions,
+  searchStorageOptions,
 } from '~/data/search'
 import type { SearchSortKey } from '~/utils/search'
 import { searchPriceCeiling, sortSearchProducts } from '~/utils/search'
@@ -21,6 +22,7 @@ const COLOR_LABELS = new Map(searchColorOptions.map(o => [o.id, o.label]))
 const FINGERPRINT_LABELS = new Map(
   searchFingerprintOptions.map(o => [o.value, o.label] as const),
 )
+const STORAGE_LABELS = new Map(searchStorageOptions.map(o => [o.id, o.label]))
 
 /**
  * Facet + sort state for the search-results page. Filters are applied live
@@ -32,6 +34,8 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
   const brands = ref<string[]>([])
   const color = ref<string | null>(null)
   const fingerprint = ref<SearchFingerprintValue | null>(null)
+  /** «حافظه داخلی» — mobile-only facet; ids are capacities in GB. */
+  const storage = ref<string[]>([])
   const sort = ref<SearchSortKey>('best-selling')
 
   const priceCeiling = computed(() => searchPriceCeiling(source.value))
@@ -68,6 +72,10 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
     fingerprint.value = fingerprint.value === value ? null : value
   }
 
+  function toggleStorage(id: string) {
+    toggle(storage, id)
+  }
+
   function resetPrice() {
     priceRange.value = [0, priceCeiling.value]
   }
@@ -78,6 +86,7 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
     brands.value = []
     color.value = null
     fingerprint.value = null
+    storage.value = []
     resetPrice()
   }
 
@@ -90,6 +99,7 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
       if (color.value && !product.colorIds.includes(color.value)) return false
       if (fingerprint.value === 'has' && !product.hasFingerprint) return false
       if (fingerprint.value === 'none' && product.hasFingerprint) return false
+      if (storage.value.length && !storage.value.includes(String(product.storageGb))) return false
       if (product.price < min || product.price > max) return false
       return true
     })
@@ -121,6 +131,9 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
       const label = FINGERPRINT_LABELS.get(fingerprint.value) ?? fingerprint.value
       chips.push({ key: 'fingerprint', label: `اثر انگشت: ${label}` })
     }
+    for (const id of storage.value) {
+      chips.push({ key: `storage:${id}`, label: `حافظه داخلی: ${STORAGE_LABELS.get(id) ?? id}` })
+    }
 
     return chips
   })
@@ -139,6 +152,7 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
     if (kind === 'category' && id) toggleCategory(id)
     else if (kind === 'brand' && id) toggleBrand(id)
     else if (kind === 'color' && id) color.value = null
+    else if (kind === 'storage' && id) storage.value = storage.value.filter(value => value !== id)
   }
 
   const hasActiveFilters = computed(() =>
@@ -152,6 +166,7 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
     brands,
     color,
     fingerprint,
+    storage,
     sort,
     priceRange,
     priceCeiling,
@@ -164,6 +179,7 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
     toggleBrand,
     setColor,
     setFingerprint,
+    toggleStorage,
     resetPrice,
     removeChip,
     reset,
