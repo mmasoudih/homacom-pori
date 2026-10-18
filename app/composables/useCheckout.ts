@@ -6,7 +6,6 @@ import {
   deliveryTimeSlots,
   getDeliveryDays,
   onlineTransactionLimit,
-  paymentGateways,
   shippingMethods,
   walletBalance,
 } from '~/data/checkout'
@@ -38,7 +37,8 @@ export function useCheckout() {
 
   // Step 2
   const paymentMethod = ref<PaymentMethod>('online')
-  const gatewayId = ref(paymentGateways[0]?.id ?? '')
+  const gatewayId = ref('mellat')
+  const installmentId = ref('tapp')
   const creditProviderId = ref('')
   const discountCode = ref('')
   const discountOpen = ref(false)
@@ -81,7 +81,7 @@ export function useCheckout() {
     () => creditProviders.find(provider => provider.id === creditProviderId.value) ?? null,
   )
   const creditInsufficient = computed(
-    () => !selectedCredit.value || selectedCredit.value.limit < payable.value,
+    () => !selectedCredit.value || selectedCredit.value.balance < payable.value,
   )
 
   function toggleCreditProvider(id: string) {
@@ -116,7 +116,8 @@ export function useCheckout() {
     deliveryDay.value = ''
     timeSlot.value = ''
     paymentMethod.value = 'online'
-    gatewayId.value = paymentGateways[0]?.id ?? ''
+    gatewayId.value = 'mellat'
+    installmentId.value = 'tapp'
     creditProviderId.value = ''
     discountCode.value = ''
     discountOpen.value = false
@@ -139,6 +140,7 @@ export function useCheckout() {
     timeSlots: deliveryTimeSlots,
     paymentMethod,
     gatewayId,
+    installmentId,
     creditProviderId,
     selectedCredit,
     creditInsufficient,

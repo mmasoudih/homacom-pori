@@ -4,6 +4,7 @@ import type { CheckoutAddress } from '~/data/checkout'
 import {
   creditProviders,
   discountCodePlaceholder,
+  installmentProviders,
   paymentGateways,
   shippingMethods,
 } from '~/data/checkout'
@@ -13,6 +14,8 @@ const {
   isEmpty,
   clear: clearCart,
 } = useCart()
+
+const { setResult } = useCheckoutResult()
 
 const {
   step,
@@ -29,8 +32,8 @@ const {
   timeSlots,
   paymentMethod,
   gatewayId,
+  installmentId,
   creditProviderId,
-  creditInsufficient,
   discountCode,
   discountOpen,
   rows,
@@ -111,15 +114,23 @@ function next() {
   }
 
   if (paymentMethod.value === 'installment') {
-    creditOpen.value = true
+    if (!installmentId.value) {
+      creditOpen.value = true
+      return
+    }
+    settlePayment()
     return
   }
 
-  // Mock payment: the gateway/result pages aren't part of this scope.
-  toast.success('پرداخت با موفقیت انجام شد و سفارش شما ثبت شد.')
+  settlePayment()
+}
+
+/** Mock gateway: store the receipt, empty the cart and show the result page. */
+function settlePayment() {
+  setResult(createCheckoutResult(payable.value))
   clearCart()
   reset()
-  navigateTo('/dashboard/orders', { replace: true })
+  navigateTo('/checkout/success', { replace: true })
 }
 
 function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
@@ -265,11 +276,11 @@ function applyDiscount() {
               <CheckoutPaymentMethods
                 v-model:method="paymentMethod"
                 v-model:gateway-id="gatewayId"
+                v-model:installment-id="installmentId"
                 :gateways="paymentGateways"
+                :installments="installmentProviders"
                 :wallet-balance="walletBalance"
                 :wallet-insufficient="walletInsufficient"
-                :credit-insufficient="creditInsufficient"
-                @request-credit="creditOpen = true"
               />
 
               <div
@@ -295,8 +306,11 @@ function applyDiscount() {
               />
             </section>
 
-            <!-- Discount code -->
-            <section class="flex flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:p-5">
+            <!-- Discount code: the whole card toggles, the field itself doesn't -->
+            <section
+              class="flex cursor-pointer flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:p-5"
+              @click="discountOpen = !discountOpen"
+            >
               <div class="flex items-center justify-between gap-3">
                 <UiTypography as="span" size="lg" weight="medium">کد تخفیف دارید؟</UiTypography>
 
@@ -307,7 +321,6 @@ function applyDiscount() {
                   class="relative h-[17px] w-[30px] shrink-0 rounded-full transition-colors"
                   :class="discountOpen ? 'bg-R-300' : 'bg-T-500'"
                   aria-label="کد تخفیف"
-                  @click="discountOpen = !discountOpen"
                 >
                   <span
                     class="absolute top-[2px] size-[13px] rounded-full bg-white transition-all"
@@ -316,19 +329,23 @@ function applyDiscount() {
                 </button>
               </div>
 
-              <div v-if="discountOpen" class="flex flex-col gap-2.5 lg:flex-row">
+              <div
+                v-if="discountOpen"
+                class="flex h-[42px] w-full items-center gap-1.5 rounded-[12px] border border-T-500 py-1 pe-1 ps-3 lg:w-[314px] lg:self-start"
+                @click.stop
+              >
                 <input
                   v-model="discountCode"
                   type="text"
                   :placeholder="discountCodePlaceholder"
-                  class="h-[42px] min-w-0 flex-1 rounded-[12px] border border-T-400 bg-T-50 px-4 text-[13px] text-T-900 outline-none placeholder:text-T-600 focus:border-R-300"
+                  class="min-w-0 flex-1 bg-transparent text-[12.5px] text-T-900 outline-none placeholder:text-T-600"
                 >
                 <button
                   type="button"
-                  class="flex h-[42px] shrink-0 items-center justify-center rounded-[12px] bg-R-300 px-6"
+                  class="flex h-[34px] w-[56px] shrink-0 items-center justify-center rounded-[12px] bg-R-300"
                   @click="applyDiscount"
                 >
-                  <UiTypography as="span" size="lg" weight="bold" color="white">اعمال</UiTypography>
+                  <UiTypography as="span" size="md" weight="semibold" color="white">اعمال</UiTypography>
                 </button>
               </div>
             </section>

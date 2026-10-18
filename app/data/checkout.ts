@@ -33,7 +33,19 @@ export interface DeliveryDay {
 
 export interface PaymentGateway {
   id: string
+  /** Short bank name shown first (e.g. «سپ»). */
+  title: string
+  subtitle: string
+  logo: string
+}
+
+export interface InstallmentProvider {
+  id: string
   name: string
+  badge: 'اعتباری' | 'اقساطی'
+  monthly: string
+  terms: string
+  logo: string
 }
 
 export interface CreditProvider {
@@ -41,8 +53,8 @@ export interface CreditProvider {
   name: string
   /** e.g. «کیف پول بالون» */
   label: string
-  limit: number
-  description: string
+  /** Wallet balance shown under the name, in Tomans (Figma 2984). */
+  balance: number
 }
 
 /** Mock signed-in user (used when the order is delivered to «خودم»). */
@@ -101,8 +113,44 @@ export function getDeliveryDays(count = 5, from = new Date()): DeliveryDay[] {
 }
 
 export const paymentGateways: PaymentGateway[] = [
-  { id: 'ecommerce', name: 'تجارت الکترونیک' },
-  { id: 'digipay', name: 'دیجی‌پی' },
+  { id: 'sepah', title: 'سپ', subtitle: 'درگاه بانک سپه', logo: '/icons/cart/gw-sepah.svg' },
+  { id: 'mellat', title: 'تاپ', subtitle: 'درگاه بانک ملت', logo: '/icons/cart/gw-mellat.svg' },
+]
+
+/** Installment services shown when «پرداخت اقساطی» is selected (Figma 27704). */
+export const installmentProviders: InstallmentProvider[] = [
+  {
+    id: 'technopy',
+    name: 'تکنوپی',
+    badge: 'اعتباری',
+    monthly: '۲,۰۰۰,۰۰۰ تومان ماهیانه',
+    terms: '۴ قسطه بدون کارمزد',
+    logo: '/icons/cart/inst-technopy.svg',
+  },
+  {
+    id: 'tapp',
+    name: 'تاپ',
+    badge: 'اقساطی',
+    monthly: '۲,۰۰۰,۰۰۰ تومان ماهیانه',
+    terms: '۴ قسطه بدون کارمزد',
+    logo: '/icons/cart/inst-snappay.svg',
+  },
+  {
+    id: 'lendo',
+    name: 'لندو',
+    badge: 'اقساطی',
+    monthly: '۲,۰۰۰,۰۰۰ تومان ماهیانه',
+    terms: '۴ قسطه بدون کارمزد',
+    logo: '/icons/cart/inst-lendo.svg',
+  },
+  {
+    id: 'digipay',
+    name: 'دیجی‌پی',
+    badge: 'اقساطی',
+    monthly: '۲,۰۰۰,۰۰۰ تومان ماهیانه',
+    terms: '۴ قسطه بدون کارمزد',
+    logo: '/icons/cart/inst-digipay.svg',
+  },
 ]
 
 export const creditProviders: CreditProvider[] = [
@@ -110,15 +158,13 @@ export const creditProviders: CreditProvider[] = [
     id: 'balon',
     name: 'بالون',
     label: 'کیف پول بالون',
-    limit: 50_000_000,
-    description: 'خرید اعتباری تا سقف ۵۰ میلیون تومان',
+    balance: 100_500_000,
   },
   {
     id: 'ewano',
     name: 'اِوانو',
     label: 'کیف پول اِوانو',
-    limit: 30_000_000,
-    description: 'خرید اعتباری تا سقف ۳۰ میلیون تومان',
+    balance: 0,
   },
 ]
 
@@ -129,3 +175,26 @@ export const walletBalance = 8_500_000
 export const onlineTransactionLimit = 395_000_000
 
 export const discountCodePlaceholder = 'کد تخفیف را وارد کنید'
+
+// ---------------------------------------------------------------------------
+// Payment result (Figma: desktop 27440 «checkout-seccussfull» /
+// 27473 «checkout-un seccussfull»; mobile 95779 / 95812)
+// ---------------------------------------------------------------------------
+
+export interface CheckoutResult {
+  /** e.g. «AXM-24578». */
+  orderNumber: string
+  /** e.g. «۱۴۰۴/۱۱/۱۳ - ۲۰:۴۵». */
+  paidAt: string
+  /** e.g. «۱۲۵۸۴۷۴۰۲». */
+  trackingNumber: string
+  amount: number
+}
+
+/** Shown when a result page is opened directly, so it still matches the design. */
+export const fallbackCheckoutResult: CheckoutResult = {
+  orderNumber: 'AXM-24578',
+  paidAt: '۱۴۰۴/۱۱/۱۳ - ۲۰:۴۵',
+  trackingNumber: '۱۲۵۸۴۷۴۰۲',
+  amount: 8_500_000,
+}

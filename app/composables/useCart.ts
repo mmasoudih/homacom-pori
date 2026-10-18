@@ -4,6 +4,7 @@ import type { CartItem } from '~/data/cart'
 import { cartInsuranceOptions, cartItems, cartServiceGroups } from '~/data/cart'
 import type { ProductDetail, Seller } from '~/data/product'
 import { getDiscountPercent } from '~/utils/product'
+import { toastIcons } from '~/utils/toast'
 
 export interface AddToCartOptions {
   product: ProductDetail
@@ -245,7 +246,7 @@ export function useCart() {
     }
 
     persist()
-    toast.success('کالا به سبد خرید اضافه شد.')
+    toast.success('این کالا به سبد خرید شما اضافه شد.', { icon: toastIcons.bag })
     return id
   }
 

@@ -42,37 +42,39 @@ const emit = defineEmits<{
       <UiTypography as="span" size="lg" weight="bold">{{ title }}</UiTypography>
     </div>
 
-    <!-- Desktop -->
-    <div
-      class="relative mx-auto hidden h-[64px] w-full max-w-[1440px] items-center justify-between px-6 lg:flex lg:rounded-[20px] lg:border lg:border-T-400"
-    >
-      <button
-        v-if="!backTo"
-        type="button"
-        class="flex items-center gap-2 text-R-300 transition-opacity hover:opacity-80"
-        @click="emit('back')"
+    <!-- Desktop: 1350px bar, 45px gutters, 16px from the top (Figma Frame 3339) -->
+    <div class="mx-auto hidden w-full max-w-[1440px] px-[45px] pt-4 lg:block">
+      <div
+        class="relative flex h-[64px] w-full items-center justify-between rounded-[20px] border border-T-400 px-6"
       >
-        <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
-        <UiTypography as="span" size="lg" weight="semibold" color="primary">
-          {{ backLabel }}
-        </UiTypography>
-      </button>
-      <NuxtLink
-        v-else
-        :to="backTo"
-        class="flex items-center gap-2 text-R-300 transition-opacity hover:opacity-80"
-      >
-        <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
-        <UiTypography as="span" size="lg" weight="semibold" color="primary">
-          {{ backLabel }}
-        </UiTypography>
-      </NuxtLink>
+        <button
+          v-if="!backTo"
+          type="button"
+          class="flex items-center gap-2 text-R-300 transition-opacity hover:opacity-80"
+          @click="emit('back')"
+        >
+          <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
+          <UiTypography as="span" size="lg" weight="semibold" color="primary">
+            {{ backLabel }}
+          </UiTypography>
+        </button>
+        <NuxtLink
+          v-else
+          :to="backTo"
+          class="flex items-center gap-2 text-R-300 transition-opacity hover:opacity-80"
+        >
+          <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
+          <UiTypography as="span" size="lg" weight="semibold" color="primary">
+            {{ backLabel }}
+          </UiTypography>
+        </NuxtLink>
 
-      <NuxtLink to="/" class="absolute left-1/2 flex -translate-x-1/2 items-center" aria-label="هماکام">
-        <img src="/icons/cart/checkout-logo.svg" alt="هماکام" class="h-[64px] w-auto object-contain">
-      </NuxtLink>
+        <NuxtLink to="/" class="absolute left-1/2 flex -translate-x-1/2 items-center" aria-label="هماکام">
+          <img src="/icons/cart/checkout-logo.svg" alt="هماکام" class="h-[64px] w-auto object-contain">
+        </NuxtLink>
 
-      <span class="w-[190px]" aria-hidden="true" />
+        <span class="w-[190px]" aria-hidden="true" />
+      </div>
     </div>
   </header>
 </template>

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { IconBell } from '@tabler/icons-vue'
+import { toastIcons } from '~/utils/toast'
 
 const props = withDefaults(
   defineProps<{ open: boolean }>(),
@@ -38,7 +39,7 @@ function submit() {
     toast.error('لطفا حداقل یک روش اطلاع‌رسانی را انتخاب کنید.')
     return
   }
-  toast.success('درخواست شما ثبت شد؛ به محض موجود شدن محصول به شما اطلاع می‌دهیم.')
+  toast.success('اطلاع‌رسانی به شما برای موجودی این محصول فعال شد.', { icon: toastIcons.bell })
   emit('update:open', false)
 }
 

@@ -63,11 +63,11 @@ const logos: Record<string, string> = {
         </UiTypography>
 
         <span class="flex shrink-0 items-baseline gap-1.5">
-          <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
-            تومان
-          </UiTypography>
           <UiTypography as="span" size="lg" weight="medium" leading="none">
             {{ formatPriceFa(method.price) }}
+          </UiTypography>
+          <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
+            تومان
           </UiTypography>
         </span>
       </button>
