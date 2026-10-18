@@ -1,7 +1,7 @@
 import { computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import type { CartItem } from '~/data/cart'
-import { cartInsuranceOptions, cartItems } from '~/data/cart'
+import { cartInsuranceOptions, cartItems, cartServiceGroups } from '~/data/cart'
 import type { ProductDetail, Seller } from '~/data/product'
 import { getDiscountPercent } from '~/utils/product'
 
@@ -50,6 +50,9 @@ function cloneItems(source: CartItem[]): CartItem[] {
     insuranceOptions: item.insuranceOptions?.length
       ? item.insuranceOptions.map(option => ({ ...option }))
       : cartInsuranceOptions.map(option => ({ ...option })),
+    serviceGroups: item.serviceGroups?.length
+      ? item.serviceGroups.map(group => ({ ...group, items: group.items.map(service => ({ ...service })) }))
+      : cartServiceGroups.map(group => ({ ...group, items: group.items.map(service => ({ ...service })) })),
     services: (item.services ?? []).map(service => ({ ...service })),
   }))
 }
@@ -172,7 +175,17 @@ export function useCart() {
       = insuranceOptions.find(i => i.id === options.insuranceId) ?? null
 
     const selectedIds = options.serviceIds ?? []
-    const services = product.serviceCatalog
+    const serviceGroups = product.serviceCatalog.map(category => ({
+      id: category.id,
+      title: category.title,
+      icon: category.icon,
+      items: category.items.map(service => ({
+        id: service.id,
+        label: service.label,
+        price: service.price,
+      })),
+    }))
+    const services = serviceGroups
       .flatMap(category => category.items)
       .filter(service => selectedIds.includes(service.id))
 
@@ -197,6 +210,7 @@ export function useCart() {
       existing.sellerName = seller?.name
       existing.insuranceOptions = insuranceOptions
       existing.insurance = insurance ? { ...insurance } : null
+      existing.serviceGroups = serviceGroups
       existing.services = services.map(service => ({
         id: service.id,
         label: service.label,
@@ -219,6 +233,7 @@ export function useCart() {
           sellerName: seller?.name,
           insurance: insurance ? { ...insurance } : null,
           insuranceOptions,
+          serviceGroups,
           services: services.map(service => ({
             id: service.id,
             label: service.label,
@@ -278,6 +293,18 @@ export function useCart() {
     persist()
   }
 
+  /** Replace the add-on services of a line from the services dialog. */
+  function setServices(itemId: string, serviceIds: string[]) {
+    const item = find(itemId)
+    if (!item) return
+    const catalog = item.serviceGroups ?? cartServiceGroups
+    item.services = catalog
+      .flatMap(group => group.items)
+      .filter(service => serviceIds.includes(service.id))
+      .map(service => ({ ...service }))
+    persist()
+  }
+
   function removeInsurance(id: string) {
     const item = find(id)
     if (!item) return
@@ -310,6 +337,7 @@ export function useCart() {
     removeItem,
     removeAll,
     setInsurance,
+    setServices,
     removeInsurance,
     removeService,
   }

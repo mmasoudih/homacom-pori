@@ -15,6 +15,7 @@ const {
   removeItem,
   removeAll,
   setInsurance,
+  setServices,
   removeInsurance,
   removeService,
 } = useCart()
@@ -49,8 +50,22 @@ function confirmInsurance(insuranceId: string | null) {
   insuranceDialog.open = false
 }
 
-function openServices() {
-  toast.info('افزودن خدمات و لوازم جانبی به‌زودی در دسترس قرار می‌گیرد.')
+// --- Add-on services dialog --------------------------------------------------
+
+const servicesDialog = reactive<{ open: boolean, itemId: string }>({ open: false, itemId: '' })
+
+const servicesItem = computed(
+  () => items.value.find(item => item.id === servicesDialog.itemId) ?? null,
+)
+
+function openServices(itemId: string) {
+  servicesDialog.itemId = itemId
+  servicesDialog.open = true
+}
+
+function confirmServices(ids: string[]) {
+  if (servicesDialog.itemId) setServices(servicesDialog.itemId, ids)
+  servicesDialog.open = false
 }
 </script>
 
@@ -96,7 +111,7 @@ function openServices() {
               @remove-insurance="removeInsurance(item.id)"
               @remove-service="serviceId => removeService(item.id, serviceId)"
               @add-insurance="openInsurance(item.id)"
-              @add-service="openServices"
+              @add-service="openServices(item.id)"
             />
           </div>
 
@@ -124,7 +139,7 @@ function openServices() {
           @remove-insurance="removeInsurance(item.id)"
           @remove-service="serviceId => removeService(item.id, serviceId)"
           @add-insurance="openInsurance(item.id)"
-          @add-service="openServices"
+          @add-service="openServices(item.id)"
         />
       </template>
     </main>
@@ -142,6 +157,12 @@ function openServices() {
       v-model:open="insuranceDialog.open"
       :item="insuranceItem"
       @confirm="confirmInsurance"
+    />
+
+    <CartServicesDialog
+      v-model:open="servicesDialog.open"
+      :item="servicesItem"
+      @confirm="confirmServices"
     />
   </div>
 </template>

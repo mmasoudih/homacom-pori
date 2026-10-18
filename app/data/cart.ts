@@ -18,6 +18,14 @@ export interface CartService {
   price: number
 }
 
+/** A category of add-on services offered by the «افزودن خدمت» dialog. */
+export interface CartServiceGroup {
+  id: string
+  title: string
+  icon: string
+  items: CartService[]
+}
+
 export interface CartItem {
   id: string
   title: string
@@ -42,6 +50,8 @@ export interface CartItem {
   insurance: CartInsurance | null
   /** Policies offered when picking insurance for this line. */
   insuranceOptions?: CartInsurance[]
+  /** Everything selectable from the «افزودن خدمت» dialog. */
+  serviceGroups?: CartServiceGroup[]
   services: CartService[]
 }
 
@@ -80,6 +90,47 @@ const ACCESSORY_SERVICES: CartService[] = [
   { id: 'protective-case', label: 'کاور محافظتی', price: 2_180_000 },
 ]
 
+/** Groups shown in the cart's «افزودن خدمات و لوازم جانبی» dialog. */
+export const cartServiceGroups: CartServiceGroup[] = [
+  {
+    id: 'cat-apps',
+    title: 'نرم‌افزارهای کاربردی',
+    icon: 'package',
+    items: [
+      { id: 'android-games', label: 'بازی‌های اندروید', price: 1_200_000 },
+      { id: 'offline-map', label: 'نصب نقشه آفلاین', price: 350_000 },
+      { id: 'office-suite', label: 'نصب بسته اداری', price: 480_000 },
+    ],
+  },
+  {
+    id: 'cat-protection',
+    title: 'گارد و محافظ',
+    icon: 'shield',
+    items: [
+      { id: 'protective-case', label: 'کاور محافظتی', price: 2_180_000 },
+      { id: 'screen-glass', label: 'گلس محافظ صفحه', price: 590_000 },
+    ],
+  },
+  {
+    id: 'cat-charger',
+    title: 'شارژ و کابل',
+    icon: 'bolt',
+    items: [
+      { id: 'wall-charger', label: 'شارژر دیواری ۲۵ وات سامسونگ', price: 490_000 },
+      { id: 'cable-c', label: 'کابل Type-C اصلی سامسونگ', price: 180_000 },
+    ],
+  },
+  {
+    id: 'cat-accessory',
+    title: 'لوازم جانبی',
+    icon: 'usb',
+    items: [
+      { id: 'usb-64', label: 'فلش مموری ۶۴ گیگابایت', price: 850_000 },
+      { id: 'memory-card', label: 'میکرو اس‌دی ۱۲۸ گیگابایت', price: 1_150_000 },
+    ],
+  },
+]
+
 export const cartItems: CartItem[] = [
   {
     id: 'iphone-17-256-blue',
@@ -94,6 +145,7 @@ export const cartItems: CartItem[] = [
     quantity: 1,
     insurance: DIGITAL_INSURANCE,
     insuranceOptions: cartInsuranceOptions,
+    serviceGroups: cartServiceGroups,
     services: ACCESSORY_SERVICES,
   },
   {
@@ -109,6 +161,7 @@ export const cartItems: CartItem[] = [
     maxQuantity: 5,
     insurance: null,
     insuranceOptions: cartInsuranceOptions,
+    serviceGroups: cartServiceGroups,
     services: [],
   },
   {
@@ -125,6 +178,7 @@ export const cartItems: CartItem[] = [
     maxQuantity: 8,
     insurance: null,
     insuranceOptions: cartInsuranceOptions,
+    serviceGroups: cartServiceGroups,
     services: [],
   },
   {
@@ -140,6 +194,7 @@ export const cartItems: CartItem[] = [
     quantity: 1,
     insurance: DIGITAL_INSURANCE,
     insuranceOptions: cartInsuranceOptions,
+    serviceGroups: cartServiceGroups,
     services: ACCESSORY_SERVICES,
   },
 ]

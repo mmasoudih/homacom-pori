@@ -26,8 +26,8 @@ const total = computed(() => props.services.length)
       </div>
 
       <button type="button" class="flex items-center gap-1 text-R-300" @click="emit('add')">
-        <UiTypography as="span" size="xsMd" weight="medium" color="primary">افزودن خدمت</UiTypography>
         <img src="/icons/cart/plus-red.svg" alt="" class="size-[11px] shrink-0">
+        <UiTypography as="span" size="xsMd" weight="medium" color="primary">افزودن خدمت</UiTypography>
       </button>
     </div>
 
@@ -38,14 +38,7 @@ const total = computed(() => props.services.length)
         :key="service.id"
         class="flex items-center gap-2 rounded-[8px] border border-dashed border-[#F8A5AF] bg-[#FFF2F4] p-2.5"
       >
-        <button
-          type="button"
-          class="flex shrink-0 items-center justify-center"
-          :aria-label="`حذف ${service.label}`"
-          @click="emit('remove', service.id)"
-        >
-          <img src="/icons/cart/chip-remove.svg" alt="" class="h-[17.083px] w-[19.583px]">
-        </button>
+        <img src="/icons/cart/chip-remove.svg" alt="" class="h-[17.083px] w-[19.583px] shrink-0">
 
         <UiTypography as="span" size="xsMd" weight="medium">
           {{ service.label }}
@@ -66,7 +59,14 @@ const total = computed(() => props.services.length)
           </UiTypography>
         </span>
 
-        <img src="/icons/cart/x-mark.svg" alt="" class="size-[11.25px] shrink-0">
+        <button
+          type="button"
+          class="flex size-[18px] shrink-0 items-center justify-center"
+          :aria-label="`حذف ${service.label}`"
+          @click="emit('remove', service.id)"
+        >
+          <img src="/icons/cart/x-mark.svg" alt="" class="size-[11.25px]">
+        </button>
       </div>
     </div>
 

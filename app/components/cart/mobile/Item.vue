@@ -88,8 +88,8 @@ const emit = defineEmits<{
           class="flex items-center gap-1 text-R-300"
           @click="emit('addInsurance')"
         >
-          <UiTypography as="span" size="xs" weight="medium" color="primary">افزودن بیمه</UiTypography>
           <img src="/icons/cart/plus-red.svg" alt="" class="size-[11px] shrink-0">
+          <UiTypography as="span" size="xs" weight="medium" color="primary">افزودن بیمه</UiTypography>
         </button>
       </div>
 
