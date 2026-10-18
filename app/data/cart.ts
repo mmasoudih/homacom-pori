@@ -40,6 +40,8 @@ export interface CartItem {
   /** Set when the line is a specific seller offer (its own price/terms). */
   sellerName?: string
   insurance: CartInsurance | null
+  /** Policies offered when picking insurance for this line. */
+  insuranceOptions?: CartInsurance[]
   services: CartService[]
 }
 
@@ -58,13 +60,20 @@ const cartImage = {
   samsung: '/figma/fill-eedc0bf76b5dc7cd.png',
 }
 
-const DIGITAL_INSURANCE: CartInsurance = {
-  id: 'digital-equipment-saman',
-  name: 'بیمه تجهیزات دیجیتال - بیمه سامان',
-  price: 3_500_000,
-  oldPrice: 4_000_000,
-  discount: 12,
-}
+/** Selectable policies in the insurance dialog (Figma «انتخاب بیمه»). */
+export const cartInsuranceOptions: CartInsurance[] = [
+  {
+    id: 'digital-equipment-saman',
+    name: 'بیمه تجهیزات دیجیتال - بیمه سامان',
+    price: 3_500_000,
+    oldPrice: 4_000_000,
+    discount: 12,
+  },
+  { id: 'digital-equipment-sina', name: 'بیمه سینا', price: 1_200_000 },
+  { id: 'digital-equipment-matin', name: 'بیمه متین', price: 690_000 },
+]
+
+const DIGITAL_INSURANCE: CartInsurance = cartInsuranceOptions[0]!
 
 const ACCESSORY_SERVICES: CartService[] = [
   { id: 'android-games', label: 'بازی‌های اندروید', price: 1_200_000 },
@@ -84,6 +93,7 @@ export const cartItems: CartItem[] = [
     discount: 30,
     quantity: 1,
     insurance: DIGITAL_INSURANCE,
+    insuranceOptions: cartInsuranceOptions,
     services: ACCESSORY_SERVICES,
   },
   {
@@ -98,6 +108,7 @@ export const cartItems: CartItem[] = [
     quantity: 3,
     maxQuantity: 5,
     insurance: null,
+    insuranceOptions: cartInsuranceOptions,
     services: [],
   },
   {
@@ -113,6 +124,7 @@ export const cartItems: CartItem[] = [
     quantity: 8,
     maxQuantity: 8,
     insurance: null,
+    insuranceOptions: cartInsuranceOptions,
     services: [],
   },
   {
@@ -127,6 +139,7 @@ export const cartItems: CartItem[] = [
     discount: 30,
     quantity: 1,
     insurance: DIGITAL_INSURANCE,
+    insuranceOptions: cartInsuranceOptions,
     services: ACCESSORY_SERVICES,
   },
 ]

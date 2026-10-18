@@ -26,11 +26,8 @@ const total = computed(() => props.services.length)
       </div>
 
       <button type="button" class="flex items-center gap-1 text-R-300" @click="emit('add')">
-        <span
-          class="size-[11px] shrink-0 bg-current [mask-image:url(/icons/cart/plus.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-          aria-hidden="true"
-        />
         <UiTypography as="span" size="xsMd" weight="medium" color="primary">افزودن خدمت</UiTypography>
+        <img src="/icons/cart/plus-red.svg" alt="" class="size-[11px] shrink-0">
       </button>
     </div>
 

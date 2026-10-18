@@ -58,7 +58,7 @@ const canDecrement = computed(() => props.quantity > 1)
     </button>
 
     <span class="flex flex-col items-center justify-center gap-0.5">
-      <UiTypography as="span" size="xl" weight="medium" leading="none" class="text-T-900">
+      <UiTypography as="span" size="xl" weight="medium" class="leading-[23px] text-T-900">
         {{ toPersianDigits(quantity) }}
       </UiTypography>
       <UiTypography
@@ -66,8 +66,8 @@ const canDecrement = computed(() => props.quantity > 1)
         as="span"
         size="xs"
         weight="semibold"
-        leading="none"
         color="subtle"
+        class="leading-[16px]"
       >حداکثر</UiTypography>
     </span>
 

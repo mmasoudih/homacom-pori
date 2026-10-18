@@ -14,6 +14,7 @@ const {
   decrement,
   removeItem,
   removeAll,
+  setInsurance,
   removeInsurance,
   removeService,
 } = useCart()
@@ -30,8 +31,22 @@ function goCheckout() {
   toast.info('صفحه پرداخت به‌زودی در دسترس قرار می‌گیرد.')
 }
 
-function openInsurance() {
-  toast.info('انتخاب بیمه برای این کالا به‌زودی در دسترس قرار می‌گیرد.')
+// --- Insurance selection dialog ----------------------------------------------
+
+const insuranceDialog = reactive<{ open: boolean, itemId: string }>({ open: false, itemId: '' })
+
+const insuranceItem = computed(
+  () => items.value.find(item => item.id === insuranceDialog.itemId) ?? null,
+)
+
+function openInsurance(itemId: string) {
+  insuranceDialog.itemId = itemId
+  insuranceDialog.open = true
+}
+
+function confirmInsurance(insuranceId: string | null) {
+  if (insuranceDialog.itemId) setInsurance(insuranceDialog.itemId, insuranceId)
+  insuranceDialog.open = false
 }
 
 function openServices() {
@@ -80,7 +95,7 @@ function openServices() {
               @remove="removeItem(item.id)"
               @remove-insurance="removeInsurance(item.id)"
               @remove-service="serviceId => removeService(item.id, serviceId)"
-              @add-insurance="openInsurance"
+              @add-insurance="openInsurance(item.id)"
               @add-service="openServices"
             />
           </div>
@@ -108,7 +123,7 @@ function openServices() {
           @remove="removeItem(item.id)"
           @remove-insurance="removeInsurance(item.id)"
           @remove-service="serviceId => removeService(item.id, serviceId)"
-          @add-insurance="openInsurance"
+          @add-insurance="openInsurance(item.id)"
           @add-service="openServices"
         />
       </template>
@@ -121,5 +136,12 @@ function openServices() {
 
     <LandingMobileBottomNav />
     <CartMobileStickyBar v-if="!isEmpty" :total="payableTotal" @checkout="goCheckout" />
+
+    <!-- Insurance selection (modal on desktop, bottom sheet on mobile) -->
+    <CartInsuranceDialog
+      v-model:open="insuranceDialog.open"
+      :item="insuranceItem"
+      @confirm="confirmInsurance"
+    />
   </div>
 </template>

@@ -21,7 +21,7 @@ const emit = defineEmits<{
     <!-- Details at the start (right in RTL), thumbnail + stepper at the end. -->
     <div class="flex gap-3">
       <div class="flex min-w-0 flex-1 flex-col gap-3">
-        <NuxtLink :to="item.href" class="line-clamp-2">
+        <NuxtLink :to="item.href" class="line-clamp-2 text-[12.5px] leading-[18px]">
           <UiTypography as="span" size="md" class="leading-[18px]">
             {{ item.title }}
           </UiTypography>
@@ -64,10 +64,7 @@ const emit = defineEmits<{
           <UiTypography as="span" size="md" weight="semibold" leading="none" class="text-[#5A6AFF]">
             اقساطی
           </UiTypography>
-          <span
-            class="size-[15px] shrink-0 bg-current [mask-image:url(/icons/coins-front.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            aria-hidden="true"
-          />
+          <img src="/icons/cart/coins-blue.svg" alt="" class="size-[15px] shrink-0">
         </div>
 
         <CartQtyStepper
@@ -91,11 +88,8 @@ const emit = defineEmits<{
           class="flex items-center gap-1 text-R-300"
           @click="emit('addInsurance')"
         >
-          <span
-            class="size-[11px] shrink-0 bg-current [mask-image:url(/icons/cart/plus.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            aria-hidden="true"
-          />
           <UiTypography as="span" size="xs" weight="medium" color="primary">افزودن بیمه</UiTypography>
+          <img src="/icons/cart/plus-red.svg" alt="" class="size-[11px] shrink-0">
         </button>
       </div>
 

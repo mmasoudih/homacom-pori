@@ -1,7 +1,7 @@
 import { computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import type { CartItem } from '~/data/cart'
-import { cartItems } from '~/data/cart'
+import { cartInsuranceOptions, cartItems } from '~/data/cart'
 import type { ProductDetail, Seller } from '~/data/product'
 import { getDiscountPercent } from '~/utils/product'
 
@@ -45,7 +45,12 @@ function cloneItems(source: CartItem[]): CartItem[] {
   return source.map(item => ({
     ...item,
     insurance: item.insurance ? { ...item.insurance } : null,
-    services: item.services.map(service => ({ ...service })),
+    // Lines saved before the dialog existed (or from another product) still
+    // need a policy list to choose from.
+    insuranceOptions: item.insuranceOptions?.length
+      ? item.insuranceOptions.map(option => ({ ...option }))
+      : cartInsuranceOptions.map(option => ({ ...option })),
+    services: (item.services ?? []).map(service => ({ ...service })),
   }))
 }
 
@@ -156,8 +161,15 @@ export function useCart() {
     const color = product.colors.find(c => c.value === options.color) ?? product.colors[0]
     const warranty
       = product.warrantyOptions.find(w => w.id === options.warrantyId) ?? product.warrantyOptions[0]
+    const insuranceOptions = product.insuranceOptions.map(policy => ({
+      id: policy.id,
+      name: policy.name,
+      price: policy.price,
+      oldPrice: policy.oldPrice,
+      discount: policy.discount,
+    }))
     const insurance
-      = product.insuranceOptions.find(i => i.id === options.insuranceId) ?? null
+      = insuranceOptions.find(i => i.id === options.insuranceId) ?? null
 
     const selectedIds = options.serviceIds ?? []
     const services = product.serviceCatalog
@@ -183,15 +195,8 @@ export function useCart() {
       existing.oldPrice = oldPrice
       existing.discount = discount
       existing.sellerName = seller?.name
-      existing.insurance = insurance
-        ? {
-            id: insurance.id,
-            name: insurance.name,
-            price: insurance.price,
-            oldPrice: insurance.oldPrice,
-            discount: insurance.discount,
-          }
-        : null
+      existing.insuranceOptions = insuranceOptions
+      existing.insurance = insurance ? { ...insurance } : null
       existing.services = services.map(service => ({
         id: service.id,
         label: service.label,
@@ -212,15 +217,8 @@ export function useCart() {
           discount,
           quantity,
           sellerName: seller?.name,
-          insurance: insurance
-            ? {
-                id: insurance.id,
-                name: insurance.name,
-                price: insurance.price,
-                oldPrice: insurance.oldPrice,
-                discount: insurance.discount,
-              }
-            : null,
+          insurance: insurance ? { ...insurance } : null,
+          insuranceOptions,
           services: services.map(service => ({
             id: service.id,
             label: service.label,
@@ -268,6 +266,18 @@ export function useCart() {
     toast.success('همه کالاها از سبد خرید حذف شدند.')
   }
 
+  /** Pick (or clear) the policy for a line from the insurance dialog. */
+  function setInsurance(itemId: string, insuranceId: string | null) {
+    const item = find(itemId)
+    if (!item) return
+    const option
+      = item.insuranceOptions?.find(policy => policy.id === insuranceId)
+        ?? cartInsuranceOptions.find(policy => policy.id === insuranceId)
+        ?? null
+    item.insurance = option ? { ...option } : null
+    persist()
+  }
+
   function removeInsurance(id: string) {
     const item = find(id)
     if (!item) return
@@ -299,6 +309,7 @@ export function useCart() {
     decrement,
     removeItem,
     removeAll,
+    setInsurance,
     removeInsurance,
     removeService,
   }
