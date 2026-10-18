@@ -40,6 +40,9 @@ watch(headerHeight, (height) => {
 const token = useCookie('auth_token')
 const authed = computed(() => !!token.value)
 
+// Cart badge — shares the session cart with /cart.
+const { count: cartCount } = useCart()
+
 const megaOpen = ref(false)
 const megaTriggerEl = ref<HTMLElement | null>(null)
 
@@ -185,20 +188,22 @@ onMounted(() => {
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
         <!-- Cart button -->
-        <button
+        <NuxtLink
+          to="/cart"
           class="relative col-start-5 row-start-1 mt-[22px] flex size-12 items-center justify-center justify-self-end rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
           aria-label="سبد خرید"
         >
           <img src="/icons/shopping-bag.svg" alt="" class="size-6">
           <UiTypography
+            v-if="cartCount > 0"
             as="span"
             size="md"
             weight="bold"
             tracking="wide"
             color="white"
             class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary"
-          >{{ toPersianDigits('4') }}</UiTypography>
-        </button>
+          >{{ toPersianDigits(cartCount) }}</UiTypography>
+        </NuxtLink>
 
         <!-- Auth: logged-in cluster or login pill -->
         <div class="col-start-4 row-start-1 mt-[22px] flex h-12 items-center justify-self-end">

@@ -25,6 +25,10 @@ const props = withDefaults(
   { selectedColor: '', selectedWarranty: undefined, class: '' },
 )
 
+const emit = defineEmits<{
+  'add-to-cart': []
+}>()
+
 const isAvailable = computed(() => props.product.stockStatus === 'available')
 
 const selectedColor = computed(() =>
@@ -91,6 +95,7 @@ const linkIconClass = {
       <button
         type="button"
         class="flex h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-R-300 text-[13.5px] font-bold text-white transition-colors hover:bg-R-400"
+        @click="emit('add-to-cart')"
       >
         <IconShoppingCart class="size-4.5" />
         افزودن به سبد خرید
