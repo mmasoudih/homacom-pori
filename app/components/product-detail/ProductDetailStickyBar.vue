@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { toast } from 'vue-sonner'
+import { computed } from 'vue'
 import {
   IconBasket,
   IconPlus,
@@ -8,7 +7,7 @@ import {
   IconBell,
 } from '@tabler/icons-vue'
 import type { ProductDetail } from '~/data/product'
-import { formatPrice } from '~/utils/format'
+import { formatPrice, toPersianDigits } from '~/utils/format'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(
@@ -16,19 +15,24 @@ const props = withDefaults(
     product: ProductDetail
     /** Extra price added by selected services/insurance. */
     extraPrice?: number
+    /** Quantity of this selection already in the cart (0 = not added yet). */
+    quantity?: number
     class?: string
   }>(),
-  { extraPrice: 0, class: '' },
+  { extraPrice: 0, quantity: 0, class: '' },
 )
 
 const emit = defineEmits<{
   'notify-me': []
+  'add-to-cart': []
+  increment: []
+  decrement: []
+  remove: []
 }>()
 
 const isAvailable = computed(() => props.product.stockStatus === 'available')
 
-const added = ref(false)
-const quantity = ref(1)
+const added = computed(() => props.quantity > 0)
 
 const discountPercent = computed(() =>
   props.product.oldPrice ? props.product.price - props.product.oldPrice : 0,
@@ -36,22 +40,16 @@ const discountPercent = computed(() =>
 const total = computed(() => props.product.price + props.extraPrice)
 
 function addToCart() {
-  added.value = true
-  toast.success('کالا به سبد خرید اضافه شد.')
+  emit('add-to-cart')
 }
 
 function increment() {
-  quantity.value += 1
+  emit('increment')
 }
 
 function decrement() {
-  if (quantity.value > 1) {
-    quantity.value -= 1
-  }
-  else {
-    added.value = false
-    toast.success('کالا از سبد خرید حذف شد.')
-  }
+  if (props.quantity > 1) emit('decrement')
+  else emit('remove')
 }
 
 function notifyMe() {
@@ -126,7 +124,7 @@ function notifyMe() {
         >
           <IconPlus class="size-4.5" />
         </button>
-        <span class="text-[14px] font-bold text-T-900">{{ quantity }}</span>
+        <span class="text-[14px] font-bold text-T-900">{{ toPersianDigits(quantity) }}</span>
         <button
           v-if="quantity > 1"
           type="button"

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { toast } from 'vue-sonner'
 import { IconX } from '@tabler/icons-vue'
 import type { Seller, SellerType } from '~/data/product'
 import { formatPrice } from '~/utils/format'
@@ -15,6 +14,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  'add-to-cart': [seller: Seller]
 }>()
 
 const filters: Array<{ id: SellerType | 'all', label: string }> = [
@@ -39,7 +39,7 @@ const filtered = computed(() =>
 )
 
 function addToCart(seller: Seller) {
-  toast.success(`کالای فروشنده «${seller.name}» به سبد خرید اضافه شد.`)
+  emit('add-to-cart', seller)
 }
 
 const dialogShell

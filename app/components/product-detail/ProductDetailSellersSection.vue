@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toast } from 'vue-sonner'
 import { IconShoppingCart, IconUser } from '@tabler/icons-vue'
 import type { Seller } from '~/data/product'
 import { formatPriceFa } from '~/utils/format'
@@ -23,7 +22,6 @@ function typeLabel(type: Seller['type']) {
 
 function addToCart(seller: Seller) {
   emit('add-to-cart', seller)
-  toast.success(`کالای فروشنده «${seller.name}» به سبد خرید اضافه شد.`)
 }
 </script>
 

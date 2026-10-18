@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { getProductDetail } from '~/data/product'
+import type { Seller } from '~/data/product'
 import { DEMO_COMPARE_PRODUCT_ID } from '~/data/compare'
+import { cartLineId } from '~/composables/useCart'
 
 const route = useRoute()
 const router = useRouter()
@@ -58,6 +60,57 @@ const selectedInsurancePrice = computed(() =>
 
 /** Services + insurance, added on top of the product price (mobile bar). */
 const extraPrice = computed(() => servicesPrice.value + selectedInsurancePrice.value)
+
+// --- Cart ---------------------------------------------------------------------
+
+const {
+  items: cartItems,
+  addProduct,
+  increment: incrementCartLine,
+  decrement: decrementCartLine,
+  removeItem: removeCartLine,
+} = useCart()
+
+/** Cart line for the current colour/warranty selection. */
+const currentLineId = computed(() =>
+  product.value
+    ? cartLineId({
+        product: product.value,
+        color: selectedColor.value || product.value.colors[0]?.value,
+        warrantyId: selectedWarranty.value?.id,
+      })
+    : '',
+)
+
+/** How many of the current selection are already in the cart. */
+const currentQuantity = computed(
+  () => cartItems.value.find(item => item.id === currentLineId.value)?.quantity ?? 0,
+)
+
+function addSelectionToCart(quantity = 1) {
+  if (!product.value) return
+  addProduct({
+    product: product.value,
+    color: selectedColor.value,
+    warrantyId: selectedWarranty.value?.id,
+    insuranceId: selectedInsuranceId.value,
+    serviceIds: addedServiceIds.value,
+    quantity,
+  })
+}
+
+/** A seller offer becomes its own cart line (its price + credit terms). */
+function addSellerToCart(seller: Seller) {
+  if (!product.value) return
+  addProduct({
+    product: product.value,
+    color: selectedColor.value,
+    warrantyId: selectedWarranty.value?.id,
+    insuranceId: selectedInsuranceId.value,
+    serviceIds: addedServiceIds.value,
+    seller,
+  })
+}
 
 function removeServiceById(serviceId: string) {
   addedServiceIds.value = addedServiceIds.value.filter(i => i !== serviceId)
@@ -209,6 +262,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
               @open-services="dialogs.services = true"
               @open-insurance="dialogs.insurance = true"
               @notify-me="dialogs.notify = true"
+              @add-to-cart="addSelectionToCart()"
             />
 
             <!-- Sellers span the gallery + info columns (not the whole page) -->
@@ -216,6 +270,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
               v-if="product.stockStatus === 'available'"
               class="lg:col-span-2"
               :sellers="product.sellers"
+              @add-to-cart="addSellerToCart"
             />
           </div>
 
@@ -260,6 +315,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
                 :links="product.stickyLinks"
                 :selected-color="selectedColor"
                 :selected-warranty="selectedWarranty"
+                @add-to-cart="addSelectionToCart()"
               />
             </div>
           </div>
@@ -290,7 +346,12 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
       v-if="product"
       :product="product"
       :extra-price="extraPrice"
+      :quantity="currentQuantity"
       @notify-me="dialogs.notify = true"
+      @add-to-cart="addSelectionToCart()"
+      @increment="incrementCartLine(currentLineId)"
+      @decrement="decrementCartLine(currentLineId)"
+      @remove="removeCartLine(currentLineId)"
     />
 
     <!-- Dialogs & sheets -->
@@ -320,6 +381,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
       v-if="product"
       v-model:open="dialogs.sellers"
       :sellers="product.sellers"
+      @add-to-cart="addSellerToCart"
     />
 
     <ProductDetailCommentsSheet

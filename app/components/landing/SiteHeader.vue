@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
+import { onClickOutside, useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
 import { toPersianDigits } from '~/utils/format'
@@ -39,6 +39,24 @@ watch(headerHeight, (height) => {
 
 const token = useCookie('auth_token')
 const authed = computed(() => !!token.value)
+
+// Cart badge — shares the session cart with /cart.
+const { count: cartCount } = useCart()
+
+// Mini cart dropdown (desktop), toggled by the cart button.
+const cartOpen = ref(false)
+const cartWrapEl = ref<HTMLElement | null>(null)
+
+onClickOutside(cartWrapEl, () => {
+  cartOpen.value = false
+})
+
+watch(
+  () => route.fullPath,
+  () => {
+    cartOpen.value = false
+  },
+)
 
 const megaOpen = ref(false)
 const megaTriggerEl = ref<HTMLElement | null>(null)
@@ -184,21 +202,30 @@ onMounted(() => {
     <div class="mx-auto hidden max-w-[1440px] lg:block lg:px-6">
       <!-- Row 1: Cart, Auth, Search, Logo -->
       <div class="grid h-[71px] grid-cols-[86px_480px_1fr_269px_61px] px-0">
-        <!-- Cart button -->
-        <button
-          class="relative col-start-5 row-start-1 mt-[22px] flex size-12 items-center justify-center justify-self-end rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
-          aria-label="سبد خرید"
-        >
-          <img src="/icons/shopping-bag.svg" alt="" class="size-6">
-          <UiTypography
-            as="span"
-            size="md"
-            weight="bold"
-            tracking="wide"
-            color="white"
-            class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary"
-          >{{ toPersianDigits('4') }}</UiTypography>
-        </button>
+        <!-- Cart button + mini cart dropdown -->
+        <div ref="cartWrapEl" class="relative col-start-5 row-start-1 mt-[22px] justify-self-end">
+          <button
+            type="button"
+            class="relative flex size-12 items-center justify-center rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
+            :aria-expanded="cartOpen"
+            aria-haspopup="dialog"
+            aria-label="سبد خرید"
+            @click="cartOpen = !cartOpen"
+          >
+            <img src="/icons/shopping-bag.svg" alt="" class="size-6">
+            <UiTypography
+              v-if="cartCount > 0"
+              as="span"
+              size="md"
+              weight="bold"
+              tracking="wide"
+              color="white"
+              class="absolute right-[0px] bottom-[-6px] flex size-[18px] items-center justify-center rounded-full bg-primary"
+            >{{ toPersianDigits(cartCount) }}</UiTypography>
+          </button>
+
+          <CartMiniMenu :open="cartOpen" @update:open="cartOpen = $event" />
+        </div>
 
         <!-- Auth: logged-in cluster or login pill -->
         <div class="col-start-4 row-start-1 mt-[22px] flex h-12 items-center justify-self-end">

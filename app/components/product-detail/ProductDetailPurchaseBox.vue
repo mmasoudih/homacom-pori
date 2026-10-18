@@ -31,6 +31,7 @@ const emit = defineEmits<{
   'open-services': []
   'open-insurance': []
   'notify-me': []
+  'add-to-cart': []
 }>()
 
 const isAvailable = computed(() => props.product.stockStatus === 'available')
@@ -206,6 +207,7 @@ const payable = computed(
     <button
       type="button"
       class="flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-R-300 text-[14px] font-bold text-white transition-colors hover:bg-R-400"
+      @click="emit('add-to-cart')"
     >
       <IconShoppingCart class="size-5" />
       افزودن به سبد خرید

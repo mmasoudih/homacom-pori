@@ -6,6 +6,9 @@ import {
   IconX,
 } from '@tabler/icons-vue'
 import { cn } from '~/lib/utils'
+import { toPersianDigits } from '~/utils/format'
+
+const { count: cartCount } = useCart()
 
 const props = withDefaults(
   defineProps<{ class?: string }>(),
@@ -28,9 +31,13 @@ const emit = defineEmits<{
       <button type="button" class="flex size-8 items-center justify-center" aria-label="گزینه‌های بیشتر">
         <IconDotsVertical class="size-5" />
       </button>
-      <button type="button" class="flex size-8 items-center justify-center" aria-label="سبد خرید">
+      <NuxtLink to="/cart" class="relative flex size-8 items-center justify-center" aria-label="سبد خرید">
         <IconShoppingBag class="size-5" />
-      </button>
+        <span
+          v-if="cartCount > 0"
+          class="absolute -end-1 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-white"
+        >{{ toPersianDigits(cartCount) }}</span>
+      </NuxtLink>
       <button type="button" class="flex size-8 items-center justify-center" aria-label="جستجو">
         <IconSearch class="size-5" />
       </button>

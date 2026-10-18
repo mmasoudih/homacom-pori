@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { IconPlus, IconMinus, IconX } from '@tabler/icons-vue'
+import { toastIcons } from '~/utils/toast'
 
 /** Minimal shape so the dialog can serve both the product page and dashboard comments. */
 export interface CommentDialogProduct {
@@ -67,7 +68,7 @@ function submit() {
     toast.error('لطفا امتیاز و متن دیدگاه (حداقل ۱۰ کاراکتر) را وارد کنید.')
     return
   }
-  toast.success('دیدگاه شما با موفقیت ثبت شد و پس از تایید نمایش داده می‌شود.')
+  toast.success('نظر شما با موفقیت ارسال شد و پس از تایید نمایش داده خواهد شد', { icon: toastIcons.message })
   emit('update:open', false)
 }
 
