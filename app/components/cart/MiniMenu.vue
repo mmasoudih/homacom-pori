@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toast } from 'vue-sonner'
 import { formatPriceFa } from '~/utils/format'
 
 defineProps<{
@@ -27,7 +26,7 @@ function close() {
 function goCheckout() {
   if (isEmpty.value) return
   close()
-  toast.info('صفحه پرداخت به‌زودی در دسترس قرار می‌گیرد.')
+  navigateTo('/checkout')
 }
 </script>
 

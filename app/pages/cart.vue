@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toast } from 'vue-sonner'
 import { toPersianDigits } from '~/utils/format'
 
 const route = useRoute()
@@ -29,7 +28,7 @@ useHead({
 
 function goCheckout() {
   if (isEmpty.value) return
-  toast.info('صفحه پرداخت به‌زودی در دسترس قرار می‌گیرد.')
+  navigateTo('/checkout')
 }
 
 // --- Insurance selection dialog ----------------------------------------------

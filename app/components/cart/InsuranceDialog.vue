@@ -42,10 +42,10 @@ function confirm() {
       :class="dialogShell"
       :show-close-button="false"
       overlay-class="bg-[#1D1D1F]/45 backdrop-blur-[8px]"
-      class="max-w-[507px] gap-0 rounded-[24px] border-0 p-0 lg:max-w-[507px]"
+      class="flex! max-h-[90dvh] flex-col overflow-hidden max-w-[507px] gap-0 rounded-[24px] border-0 p-0 lg:max-w-[507px]"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between gap-3 border-b border-T-400 px-4 py-6 lg:px-6">
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-T-400 px-4 py-6 lg:px-6">
         <UiDialogTitle class="text-[16px] font-bold text-T-900">انتخاب بیمه</UiDialogTitle>
         <UiDialogDescription class="sr-only">
           انتخاب پوشش بیمه برای کالای سبد خرید
@@ -59,7 +59,7 @@ function confirm() {
       </div>
 
       <!-- Body -->
-      <div class="flex flex-col gap-[18px] px-4 py-3 lg:px-6 lg:py-8">
+      <div class="scrollbar-thin flex min-h-0 flex-1 flex-col gap-[18px] overflow-y-auto px-4 py-3 lg:px-6 lg:py-8">
         <UiTypography as="p" size="lg" weight="medium">
           پوشش بیمه مورد نظر خود را برای این کالا انتخاب کنید:
         </UiTypography>
@@ -102,7 +102,7 @@ function confirm() {
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center gap-3 p-5 lg:gap-6 lg:p-6">
+      <div class="flex shrink-0 items-center gap-3 p-5 lg:gap-6 lg:p-6">
         <button
           type="button"
           class="flex h-[41px] flex-1 items-center justify-center rounded-[12px] bg-T-300 transition-colors hover:bg-T-400 lg:h-[42px]"

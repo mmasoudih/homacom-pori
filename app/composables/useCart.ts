@@ -274,6 +274,12 @@ export function useCart() {
     toast.success('کالا از سبد خرید حذف شد.')
   }
 
+  /** Empty the cart without a toast (used after a completed payment). */
+  function clear() {
+    items.value = []
+    persist()
+  }
+
   function removeAll() {
     if (isEmpty.value) return
     items.value = []
@@ -336,6 +342,7 @@ export function useCart() {
     decrement,
     removeItem,
     removeAll,
+    clear,
     setInsurance,
     setServices,
     removeInsurance,

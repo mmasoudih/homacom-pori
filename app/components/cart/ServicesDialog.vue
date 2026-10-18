@@ -82,10 +82,10 @@ const dialogShell
       :class="dialogShell"
       :show-close-button="false"
       overlay-class="bg-[#1D1D1F]/45 backdrop-blur-[8px]"
-      class="max-w-[543px] gap-0 rounded-[24px] border-0 p-0 lg:max-w-[543px]"
+      class="flex! max-h-[90dvh] flex-col overflow-hidden max-w-[543px] gap-0 rounded-[24px] border-0 p-0 lg:max-w-[543px]"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between gap-3 border-b border-T-400 px-6 py-5 lg:py-6">
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-T-400 px-6 py-5 lg:py-6">
         <div class="flex min-w-0 items-center gap-3">
           <span class="hidden size-[46px] shrink-0 items-center justify-center rounded-[12px] bg-R-10 lg:flex">
             <img src="/icons/cart/services-header.svg" alt="" class="size-5">
@@ -106,7 +106,7 @@ const dialogShell
       </div>
 
       <!-- Categories -->
-      <div class="scrollbar-thin flex max-h-[52vh] flex-col gap-2 overflow-y-auto px-4 py-4 lg:max-h-[422px] lg:px-6">
+      <div class="scrollbar-thin flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-4 lg:px-6">
         <div
           v-for="group in groups"
           :key="group.id"
@@ -176,7 +176,7 @@ const dialogShell
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center justify-between gap-3 border-t border-T-400 px-5 py-[15px] lg:px-6">
+      <div class="flex shrink-0 items-center justify-between gap-3 border-t border-T-400 px-5 py-[15px] lg:px-6">
         <div class="flex flex-col gap-1">
           <UiTypography as="span" size="md" color="muted">
             ({{ toPersianDigits(selectedItems.length) }} خدمت) برای این کالا
