@@ -36,6 +36,10 @@ const {
   creditProviderId,
   discountCode,
   discountOpen,
+  promoCode,
+  promoDiscount,
+  applyPromoCode,
+  clearPromoCode,
   rows,
   payable,
   shippingReady,
@@ -48,6 +52,8 @@ const {
   backToShipping,
   reset,
 } = useCheckout()
+
+const discountTotal = computed(() => rows.value.find(row => row.key === 'discount')?.value ?? 0)
 
 const selectedDay = computed(
   () => deliveryDays.value.find(day => day.id === deliveryDay.value) ?? null,
@@ -143,7 +149,8 @@ function applyDiscount() {
     toast.error('کد تخفیف را وارد کنید.')
     return
   }
-  toast.info('کد تخفیف ثبت شد و پس از بررسی اعمال می‌شود.')
+  applyPromoCode(discountCode.value)
+  toast.success('کد تخفیف اعمال شد.')
 }
 </script>
 
@@ -156,24 +163,27 @@ function applyDiscount() {
       @back="backToShipping"
     />
 
-    <main class="mx-auto w-full max-w-[1440px] flex-1 px-4 pb-[132px] pt-4 lg:px-[45px] lg:pb-16 lg:pt-6">
+    <main
+      class="mx-auto w-full max-w-[1440px] flex-1 px-4 pt-4 lg:px-[45px] lg:pb-16 lg:pt-6"
+      :class="isShippingStep ? 'pb-[132px]' : 'pb-[200px]'"
+    >
       <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_324px] lg:gap-[38px]">
         <!-- ============================ Content ============================ -->
-        <div class="flex min-w-0 flex-col gap-3 lg:gap-6">
+        <div class="flex min-w-0 flex-col gap-4 lg:gap-6">
           <!-- ====================== Step 1 — shipping ====================== -->
           <template v-if="isShippingStep">
-            <!-- Address -->
-            <section class="flex flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:gap-6 lg:p-5">
+            <!-- Address (mobile: address-checkout-box-mobile, no outer card) -->
+            <section class="flex flex-col gap-[17px] lg:gap-6 lg:rounded-[12px] lg:border lg:border-T-400 lg:p-5">
               <UiTypography as="h2" size="lg" weight="bold" class="lg:text-[18px]">
                 انتخاب آدرس
               </UiTypography>
 
               <div
                 v-if="address"
-                class="flex items-start gap-4 rounded-[12px] border border-T-400 p-4"
+                class="flex flex-col gap-[14px] rounded-[12px] border border-T-400 p-[15px] lg:flex-row lg:items-start lg:gap-4 lg:p-4"
               >
-                <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <UiTypography as="span" size="lg" weight="medium">{{ address.city }}</UiTypography>
+                <div class="flex min-w-0 flex-1 flex-col gap-2 lg:gap-1.5 lg:min-h-0 max-lg:min-h-[72px]">
+                  <UiTypography as="span" size="lg" weight="medium" class="leading-[17px]">{{ address.city }}</UiTypography>
 
                   <div class="flex items-center gap-2.5">
                     <img src="/icons/cart/addr-map.svg" alt="" class="size-[18px] shrink-0">
@@ -184,23 +194,23 @@ function applyDiscount() {
 
                   <div class="flex items-center gap-2.5">
                     <img src="/icons/cart/addr-post.svg" alt="" class="size-[18px] shrink-0">
-                    <UiTypography as="span" size="md" color="muted" class="min-w-0 flex-1">
+                    <UiTypography as="span" size="md" color="muted" class="min-w-0 flex-1 leading-[18px]">
                       کد پستی: {{ address.postalCode }}
                     </UiTypography>
                   </div>
 
-                  <UiTypography as="span" size="md" color="muted">
+                  <UiTypography as="span" size="md" color="muted" class="hidden lg:block">
                     {{ address.recipient }} — {{ address.phone }}
                   </UiTypography>
                 </div>
 
                 <button
                   type="button"
-                  class="flex shrink-0 items-center gap-1 text-R-300"
+                  class="flex shrink-0 items-center gap-1 self-start text-R-300 max-lg:h-[25px] lg:self-auto"
                   @click="addressOpen = true"
                 >
                   <UiTypography as="span" size="md" weight="medium" color="primary">تغییر آدرس</UiTypography>
-                  <img src="/icons/cart/angle-down.svg" alt="" class="size-3 rotate-90">
+                  <img src="/icons/cart/angle-left.svg" alt="" class="size-[13px]">
                 </button>
               </div>
 
@@ -268,7 +278,7 @@ function applyDiscount() {
 
           <!-- ======================= Step 2 — payment ====================== -->
           <template v-else>
-            <section class="flex flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:gap-6 lg:p-5">
+            <section class="flex flex-col gap-[17px] lg:gap-6 lg:rounded-[12px] lg:border lg:border-T-400 lg:p-5">
               <UiTypography as="h2" size="lg" weight="bold" class="lg:text-[18px]">
                 روش پرداخت
               </UiTypography>
@@ -281,11 +291,12 @@ function applyDiscount() {
                 :installments="installmentProviders"
                 :wallet-balance="walletBalance"
                 :wallet-insufficient="walletInsufficient"
+                :limit-exceeded="paymentMethod === 'online' && limitExceeded"
               />
 
               <div
                 v-if="paymentMethod === 'online' && limitExceeded"
-                class="rounded-[8px] border border-dashed border-[#F2DDB4] bg-[#FFFCF7] p-3"
+                class="hidden rounded-[8px] border border-dashed border-[#F2DDB4] bg-[#FFFCF7] p-3 lg:block"
               >
                 <UiTypography as="span" size="md" color="muted" class="leading-[18px]">
                   به‌دلیل سقف ۳۹۵ میلیون تومانی هر تراکنش اینترنتی، مابقی مبلغ سفارش را می‌توانید از «جزئیات سفارش» در داشبورد پرداخت کنید؛ سفارش با تکمیل پرداخت نهایی می‌شود.
@@ -294,7 +305,7 @@ function applyDiscount() {
             </section>
 
             <!-- Credit wallets -->
-            <section class="flex flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:gap-6 lg:p-5">
+            <section class="flex flex-col gap-[17px] lg:gap-6 lg:rounded-[12px] lg:border lg:border-T-400 lg:p-5">
               <UiTypography as="h2" size="lg" weight="bold" class="lg:text-[18px]">
                 استفاده از اعتبار
               </UiTypography>
@@ -308,17 +319,19 @@ function applyDiscount() {
 
             <!-- Discount code: the whole card toggles, the field itself doesn't -->
             <section
-              class="flex cursor-pointer flex-col gap-4 rounded-[12px] border border-T-400 p-4 lg:p-5"
+              class="flex cursor-pointer flex-col gap-[14px] rounded-[12px] border border-T-400 p-[11px] lg:gap-4 lg:p-5"
               @click="discountOpen = !discountOpen"
             >
-              <div class="flex items-center justify-between gap-3">
-                <UiTypography as="span" size="lg" weight="medium">کد تخفیف دارید؟</UiTypography>
+              <div class="flex items-center gap-[14px] max-lg:h-[30px] lg:justify-between lg:gap-3">
+                <UiTypography as="span" size="lg" weight="medium" class="min-w-0 flex-1 text-start lg:flex-none">
+                  کد تخفیف دارید؟
+                </UiTypography>
 
                 <button
                   type="button"
                   role="switch"
                   :aria-checked="discountOpen"
-                  class="relative h-[17px] w-[30px] shrink-0 rounded-full transition-colors"
+                  class="relative h-[17px] w-[30px] shrink-0 rounded-full transition-colors max-lg:order-first"
                   :class="discountOpen ? 'bg-R-300' : 'bg-T-500'"
                   aria-label="کد تخفیف"
                 >
@@ -327,10 +340,38 @@ function applyDiscount() {
                     :class="discountOpen ? 'start-[15px]' : 'start-[2px]'"
                   />
                 </button>
+
+                <!-- Mobile: disclosure chevron at the end (left) -->
+                <img
+                  src="/icons/cart/angle-down.svg"
+                  alt=""
+                  class="size-[18px] shrink-0 transition-transform lg:hidden"
+                  :class="discountOpen ? '-rotate-90' : 'rotate-90'"
+                >
+              </div>
+
+              <!-- Applied code (Figma 3528 / discount-box) -->
+              <div
+                v-if="promoDiscount > 0"
+                class="flex h-[53px] w-full items-center gap-3 rounded-[12px] border border-[#5A6AFF] bg-[#EAECFF] px-3 py-1 lg:w-[314px] lg:self-start"
+                @click.stop
+              >
+                <img src="/icons/cart/discount-check.svg" alt="" class="size-[27px] shrink-0">
+                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <UiTypography as="span" size="md" weight="bold" class="leading-[15px] text-[#5A6AFF]">
+                    {{ promoCode }}
+                  </UiTypography>
+                  <UiTypography as="span" size="md" weight="medium" class="leading-[15px] text-[#5A6AFF]">
+                    {{ formatPriceFa(promoDiscount / 1000) }} هزار تومان تخفیف
+                  </UiTypography>
+                </span>
+                <button type="button" aria-label="حذف کد تخفیف" @click="clearPromoCode">
+                  <img src="/icons/cart/discount-x.svg" alt="" class="size-4">
+                </button>
               </div>
 
               <div
-                v-if="discountOpen"
+                v-if="discountOpen && !promoDiscount"
                 class="flex h-[42px] w-full items-center gap-1.5 rounded-[12px] border border-T-500 py-1 pe-1 ps-3 lg:w-[314px] lg:self-start"
                 @click.stop
               >
@@ -366,7 +407,8 @@ function applyDiscount() {
       <!-- ========================= Mobile invoice ========================= -->
       <div class="mt-6 lg:hidden">
         <CheckoutSummary
-          title="صورت‌حساب:"
+          :payment="!isShippingStep"
+          :title="isShippingStep ? '' : 'صورت‌حساب:'"
           :rows="rows"
           :total="payable"
           cta-label=""
@@ -375,20 +417,53 @@ function applyDiscount() {
     </main>
 
     <!-- ========================= Mobile sticky CTA ======================== -->
-    <div class="fixed inset-x-0 bottom-0 z-40 border-t border-T-400 bg-T-50/95 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex flex-col gap-0.5">
-          <UiTypography as="span" size="sm" weight="semibold" color="subtle">جمع کل:</UiTypography>
-          <div class="flex items-baseline gap-1.5">
-            <UiTypography as="span" size="xl" weight="medium" leading="none">
-              {{ formatPriceFa(payable) }}
-            </UiTypography>
-            <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
-              تومان
-            </UiTypography>
+    <div
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-T-400 bg-T-50/95 backdrop-blur lg:hidden"
+      :class="isShippingStep
+        ? 'px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3'
+        : 'px-[18px] pb-[calc(19px+env(safe-area-inset-bottom))] pt-[10px]'"
+    >
+      <!-- Step 2 — Figma Frame 3587: discount + payable rows over the pay CTA -->
+      <div v-if="!isShippingStep" class="flex flex-col gap-3">
+        <div class="flex flex-col">
+          <div class="flex h-[45px] items-center gap-1.5 border-b border-T-300 px-3">
+            <img src="/icons/cart/row-discount.svg" alt="" class="size-5 shrink-0">
+            <UiTypography as="span" size="md" color="muted">تخفیف:</UiTypography>
+            <span class="ms-auto flex items-baseline gap-1.5">
+              <UiTypography as="span" size="lg" weight="medium" leading="none">
+                {{ formatPriceFa(discountTotal) }}
+              </UiTypography>
+              <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
+                تومان
+              </UiTypography>
+            </span>
+          </div>
+
+          <div class="flex h-[46px] items-center gap-1.5 px-3">
+            <img src="/icons/cart/row-items.svg" alt="" class="size-5 shrink-0">
+            <UiTypography as="span" size="md" color="muted">مبلغ قابل پرداخت</UiTypography>
+            <span class="ms-auto flex items-baseline gap-1.5">
+              <UiTypography as="span" size="2xl" weight="semibold" class="leading-[22px]">
+                {{ formatPriceFa(payable) }}
+              </UiTypography>
+              <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
+                تومان
+              </UiTypography>
+            </span>
           </div>
         </div>
 
+        <button
+          type="button"
+          class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300"
+          @click="next"
+        >
+          <UiTypography as="span" size="lg" weight="bold" color="white">{{ ctaLabel }}</UiTypography>
+        </button>
+      </div>
+
+      <!-- Step 1 — CTA at the start (right), sum at the end (left), Figma Frame 3642 -->
+      <div v-else class="flex items-center justify-between gap-3">
         <button
           v-if="!blockedLabel"
           type="button"
@@ -403,10 +478,22 @@ function applyDiscount() {
           class="flex h-[42px] min-w-0 max-w-[217px] flex-1 items-center justify-center rounded-[12px] border border-[#F2DDB4] px-2 text-center"
           @click="shippingOpen = true"
         >
-          <UiTypography as="span" size="md" weight="medium" class="text-[#CF982C]">
+          <UiTypography as="span" size="md" weight="medium" class="min-w-0 text-center leading-[17px] text-[#CF982C]">
             {{ blockedLabel }}
           </UiTypography>
         </button>
+
+        <div class="flex flex-col gap-0.5">
+          <UiTypography as="span" size="sm" weight="semibold" color="subtle" class="leading-[14px]">جمع کل:</UiTypography>
+          <div class="flex items-baseline gap-1.5">
+            <UiTypography as="span" size="2xl" weight="semibold" class="leading-[22px]">
+              {{ formatPriceFa(payable) }}
+            </UiTypography>
+            <UiTypography as="span" size="sm" weight="semibold" color="subtle" class="leading-[14px]">
+              تومان
+            </UiTypography>
+          </div>
+        </div>
       </div>
     </div>
 

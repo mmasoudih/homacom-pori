@@ -10,8 +10,10 @@ withDefaults(
     blockedLabel?: string
     title?: string
     class?: string
+    /** Mobile payment-step invoice (Figma 3645): padded block, title, no total. */
+    payment?: boolean
   }>(),
-  { blockedLabel: '', title: '', class: '' },
+  { blockedLabel: '', title: '', class: '', payment: false },
 )
 
 const emit = defineEmits<{
@@ -28,32 +30,45 @@ const rowIcons: Record<string, string> = {
 </script>
 
 <template>
-  <aside :class="['flex flex-col gap-6 rounded-[12px] border border-T-400 bg-T-50 p-5', $props.class]">
-    <div class="flex flex-col gap-1.5">
-      <UiTypography v-if="title" as="p" size="lg" weight="bold">{{ title }}</UiTypography>
+  <aside
+    :class="[
+      'flex flex-col gap-6 rounded-[12px] border border-T-400 bg-T-50 p-5',
+      // Mobile: a full-bleed band (86978 shipping) or a padded payment-step invoice (3645).
+      payment
+        ? 'max-lg:-mx-4 max-lg:gap-6 max-lg:rounded-none max-lg:border-0 max-lg:px-5 max-lg:py-5'
+        : 'max-lg:-mx-4 max-lg:gap-4 max-lg:rounded-none max-lg:border-x-0 max-lg:px-0 max-lg:py-5',
+      $props.class,
+    ]"
+  >
+    <div class="flex flex-col gap-1.5" :class="payment ? 'max-lg:gap-6' : ''">
+      <UiTypography v-if="title" as="p" size="lg" weight="bold" class="leading-[19px] max-lg:leading-[17px]">{{ title }}</UiTypography>
 
-      <div
-        v-for="row in rows"
-        :key="row.key"
-        class="flex h-[45px] items-center gap-1.5 border-b border-T-300 last:border-b-0"
-      >
-        <img :src="rowIcons[row.key]" alt="" class="size-5 shrink-0">
+      <div class="flex flex-col gap-1.5" :class="payment ? 'max-lg:px-0' : 'max-lg:px-4'">
+        <div
+          v-for="row in rows"
+          :key="row.key"
+          class="flex h-[45px] items-center gap-1.5 border-b border-T-300 last:border-b-0 max-lg:last:border-b"
+          :class="payment ? 'max-lg:px-0' : 'max-lg:px-3'"
+        >
+          <img :src="rowIcons[row.key]" alt="" class="size-5 shrink-0">
 
-        <UiTypography as="span" size="md" color="muted">{{ row.label }}:</UiTypography>
+          <UiTypography as="span" size="md" color="muted">{{ row.label }}:</UiTypography>
 
-        <span class="ms-auto flex items-baseline gap-1.5">
-          <UiTypography as="span" size="lg" weight="medium" leading="none">
-            {{ formatPriceFa(row.value) }}
-          </UiTypography>
-          <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
-            تومان
-          </UiTypography>
-        </span>
+          <span class="ms-auto flex items-baseline gap-1.5">
+            <UiTypography as="span" size="lg" weight="medium" leading="none">
+              {{ formatPriceFa(row.value) }}
+            </UiTypography>
+            <UiTypography as="span" size="sm" weight="semibold" leading="none" color="subtle">
+              تومان
+            </UiTypography>
+          </span>
+        </div>
       </div>
     </div>
 
-    <div class="flex flex-col gap-3">
-      <div class="flex min-h-[26px] items-center justify-between gap-2">
+    <div v-if="!payment" class="flex flex-col gap-3">
+      <!-- Desktop total -->
+      <div class="hidden min-h-[26px] items-center justify-between gap-2 lg:flex">
         <UiTypography as="span" size="lg" weight="semibold">جمع کل</UiTypography>
 
         <span class="flex items-baseline gap-1.5">
@@ -64,6 +79,24 @@ const rowIcons: Record<string, string> = {
             تومان
           </UiTypography>
         </span>
+      </div>
+
+      <!-- Mobile total: the frame puts the sum at the start of the CTA row -->
+      <div class="flex justify-end px-4 lg:hidden">
+        <div class="flex flex-col gap-0.5">
+          <UiTypography as="span" size="sm" weight="semibold" color="subtle" class="leading-[14px]">
+            جمع کل:
+          </UiTypography>
+
+          <span class="flex items-baseline gap-1.5">
+            <UiTypography as="span" size="2xl" weight="semibold" class="leading-[22px]">
+              {{ formatPriceFa(total) }}
+            </UiTypography>
+            <UiTypography as="span" size="sm" weight="semibold" color="subtle" class="leading-[14px]">
+              تومان
+            </UiTypography>
+          </span>
+        </div>
       </div>
 
       <div

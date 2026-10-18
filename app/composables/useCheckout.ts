@@ -42,6 +42,9 @@ export function useCheckout() {
   const creditProviderId = ref('')
   const discountCode = ref('')
   const discountOpen = ref(false)
+  /** Applied promo code + its amount (demo: any code is worth 500,000). */
+  const promoCode = ref('')
+  const promoDiscount = ref(0)
 
   const address = computed(
     () => addresses.value.find(item => item.id === addressId.value) ?? null,
@@ -60,15 +63,34 @@ export function useCheckout() {
 
   const rows = computed(() => [
     { key: 'items', label: 'مجموع قیمت کالاها', value: itemsTotal.value, icon: 'items' },
-    { key: 'discount', label: 'تخفیف', value: discountTotal.value, icon: 'discount' },
+    { key: 'discount', label: 'تخفیف', value: discountTotal.value + promoDiscount.value, icon: 'discount' },
     { key: 'insurance', label: 'مبلغ بیمه‌ها', value: insuranceTotal.value, icon: 'insurance' },
     { key: 'services', label: 'خدمات', value: servicesTotal.value, icon: 'services' },
     { key: 'shipping', label: 'هزینه ارسال', value: shippingCost.value, icon: 'shipping' },
   ])
 
-  const payable = computed(
-    () => itemsTotal.value + insuranceTotal.value + servicesTotal.value + shippingCost.value,
-  )
+  const payable = computed(() => Math.max(
+    0,
+    itemsTotal.value + insuranceTotal.value + servicesTotal.value + shippingCost.value - promoDiscount.value,
+  ))
+
+  /** Demo promo value — the design's «OFF-Homa-500» chip says 500,000 Tomans. */
+  const PROMO_DISCOUNT = 500_000
+
+  function applyPromoCode(code: string) {
+    const normalized = code.trim().toUpperCase()
+    if (!normalized) return 0
+    promoCode.value = normalized
+    promoDiscount.value = PROMO_DISCOUNT
+    discountCode.value = normalized
+    return PROMO_DISCOUNT
+  }
+
+  function clearPromoCode() {
+    promoCode.value = ''
+    promoDiscount.value = 0
+    discountCode.value = ''
+  }
 
   const shippingReady = computed(
     () => !!shippingMethodId.value && !!deliveryDay.value && !!timeSlot.value,
@@ -121,6 +143,8 @@ export function useCheckout() {
     creditProviderId.value = ''
     discountCode.value = ''
     discountOpen.value = false
+    promoCode.value = ''
+    promoDiscount.value = 0
     deliveryDays.value = getDeliveryDays()
   }
 
@@ -146,6 +170,10 @@ export function useCheckout() {
     creditInsufficient,
     discountCode,
     discountOpen,
+    promoCode,
+    promoDiscount,
+    applyPromoCode,
+    clearPromoCode,
     rows,
     payable,
     shippingReady,

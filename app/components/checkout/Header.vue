@@ -19,27 +19,27 @@ const emit = defineEmits<{
 <template>
   <!-- Slim checkout bar — desktop: centred logo + back link; mobile: back + title. -->
   <header class="border-b border-T-400 bg-T-50 lg:border-0">
-    <!-- Mobile -->
-    <div class="flex h-[62px] items-center justify-between gap-3 px-4 lg:hidden">
+    <!-- Mobile: arrow at the start (right), then the title (Figma Frame 3279) -->
+    <div class="flex h-[62px] items-center gap-5 px-4 lg:hidden">
       <button
         v-if="!backTo"
         type="button"
-        class="flex size-8 items-center justify-center text-R-300"
+        class="relative flex size-6 shrink-0 items-center justify-center after:absolute after:-inset-2 after:content-['']"
         :aria-label="backLabel"
         @click="emit('back')"
       >
-        <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
+        <img src="/icons/cart/arrow-back-dark.svg" alt="" class="size-6">
       </button>
       <NuxtLink
         v-else
         :to="backTo"
-        class="flex size-8 items-center justify-center text-R-300"
+        class="relative flex size-6 shrink-0 items-center justify-center after:absolute after:-inset-2 after:content-['']"
         :aria-label="backLabel"
       >
-        <img src="/icons/cart/arrow-back.svg" alt="" class="size-6">
+        <img src="/icons/cart/arrow-back-dark.svg" alt="" class="size-6">
       </NuxtLink>
 
-      <UiTypography as="span" size="lg" weight="bold">{{ title }}</UiTypography>
+      <UiTypography as="span" size="xl" weight="bold" class="leading-[19px]">{{ title }}</UiTypography>
     </div>
 
     <!-- Desktop: 1350px bar, 45px gutters, 16px from the top (Figma Frame 3339) -->
