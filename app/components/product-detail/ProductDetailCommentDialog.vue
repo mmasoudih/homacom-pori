@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { IconPlus, IconMinus, IconX } from '@tabler/icons-vue'
+import { apiErrorMessage } from '~/composables/useApi'
 import { toastIcons } from '~/utils/toast'
 
 /** Minimal shape so the dialog can serve both the product page and dashboard comments. */
@@ -14,8 +15,12 @@ const props = withDefaults(
   defineProps<{
     open: boolean
     product: CommentDialogProduct
+    /** Backend product id; when set the comment is posted to the API. */
+    productId?: number | null
   }>(),
-  {},
+  {
+    productId: null,
+  },
 )
 
 const emit = defineEmits<{
@@ -63,11 +68,31 @@ function addPoint(list: 'positive' | 'negative') {
   ;(list === 'positive' ? positiveDraft : negativeDraft).value = ''
 }
 
-function submit() {
+async function submit() {
   if (!canSubmit.value) {
     toast.error('لطفا امتیاز و متن دیدگاه (حداقل ۱۰ کاراکتر) را وارد کنید.')
     return
   }
+
+  if (props.productId) {
+    try {
+      const api = useApi()
+      await api.post('/shop/user/comments', {
+        title: text.value.trim().slice(0, 80),
+        content: text.value.trim(),
+        relate_to: 'product',
+        relate_id: props.productId,
+        score: rating.value,
+        strength: positives.value,
+        weakness: negatives.value,
+      })
+    }
+    catch (err) {
+      toast.error(apiErrorMessage(err, 'ارسال دیدگاه انجام نشد.'))
+      return
+    }
+  }
+
   toast.success('نظر شما با موفقیت ارسال شد و پس از تایید نمایش داده خواهد شد', { icon: toastIcons.message })
   emit('update:open', false)
 }

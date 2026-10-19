@@ -371,6 +371,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
       v-if="product"
       v-model:open="dialogs.comment"
       :product="product"
+      :product-id="product.stockId ? Number(product.id) : null"
     />
 
     <ProductDetailInsuranceDialog

@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import type { CommentTabKey, MyComment, PendingComment } from '~/data/comments'
-import {
-  commentTabs as baseTabs,
-  myComments as initialMine,
-  pendingComments as initialPending,
-} from '~/data/comments'
+import { toast } from 'vue-sonner'
+import type { CommentTabKey } from '~/data/comments'
+import { commentTabs as baseTabs } from '~/data/comments'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
 const router = useRouter()
 
 const activeTab = ref<CommentTabKey>((route.query.tab as string) === 'pending' ? 'pending' : 'mine')
 
-const mine = ref<MyComment[]>([...initialMine])
-const pending = ref<PendingComment[]>([...initialPending])
+const {
+  mine,
+  pending,
+  loaded,
+  load: loadComments,
+  remove: deleteComment,
+} = useUserComments()
+
+onMounted(() => {
+  loadComments().catch(err => toast.error(apiErrorMessage(err, 'دریافت دیدگاه‌ها انجام نشد.')))
+})
 
 const tabs = computed(() => baseTabs.map(tab => ({
   ...tab,
@@ -22,7 +29,7 @@ const tabs = computed(() => baseTabs.map(tab => ({
 const isEmpty = computed(() => route.query.empty === '1')
 
 const showEmpty = computed(() =>
-  isEmpty.value || (activeTab.value === 'mine' ? mine.value.length === 0 : pending.value.length === 0),
+  isEmpty.value || (loaded.value && (activeTab.value === 'mine' ? mine.value.length === 0 : pending.value.length === 0)),
 )
 
 const dialogOpen = ref(false)
@@ -32,8 +39,14 @@ watch(activeTab, (tab) => {
   router.replace({ query: { ...route.query, tab: tab === 'mine' ? undefined : tab } })
 })
 
-function removeComment(id: string) {
-  mine.value = mine.value.filter(comment => comment.id !== id)
+async function removeComment(id: string) {
+  try {
+    await deleteComment(id)
+    toast.success('دیدگاه حذف شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'حذف دیدگاه انجام نشد.'))
+  }
 }
 
 function openDialog(comment: { title: string, image: string }) {
