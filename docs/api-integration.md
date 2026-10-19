@@ -7,6 +7,8 @@ Machine-readable spec: `https://new.ahoma.ir/docs?api-docs.json`.
 Work is done in phases. Each phase is committed separately so it can be reverted
 independently.
 
+**Backend asks / missing data:** see [`api-backend-gaps.md`](./api-backend-gaps.md).
+
 ## Current state (audit)
 
 - [x] `NUXT_PUBLIC_API_BASE` configured (`https://new.ahoma.ir/api`).
@@ -15,7 +17,12 @@ independently.
 - [x] `auth_token` cookie written on login.
 - [x] Shared API client sends `Authorization` (with 401 refresh/retry).
 - [x] Auth middleware, `X-Cart-Token` support, refresh and logout.
-- [ ] Everything else is mock data under `app/data/*` and `app/composables/use*.ts`.
+- [x] Catalog search, product detail/comments, blog, brands/FAQ, banners/stories,
+      cart, addresses (list/delete), profile, orders, favorites, comments and
+      tickets now read from the API.
+- [ ] Still designed-mock: checkout submit/payment/returns, notifications,
+      insurance/services after add-to-cart, static CMS pages, landing product
+      carousels, address add/edit forms.
 
 ## Phase 0 — Shared infrastructure
 
@@ -27,8 +34,9 @@ independently.
 - [x] Persist `X-Cart-Token` for guest cart; send on cart endpoints.
 - [x] Auth middleware for `/dashboard/**` with redirect-back support.
 - [x] Shared API types (`ApiEnvelope`, `ApiPagination`, `ApiError`).
-- [ ] Normalize media URLs and pagination per page (Phase 2+).
-- [ ] Decide direct browser calls vs Nitro proxy (CORS/token safety).
+- [x] Normalize relative media URLs (`resolveMediaUrl`).
+- [x] Direct browser calls confirmed working: API reflects `Origin` in CORS and
+      allows `authorization,content-type`.
 
 ## Phase 1 — Auth (7 endpoints)
 
@@ -39,35 +47,41 @@ independently.
 - [x] `POST /api/auth/reset-password` → `app/pages/auth/reset-password.vue`
 - [x] `POST /api/auth/logout` → `app/components/dashboard/LogoutDialog.vue`
 - [x] `POST /api/auth/refresh` → API client interceptor
-- [ ] Verify token expiry (`token_expire`) and hydrate user via
-      `GET /api/shop/user/profile/me`
+- [x] Hydrate user via `GET /api/shop/user/profile/me`.
+- [ ] Pre-emptive refresh from `token_expire` (currently refresh only on a 401).
 
 ## Phase 2 — Global shell / CMS (6 Public + Banner + Story)
 
-- [ ] `GET /api/shop/public/site-header` → `landing/SiteHeader.vue`
+- [ ] `GET /api/shop/public/site-header` → `landing/SiteHeader.vue` (live menu
+      items have `link: null`; top nav stays designed until links are populated)
 - [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile,
       mock tree as fallback)
 - [x] `GET /api/shop/public/footer` → `landing/SiteFooter.vue` (contact block;
       menu columns stay designed until the API returns links)
-- [ ] `GET /api/shop/public/blog-header` → `blog/BlogSiteHeader.vue`
+- [x] Blog header nav uses `/shop/public/blog-category` (the dedicated
+      `/blog-header` endpoint is not needed until it differs)
 - [x] `GET /api/shop/public/blog-category` → blog nav/drawer (mock tree as
       fallback)
-- [ ] `GET /api/shop/public/colors` → color filters (`SearchColorFilter`)
+- [ ] `GET /api/shop/public/colors` → color filters (`SearchColorFilter` still
+      uses the designed swatches)
 - [x] `GET /api/shop/banners?filters[position]=` → landing hero + banner rows
       (mock banners per slot as fallback)
 - [x] `GET /api/shop/stories` → header story strip (`HeaderCircleStrip`)
 
 ## Phase 3 — Catalog, search, product detail
 
-- [ ] `GET /api/shop/products` (q, categories, colors, brands, ids, price range,
-      only_exists, vip, homa_off, sort, page, per_page) → landing carousels,
-      `search.vue`, category pages
+- [x] `GET /api/shop/products` (q, ids, pagination) → header search + `search.vue`
+      (prices enriched with one detail call per result — see gaps doc)
+- [ ] Landing carousels (`جدیدترین`, `پرفروش‌ترین`) still use designed products;
+      the list endpoint has no price and no documented sort values.
 - [x] `GET /api/shop/products/{slug}` → `product/[id].vue` + `product-detail/*`
       (gallery, colors, stocks/price, warranties, services, questions, SEO;
       mock product kept as fallback)
 - [x] `GET /api/shop/products/{id}/comments` → comments section/sheet
-- [ ] Replace `useProductSearch` / `useSearchResults` / `useSearchFilters` mocks
-- [ ] Debounced header search suggestions
+- [x] Replace `useProductSearch` / `useSearchResults` data with the API
+- [x] Debounced header search suggestions
+- [ ] `useSearchFilters` facets are still the designed brand/colour lists;
+      API brand ids are mapped by title, unsupported brands fall out of facets
 
 ## Phase 4 — Blog
 
@@ -185,16 +199,19 @@ independently.
 - [x] `GET /api/shop/faqs` → `faq.vue` (mock content as fallback)
 - [x] `GET /api/shop/brands` → `brands.vue`, `landing/BrandsSection`
 - [ ] Confirm backend for: about, terms, guarantee, installment, contact, branch,
-      collaboration, notifications
+      collaboration, notifications (none in the spec — see gaps doc)
 - [ ] Keep mock or move to CMS — decision needed
 
 ## Known gaps / decisions
 
-1. **CORS & auth transport**: direct browser `$fetch` to `new.ahoma.ir` or Nitro
-   proxy? Affects cookie/SSR strategy.
+1. **CORS**: confirmed for local dev; production origin must be allowed.
 2. **Checkout/order creation, returns, payment, notifications** are absent from
-   the spec.
-3. **Order list requires both `status` and `type`** — needs a default tab
-   mapping (`type=sales`).
-4. **Guest cart** uses `X-Cart-Token`; confirm it survives login/merge.
-5. **OpenAPI codegen**: add `openapi-typescript` or hand-write types?
+   the spec — see `api-backend-gaps.md`.
+3. **Order list requires both `status` and `type`** — the UI merges statuses
+   (`type=sales`) and paginates client-side.
+4. **Guest cart** works with a client-generated `cart_token`; login-time merge
+   still needs confirmation.
+5. **Product/favorite cards** pay for an N+1 detail request to get prices until
+   the list endpoint returns price/stock.
+6. **OpenAPI codegen**: types are hand-written per feature; consider
+   `openapi-typescript` once the payloads stabilise.
