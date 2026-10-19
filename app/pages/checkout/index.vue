@@ -14,6 +14,8 @@ import { apiErrorMessage } from '~/composables/useApi'
 const {
   isEmpty,
   clear: clearCart,
+  setAddress: persistAddress,
+  setPaymentMethod: persistPaymentMethod,
 } = useCart()
 
 const { setResult } = useCheckoutResult()
@@ -87,6 +89,18 @@ const shippingOpen = ref(false)
 const creditOpen = ref(false)
 
 const route = useRoute()
+
+// Keep the server cart in sync with the current checkout selection. The final
+// submit endpoint is still missing, but the cart already stores these choices.
+watch(addressId, (id) => {
+  if (!id || !/^\d+$/.test(id)) return
+  persistAddress(id).catch(() => {})
+})
+
+watch(paymentMethod, (method) => {
+  const apiMethod = method === 'online' || method === 'wallet' ? 'online' : 'mixed'
+  persistPaymentMethod(apiMethod).catch(() => {})
+})
 
 onMounted(() => {
   if (isEmpty.value) navigateTo('/cart')

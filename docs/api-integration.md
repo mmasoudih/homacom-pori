@@ -120,9 +120,9 @@ independently.
 - [x] `POST /api/shop/cart/add-to-cart` (`stock_id`, `quantity`, `services[]`)
 - [x] `POST /api/shop/cart/add-qty` / `sub-qty`
 - [x] `DELETE /api/shop/cart/item` (line remove + clear)
-- [x] `POST /api/shop/cart/set-user-address`
-- [x] `POST /api/shop/cart/set/payment-method`
-      (`online | pay_in_delivery | pay_in_person | mixed | manual`)
+- [x] `POST /api/shop/cart/set-user-address` → checkout address selection
+- [x] `POST /api/shop/cart/set/payment-method` → checkout payment selection
+      (`online` + wallet→`online`; installment→`mixed`, mapping needs confirmation)
 - [x] `POST /api/shop/cart/set-discount` (coupon apply/clear)
 - [x] Sync header badge + cart totals from API items
 - [ ] Insurance / add-on services chosen **after** a line exists are local-only

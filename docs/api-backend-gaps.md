@@ -68,6 +68,10 @@ Mostly sufficient. Remaining asks:
   knows the max. Return a usable `min_in_cart` per stock and expose it in the
   product detail response so the stepper can enforce it.
 - **Coupon:** confirm the error codes/messages for invalid/expired coupons.
+- **Payment method:** the checkout UI offers `online`, `wallet` and
+  `installment`; the cart endpoint accepts `online | pay_in_delivery |
+  pay_in_person | mixed | manual`. Add wallet/installment values (or document the
+  intended mapping).
 - **Totals:** confirm that `totals.payable_price` already includes
   services/insurance/coupon so the UI can trust it instead of recomputing.
 
