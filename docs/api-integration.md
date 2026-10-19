@@ -168,12 +168,17 @@ independently.
 
 ## Phase 11 — Tickets
 
-- [ ] `GET /api/shop/user/ticket/departments` → new ticket dialog
-- [ ] `GET /api/shop/user/ticket` (status, department, q, sort, pagination)
-- [ ] `POST /api/shop/user/ticket`
-- [ ] `GET /api/shop/user/ticket/{ticket}/messages`
-- [ ] `POST /api/shop/user/ticket/{ticket}/reply`
-- [ ] `POST /api/shop/user/ticket/{ticket}/close`
+- [x] `GET /api/shop/user/ticket/departments` → new-ticket department select
+- [x] `GET /api/shop/user/ticket` (status, department, q, sort, pagination)
+- [x] `POST /api/shop/user/ticket`
+- [x] `GET /api/shop/user/ticket/{ticket}/messages`
+- [x] `POST /api/shop/user/ticket/{ticket}/reply`
+- [x] `POST /api/shop/user/ticket/{ticket}/close`
+- [ ] No delete-ticket endpoint: the list's delete action closes the ticket.
+- [ ] Ticket create always sends `priority: medium` (no priority selector).
+- [ ] Ticket attachments are UI-only (no upload endpoint in the spec).
+- [ ] Message author is inferred from `supporter.id` vs `user_id`; there is no
+      explicit author/role field in `TicketMessageResource`.
 
 ## Phase 12 — Static/CMS pages (no endpoints in spec)
 

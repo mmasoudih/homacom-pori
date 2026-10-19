@@ -1,18 +1,32 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import type { NewTicketPayload, Ticket } from '~/data/tickets'
-import { tickets as initialTickets } from '~/data/tickets'
+import type { NewTicketPayload } from '~/data/tickets'
+import { apiErrorMessage } from '~/composables/useApi'
 import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 
 const route = useRoute()
 const router = useRouter()
 const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
 
-const items = ref<Ticket[]>([...initialTickets])
+const {
+  tickets: items,
+  loaded,
+  load: loadTickets,
+  create: createTicketApi,
+  close: closeTicketApi,
+} = useTickets()
+const { departments, load: loadDepartments } = useTicketDepartments()
 const dialogOpen = ref(false)
 
-const isEmpty = computed(() => route.query.empty === '1' || items.value.length === 0)
+onMounted(() => {
+  Promise.all([loadTickets(), loadDepartments()])
+    .catch(err => toast.error(apiErrorMessage(err, 'دریافت تیکت‌ها انجام نشد.')))
+})
+
+const isEmpty = computed(
+  () => route.query.empty === '1' || (loaded.value && items.value.length === 0),
+)
 
 function openDialog() {
   dialogOpen.value = true
@@ -22,30 +36,35 @@ function viewTicket(id: string) {
   router.push(`/dashboard/tickets/${id}`)
 }
 
-function removeTicket(id: string) {
-  items.value = items.value.filter(ticket => ticket.id !== id)
-  toast.success('تیکت حذف شد.')
+async function removeTicket(id: string) {
+  try {
+    await closeTicketApi(id)
+    toast.success('تیکت بسته شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'بستن تیکت انجام نشد.'))
+  }
 }
 
-let ticketSeq = items.value.length
+async function createTicket(payload: NewTicketPayload) {
+  const departmentId = Number(payload.topic)
+  if (!departmentId) {
+    toast.error('بخش پشتیبانی را انتخاب کنید.')
+    return
+  }
 
-function createTicket(payload: NewTicketPayload) {
-  ticketSeq += 1
-  const id = `ticket-${Date.now()}`
-  items.value = [
-    {
-      id,
-      code: `321EAAP6-${String(ticketSeq).padStart(4, '0')}`,
+  try {
+    await createTicketApi({
       subject: payload.subject,
-      department: 'بخش مالی',
-      status: 'waiting',
-      date: '۱۴۰۴ مهر ۲۸ - ۱۰:۳۰',
-      messages: [
-        { id: `${id}-message-1`, author: 'user', body: payload.description, date: '۱۴۰۴ مهر ۲۸ - ۱۰:۳۰' },
-      ],
-    },
-    ...items.value,
-  ]
+      departmentId,
+      priority: 'medium',
+      content: payload.description,
+    })
+    toast.success('تیکت شما ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت تیکت انجام نشد.'))
+  }
 }
 
 useHead({ title: 'پشتیبانی | هماکام' })
@@ -79,8 +98,8 @@ useHead({ title: 'پشتیبانی | هماکام' })
     </DashboardTicketsMobileShell>
 
     <ClientOnly>
-      <DashboardTicketsNewTicketDialog v-if="isDesktop" v-model:open="dialogOpen" @submit="createTicket" />
-      <DashboardTicketsMobileNewTicketSheet v-else v-model:open="dialogOpen" @submit="createTicket" />
+      <DashboardTicketsNewTicketDialog v-if="isDesktop" v-model:open="dialogOpen" :departments="departments" @submit="createTicket" />
+      <DashboardTicketsMobileNewTicketSheet v-else v-model:open="dialogOpen" :departments="departments" @submit="createTicket" />
     </ClientOnly>
   </div>
 </template>
