@@ -166,8 +166,8 @@ independently.
 - [x] `PUT /api/shop/user/profile/email`
 - [x] `PUT /api/shop/user/profile/national-code`
 - [x] `PUT /api/shop/user/profile/birthday`
-- [ ] `PUT /api/shop/user/profile/company-information` (read-only mapping for now;
-      the legal form has fields the API does not accept)
+- [x] `PUT /api/shop/user/profile/company-information` (legal dialog now collects
+      economic code + CEO; city/province/postalAddress remain UI-only)
 
 ## Phase 9 — Favorites
 

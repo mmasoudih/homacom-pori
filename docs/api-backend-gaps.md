@@ -119,11 +119,10 @@ shipping/payment methods are still designed mocks. The submit step is blocked.
 - No **password change** endpoint (`forgot/reset` exists, but not an
   authenticated change).
 - No **avatar upload** endpoint (the picker only previews locally).
-- Company info field mismatch:
-  - UI has `city`, `province`, `postalAddress`; API has
-    `company_economic_code` (no equivalent).
-  - API requires `company_ceo`; the UI does not collect it.
-  - Please confirm the exact field mapping or align both sides.
+- Company info: the legal dialog now collects `company_economic_code` and
+  `company_ceo`, so the update endpoint is fully called. `city`, `province` and
+  `postalAddress` remain UI-only — the API has no fields for them. Add them if
+  the legal address must be stored.
 - `birthday` is Gregorian (`YYYY-MM-DD`); the UI displays Jalali. We convert
   client-side — document the expected timezone/calendar.
 

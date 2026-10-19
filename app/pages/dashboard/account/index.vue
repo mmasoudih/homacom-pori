@@ -16,6 +16,7 @@ const {
   saveEmail: updateEmail,
   saveNationalId: updateNationalId,
   saveBirthdate: updateBirthdate,
+  saveCompany: updateCompany,
 } = useUserProfile()
 
 onMounted(loadProfile)
@@ -102,9 +103,14 @@ function saveBank(payload: { cardNumber: string, shebaNumber: string }) {
   toast.success('اطلاعات حساب بانکی با موفقیت ثبت شد.')
 }
 
-function saveLegal(payload: LegalInfo) {
-  profile.value.legal = { ...payload }
-  toast.success('اطلاعات حقوقی با موفقیت ثبت شد.')
+async function saveLegal(payload: LegalInfo) {
+  try {
+    await updateCompany(payload)
+    toast.success('اطلاعات حقوقی با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت اطلاعات حقوقی انجام نشد.'))
+  }
 }
 
 function savePassword(_payload: { password: string }) {

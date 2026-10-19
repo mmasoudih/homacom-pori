@@ -33,7 +33,9 @@ function mapProfile(data: ApiProfile): AccountProfile {
         phone: data.company_tel ?? '',
         city: '',
         province: '',
-        postalAddress: data.company_economic_code ?? '',
+        postalAddress: '',
+        economicCode: data.company_economic_code ?? '',
+        ceo: data.company_ceo ?? '',
       }
     : null
 
@@ -100,6 +102,18 @@ export function useUserProfile() {
     profile.value.nationalId = payload.nationalId
   }
 
+  async function saveCompany(payload: LegalInfo) {
+    await api.put('/shop/user/profile/company-information', {
+      company_name: payload.organizationName,
+      company_register_id: payload.registrationId,
+      company_national_code: payload.nationalId,
+      company_economic_code: payload.economicCode ?? '',
+      company_ceo: payload.ceo ?? `${profile.value.firstName} ${profile.value.lastName}`.trim(),
+      company_tel: payload.phone,
+    })
+    profile.value.legal = { ...payload }
+  }
+
   async function saveBirthdate(payload: { year: string, month: string, day: string, birthDate: string }) {
     const year = Number(toEnglishDigits(payload.year))
     const month = Number(toEnglishDigits(payload.month))
@@ -114,5 +128,5 @@ export function useUserProfile() {
     profile.value.birthDate = payload.birthDate
   }
 
-  return { profile, pending, loaded, load, saveName, saveEmail, saveNationalId, saveBirthdate }
+  return { profile, pending, loaded, load, saveName, saveEmail, saveNationalId, saveBirthdate, saveCompany }
 }
