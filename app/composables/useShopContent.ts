@@ -7,6 +7,7 @@ import { megaCategories } from '~/data/categories'
 import type { BrandItem } from '~/data/pages/brands'
 import { brandsPage } from '~/data/pages/brands'
 import { faqCategories, faqItems } from '~/data/pages/faq'
+import { resolveMediaUrl } from '~/utils/media'
 
 interface ApiCategory {
   id: number
@@ -110,13 +111,8 @@ interface ApiFaqSubject {
 const faqIcons = ['package', 'credit', 'delivery', 'return', 'user', 'tag', 'products'] as const
 
 function absoluteMedia(path?: string | null): string {
-  if (!path) return ''
-  if (/^https?:\/\//.test(path)) return path
-
   const config = useRuntimeConfig()
-  const base = String(config.public.apiBase || '')
-  const origin = base.replace(/\/api\/?$/, '')
-  return `${origin}/${path.replace(/^\/+/, '')}`
+  return resolveMediaUrl(path, String(config.public.apiBase || ''))
 }
 
 /** Brand list, falling back to the designed mock list when the API is empty. */

@@ -61,9 +61,10 @@ independently.
 - [ ] `GET /api/shop/products` (q, categories, colors, brands, ids, price range,
       only_exists, vip, homa_off, sort, page, per_page) → landing carousels,
       `search.vue`, category pages
-- [ ] `GET /api/shop/products/{slug}` → `product/[id].vue` + `product-detail/*`
-      (gallery, colors, sizes, stocks/price, warranties, services, related, SEO)
-- [ ] `GET /api/shop/products/{id}/comments` → comments section/sheet
+- [x] `GET /api/shop/products/{slug}` → `product/[id].vue` + `product-detail/*`
+      (gallery, colors, stocks/price, warranties, services, questions, SEO;
+      mock product kept as fallback)
+- [x] `GET /api/shop/products/{id}/comments` → comments section/sheet
 - [ ] Replace `useProductSearch` / `useSearchResults` / `useSearchFilters` mocks
 - [ ] Debounced header search suggestions
 
