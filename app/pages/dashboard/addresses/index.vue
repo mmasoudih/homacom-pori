@@ -1,15 +1,30 @@
 <script setup lang="ts">
-import { addresses as initialAddresses } from '~/data/addresses'
+import { toast } from 'vue-sonner'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
-const items = ref([...initialAddresses])
+const {
+  addresses: items,
+  load: loadAddresses,
+  remove: deleteAddress,
+} = useUserAddresses()
+
+onMounted(() => {
+  loadAddresses().catch(err => toast.error(apiErrorMessage(err, 'دریافت آدرس‌ها انجام نشد.')))
+})
 
 const isEmpty = computed(
   () => route.query.empty === '1' || items.value.length === 0,
 )
 
-function remove(id: string) {
-  items.value = items.value.filter(address => address.id !== id)
+async function remove(id: string) {
+  try {
+    await deleteAddress(id)
+    toast.success('آدرس حذف شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'حذف آدرس انجام نشد.'))
+  }
 }
 
 useHead({

@@ -77,10 +77,12 @@ independently.
 
 ## Phase 5 — Addresses & locations
 
-- [ ] `GET /api/address/states` → address forms
-- [ ] `GET /api/address/cities?filters[parent_id]=` → address forms
-- [ ] `GET/POST/PUT/DELETE /api/shop/user/address` → dashboard addresses and
-      checkout address dialogs
+- [x] `GET /api/address/states` → `useStates()` (ready for address forms)
+- [x] `GET /api/address/cities?filters[parent_id]=` → `useCities()`
+- [x] `GET/DELETE /api/shop/user/address` → dashboard addresses list/delete
+- [x] `POST/PUT /api/shop/user/address` → `useUserAddresses()` (forms not wired yet)
+- [ ] Wire the checkout address dialog + dashboard add/edit buttons to the CRUD
+      composable
 - [ ] Map fields: `title, state, city, address, lat, lng, mobile, nickname,
       code_melli, zip_code, plaque, floor, unit`
 
