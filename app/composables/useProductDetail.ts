@@ -77,6 +77,7 @@ interface ApiProduct {
   title_en?: string | null
   slug: string
   img?: string | null
+  is_favorite?: boolean | null
   rate?: number | null
   comments_count?: number | null
   categories?: Array<{ id: number, title: string, slug?: string }>
@@ -298,6 +299,7 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
     ...base,
     id: String(api.id),
     stockId: defaultStock?.id,
+    isFavorite: !!api.is_favorite,
     title: api.title,
     englishTitle: api.title_en ?? base.englishTitle,
     breadcrumb,

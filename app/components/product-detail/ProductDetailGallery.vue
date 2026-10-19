@@ -21,8 +21,12 @@ const props = withDefaults(
     class?: string
     /** Catalog id to add/remove from the compare list when «مقایسه» is clicked. */
     compareId?: string
+    /** Backend product id for the favourite toggle. */
+    productId?: number | null
+    /** API-provided favourite state. */
+    isFavorite?: boolean
   }>(),
-  { alt: '', class: '', compareId: '' },
+  { alt: '', class: '', compareId: '', productId: null, isFavorite: false },
 )
 
 const { t } = useI18n()
@@ -30,7 +34,9 @@ const { t } = useI18n()
 const active = ref(0)
 const current = computed(() => props.images[active.value])
 const lightboxOpen = ref(false)
-const favorited = ref(false)
+const favorited = ref(props.isFavorite)
+watch(() => props.isFavorite, value => { favorited.value = value })
+const favoritesApi = useFavorites()
 const hoverZoom = ref(false)
 const zoomOrigin = ref('50% 50%')
 
@@ -49,8 +55,18 @@ function onAction(key: string) {
   }
 
   if (key === 'favorite') {
-    favorited.value = !favorited.value
-    if (favorited.value) toast.success(t('product.favoriteSuccess'))
+    if (!props.productId) {
+      favorited.value = !favorited.value
+      if (favorited.value) toast.success(t('product.favoriteSuccess'))
+      return
+    }
+
+    favoritesApi.toggle(props.productId)
+      .then((added) => {
+        favorited.value = added
+        if (added) toast.success(t('product.favoriteSuccess'))
+      })
+      .catch(() => toast.error(t('product.favoriteFailed')))
     return
   }
 

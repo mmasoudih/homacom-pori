@@ -242,6 +242,8 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
               :images="product.images"
               :alt="product.title"
               :compare-id="DEMO_COMPARE_PRODUCT_ID"
+              :product-id="product.stockId ? Number(product.id) : null"
+              :is-favorite="!!product.isFavorite"
             />
 
             <ProductDetailInfoBox

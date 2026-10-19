@@ -153,6 +153,8 @@ export interface ProductDetail {
   id: string
   /** Default backend stock id used by add-to-cart. */
   stockId?: number
+  /** Authenticated favourite state from the API. */
+  isFavorite?: boolean
   title: string
   englishTitle: string
   breadcrumb: string[]
