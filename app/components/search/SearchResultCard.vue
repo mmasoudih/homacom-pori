@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { SearchProduct } from '~/data/search'
 import { searchColorOptions } from '~/data/search'
-import { DEMO_PRODUCT_ID } from '~/data/product'
 import type { Product } from '~/utils/product'
 
 const props = defineProps<{
@@ -35,7 +34,7 @@ const product = computed<Product>(() => ({
     variant="vertical"
     discount-placement="inline"
     :product="product"
-    :href="`/product/${DEMO_PRODUCT_ID}`"
+    :href="`/product/${product.id}`"
     image-class="bg-transparent"
     class="h-full rounded-none border-0 p-4"
   />
