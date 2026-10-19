@@ -8,6 +8,7 @@ import { cartLineId } from '~/composables/useCart'
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => String(route.params.id))
+const siteUrl = String(useRuntimeConfig().public.siteUrl).replace(/\/+$/, '')
 
 const product = computed(() => getProductDetail(id.value))
 const notFound = computed(() => !product.value)
@@ -22,10 +23,26 @@ onMounted(() => {
 })
 onUnmounted(() => clearTimeout(loadingTimer))
 
-useHead({
-  title: computed(() =>
-    product.value ? `${product.value.title} | هماکام` : 'کالا یافت نشد | هماکام',
-  ),
+const seoTitle = computed(() =>
+  product.value ? `${product.value.title} | هماکام` : 'کالا یافت نشد | هماکام',
+)
+const seoDescription = computed(() =>
+  product.value
+    ? `خرید ${product.value.title} از فروشگاه اینترنتی هماکام با ضمانت اصالت کالا، ارسال سریع و امکان خرید اقساطی.`
+    : 'کالای مورد نظر در فروشگاه اینترنتی هماکام یافت نشد.',
+)
+const seoImage = computed(() => {
+  const src = product.value?.images.find(item => item.type === 'image')?.src
+  if (!src) return undefined
+  return `${siteUrl}${src}`
+})
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogType: 'website',
+  ogImage: seoImage,
 })
 
 // --- Selection state --------------------------------------------------------

@@ -3,20 +3,79 @@ import { IconArrowUp, IconChevronDown } from "@tabler/icons-vue";
 import type { SeoSegment } from "~/data/landing";
 import { footerData } from "~/data/landing";
 import { toPersianDigits } from "~/utils/format";
+import { toMailtoHref, toTelHref } from "~/utils/auth";
+
+const { t } = useI18n();
+const config = useRuntimeConfig();
+
+// Contact details come from the shop API; the designed mock values remain as a
+// fallback so the footer never renders empty on a cold/offline API.
+const { data: footerApi } = await useFetch<{
+  data?: {
+    tel?: string | null;
+    mobile?: string | null;
+    email?: string | null;
+    address?: string | null;
+  };
+}>(() => `${config.public.apiBase}/shop/public/footer`, {
+  key: "shop-footer",
+  server: false,
+  lazy: true,
+  default: () => ({ data: {} }),
+});
+
+function formatPhone(phone: string) {
+  if (phone.includes("-")) return phone;
+  const digits = phone.replace(/\D/g, "");
+  return digits.length === 11 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : phone;
+}
+
+const contactPhones = computed(() => {
+  const data = footerApi.value?.data;
+  const phones = [data?.mobile, data?.tel].filter(
+    (value): value is string => !!value?.trim(),
+  );
+  return phones.length ? phones.map(formatPhone) : footerData.phones;
+});
+
+const contactEmail = computed(() => footerApi.value?.data?.email || footerData.email);
+const contactAddress = computed(
+  () => footerApi.value?.data?.address || footerData.address,
+);
 
 const openRow = ref("");
 
-const accordionRows = [
-  ...footerData.columns.map((col) => ({ title: col.title, links: col.links })),
+interface FooterLink {
+  label: string;
+  href: string;
+  /** `true` for tel:/mailto: URLs, which must render as a plain <a>. */
+  external?: boolean;
+}
+
+const contactLinks = computed<FooterLink[]>(() => [
+  ...contactPhones.value.map(phone => ({
+    label: `${t("footer.call")} ${toPersianDigits(phone)}`,
+    href: toTelHref(phone),
+    external: true,
+  })),
+  {
+    label: `${t("footer.email")} ${contactEmail.value}`,
+    href: toMailtoHref(contactEmail.value),
+    external: true,
+  },
+  {
+    label: `${t("footer.address")} ${contactAddress.value}`,
+    href: "#",
+  },
+]);
+
+const accordionRows = computed(() => [
+  ...footerData.columns.map((col) => ({ title: col.title, links: col.links as FooterLink[] })),
   {
     title: footerData.contactTitle,
-    links: [
-      `تماس: ${footerData.phones.map(toPersianDigits).join(" | ")}`,
-      `ایمیل: ${footerData.email}`,
-      `آدرس: ${footerData.address}`,
-    ],
+    links: contactLinks.value,
   },
-];
+]);
 
 /** Column headings render the leading words dark and the last word in brand red. */
 function titleParts(title: string) {
@@ -87,15 +146,24 @@ function scrollTop() {
             </button>
 
             <div v-if="openRow === row.title" class="flex flex-col gap-3 pb-4">
-              <NuxtLink
-                v-for="(link, li) in row.links"
-                :key="li"
-                :to="typeof link === 'string' ? '#' : link.href"
-                class="flex items-center gap-2 text-[14px] text-T-700 transition-colors hover:text-primary"
-              >
-                <span class="size-[6px] shrink-0 rounded-full bg-primary" />
-                {{ typeof link === "string" ? link : link.label }}
-              </NuxtLink>
+              <template v-for="(link, li) in row.links" :key="li">
+                <a
+                  v-if="link.external"
+                  :href="link.href"
+                  class="flex items-center gap-2 text-[14px] text-T-700 transition-colors hover:text-primary"
+                >
+                  <span class="size-[6px] shrink-0 rounded-full bg-primary" />
+                  {{ link.label }}
+                </a>
+                <NuxtLink
+                  v-else
+                  :to="link.href"
+                  class="flex items-center gap-2 text-[14px] text-T-700 transition-colors hover:text-primary"
+                >
+                  <span class="size-[6px] shrink-0 rounded-full bg-primary" />
+                  {{ link.label }}
+                </NuxtLink>
+              </template>
             </div>
           </div>
         </div>
@@ -122,13 +190,13 @@ function scrollTop() {
             <nav class="mt-7 flex flex-col gap-3">
               <NuxtLink
                 v-for="link in col.links"
-                :key="typeof link === 'string' ? link : link.label"
-                :to="typeof link === 'string' ? '#' : link.href"
+                :key="link.label"
+                :to="link.href"
                 class="flex h-6 items-center gap-2 text-T-700 transition-colors hover:text-primary"
               >
                 <span class="size-[7px] shrink-0 rounded-full bg-primary" />
                 <UiTypography as="span" size="lg" weight="regular" color="inherit">
-                  {{ typeof link === "string" ? link : link.label }}
+                  {{ link.label }}
                 </UiTypography>
               </NuxtLink>
             </nav>
@@ -156,16 +224,17 @@ function scrollTop() {
             <!-- Phones -->
             <div class="flex items-start gap-2">
               <img src="/icons/phone-call.svg" alt="" class="size-5 shrink-0" >
-              <UiTypography as="span" size="lg" weight="regular" color="muted">تماس:</UiTypography>
+              <UiTypography as="span" size="lg" weight="regular" color="muted">{{ $t("footer.call") }}</UiTypography>
               <UiTypography as="span" size="lg" weight="regular" color="muted" class="flex items-center gap-2.5">
-                <template v-for="(phone, pi) in footerData.phones" :key="phone">
+                <template v-for="(phone, pi) in contactPhones" :key="phone">
                   <span v-if="pi > 0" class="h-[14px] w-px bg-primary" />
-                  <span
-                    ><span class="text-primary">{{
-                      toPersianDigits(phoneParts(phone).lead)
-                    }}</span
-                    >{{ toPersianDigits(phoneParts(phone).rest) }}</span
+                  <a
+                    :href="toTelHref(phone)"
+                    dir="ltr"
+                    class="transition-colors hover:text-primary"
                   >
+                    <span class="text-primary">{{ toPersianDigits(phoneParts(phone).lead) }}</span>{{ toPersianDigits(phoneParts(phone).rest) }}
+                  </a>
                 </template>
               </UiTypography>
             </div>
@@ -173,23 +242,25 @@ function scrollTop() {
             <!-- Email -->
             <div class="flex items-start gap-2">
               <img src="/icons/envelope-open-empty.svg" alt="" class="size-5 shrink-0" >
-              <UiTypography as="span" size="lg" weight="regular" color="muted">ایمیل:</UiTypography>
-              <UiTypography as="span" size="lg" weight="regular" color="muted" dir="ltr">{{
-                footerData.email
-              }}</UiTypography>
+              <UiTypography as="span" size="lg" weight="regular" color="muted">{{ $t("footer.email") }}</UiTypography>
+              <a
+                :href="toMailtoHref(contactEmail)"
+                dir="ltr"
+                class="transition-colors hover:text-primary"
+              >{{ contactEmail }}</a>
             </div>
 
             <!-- Address -->
             <div class="flex items-start gap-2">
               <img src="/icons/location-pin-line.svg" alt="" class="size-5 shrink-0" >
-              <UiTypography as="span" size="lg" weight="regular" color="muted">آدرس:</UiTypography>
+              <UiTypography as="span" size="lg" weight="regular" color="muted">{{ $t("footer.address") }}</UiTypography>
               <UiTypography
                 as="span"
                 size="lg"
                 weight="regular"
                 color="muted"
                 class="min-w-0 flex-1 text-right leading-[24px]"
-                >{{ footerData.address }}</UiTypography
+                >{{ contactAddress }}</UiTypography
               >
             </div>
           </div>
@@ -250,7 +321,7 @@ function scrollTop() {
             class="relative flex items-center justify-center gap-3 whitespace-nowrap rounded-full bg-primary py-2 ps-2 pe-4 transition-opacity hover:opacity-90 lg:h-[46px] lg:min-w-[140px] lg:gap-[17px] lg:rounded-[20px] lg:py-[9px] lg:ps-[9px] lg:pe-[17px]"
             @click="scrollTop"
           >
-            <UiTypography as="span" size="lg" weight="semibold" color="white">بازگشت به بالا</UiTypography>
+            <UiTypography as="span" size="lg" weight="semibold" color="white">{{ $t("footer.backToTop") }}</UiTypography>
             <span
               class="flex size-[30px] items-center justify-center rounded-[10px] bg-T-50"
             >

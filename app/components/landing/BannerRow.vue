@@ -57,10 +57,9 @@ const mobileAspectClass = computed(() =>
           columns > 1
             ? `${mobileAspectClass} lg:aspect-auto ${heightClass}`
             : centered
-              ? 'aspect-[278/212]'
+              ? 'aspect-[278/212] w-full'
               : ''
         "
-        :style="!centered ? {} : { margin: '0 auto', width: '278px' }"
       >
     </a>
   </div>

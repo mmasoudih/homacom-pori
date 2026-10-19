@@ -9,8 +9,15 @@ import {
   bestsellerFilters,
 } from '~/data/landing'
 
-useHead({
-  title: 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال',
+const seoTitle = 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال'
+const seoDescription = 'خرید آنلاین گوشی موبایل، لپ‌تاپ، ساعت هوشمند، هدفون، کنسول بازی و لوازم جانبی از فروشگاه اینترنتی هماکام؛ ضمانت اصالت کالا، ارسال سریع و خرید اقساطی.'
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogType: 'website',
 })
 </script>
 

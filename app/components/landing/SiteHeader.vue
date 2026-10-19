@@ -209,7 +209,7 @@ onMounted(() => {
             class="relative flex size-12 items-center justify-center rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
             :aria-expanded="cartOpen"
             aria-haspopup="dialog"
-            aria-label="سبد خرید"
+            :aria-label="$t('nav.cart')"
             @click="cartOpen = !cartOpen"
           >
             <img src="/icons/shopping-bag.svg" alt="" class="size-6">
@@ -233,14 +233,14 @@ onMounted(() => {
             <NuxtLink
               to="/dashboard"
               class="flex size-11 items-center justify-center rounded-full bg-T-200 text-T-600 transition-colors hover:bg-T-300"
-              aria-label="حساب کاربری"
+              :aria-label="$t('nav.account')"
             >
               <IconUser class="size-6" />
             </NuxtLink>
             <NuxtLink
               to="/dashboard"
               class="relative flex size-11 items-center justify-center rounded-full border border-T-400 text-T-700 transition-colors hover:bg-secondary"
-              aria-label="اعلان‌ها"
+              :aria-label="$t('nav.notifications')"
             >
               <IconBell class="size-5" />
               <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
@@ -255,11 +255,7 @@ onMounted(() => {
             dir="rtl"
           >
             <NuxtLink to="/auth/login" class="hover:text-primary">
-              <UiTypography as="span" size="lg" weight="medium" color="inherit">ورود</UiTypography>
-            </NuxtLink>
-            <span class="text-T-500">|</span>
-            <NuxtLink to="/auth/register" class="hover:text-primary">
-              <UiTypography as="span" size="lg" weight="medium" color="inherit">ثبت‌نام</UiTypography>
+              <UiTypography as="span" size="lg" weight="medium" color="inherit">{{ $t('common.loginOrRegister') }}</UiTypography>
             </NuxtLink>
           </div>
         </div>
@@ -313,7 +309,7 @@ onMounted(() => {
                   @click="toggleMega"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
-                  {{ item.label }}
+                  {{ $t(item.labelKey) }}
                 </button>
                 <NuxtLink
                   v-else
@@ -321,7 +317,7 @@ onMounted(() => {
                   class="group flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
-                  {{ item.label }}
+                  {{ $t(item.labelKey) }}
                 </NuxtLink>
               </template>
             </nav>
@@ -339,7 +335,6 @@ onMounted(() => {
             </a>
           </div>
 
-          <div v-if="quickCategories" class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
           <!-- Quick-access circle strip (home only) -->
           <LandingHeaderCircleStrip v-if="quickCategories" class="w-full pb-[20px]" />
 
@@ -354,11 +349,11 @@ onMounted(() => {
         <button
           type="button"
           class="flex h-11 flex-1 items-center gap-2 rounded-full border border-T-400 bg-T-200 px-4"
-          aria-label="جستجو در محصولات"
+          :aria-label="$t('nav.searchProducts')"
           @click="openSearch"
         >
           <IconSearch class="size-5 shrink-0 text-T-600" />
-          <span class="text-[15px] text-T-600">جستجو در</span>
+          <span class="text-[15px] text-T-600">{{ $t('nav.searchIn') }}</span>
           <svg
             width="56"
             height="20"
@@ -378,7 +373,7 @@ onMounted(() => {
           v-if="authed"
           to="/dashboard"
           class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
-          aria-label="حساب کاربری"
+          :aria-label="$t('nav.account')"
         >
           <IconUser class="size-6" />
           <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">

@@ -24,6 +24,8 @@ export type GalleryItemType = 'image' | 'video' | 'view360'
 export interface GalleryItem {
   type: GalleryItemType
   src?: string
+  /** Poster shown before a video starts playing. */
+  poster?: string
 }
 
 export interface WarrantyOption {
@@ -214,8 +216,8 @@ const GALLERY: GalleryItem[] = [
   { type: 'image', src: '/figma/fill-e393cbb3afd42faa.png' },
   { type: 'image', src: '/figma/fill-eedc0bf76b5dc7cd.png' },
   { type: 'image', src: '/figma/fill-603959b7e3e05165.png' },
-  { type: 'video' },
-  { type: 'view360' },
+  { type: 'video', src: '/videos/product-demo.mp4', poster: '/figma/fill-e393cbb3afd42faa.png' },
+  { type: 'view360', src: '/figma/fill-e393cbb3afd42faa.png' },
 ]
 
 const SPEC_CHIPS: SpecChip[] = [

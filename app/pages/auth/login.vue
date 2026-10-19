@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { IconArrowRight } from '@tabler/icons-vue'
 import { toTypedSchema } from '@vee-validate/zod'
-import { useForm, Field as VeeField } from 'vee-validate'
+import { useField, useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -12,18 +11,26 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '~/composables/useAuth'
+import { IRAN_MOBILE_REGEX, MOBILE_MAX_LENGTH, sanitizeMobileInput } from '~/utils/auth'
 
-const config = useRuntimeConfig()
+const { t } = useI18n()
 const router = useRouter()
+const { sendOtp } = useAuth()
+
+useSeoMeta({
+  title: () => `${t('auth.loginTitle')} | ${t('common.brand')}`,
+  description: () => t('auth.loginSubtitle'),
+  robots: 'noindex,follow',
+})
 
 const formSchema = toTypedSchema(
   z.object({
     mobile: z
       .string()
-      .regex(/^09\d{9}$/, 'شماره موبایل معتبر نیست.'),
+      .min(1, t('auth.mobileRequired'))
+      .regex(IRAN_MOBILE_REGEX, t('auth.mobileInvalid')),
   }),
 )
 
@@ -32,101 +39,80 @@ const { handleSubmit, isSubmitting } = useForm({
   initialValues: { mobile: '' },
 })
 
-const { data: loginPage } = await useFetch<{ data?: { image?: { img?: string, alt?: string } } }>(() => `${config.public.apiBase}/getLoginPageInfo`)
+const { value: mobile, errors: mobileErrors } = useField<string>('mobile')
 
-const backgroundImage = computed(() => loginPage.value?.data?.image?.img ?? '')
-const backgroundAlt = computed(() => loginPage.value?.data?.image?.alt ?? 'تصویر ورود')
-
-const { sendOtp } = useAuth()
+// Keep the field numeric and capped at 11 characters even when the user
+// pastes Persian digits or a formatted number.
+watch(mobile, (value) => {
+  const clean = sanitizeMobileInput(value)
+  if (clean !== value) mobile.value = clean
+})
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await sendOtp(values.mobile)
-    await router.push({ path: '/auth/verify', query: { mobile: values.mobile } })
+    await sendOtp(sanitizeMobileInput(values.mobile))
+    await router.push({ path: '/auth/verify', query: { mobile: sanitizeMobileInput(values.mobile) } })
   }
   catch (err: unknown) {
-    toast.error(err instanceof Error ? err.message : 'ارسال کد تأیید با خطا مواجه شد.')
+    toast.error(err instanceof Error ? err.message : t('auth.otpSendFailed'))
   }
 })
 </script>
 
 <template>
-  <div dir="rtl" class="grid min-h-dvh bg-background lg:grid-cols-12">
-    <section class="flex flex-col lg:col-span-3">
-      <div class="flex items-start justify-start p-6">
-        <Button
-          variant="ghost"
-          class="text-primary hover:bg-primary hover:text-white cursor-pointer"
-          aria-label="بازگشت"
-          @click="router.back()"
-        >
-          <IconArrowRight data-icon="inline-start" />
-          بازگشت
-        </Button>
-      </div>
+  <AuthShell :title="t('auth.loginTitle')" :subtitle="t('auth.loginSubtitle')">
+    <form class="flex flex-col gap-6" novalidate @submit="onSubmit">
+      <FieldGroup>
+        <Field :data-invalid="!!mobileErrors.length">
+          <FieldLabel for="login-mobile">
+            {{ t('auth.mobileLabel') }}
+          </FieldLabel>
+          <Input
+            id="login-mobile"
+            v-model="mobile"
+            type="tel"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            :maxlength="MOBILE_MAX_LENGTH"
+            dir="ltr"
+            autocomplete="tel-national"
+            :placeholder="t('auth.mobilePlaceholder')"
+            class="text-start"
+            :aria-invalid="!!mobileErrors.length"
+          />
+          <FieldError v-if="mobileErrors.length" :errors="mobileErrors" />
+        </Field>
+      </FieldGroup>
 
-      <div class="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-8 px-6 pb-16 lg:px-16">
-        <div class="flex flex-col items-center gap-4 text-center">
-          <img
-            src="/homacom-logo.png"
-            alt="هماکام"
-            class="size-14 rounded-2xl object-contain"
-          >
+      <Button type="submit" class="w-full" :disabled="isSubmitting">
+        <Spinner v-if="isSubmitting" data-icon="inline-start" />
+        {{ t('common.continue') }}
+      </Button>
 
-          <div class="flex flex-col gap-2">
-            <h1 class="text-2xl font-bold">ثبت‌نام یا ورود</h1>
-            <p class="text-sm text-muted-foreground">
-              شماره موبایل خود را وارد کنید.
-            </p>
-          </div>
-        </div>
+      <Button as-child variant="outline" class="w-full">
+        <NuxtLink to="/auth/login-with-password">
+          {{ t('auth.loginWithPassword') }}
+        </NuxtLink>
+      </Button>
+    </form>
 
-        <form class="flex flex-col gap-6" novalidate @submit="onSubmit">
-          <FieldGroup>
-            <VeeField v-slot="{ componentField, errors }" name="mobile">
-              <Field :data-invalid="!!errors.length">
-                <FieldLabel for="login-mobile">
-                  شماره موبایل
-                </FieldLabel>
-                <Input
-                  id="login-mobile"
-                  v-bind="componentField"
-                  type="tel"
-                  inputmode="numeric"
-                  dir="ltr"
-                  autocomplete="tel"
-                  placeholder="09xxxxxxxxx"
-                  class="text-start"
-                  :aria-invalid="!!errors.length"
-                />
-                <FieldError v-if="errors.length" :errors="errors" />
-              </Field>
-            </VeeField>
-          </FieldGroup>
-
-          <Button type="submit" class="w-full" :disabled="isSubmitting">
-            <Spinner v-if="isSubmitting" data-icon="inline-start" />
-            ادامه
-          </Button>
-        </form>
-
-        <p class="text-center text-xs text-muted-foreground">
-          با ادامه، <a href="#" class="text-primary underline-offset-4 hover:underline">قوانین و مقررات</a> و
-          <a href="#" class="text-primary underline-offset-4 hover:underline">حریم خصوصی</a> را می‌پذیرید.
-        </p>
-      </div>
-    </section>
-
-    <section class="hidden lg:col-span-9 lg:block">
-      <div class="relative h-full min-h-dvh w-full">
-        <Skeleton v-if="!backgroundImage" class="absolute inset-0 size-full rounded-none" />
-        <img
-          v-else
-          :src="backgroundImage"
-          :alt="backgroundAlt"
-          class="absolute inset-0 size-full rounded-none object-cover"
-        >
-      </div>
-    </section>
-  </div>
+    <template #footer>
+      <p class="text-center text-xs text-muted-foreground">
+        {{ t('auth.termsPrefix') }}
+        <NuxtLink to="/terms" class="text-primary underline-offset-4 hover:underline">
+          {{ t('auth.terms') }}
+        </NuxtLink>
+        {{ ' ' }}
+        <span>و</span>
+        {{ ' ' }}
+        <NuxtLink to="/terms" class="text-primary underline-offset-4 hover:underline">
+          {{ t('auth.privacy') }}
+        </NuxtLink>
+        {{ t('auth.termsSuffix') }}
+      </p>
+      <p class="mt-2 text-center text-xs text-muted-foreground">
+        {{ t('auth.noAccountHint') }}
+      </p>
+    </template>
+  </AuthShell>
 </template>

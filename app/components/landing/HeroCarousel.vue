@@ -58,29 +58,31 @@ function go(dir: 1 | -1) {
     >
       <CarouselContent class="ms-0 h-full">
         <CarouselItem
-          v-for="slide in slides"
+          v-for="(slide, i) in slides"
           :key="slide"
-          class="h-full basis-full ps-0 transition-opacity duration-500"
+          class="h-full basis-full ps-0 transition-opacity duration-700"
+          :class="active === i ? 'is-active' : ''"
         >
           <img
             :src="slide"
-            alt="بنر اصلی هماکام"
-            class="h-full w-full object-cover"
+            :alt="$t('landing.heroAlt')"
+            class="h-full w-full object-cover will-change-transform"
+            :class="active === i ? 'hero-slide-active' : ''"
           >
         </CarouselItem>
       </CarouselContent>
 
       <!-- Arrows (desktop only) -->
       <button
-        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary lg:flex"
-        aria-label="قبلی"
+        class="absolute left-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-all duration-300 hover:scale-105 hover:bg-secondary active:scale-95 lg:flex"
+        :aria-label="$t('landing.heroPrev')"
         @click="go(-1)"
       >
         <IconChevronLeft class="size-[18px] text-T-700" />
       </button>
       <button
-        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-colors hover:bg-secondary lg:flex"
-        aria-label="بعدی"
+        class="absolute right-[41px] top-1/2 hidden size-[38px] -translate-y-1/2 items-center justify-center rounded-full border border-T-400 bg-T-50 shadow-sm transition-all duration-300 hover:scale-105 hover:bg-secondary active:scale-95 lg:flex"
+        :aria-label="$t('landing.heroNext')"
         @click="go(1)"
       >
         <IconChevronLeft class="size-[18px] rotate-180 text-T-700" />
@@ -89,7 +91,7 @@ function go(dir: 1 | -1) {
       <!-- Dots (mobile: inside bottom) -->
       <div class="absolute bottom-4 left-1/2 -translate-x-1/2 lg:hidden">
         <div
-          class="flex items-center justify-center gap-[2px] rounded-[50px] bg-T-50/65 px-[20px] py-2 shadow-[0_0_6px_rgba(0,0,0,0.08)] backdrop-blur-[75px]"
+          class="flex items-center justify-center gap-[2px] rounded-[50px] bg-T-50/65 px-[20px] py-2 backdrop-blur-[75px]"
         >
           <button
             v-for="i in total"
@@ -100,7 +102,7 @@ function go(dir: 1 | -1) {
                 ? 'relative w-[29px] bg-T-500'
                 : 'w-2 bg-T-500'
             "
-            :aria-label="`اسلاید ${i}`"
+            :aria-label="$t('landing.heroSlide', { index: i })"
             @click="goTo(i - 1)"
           >
             <span
@@ -124,7 +126,7 @@ function go(dir: 1 | -1) {
             ? 'relative w-[29px] bg-T-500'
             : 'w-2 bg-T-500'
         "
-        :aria-label="`اسلاید ${i}`"
+        :aria-label="$t('landing.heroSlide', { index: i })"
         @click="goTo(i - 1)"
       >
         <span
@@ -147,9 +149,33 @@ function go(dir: 1 | -1) {
   }
 }
 
+@keyframes hero-slide-zoom {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 .carousel-fill {
   animation-name: carousel-fill;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
+}
+
+.hero-slide-active {
+  animation: hero-slide-zoom 7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-active {
+    animation: none;
+  }
+
+  .carousel-fill {
+    animation: none;
+    width: 100%;
+  }
 }
 </style>

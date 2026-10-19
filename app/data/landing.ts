@@ -24,10 +24,10 @@ export interface OfferCard {
 }
 
 export const headerNav = [
-  { label: 'دسته بندی محصولات', icon: 'grid', href: '#categories', mega: true },
-  { label: 'خرید حضوری', icon: 'store', href: '/branch' },
-  { label: 'پنل همکار و سازمانی', icon: 'user-check', href: '/collaboration' },
-  { label: 'خرید اقساطی', icon: 'coins', href: '/installment' },
+  { label: 'دسته بندی محصولات', labelKey: 'nav.categories', icon: 'grid', href: '#categories', mega: true },
+  { label: 'خرید حضوری', labelKey: 'nav.inPerson', icon: 'store', href: '/branch' },
+  { label: 'پنل همکار و سازمانی', labelKey: 'nav.corporate', icon: 'user-check', href: '/collaboration' },
+  { label: 'خرید اقساطی', labelKey: 'nav.installment', icon: 'coins', href: '/installment' },
 ]
 
 export const categories: Category[] = [
