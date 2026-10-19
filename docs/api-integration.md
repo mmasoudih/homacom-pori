@@ -102,10 +102,13 @@ independently.
 - [x] `GET /api/address/cities?filters[parent_id]=` → `useCities()`
 - [x] `GET/DELETE /api/shop/user/address` → dashboard addresses list/delete
 - [x] `POST/PUT /api/shop/user/address` → `useUserAddresses()` (forms not wired yet)
-- [ ] Wire the checkout address dialog + dashboard add/edit buttons to the CRUD
-      composable
-- [ ] Map fields: `title, state, city, address, lat, lng, mobile, nickname,
-      code_melli, zip_code, plaque, floor, unit`
+- [x] Dashboard add/edit dialog wired to the CRUD composable (state/city
+      selects from the API)
+- [x] Map fields: `title, state, city, address, lat, lng, mobile, nickname,
+      code_melli, zip_code` (plaque/floor/unit are not in the dialog yet)
+- [ ] Checkout's map-based add-address wizard still adds locally; it does not
+      carry lat/lng or state/city ids, so it cannot POST yet.
+- [ ] New addresses without a map pin use Tehran's default lat/lng.
 
 ## Phase 6 — Cart (8 endpoints)
 

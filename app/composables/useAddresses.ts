@@ -61,6 +61,15 @@ function mapAddress(item: ApiAddress): Address {
       .filter(Boolean)
       .join('، '),
     postalCode: item.zip_code ?? '',
+    stateId: item.state?.id,
+    cityId: item.city?.id,
+    addressLine: item.address,
+    mobile: item.mobile ?? undefined,
+    nickname: item.nickname ?? undefined,
+    codeMelli: item.code_melli ?? undefined,
+    lat: item.lat,
+    lng: item.lng,
+    isDefault: item.is_default === 'yes',
   }
 }
 

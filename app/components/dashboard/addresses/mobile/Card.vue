@@ -8,6 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   remove: [id: string]
+  edit: [address: Address]
 }>()
 
 const postalCode = computed(() => toPersianDigits(props.address.postalCode))
@@ -36,6 +37,7 @@ const postalCode = computed(() => toPersianDigits(props.address.postalCode))
         type="button"
         class="flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-T-100"
         aria-label="ویرایش آدرس"
+        @click="emit('edit', address)"
       >
         <img src="/icons/address-edit.svg" alt="" class="size-[18px] shrink-0" aria-hidden="true">
       </button>
