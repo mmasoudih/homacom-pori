@@ -1,9 +1,11 @@
 import { computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import type { CartItem } from '~/data/cart'
-import { cartInsuranceOptions, cartItems, cartServiceGroups } from '~/data/cart'
+import type { CartItem, CartService, CartServiceGroup } from '~/data/cart'
+import { cartInsuranceOptions, cartServiceGroups } from '~/data/cart'
 import type { ProductDetail, Seller } from '~/data/product'
+import { apiErrorMessage } from '~/composables/useApi'
 import { getDiscountPercent } from '~/utils/product'
+import { resolveMediaUrl } from '~/utils/media'
 import { toastIcons } from '~/utils/toast'
 
 export interface AddToCartOptions {
@@ -31,40 +33,101 @@ export function cartLineId(options: {
   return [options.product.id, options.color ?? '', options.warrantyId ?? '', options.sellerId ?? ''].join('__')
 }
 
-/**
- * Shared, in-session cart (mock — no persistence).
- *
- * Backed by `useState` so the header badge, the cart page and any «add to
- * cart» action read/write the same list across navigation within a session.
- */
-const CART_STORAGE_KEY = 'homacom:cart:v1'
-
-/** Client-side singleton: only the first `useCart()` hydrates from storage. */
-let storageReady = false
-
-function cloneItems(source: CartItem[]): CartItem[] {
-  return source.map(item => ({
-    ...item,
-    insurance: item.insurance ? { ...item.insurance } : null,
-    // Lines saved before the dialog existed (or from another product) still
-    // need a policy list to choose from.
-    insuranceOptions: item.insuranceOptions?.length
-      ? item.insuranceOptions.map(option => ({ ...option }))
-      : cartInsuranceOptions.map(option => ({ ...option })),
-    serviceGroups: item.serviceGroups?.length
-      ? item.serviceGroups.map(group => ({ ...group, items: group.items.map(service => ({ ...service })) }))
-      : cartServiceGroups.map(group => ({ ...group, items: group.items.map(service => ({ ...service })) })),
-    services: (item.services ?? []).map(service => ({ ...service })),
-  }))
+interface ApiCartService {
+  id: number
+  title?: string | null
+  customer_price?: string | number | null
+  real_price?: string | number | null
+  line_total?: string | number | null
+  service_item?: { id?: number, title?: string | null } | null
 }
 
+interface ApiCartItem {
+  id: number
+  title: string
+  image?: string | null
+  customer_price?: string | number | null
+  real_price?: string | number | null
+  quantity: number
+  services?: ApiCartService[]
+  stock?: {
+    id: number
+    customer_price?: string | number | null
+    real_price?: string | number | null
+    discount?: number | null
+    max_in_cart?: number | null
+    color?: { title?: string | null, code?: string | null } | null
+    warranty?: { title?: string | null } | null
+    store?: { title?: string | null } | null
+  } | null
+  color?: { title?: string | null, code?: string | null } | null
+  warranty?: { title?: string | null } | null
+}
+
+interface ApiCart {
+  id: number
+  cart_token?: string | null
+  items?: ApiCartItem[]
+  coupon?: { code?: string | null, discount_price?: number | null } | null
+}
+
+const CART_STORAGE_KEY = 'homacom:cart:v1'
+let loadStarted = false
+
+function num(value: unknown): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function cloneServices(services: CartService[]): CartService[] {
+  return services.map(service => ({ ...service }))
+}
+
+function cloneGroups(groups: CartServiceGroup[]): CartServiceGroup[] {
+  return groups.map(group => ({ ...group, items: group.items.map(item => ({ ...item })) }))
+}
+
+function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
+  const stock = item.stock
+  const color = stock?.color ?? item.color
+  const warranty = stock?.warranty ?? item.warranty
+  const price = num(item.customer_price ?? stock?.customer_price)
+  const realPrice = num(item.real_price ?? stock?.real_price)
+
+  return {
+    id: String(item.id),
+    apiId: item.id,
+    stockId: stock?.id,
+    title: item.title,
+    href: '#',
+    image: resolveMediaUrl(item.image, apiBase),
+    color: { name: color?.title ?? '', value: color?.code ?? '' },
+    warranty: warranty?.title ?? '',
+    price,
+    oldPrice: realPrice > price ? realPrice : undefined,
+    discount: stock?.discount ?? undefined,
+    quantity: num(item.quantity),
+    maxQuantity: stock?.max_in_cart ?? undefined,
+    sellerName: stock?.store?.title ?? undefined,
+    insurance: null,
+    insuranceOptions: cartInsuranceOptions.map(option => ({ ...option })),
+    serviceGroups: cloneGroups(cartServiceGroups),
+    services: (item.services ?? []).map(service => ({
+      id: String(service.id),
+      label: service.title ?? service.service_item?.title ?? 'خدمت',
+      price: num(service.customer_price ?? service.real_price),
+    })),
+  }
+}
+
+/** Read the designed browser cart (used only for demo/mock products). */
 function readStoredCart(): CartItem[] | null {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY)
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return null
-    return cloneItems(parsed as CartItem[])
+    return parsed as CartItem[]
   }
   catch {
     return null
@@ -72,15 +135,56 @@ function readStoredCart(): CartItem[] | null {
 }
 
 export function useCart() {
-  const items = useState<CartItem[]>('cart-items', () => cloneItems(cartItems))
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+  const cartToken = useCookie<string | null>('cart_token')
 
-  // Restore the browser cart after mount (keeps SSR markup stable), then keep
-  // it in storage on every mutation.
-  if (import.meta.client && !storageReady) {
-    storageReady = true
+  const items = useState<CartItem[]>('cart-items', () => [])
+  const couponCode = useState<string>('cart-coupon-code', () => '')
+  const couponDiscount = useState<number>('cart-coupon-discount', () => 0)
+  const loading = useState<boolean>('cart-loading', () => false)
+
+  function ensureCartToken(): string {
+    if (!cartToken.value) {
+      const generated = globalThis.crypto?.randomUUID?.()
+        ?? `cart-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+      cartToken.value = generated
+      api.setCartToken(generated)
+    }
+    return cartToken.value
+  }
+
+  function applyCart(cart: ApiCart | undefined | null) {
+    if (!cart) return
+    items.value = (cart.items ?? []).map(item => mapCartItem(item, apiBase))
+    couponCode.value = cart.coupon?.code ?? ''
+    couponDiscount.value = num(cart.coupon?.discount_price)
+    if (cart.cart_token) cartToken.value = cart.cart_token
+  }
+
+  async function reload() {
+    ensureCartToken()
+    loading.value = true
+    try {
+      const res = await api.get<ApiCart>('/shop/cart')
+      applyCart(res.data)
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  // First consumer on the client hydrates the server/guest cart. SSR renders
+  // an empty cart so the markup is deterministic.
+  if (import.meta.client && !loadStarted) {
+    loadStarted = true
     onMounted(() => {
       const stored = readStoredCart()
-      if (stored) items.value = stored
+      if (stored?.length) items.value = stored
+      reload().catch(() => {
+        // A cold/offline API keeps the local demo cart (if any) usable.
+      })
     })
   }
 
@@ -97,12 +201,10 @@ export function useCart() {
   const count = computed(() => items.value.reduce((sum, item) => sum + item.quantity, 0))
   const isEmpty = computed(() => items.value.length === 0)
 
-  /** Price of the items as they sit in the cart (already discounted). */
   const itemsTotal = computed(() =>
     items.value.reduce((sum, item) => sum + item.price * item.quantity, 0),
   )
 
-  /** Savings against the struck-through prices. */
   const discountTotal = computed(() =>
     items.value.reduce((sum, item) => {
       const original = item.oldPrice ?? 0
@@ -126,14 +228,14 @@ export function useCart() {
     ),
   )
 
-  /** Items + insurance + services; the discount is already in `price`. */
+  /** Items + insurance + services, minus the applied coupon. */
   const payableTotal = computed(
-    () => itemsTotal.value + insuranceTotal.value + servicesTotal.value,
+    () => Math.max(0, itemsTotal.value + insuranceTotal.value + servicesTotal.value - couponDiscount.value),
   )
 
   const summary = computed(() => [
     { key: 'items', label: 'مجموع قیمت کالاها', value: itemsTotal.value },
-    { key: 'discount', label: 'تخفیف', value: discountTotal.value },
+    { key: 'discount', label: 'تخفیف', value: discountTotal.value + couponDiscount.value },
     { key: 'insurance', label: 'مبلغ بیمه‌ها', value: insuranceTotal.value },
     { key: 'services', label: 'خدمات', value: servicesTotal.value },
   ])
@@ -154,13 +256,8 @@ export function useCart() {
     )?.quantity ?? 0
   }
 
-  /**
-   * Adds a product-detail selection to the cart (merging with an existing line
-   * for the same colour/warranty/seller) and keeps its insurance/services in sync.
-   */
-  function addProduct(options: AddToCartOptions) {
+  function addLocal(options: AddToCartOptions, quantity: number): string {
     const { product, seller = null } = options
-    const quantity = Math.max(1, options.quantity ?? 1)
 
     const color = product.colors.find(c => c.value === options.color) ?? product.colors[0]
     const warranty
@@ -172,19 +269,14 @@ export function useCart() {
       oldPrice: policy.oldPrice,
       discount: policy.discount,
     }))
-    const insurance
-      = insuranceOptions.find(i => i.id === options.insuranceId) ?? null
+    const insurance = insuranceOptions.find(i => i.id === options.insuranceId) ?? null
 
     const selectedIds = options.serviceIds ?? []
     const serviceGroups = product.serviceCatalog.map(category => ({
       id: category.id,
       title: category.title,
       icon: category.icon,
-      items: category.items.map(service => ({
-        id: service.id,
-        label: service.label,
-        price: service.price,
-      })),
+      items: category.items.map(service => ({ ...service })),
     }))
     const services = serviceGroups
       .flatMap(category => category.items)
@@ -192,8 +284,7 @@ export function useCart() {
 
     const price = seller?.price ?? product.price
     const oldPrice = seller?.oldPrice ?? product.oldPrice
-    const discount
-      = seller?.discount ?? getDiscountPercent(price, oldPrice ?? 0) ?? undefined
+    const discount = seller?.discount ?? getDiscountPercent(price, oldPrice ?? 0) ?? undefined
 
     const id = cartLineId({
       product,
@@ -212,11 +303,7 @@ export function useCart() {
       existing.insuranceOptions = insuranceOptions
       existing.insurance = insurance ? { ...insurance } : null
       existing.serviceGroups = serviceGroups
-      existing.services = services.map(service => ({
-        id: service.id,
-        label: service.label,
-        price: service.price,
-      }))
+      existing.services = services.map(service => ({ ...service }))
     }
     else {
       items.value = [
@@ -235,60 +322,203 @@ export function useCart() {
           insurance: insurance ? { ...insurance } : null,
           insuranceOptions,
           serviceGroups,
-          services: services.map(service => ({
-            id: service.id,
-            label: service.label,
-            price: service.price,
-          })),
+          services: services.map(service => ({ ...service })),
         },
         ...items.value,
       ]
     }
 
     persist()
-    toast.success('این کالا به سبد خرید شما اضافه شد.', { icon: toastIcons.bag })
     return id
   }
 
-  function increment(id: string) {
+  /**
+   * Adds a product-detail selection to the server cart (or the local demo cart
+   * for mock products that have no backend stock id).
+   */
+  async function addProduct(options: AddToCartOptions): Promise<string> {
+    const quantity = Math.max(1, options.quantity ?? 1)
+    const stockId = options.seller?.stockId ?? options.product.stockId
+
+    if (!stockId) {
+      const id = addLocal(options, quantity)
+      toast.success('این کالا به سبد خرید شما اضافه شد.', { icon: toastIcons.bag })
+      return id
+    }
+
+    const services = (options.serviceIds ?? [])
+      .map((id) => {
+        const serviceId = Number(id)
+        return Number.isFinite(serviceId) ? { service_item_id: serviceId, quantity: 1 } : null
+      })
+      .filter((service): service is { service_item_id: number, quantity: number } => !!service)
+
+    try {
+      const res = await api.post<ApiCart>('/shop/cart/add-to-cart', {
+        stock_id: stockId,
+        quantity,
+        services,
+        cart_token: ensureCartToken(),
+      })
+      applyCart(res.data)
+
+      // Keep the product-detail selection key so its quantity stepper can find
+      // the line without a page reload.
+      const color = options.product.colors.find(c => c.value === options.color) ?? options.product.colors[0]
+      const warranty = options.product.warrantyOptions.find(w => w.id === options.warrantyId)
+        ?? options.product.warrantyOptions[0]
+      const localId = cartLineId({
+        product: options.product,
+        color: color?.value,
+        warrantyId: warranty?.id,
+        sellerId: options.seller?.id,
+      })
+      const added = items.value.filter(item => item.stockId === stockId).at(-1)
+      if (added) added.id = localId
+
+      toast.success('این کالا به سبد خرید شما اضافه شد.', { icon: toastIcons.bag })
+      return localId
+    }
+    catch (err) {
+      toast.error(apiErrorMessage(err, 'افزودن کالا به سبد خرید انجام نشد.'))
+      return ''
+    }
+  }
+
+  async function increment(id: string) {
     const item = find(id)
     if (!item) return
+
     const max = item.maxQuantity
     if (max != null && item.quantity >= max) {
       toast.error(`حداکثر ${max} عدد از این کالا قابل سفارش است.`)
       return
     }
+
+    if (item.apiId) {
+      try {
+        const res = await api.post<ApiCart>('/shop/cart/add-qty', {
+          cart_item_id: item.apiId,
+          quantity: 1,
+          cart_token: ensureCartToken(),
+        })
+        applyCart(res.data)
+      }
+      catch (err) {
+        toast.error(apiErrorMessage(err, 'افزایش تعداد انجام نشد.'))
+      }
+      return
+    }
+
     item.quantity += 1
     persist()
   }
 
-  function decrement(id: string) {
+  async function decrement(id: string) {
     const item = find(id)
     if (!item || item.quantity <= 1) return
+
+    if (item.apiId) {
+      try {
+        const res = await api.post<ApiCart>('/shop/cart/sub-qty', {
+          cart_item_id: item.apiId,
+          quantity: 1,
+          cart_token: ensureCartToken(),
+        })
+        applyCart(res.data)
+      }
+      catch (err) {
+        toast.error(apiErrorMessage(err, 'کاهش تعداد انجام نشد.'))
+      }
+      return
+    }
+
     item.quantity -= 1
     persist()
   }
 
-  function removeItem(id: string) {
+  async function removeItem(id: string) {
+    const item = find(id)
+    if (!item) return
+
+    if (item.apiId) {
+      try {
+        const res = await api.request<ApiCart>('/shop/cart/item', {
+          method: 'DELETE',
+          body: { cart_item_id: item.apiId, cart_token: ensureCartToken() },
+        })
+        applyCart(res.data)
+        toast.success('کالا از سبد خرید حذف شد.')
+      }
+      catch (err) {
+        toast.error(apiErrorMessage(err, 'حذف کالا از سبد خرید انجام نشد.'))
+      }
+      return
+    }
+
     items.value = items.value.filter(item => item.id !== id)
     persist()
     toast.success('کالا از سبد خرید حذف شد.')
   }
 
-  /** Empty the cart without a toast (used after a completed payment). */
-  function clear() {
+  /** Empty the cart on the server and locally. */
+  async function clear() {
+    if (items.value.length) {
+      try {
+        const res = await api.request<ApiCart>('/shop/cart/item', {
+          method: 'DELETE',
+          body: { cart_token: ensureCartToken() },
+        })
+        applyCart(res.data)
+      }
+      catch {
+        // Local clear below still empties the visible cart.
+      }
+    }
+
     items.value = []
+    couponCode.value = ''
+    couponDiscount.value = 0
     persist()
   }
 
-  function removeAll() {
+  async function removeAll() {
     if (isEmpty.value) return
-    items.value = []
-    persist()
+    await clear()
     toast.success('همه کالاها از سبد خرید حذف شدند.')
   }
 
-  /** Pick (or clear) the policy for a line from the insurance dialog. */
+  /** Apply or clear a coupon on the cart. */
+  async function applyCoupon(code: string) {
+    const res = await api.post<ApiCart>('/shop/cart/set-discount', {
+      coupon_code: code.trim() || null,
+      cart_token: ensureCartToken(),
+    })
+    applyCart(res.data)
+  }
+
+  async function clearCoupon() {
+    await applyCoupon('')
+  }
+
+  /** Choose the delivery address for the cart. */
+  async function setAddress(addressId: string) {
+    const res = await api.post<ApiCart>('/shop/cart/set-user-address', {
+      user_address_id: Number(addressId),
+      cart_token: ensureCartToken(),
+    })
+    applyCart(res.data)
+  }
+
+  /** Choose the payment method for the cart. */
+  async function setPaymentMethod(method: 'online' | 'pay_in_delivery' | 'pay_in_person' | 'mixed' | 'manual') {
+    const res = await api.post<ApiCart>('/shop/cart/set/payment-method', {
+      payment_method: method,
+      cart_token: ensureCartToken(),
+    })
+    applyCart(res.data)
+  }
+
   function setInsurance(itemId: string, insuranceId: string | null) {
     const item = find(itemId)
     if (!item) return
@@ -300,7 +530,6 @@ export function useCart() {
     persist()
   }
 
-  /** Replace the add-on services of a line from the services dialog. */
   function setServices(itemId: string, serviceIds: string[]) {
     const item = find(itemId)
     if (!item) return
@@ -330,20 +559,28 @@ export function useCart() {
     items,
     count,
     isEmpty,
+    loading,
     itemsTotal,
     discountTotal,
     insuranceTotal,
     servicesTotal,
     payableTotal,
     summary,
+    couponCode,
+    couponDiscount,
     find,
     quantityFor,
+    reload,
     addProduct,
     increment,
     decrement,
     removeItem,
     removeAll,
     clear,
+    applyCoupon,
+    clearCoupon,
+    setAddress,
+    setPaymentMethod,
     setInsurance,
     setServices,
     removeInsurance,

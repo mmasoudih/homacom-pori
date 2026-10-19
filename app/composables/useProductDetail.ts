@@ -222,6 +222,9 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
 
   const sellers: Seller[] = stocks.map(stock => ({
     id: `stock-${stock.id}`,
+    stockId: stock.id,
+    colorValue: stock.color?.code,
+    warrantyId: stock.warranty ? String(stock.warranty.id) : undefined,
     name: stock.store?.title ?? 'هماکام',
     logo: resolveMediaUrl(stock.store?.img, apiBase) || '/homacom-logo.png',
     creditLabel: stock.warranty?.title ?? 'گارانتی',
@@ -294,6 +297,7 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
   return {
     ...base,
     id: String(api.id),
+    stockId: defaultStock?.id,
     title: api.title,
     englishTitle: api.title_en ?? base.englishTitle,
     breadcrumb,

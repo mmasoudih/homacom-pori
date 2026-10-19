@@ -88,6 +88,8 @@ export type SellerType = 'cash' | 'installment' | 'credit'
 
 export interface Seller {
   id: string
+  /** Backend stock id used by add-to-cart. */
+  stockId?: number
   name: string
   logo: string
   creditLabel: string
@@ -97,6 +99,10 @@ export interface Seller {
   oldPrice?: number
   discount?: number
   type: SellerType
+  /** Colour hex code of the stock. */
+  colorValue?: string
+  /** Warranty id of the stock. */
+  warrantyId?: string
 }
 
 export interface StickyLink {
@@ -145,6 +151,8 @@ export type CommentSort = 'useful' | 'newest' | 'oldest' | 'lowest' | 'highest'
 
 export interface ProductDetail {
   id: string
+  /** Default backend stock id used by add-to-cart. */
+  stockId?: number
   title: string
   englishTitle: string
   breadcrumb: string[]

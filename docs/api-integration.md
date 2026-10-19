@@ -95,17 +95,26 @@ independently.
 
 ## Phase 6 — Cart (8 endpoints)
 
-- [ ] Rewrite `useCart.ts` from localStorage/mock to server cart
-- [ ] `GET /api/shop/cart` (server + guest `X-Cart-Token`)
-- [ ] `POST /api/shop/cart/add-to-cart` (`stock_id`, `quantity`, `services[]`)
-- [ ] `POST /api/shop/cart/add-qty` / `sub-qty`
-- [ ] `DELETE /api/shop/cart/item` (line remove + clear)
-- [ ] `POST /api/shop/cart/set-user-address`
-- [ ] `POST /api/shop/cart/set/payment-method`
+- [x] Rewrite `useCart.ts` from localStorage/mock to server cart (mock products
+      still use the local fallback)
+- [x] `GET /api/shop/cart` (server + guest `X-Cart-Token`)
+- [x] `POST /api/shop/cart/add-to-cart` (`stock_id`, `quantity`, `services[]`)
+- [x] `POST /api/shop/cart/add-qty` / `sub-qty`
+- [x] `DELETE /api/shop/cart/item` (line remove + clear)
+- [x] `POST /api/shop/cart/set-user-address`
+- [x] `POST /api/shop/cart/set/payment-method`
       (`online | pay_in_delivery | pay_in_person | mixed | manual`)
-- [ ] `POST /api/shop/cart/set-discount` (coupon apply/clear)
-- [ ] Sync header badge + cart totals from `data.totals`
-- [ ] Decide fate of mock-only insurance/service UI vs API `services[]`
+- [x] `POST /api/shop/cart/set-discount` (coupon apply/clear)
+- [x] Sync header badge + cart totals from API items
+- [ ] Insurance / add-on services chosen **after** a line exists are local-only
+      — the API only accepts `services[]` at `add-to-cart` time and has no
+      update-services endpoint
+- [ ] Cart item response has no product slug/id → cart line titles link to `#`
+      (needs `slug`/`product_id` in `CartItemResource`)
+- [ ] Checkout promo-code UI still uses the local demo amount; `applyCoupon()` /
+      `clearCoupon()` are ready but not wired into `useCheckout`
+- [ ] Guest carts work with a client-generated `cart_token` (sent as
+      `X-Cart-Token` + body); confirm login-time guest→user cart merge
 
 ## Phase 7 — Checkout & orders (partly blocked)
 
