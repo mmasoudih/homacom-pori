@@ -10,6 +10,8 @@ import {
 } from '~/data/checkout'
 import { formatPriceFa } from '~/utils/format'
 import { apiErrorMessage } from '~/composables/useApi'
+import { normalizeSearchText } from '~/utils/search'
+import { sanitizeMobileInput } from '~/utils/auth'
 
 const {
   isEmpty,
@@ -89,6 +91,12 @@ const shippingOpen = ref(false)
 const creditOpen = ref(false)
 
 const route = useRoute()
+const api = useApi()
+const { states, refresh: refreshStates } = useStates()
+const { create: createAddress } = useUserAddresses()
+const { profile, load: loadProfile } = useUserProfile()
+
+onMounted(loadProfile)
 
 // Keep the server cart in sync with the current checkout selection. The final
 // submit endpoint is still missing, but the cart already stores these choices.
@@ -154,9 +162,71 @@ function settlePayment() {
   navigateTo('/checkout/success', { replace: true })
 }
 
-function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
-  addAddress(values)
-  toast.success('آدرس جدید ثبت شد.')
+async function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
+  const province = values.province?.trim() ?? ''
+  const cityName = values.cityName?.trim() ?? ''
+
+  if (!states.value.length) {
+    try {
+      await refreshStates()
+    }
+    catch {
+      // Fall through to the "state not found" error below.
+    }
+  }
+
+  const state = states.value.find(item =>
+    normalizeSearchText(item.name) === normalizeSearchText(province),
+  )
+  if (!state) {
+    toast.error('استان انتخاب‌شده در سامانه یافت نشد.')
+    return
+  }
+
+  try {
+    const cities = await api.get<Array<{ id: number, name: string }>>('/address/cities', {
+      query: { 'filters[parent_id]': state.id },
+    })
+    const city = (cities.data ?? []).find(item =>
+      normalizeSearchText(item.name) === normalizeSearchText(cityName),
+    )
+    if (!city) {
+      toast.error('شهر انتخاب‌شده در سامانه یافت نشد.')
+      return
+    }
+
+    if (!profile.value.nationalId) {
+      toast.error('برای ثبت آدرس، ابتدا کد ملی را در اطلاعات حساب کاربری ثبت کنید.')
+      return
+    }
+
+    const mobile = sanitizeMobileInput(values.phone)
+    if (mobile.length !== 11) {
+      toast.error('شماره موبایل تحویل‌گیرنده معتبر نیست.')
+      return
+    }
+
+    await createAddress({
+      title: values.city || 'آدرس جدید',
+      state: state.id,
+      city: city.id,
+      address: values.street || values.address,
+      lat: values.lat ?? 35.6892,
+      lng: values.lng ?? 51.389,
+      mobile,
+      nickname: values.recipient || '',
+      code_melli: profile.value.nationalId,
+      zip_code: values.postalCode || null,
+      plaque: values.plaque ?? null,
+      unit: values.unit ?? null,
+    })
+
+    addAddress(values)
+    toast.success('آدرس جدید ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت آدرس انجام نشد.'))
+  }
 }
 
 async function applyDiscount() {

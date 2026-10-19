@@ -14,6 +14,14 @@ export interface CheckoutAddress {
   recipient: string
   phone: string
   isDefault?: boolean
+  /** Raw parts carried by the map wizard so the address can be POSTed. */
+  province?: string
+  cityName?: string
+  street?: string
+  plaque?: string
+  unit?: string
+  lat?: number
+  lng?: number
 }
 
 export interface ShippingMethod {

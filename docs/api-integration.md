@@ -108,8 +108,8 @@ independently.
       selects from the API)
 - [x] Map fields: `title, state, city, address, lat, lng, mobile, nickname,
       code_melli, zip_code` (plaque/floor/unit are not in the dialog yet)
-- [ ] Checkout's map-based add-address wizard still adds locally; it does not
-      carry lat/lng or state/city ids, so it cannot POST yet.
+- [x] Checkout's map-based add-address wizard now POSTs the address (resolves
+      province/city names to API ids; uses the profile national code)
 - [ ] New addresses without a map pin use Tehran's default lat/lng.
 
 ## Phase 6 — Cart (8 endpoints)
