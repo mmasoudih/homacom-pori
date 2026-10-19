@@ -17,9 +17,14 @@ independently.
 - [x] `auth_token` cookie written on login.
 - [x] Shared API client sends `Authorization` (with 401 refresh/retry).
 - [x] Auth middleware, `X-Cart-Token` support, refresh and logout.
-- [x] Catalog search, product detail/comments, blog, brands/FAQ, banners/stories,
-      cart, addresses (list/delete), profile, orders, favorites, comments and
-      tickets now read from the API.
+- [x] Every one of the 57 endpoints in the spec now has a client integration
+      (catalog, product detail/comments, blog, brands/FAQ, banners/stories,
+      header/footer, colours, cart, addresses, profile, orders, favorites,
+      comments and tickets).
+- [x] UI-level gaps that do not need backend changes are closed (colour facet,
+      site/blog header shell, footer menus, comment edit, company info, cart
+      address/payment persistence, checkout address creation, landing category
+      tiles).
 - [ ] Still designed-mock: checkout submit/payment/returns, notifications,
       insurance/services after add-to-cart, static CMS pages, landing product
       carousels, address add/edit forms.
@@ -54,8 +59,8 @@ independently.
 
 - [x] `GET /api/shop/public/site-header` → header logo/phone/menus
       (menus with links replace the designed nav; all-null live data falls back)
-- [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile,
-      mock tree as fallback)
+- [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile)
+      and the landing category tiles; mock tree as fallback
 - [x] `GET /api/shop/public/footer` → footer logo/contact/menus/about/copyright
       (designed columns kept per column when the API menu has no links)
 - [x] Blog header nav prefers `/shop/public/blog-header`, falling back to
