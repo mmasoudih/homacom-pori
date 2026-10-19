@@ -24,9 +24,10 @@ Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
 
 **Also needed**
 
-- Document the accepted `filters[sort]` values (newest / best-selling / most
-  viewed / cheapest / most expensive / …). We currently cannot drive the
-  «جدیدترین» and «پرفروش‌ترین» landing rows from the API.
+- Document/implement the accepted `filters[sort]` values. Verified working:
+  `newest`, `cheapest`, `expensive`. `best-selling`, `most-viewed`, `sales`,
+  `views` return 422. The «پرفروش‌ترین» landing row currently falls back to the
+  default order.
 - Return `pagination` consistently on every list endpoint.
 
 ---

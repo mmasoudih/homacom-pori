@@ -72,8 +72,10 @@ independently.
 
 - [x] `GET /api/shop/products` (q, ids, pagination) → header search + `search.vue`
       (prices enriched with one detail call per result — see gaps doc)
-- [ ] Landing carousels (`جدیدترین`, `پرفروش‌ترین`) still use designed products;
-      the list endpoint has no price and no documented sort values.
+- [x] Landing carousels (`جدیدترین`, `پرفروش‌ترین`) → API products
+      (`filters[sort]=newest`; best-seller sort still unavailable, so both rows
+      currently use the default order)
+- [ ] Landing carousels pay for one detail request per card to get prices.
 - [x] `GET /api/shop/products/{slug}` → `product/[id].vue` + `product-detail/*`
       (gallery, colors, stocks/price, warranties, services, questions, SEO;
       mock product kept as fallback)

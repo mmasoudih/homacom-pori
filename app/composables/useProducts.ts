@@ -104,12 +104,13 @@ export function useProductCatalog() {
     }
   }
 
-  async function fetchList(term: string, limit = 12): Promise<SearchProduct[]> {
+  async function fetchList(term: string, limit = 12, sort?: string): Promise<SearchProduct[]> {
     const query: Record<string, string | number> = {
       'filters[per_page]': limit,
       'filters[page]': 1,
     }
     if (term) query['filters[s]'] = term
+    if (sort) query['filters[sort]'] = sort
 
     const res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query })
     const items = res.data?.items ?? []
@@ -145,4 +146,50 @@ export function useProductCatalog() {
   }
 
   return { fetchList }
+}
+
+
+export interface LandingProductCard {
+  id: string
+  image: string
+  title: string
+  price: string
+  oldPrice?: string
+  discount?: string
+}
+
+function toLandingCard(product: SearchProduct): LandingProductCard {
+  return {
+    id: product.id,
+    image: product.image,
+    title: product.title,
+    price: String(product.price),
+    oldPrice: product.oldPrice != null ? String(product.oldPrice) : undefined,
+    discount: product.discount ? `%${product.discount}` : undefined,
+  }
+}
+
+/** Newest + best-selling rows for the landing page (design mock as fallback). */
+export function useLandingProducts() {
+  const { fetchList } = useProductCatalog()
+  const newest = ref<LandingProductCard[]>([])
+  const bestsellers = ref<LandingProductCard[]>([])
+  const loaded = ref(false)
+
+  onMounted(async () => {
+    try {
+      const [newestList, bestsellerList] = await Promise.all([
+        fetchList('', 6, 'newest'),
+        fetchList('', 6),
+      ])
+      newest.value = newestList.map(toLandingCard)
+      bestsellers.value = bestsellerList.map(toLandingCard)
+      loaded.value = true
+    }
+    catch {
+      // The page keeps the designed rows when the API is unavailable.
+    }
+  })
+
+  return { newest, bestsellers, loaded }
 }

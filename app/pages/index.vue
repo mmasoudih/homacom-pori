@@ -6,6 +6,7 @@ import {
 } from '~/data/landing'
 
 const { banners } = useHomeBanners()
+const { newest, bestsellers } = useLandingProducts()
 
 const seoTitle = 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال'
 const seoDescription = 'خرید آنلاین گوشی موبایل، لپ‌تاپ، ساعت هوشمند، هدفون، کنسول بازی و لوازم جانبی از فروشگاه اینترنتی هماکام؛ ضمانت اصالت کالا، ارسال سریع و خرید اقساطی.'
@@ -44,7 +45,7 @@ useSeoMeta({
 
       <LandingProductsCarousel
         title="جدیدترین محصولات"
-        :products="newestProducts"
+        :products="newest.length ? newest : newestProducts"
         :per-view="5"
         class="order-4 w-full lg:order-none"
       />
@@ -72,7 +73,7 @@ useSeoMeta({
 
       <LandingProductsCarousel
         title="پرفروش‌ترین محصولات"
-        :products="bestsellerProducts"
+        :products="bestsellers.length ? bestsellers : bestsellerProducts"
         :pills="bestsellerFilters"
         class="order-7 w-full lg:order-none"
       />
