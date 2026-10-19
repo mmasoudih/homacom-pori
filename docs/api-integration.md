@@ -53,8 +53,9 @@ independently.
 - [x] `GET /api/shop/public/blog-category` → blog nav/drawer (mock tree as
       fallback)
 - [ ] `GET /api/shop/public/colors` → color filters (`SearchColorFilter`)
-- [ ] `GET /api/shop/banners?filters[position]=` → landing hero/offers
-- [ ] `GET /api/shop/stories` → header story strip
+- [x] `GET /api/shop/banners?filters[position]=` → landing hero + banner rows
+      (mock banners per slot as fallback)
+- [x] `GET /api/shop/stories` → header story strip (`HeaderCircleStrip`)
 
 ## Phase 3 — Catalog, search, product detail
 

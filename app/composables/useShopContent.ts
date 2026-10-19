@@ -190,3 +190,110 @@ export function useFaqs() {
 
   return { faqContent, pending, error, refresh }
 }
+
+interface ApiBanner {
+  id: number
+  position: string
+  link?: string | null
+  target?: string | null
+  image?: string | null
+}
+
+export interface BannerItem {
+  image: string
+  alt?: string
+  href?: string
+}
+
+export interface HomeBanners {
+  hero: BannerItem[]
+  two: BannerItem[]
+  three: BannerItem[]
+  four: BannerItem[]
+  strip: BannerItem
+}
+
+function mapBanner(item: ApiBanner, apiBase: string): BannerItem {
+  return {
+    image: resolveMediaUrl(item.image, apiBase),
+    alt: 'بنر هماکام',
+    href: item.link || '#',
+  }
+}
+
+/**
+ * Home-page banners grouped by the design slots.
+ *
+ * Falls back to the designed mock banners per slot when the API has nothing
+ * for that position, so the landing page keeps its layout on a cold API.
+ */
+export function useHomeBanners() {
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+
+  const { bannerSlots } = useBannersFallback()
+
+  const { data } = useAsyncData<HomeBanners>(
+    'shop-home-banners',
+    async () => {
+      try {
+        const res = await api.get<ApiBanner[]>('/shop/banners')
+        const items = (res.data ?? []).map(item => ({ ...mapBanner(item, apiBase), position: item.position }))
+        if (!items.length) return bannerSlots.value
+
+        const byPosition = (position: string) => items.filter(item => item.position === position)
+        const pick = (positions: string[]) => positions.flatMap(byPosition).map(({ position: _position, ...banner }) => banner)
+
+        return {
+          hero: pick(['index_slider']).length ? pick(['index_slider']) : bannerSlots.value.hero,
+          two: pick(['index_middle_first', 'index_middle_second']).slice(0, 2).length
+            ? pick(['index_middle_first', 'index_middle_second']).slice(0, 2)
+            : bannerSlots.value.two,
+          four: pick(['index_middle_first', 'index_middle_second', 'index_middle_therd', 'index_middle_forth']).slice(0, 4).length
+            ? pick(['index_middle_first', 'index_middle_second', 'index_middle_therd', 'index_middle_forth']).slice(0, 4)
+            : bannerSlots.value.four,
+          three: pick(['index_middle_first', 'index_middle_second', 'index_middle_therd']).slice(0, 3).length
+            ? pick(['index_middle_first', 'index_middle_second', 'index_middle_therd']).slice(0, 3)
+            : bannerSlots.value.three,
+          strip: pick(['index_header_top'])[0] ?? bannerSlots.value.strip,
+        }
+      }
+      catch {
+        return bannerSlots.value
+      }
+    },
+    { server: false, lazy: true, default: () => bannerSlots.value },
+  )
+
+  return { banners: data }
+}
+
+/** Designed banner fallbacks, kept in one place for the composable above. */
+function useBannersFallback() {
+  const bannerSlots = computed<HomeBanners>(() => ({
+    hero: [1, 2, 3].map(index => ({
+      image: `/figma/fill-${index === 1 ? '4f5b0b1a98425788' : index === 2 ? 'fc0d272a9ceafa5f' : 'f48409b4bd7d0235'}.jpg`,
+      alt: 'هماکام',
+      href: '#',
+    })),
+    two: [
+      { image: '/figma/fill-e44e4b8ead1c759d.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-07e29b135a3cb6e8.png', alt: 'بنر هماکام', href: '#' },
+    ],
+    three: [
+      { image: '/figma/fill-b65ebd18e4d5d2f9.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-e2020cdafb96743f.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-9eca5bf432eebd3d.png', alt: 'بنر هماکام', href: '#' },
+    ],
+    four: [
+      { image: '/figma/fill-b65ebd18e4d5d2f9.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-e4d8a4e475bb2dd8.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-e2020cdafb96743f.png', alt: 'بنر هماکام', href: '#' },
+      { image: '/figma/fill-9eca5bf432eebd3d.png', alt: 'بنر هماکام', href: '#' },
+    ],
+    strip: { image: '/figma/fill-b57f0152df1c2d25.png', alt: 'پیشنهاد ویژه هماکام', href: '#' },
+  }))
+
+  return { bannerSlots }
+}

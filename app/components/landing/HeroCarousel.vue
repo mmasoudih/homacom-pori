@@ -6,7 +6,7 @@ import Fade from 'embla-carousel-fade'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import type { CarouselApi } from '@/components/ui/carousel'
 
-const slides = [
+const defaultSlides = [
   '/figma/fill-4f5b0b1a98425788.jpg',
   '/figma/fill-fc0d272a9ceafa5f.jpg',
   '/figma/fill-f48409b4bd7d0235.jpg',
@@ -15,7 +15,14 @@ const slides = [
   // '/figma/fill-8cfc51f6d61983d7.jpg',
 ]
 
-const total = slides.length
+const props = withDefaults(defineProps<{
+  slides?: string[]
+}>(), {
+  slides: () => [],
+})
+
+const slides = computed(() => (props.slides.length ? props.slides : defaultSlides))
+const total = computed(() => slides.value.length)
 const SLIDE_DURATION = 6000
 
 const autoplay = Autoplay({ delay: SLIDE_DURATION, stopOnInteraction: false })
