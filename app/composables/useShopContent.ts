@@ -78,6 +78,16 @@ export function useBlogNav() {
   const { data: navItems, pending, error, refresh } = useAsyncData<BlogNavItem[]>(
     'shop-blog-categories',
     async () => {
+      try {
+        const header = await api.get<{ categories?: ApiBlogCategory[] }>('/shop/public/blog-header')
+        const headerCategories = header.data?.categories ?? []
+        if (headerCategories.length)
+          return headerCategories.map(mapBlogCategory)
+      }
+      catch {
+        // Fall through to the category endpoint below.
+      }
+
       const res = await api.get<ApiBlogCategory[]>('/shop/public/blog-category')
       const items = Array.isArray(res.data) ? res.data : []
       return items.length ? items.map(mapBlogCategory) : blogNav

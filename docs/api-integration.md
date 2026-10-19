@@ -52,14 +52,14 @@ independently.
 
 ## Phase 2 — Global shell / CMS (6 Public + Banner + Story)
 
-- [ ] `GET /api/shop/public/site-header` → `landing/SiteHeader.vue` (live menu
-      items have `link: null`; top nav stays designed until links are populated)
+- [x] `GET /api/shop/public/site-header` → header logo/phone/menus
+      (menus with links replace the designed nav; all-null live data falls back)
 - [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile,
       mock tree as fallback)
-- [x] `GET /api/shop/public/footer` → `landing/SiteFooter.vue` (contact block;
-      menu columns stay designed until the API returns links)
-- [x] Blog header nav uses `/shop/public/blog-category` (the dedicated
-      `/blog-header` endpoint is not needed until it differs)
+- [x] `GET /api/shop/public/footer` → footer logo/contact/menus/about/copyright
+      (designed columns kept per column when the API menu has no links)
+- [x] Blog header nav prefers `/shop/public/blog-header`, falling back to
+      `/shop/public/blog-category`
 - [x] `GET /api/shop/public/blog-category` → blog nav/drawer (mock tree as
       fallback)
 - [x] `GET /api/shop/public/colors` → search colour facet (designed swatches as

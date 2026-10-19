@@ -4,25 +4,13 @@ import type { SeoSegment } from "~/data/landing";
 import { footerData } from "~/data/landing";
 import { toPersianDigits } from "~/utils/format";
 import { toMailtoHref, toTelHref } from "~/utils/auth";
+import { resolveMediaUrl } from "~/utils/media";
 
 const { t } = useI18n();
-const config = useRuntimeConfig();
+const { siteFooter } = useSiteFooter();
 
 // Contact details come from the shop API; the designed mock values remain as a
 // fallback so the footer never renders empty on a cold/offline API.
-const { data: footerApi } = await useFetch<{
-  data?: {
-    tel?: string | null;
-    mobile?: string | null;
-    email?: string | null;
-    address?: string | null;
-  };
-}>(() => `${config.public.apiBase}/shop/public/footer`, {
-  key: "shop-footer",
-  server: false,
-  lazy: true,
-  default: () => ({ data: {} }),
-});
 
 function formatPhone(phone: string) {
   if (phone.includes("-")) return phone;
@@ -31,17 +19,38 @@ function formatPhone(phone: string) {
 }
 
 const contactPhones = computed(() => {
-  const data = footerApi.value?.data;
+  const data = siteFooter.value;
   const phones = [data?.mobile, data?.tel].filter(
     (value): value is string => !!value?.trim(),
   );
   return phones.length ? phones.map(formatPhone) : footerData.phones;
 });
 
-const contactEmail = computed(() => footerApi.value?.data?.email || footerData.email);
+const contactEmail = computed(() => siteFooter.value.email || footerData.email);
 const contactAddress = computed(
-  () => footerApi.value?.data?.address || footerData.address,
+  () => siteFooter.value.address || footerData.address,
 );
+
+const footerLogo = computed(() =>
+  resolveMediaUrl(siteFooter.value.logo, String(useRuntimeConfig().public.apiBase || '')) || '/homacom-logo.png',
+);
+
+const footerMenus = ['menu_1', 'menu_2', 'menu_3', 'menu_4'] as const;
+
+/** Prefer API menu columns when they actually carry links. */
+const displayColumns = computed(() =>
+  footerData.columns.map((fallback, index) => {
+    const items = siteFooter.value[footerMenus[index]!] ?? [];
+    const links = items
+      .filter(item => !!item.link)
+      .map(item => ({ label: item.title, href: item.link! }));
+    if (!links.length) return fallback;
+    return { title: items[0]?.title || fallback.title, links };
+  }),
+);
+
+const aboutText = computed(() => siteFooter.value.description?.trim() || '');
+const copyrightText = computed(() => siteFooter.value.footer_copy_write?.trim() || '');
 
 const openRow = ref("");
 
@@ -70,7 +79,7 @@ const contactLinks = computed<FooterLink[]>(() => [
 ]);
 
 const accordionRows = computed(() => [
-  ...footerData.columns.map((col) => ({ title: col.title, links: col.links as FooterLink[] })),
+  ...displayColumns.value.map((col) => ({ title: col.title, links: col.links as FooterLink[] })),
   {
     title: footerData.contactTitle,
     links: contactLinks.value,
@@ -171,7 +180,7 @@ function scrollTop() {
         <!-- ============================ Desktop =========================== -->
         <div class="site-footer-desktop hidden lg:grid">
           <!-- Link columns -->
-          <div v-for="col in footerData.columns" :key="col.title">
+          <div v-for="col in displayColumns" :key="col.title">
             <h4 class="flex items-center gap-[11px]">
               <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.25">
@@ -287,7 +296,7 @@ function scrollTop() {
         >
           <a href="#" class="shrink-0">
             <img
-              src="/homacom-logo.png"
+              :src="footerLogo"
               alt="هماکام"
               class="h-[54px] w-[60px] object-contain lg:h-[86px] lg:w-[91px]"
             >
@@ -298,15 +307,18 @@ function scrollTop() {
             weight="regular"
             class="flex-1 text-right leading-[26px] text-T-700"
           >
-            <UiTypography
-              v-for="(segment, i) in footerData.about"
-              :key="i"
-              as="span"
-              size="md"
-              :weight="segment.tone ? 'bold' : 'regular'"
-              :color="segment.tone ? 'default' : 'muted'"
-              :class="segmentClass(segment.tone)"
-            >{{ segment.text }}</UiTypography>
+            <template v-if="aboutText">{{ aboutText }}</template>
+            <template v-else>
+              <UiTypography
+                v-for="(segment, i) in footerData.about"
+                :key="i"
+                as="span"
+                size="md"
+                :weight="segment.tone ? 'bold' : 'regular'"
+                :color="segment.tone ? 'default' : 'muted'"
+                :class="segmentClass(segment.tone)"
+              >{{ segment.text }}</UiTypography>
+            </template>
           </UiTypography>
         </div>
 
@@ -337,15 +349,18 @@ function scrollTop() {
           weight="regular"
           class="mt-5 pb-10 text-right text-T-700"
         >
-          <UiTypography
-            v-for="(segment, i) in footerData.copyright"
-            :key="i"
-            as="span"
-            size="lg"
-            :weight="segment.tone ? 'bold' : 'regular'"
-            :color="segment.tone ? 'default' : 'muted'"
-            :class="segmentClass(segment.tone)"
-          >{{ segment.text }}</UiTypography>
+          <template v-if="copyrightText">{{ copyrightText }}</template>
+          <template v-else>
+            <UiTypography
+              v-for="(segment, i) in footerData.copyright"
+              :key="i"
+              as="span"
+              size="lg"
+              :weight="segment.tone ? 'bold' : 'regular'"
+              :color="segment.tone ? 'default' : 'muted'"
+              :class="segmentClass(segment.tone)"
+            >{{ segment.text }}</UiTypography>
+          </template>
         </UiTypography>
       </div>
     </div>
