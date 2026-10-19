@@ -71,10 +71,16 @@ independently.
 
 ## Phase 4 — Blog
 
-- [ ] `GET /api/shop/blogs` → `blog/index.vue`
-- [ ] `GET /api/shop/blogs/category/{category}` → `blog/[category]/index.vue`
-- [ ] `GET /api/shop/blogs/{slug}` → `blog/[category]/[slug].vue`
-- [ ] Search/filters → `blog/search.vue`
+- [x] `GET /api/shop/blogs` → `blog/index.vue` (latest row + one section per
+      category)
+- [x] `GET /api/shop/blogs/category/{category}` → `blog/[category]/index.vue`
+      (pagination)
+- [x] `GET /api/shop/blogs/{slug}` → `blog/[category]/[slug].vue` (body, sidebar
+      rails, related posts)
+- [x] Search → `blog/search.vue` filters the loaded blog home payload
+      client-side (no dedicated blog-search endpoint in the spec)
+- [ ] Blog comments (API has no blog-comment endpoints; article shows none)
+- [ ] Blog article rating (API exposes `star`/`total_rating` but no 0–5 score)
 
 ## Phase 5 — Addresses & locations
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { blogSections } from '~/data/blog'
+const { home } = useBlogHome()
 
 useHead({
   title: 'لیست بلاگ | هماکام',
@@ -19,10 +19,10 @@ const crumbs = [
         :items="crumbs"
       />
 
-      <BlogHeroSlider class="lg:mt-6" />
+      <BlogHeroSlider :featured="home.hero.featured" :slides="home.hero.slides" :row="home.hero.row" class="lg:mt-6" />
 
       <BlogSectionRow
-        v-for="(section, i) in blogSections"
+        v-for="(section, i) in home.sections"
         :key="section.title"
         :title="section.title"
         :posts="section.posts"

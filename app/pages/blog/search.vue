@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { blogPosts } from '~/data/blog'
-
 const route = useRoute()
+const { home } = useBlogHome()
 
 const term = computed(() => String(route.query.q ?? '').trim())
 
@@ -12,7 +11,7 @@ useHead({
 const results = computed(() => {
   const q = term.value
   if (!q) return []
-  return blogPosts.filter(post =>
+  return home.value.allPosts.filter(post =>
     post.title.includes(q) || post.category.includes(q),
   )
 })

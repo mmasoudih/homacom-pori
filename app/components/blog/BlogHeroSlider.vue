@@ -7,8 +7,14 @@ import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
   class?: string
+  featured?: BlogPost
+  slides?: BlogPost[]
+  row?: BlogPost[]
 }>(), {
   class: '',
+  featured: () => blogHeroFeatured,
+  slides: () => blogHeroSlides,
+  row: () => blogHeroRow,
 })
 
 const to = (post: BlogPost) => `/blog/${post.categorySlug}/${post.slug}`
@@ -21,13 +27,13 @@ const heroOpts = { direction: 'rtl' as const, loop: true, align: 'start' as cons
     <div class="mx-auto hidden w-full max-w-[1440px] flex-col gap-[22px] lg:flex lg:px-6">
       <div class="grid grid-cols-3 gap-6">
         <!-- Featured card (design places it at the inline end / physical right) -->
-        <BlogPostCard :post="blogHeroFeatured" variant="overlay" class="h-[280px]" />
+        <BlogPostCard :post="featured" variant="overlay" class="h-[280px]" />
 
         <!-- Big slider -->
         <Carousel v-slot="{ scrollNext, scrollPrev }" class="col-span-2" :opts="heroOpts">
           <CarouselContent class="ms-0 h-[280px]">
             <CarouselItem
-              v-for="slide in blogHeroSlides"
+              v-for="slide in slides"
               :key="slide.slug"
               class="h-full basis-full ps-0"
             >
@@ -79,7 +85,7 @@ const heroOpts = { direction: 'rtl' as const, loop: true, align: 'start' as cons
       <!-- Overlay row -->
       <div class="grid grid-cols-3 gap-[10px]">
         <BlogPostCard
-          v-for="post in blogHeroRow"
+          v-for="post in row"
           :key="`row-${post.slug}`"
           :post="post"
           variant="overlay"
@@ -96,7 +102,7 @@ const heroOpts = { direction: 'rtl' as const, loop: true, align: 'start' as cons
     >
       <CarouselContent class="ms-0 h-[243px]">
         <CarouselItem
-          v-for="slide in blogHeroSlides"
+          v-for="slide in slides"
           :key="`m-${slide.slug}`"
           class="h-full basis-full ps-0"
         >
