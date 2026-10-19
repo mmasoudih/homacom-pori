@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { favorites as initialFavorites } from '~/data/favorites'
+import { toast } from 'vue-sonner'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
-const items = ref([...initialFavorites])
+const {
+  favorites: items,
+  loaded,
+  load: loadFavorites,
+  remove: removeFavorite,
+} = useFavorites()
+
+onMounted(() => {
+  loadFavorites().catch(err => toast.error(apiErrorMessage(err, 'دریافت علاقه‌مندی‌ها انجام نشد.')))
+})
 
 const isEmpty = computed(
-  () => route.query.empty === '1' || items.value.length === 0,
+  () => route.query.empty === '1' || (loaded.value && items.value.length === 0),
 )
 
-function remove(id: string | number | undefined) {
-  items.value = items.value.filter(product => product.id !== id)
+async function remove(id: string | number | undefined) {
+  if (id == null) return
+  try {
+    await removeFavorite(id)
+    toast.success('از علاقه‌مندی‌ها حذف شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'حذف از علاقه‌مندی‌ها انجام نشد.'))
+  }
 }
 
 useHead({

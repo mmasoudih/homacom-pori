@@ -147,9 +147,15 @@ independently.
 
 ## Phase 9 — Favorites
 
-- [ ] `GET /api/shop/user/favorite?filters[relate_to]=` → dashboard favorites
-- [ ] `POST /api/shop/user/favorite` toggle → product cards + detail heart
-- [ ] Reflect `is_favorite` from product responses
+- [x] `GET /api/shop/user/favorite?filters[relate_to]=` → dashboard favorites
+      (favorite records → product list by `filters[ids][]` → per-product detail
+      for price)
+- [x] `POST /api/shop/user/favorite` toggle → dashboard remove/toggle composable
+- [ ] Wire the product-detail heart to `useFavorites().toggle()`
+- [ ] Reflect `is_favorite` from product responses (detail resource exposes it)
+- [ ] Favorites list returns only IDs, forcing an extra product-list + N detail
+      requests to render cards; a favorites endpoint with product summaries
+      (title/image/price) would remove the N+1.
 
 ## Phase 10 — User comments
 
