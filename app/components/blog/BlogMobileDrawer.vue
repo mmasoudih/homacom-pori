@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { IconChevronDown } from '@tabler/icons-vue'
-import { blogNav, blogShopCta } from '~/data/blog'
+import { blogShopCta } from '~/data/blog'
 
 const props = defineProps<{
   open: boolean
 }>()
+
+const { navItems } = useBlogNav()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -72,7 +74,7 @@ onBeforeUnmount(() => {
 
           <!-- Categories -->
           <nav class="flex-1 overflow-y-auto">
-            <div v-for="item in blogNav" :key="item.slug" class="border-b border-T-400">
+            <div v-for="item in navItems" :key="item.slug" class="border-b border-T-400">
               <button
                 type="button"
                 class="flex h-14 w-full items-center justify-between px-6 text-start"

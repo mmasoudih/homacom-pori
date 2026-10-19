@@ -45,10 +45,13 @@ independently.
 ## Phase 2 — Global shell / CMS (6 Public + Banner + Story)
 
 - [ ] `GET /api/shop/public/site-header` → `landing/SiteHeader.vue`
-- [ ] `GET /api/shop/public/product-category` → `categories/*`
-- [ ] `GET /api/shop/public/footer` → `landing/SiteFooter.vue`
+- [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile,
+      mock tree as fallback)
+- [x] `GET /api/shop/public/footer` → `landing/SiteFooter.vue` (contact block;
+      menu columns stay designed until the API returns links)
 - [ ] `GET /api/shop/public/blog-header` → `blog/BlogSiteHeader.vue`
-- [ ] `GET /api/shop/public/blog-category` → blog nav/dropdown
+- [x] `GET /api/shop/public/blog-category` → blog nav/drawer (mock tree as
+      fallback)
 - [ ] `GET /api/shop/public/colors` → color filters (`SearchColorFilter`)
 - [ ] `GET /api/shop/banners?filters[position]=` → landing hero/offers
 - [ ] `GET /api/shop/stories` → header story strip

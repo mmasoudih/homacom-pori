@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { megaCategories, initialMegaPath, type Category } from '~/data/categories'
+import { initialMegaPath, type Category } from '~/data/categories'
 
 const props = defineProps<{
   open: boolean
@@ -9,6 +9,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
 }>()
+
+const { categories } = useProductCategories()
 
 const panelRoot = ref<HTMLElement | null>(null)
 
@@ -22,10 +24,11 @@ const tertiaryItems = computed(() => activeSecondary.value?.children ?? [])
 const columnOrder = ['root', 'secondary', 'tertiary'] as const
 type Column = (typeof columnOrder)[number]
 
-function applyPath(ids: string[]) {
-  const root = megaCategories.find((c) => c.id === ids[0]) ?? megaCategories[0]
-  const secondary = root?.children?.find((c) => c.id === ids[1])
-  const tertiary = secondary?.children?.find((c) => c.id === ids[2])
+function applyPath(ids: string[] = []) {
+  const list = categories.value
+  const root = list.find((c) => c.id === ids[0]) ?? list[0]
+  const secondary = root?.children?.find((c) => c.id === ids[1]) ?? root?.children?.[0]
+  const tertiary = secondary?.children?.find((c) => c.id === ids[2]) ?? secondary?.children?.[0]
   activeRoot.value = root
   activeSecondary.value = secondary
   activeTertiary.value = tertiary
@@ -94,6 +97,9 @@ watch(
   },
 )
 
+// Re-apply the active path once the API tree replaces the fallback.
+watch(categories, () => applyPath(initialMegaPath))
+
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 </script>
@@ -123,7 +129,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
               aria-label="دسته‌بندی‌های اصلی"
             >
               <CategoriesCategoryItem
-                v-for="item in megaCategories"
+                v-for="item in categories"
                 :key="item.id"
                 :item="item"
                 variant="root"
