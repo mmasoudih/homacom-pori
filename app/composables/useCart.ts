@@ -1,6 +1,6 @@
 import { computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import type { CartItem, CartService, CartServiceGroup } from '~/data/cart'
+import type { CartItem, CartServiceGroup } from '~/data/cart'
 import { cartInsuranceOptions, cartServiceGroups } from '~/data/cart'
 import type { ProductDetail, Seller } from '~/data/product'
 import { apiErrorMessage } from '~/composables/useApi'
@@ -77,10 +77,6 @@ let loadStarted = false
 function num(value: unknown): number {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : 0
-}
-
-function cloneServices(services: CartService[]): CartService[] {
-  return services.map(service => ({ ...service }))
 }
 
 function cloneGroups(groups: CartServiceGroup[]): CartServiceGroup[] {

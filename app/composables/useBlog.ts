@@ -100,11 +100,6 @@ function mapPost(post: ApiBlogPost, apiBase: string): BlogPost {
   }
 }
 
-function withCategory(post: BlogPost, slug: string, title: string): BlogPost {
-  if (post.categorySlug) return post
-  return { ...post, categorySlug: slug, category: title }
-}
-
 function forceCategory(post: BlogPost, slug: string, title: string): BlogPost {
   return { ...post, categorySlug: slug, category: title }
 }
