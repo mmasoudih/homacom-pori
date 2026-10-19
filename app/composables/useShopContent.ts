@@ -1,5 +1,7 @@
 import type { FaqItem } from '~/components/pages/FaqAccordion.vue'
 import type { ChipItem } from '~/components/pages/ChipRow.vue'
+import type { SearchColorOption } from '~/data/search'
+import { searchColorOptions } from '~/data/search'
 import type { BlogNavItem } from '~/data/blog'
 import { blogNav } from '~/data/blog'
 import type { Category } from '~/data/categories'
@@ -296,4 +298,116 @@ function useBannersFallback() {
   }))
 
   return { bannerSlots }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public shell: colours, site header, footer                                  */
+/* -------------------------------------------------------------------------- */
+
+interface ApiColor {
+  id: number
+  title: string
+  title_en?: string | null
+  code: string
+}
+
+interface ApiMenu {
+  title: string
+  link?: string | null
+  target?: string | null
+  class?: string | null
+  icon?: string | null
+  sort?: number | null
+}
+
+interface ApiSiteHeader {
+  menus?: ApiMenu[]
+  logo?: string | null
+  logo_dark?: string | null
+  tel?: string | null
+  mobile?: string | null
+  blog_title?: string | null
+  description?: string | null
+}
+
+type ApiFooterMenu = ApiMenu
+
+interface ApiSiteFooter {
+  menu_1?: ApiFooterMenu[]
+  menu_2?: ApiFooterMenu[]
+  menu_3?: ApiFooterMenu[]
+  menu_4?: ApiFooterMenu[]
+  logo?: string | null
+  logo_dark?: string | null
+  tel?: string | null
+  mobile?: string | null
+  email?: string | null
+  address?: string | null
+  description?: string | null
+  footer_copy_write?: string | null
+  instagram?: string | null
+  linkedin?: string | null
+  telegram?: string | null
+  twitter?: string | null
+  watsapp?: string | null
+  currency?: string | null
+  blog_title?: string | null
+}
+
+/** Product colours for the search facet (designed list as fallback). */
+export function useShopColors() {
+  const api = useApi()
+
+  const { data: colors } = useAsyncData<SearchColorOption[]>(
+    'shop-colors',
+    async () => {
+      const res = await api.get<ApiColor[]>('/shop/public/colors')
+      const items = Array.isArray(res.data) ? res.data : []
+      if (!items.length) return searchColorOptions
+
+      return items
+        .filter(color => !!color.code)
+        .map(color => ({
+          id: String(color.id),
+          label: color.title,
+          swatch: `linear-gradient(135deg, ${color.code} 0%, ${color.code} 55%, ${color.code} 100%)`,
+          dot: color.code,
+        }))
+    },
+    { server: false, lazy: true, default: () => searchColorOptions },
+  )
+
+  return { colors }
+}
+
+/** Header shell: menus, logo and phone numbers. */
+export function useSiteHeader() {
+  const api = useApi()
+
+  const { data: siteHeader } = useAsyncData<ApiSiteHeader>(
+    'shop-site-header',
+    async () => {
+      const res = await api.get<ApiSiteHeader>('/shop/public/site-header')
+      return res.data ?? {}
+    },
+    { server: false, lazy: true, default: () => ({}) },
+  )
+
+  return { siteHeader }
+}
+
+/** Full footer payload: menus, logo, contact, social and copyright. */
+export function useSiteFooter() {
+  const api = useApi()
+
+  const { data: siteFooter } = useAsyncData<ApiSiteFooter>(
+    'shop-footer',
+    async () => {
+      const res = await api.get<ApiSiteFooter>('/shop/public/footer')
+      return res.data ?? {}
+    },
+    { server: false, lazy: true, default: () => ({}) },
+  )
+
+  return { siteFooter }
 }

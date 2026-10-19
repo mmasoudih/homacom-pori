@@ -13,7 +13,7 @@ interface ApiProductSummary {
   created_at?: string | null
   brand?: { id: number, title: string, title_en?: string | null } | null
   categories?: Array<{ id: number, title: string }>
-  colors?: Array<{ title?: string | null, title_en?: string | null, code?: string | null }>
+  colors?: Array<{ id?: number, title?: string | null, title_en?: string | null, code?: string | null }>
 }
 
 interface ApiProductDetail {
@@ -65,6 +65,11 @@ function mapBrandId(title?: string | null): string {
 function mapColorIds(colors?: ApiProductSummary['colors']): string[] {
   const ids = new Set<string>()
   for (const color of colors ?? []) {
+    if (color.id != null) {
+      ids.add(String(color.id))
+      continue
+    }
+
     const haystack = `${color.title_en ?? ''} ${color.title ?? ''}`.toLowerCase()
     for (const [needle, id] of COLOR_IDS) {
       if (haystack.includes(needle)) {

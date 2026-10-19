@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { SearchProduct } from '~/data/search'
-import { searchColorOptions } from '~/data/search'
 import type { Product } from '~/utils/product'
 
 const props = defineProps<{
   product: SearchProduct
 }>()
 
-const colorMap = new Map(searchColorOptions.map(option => [option.id, option]))
+const { colors: shopColors } = useShopColors()
+const colorMap = computed(() => new Map(shopColors.value.map(option => [option.id, option])))
 
 /**
  * Adapts the search facet fields onto the shared `<Product>` model. The card
@@ -22,7 +22,7 @@ const product = computed<Product>(() => ({
   oldPrice: props.product.oldPrice,
   discount: props.product.discount,
   colors: props.product.colorIds.map((id) => {
-    const option = colorMap.get(id)
+    const option = colorMap.value.get(id)
     return { value: option?.dot ?? '#e5e7eb', name: option?.label ?? 'رنگ محصول' }
   }),
 }))

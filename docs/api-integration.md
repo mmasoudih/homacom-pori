@@ -62,8 +62,8 @@ independently.
       `/blog-header` endpoint is not needed until it differs)
 - [x] `GET /api/shop/public/blog-category` → blog nav/drawer (mock tree as
       fallback)
-- [ ] `GET /api/shop/public/colors` → color filters (`SearchColorFilter` still
-      uses the designed swatches)
+- [x] `GET /api/shop/public/colors` → search colour facet (designed swatches as
+      fallback; live colour titles are still placeholder data)
 - [x] `GET /api/shop/banners?filters[position]=` → landing hero + banner rows
       (mock banners per slot as fallback)
 - [x] `GET /api/shop/stories` → header story strip (`HeaderCircleStrip`)
