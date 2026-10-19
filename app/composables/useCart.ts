@@ -1,4 +1,4 @@
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { toast } from 'vue-sonner'
 import type { CartItem, CartServiceGroup } from '~/data/cart'
 import { cartInsuranceOptions, cartServiceGroups } from '~/data/cart'
@@ -72,7 +72,6 @@ interface ApiCart {
 }
 
 const CART_STORAGE_KEY = 'homacom:cart:v1'
-let loadStarted = false
 
 function num(value: unknown): number {
   const parsed = Number(value)
@@ -113,20 +112,6 @@ function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
       label: service.title ?? service.service_item?.title ?? 'خدمت',
       price: num(service.customer_price ?? service.real_price),
     })),
-  }
-}
-
-/** Read the designed browser cart (used only for demo/mock products). */
-function readStoredCart(): CartItem[] | null {
-  try {
-    const raw = localStorage.getItem(CART_STORAGE_KEY)
-    if (!raw) return null
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return null
-    return parsed as CartItem[]
-  }
-  catch {
-    return null
   }
 }
 
@@ -171,18 +156,28 @@ export function useCart() {
     }
   }
 
-  // First consumer on the client hydrates the server/guest cart. SSR renders
-  // an empty cart so the markup is deterministic.
-  if (import.meta.client && !loadStarted) {
-    loadStarted = true
-    onMounted(() => {
-      const stored = readStoredCart()
-      if (stored?.length) items.value = stored
-      reload().catch(() => {
-        // A cold/offline API keeps the local demo cart (if any) usable.
-      })
-    })
-  }
+  const authToken = useCookie<string | null>('auth_token')
+
+  // SSR + client hydration share one keyed fetch. Guests without a cart token
+  // (and anonymous visitors) skip the request entirely.
+  const { data: initialCart } = useAsyncData<ApiCart | null>(
+    'shop-cart',
+    async () => {
+      if (!cartToken.value && !authToken.value) return null
+      try {
+        const res = await api.get<ApiCart>('/shop/cart')
+        return res.data ?? null
+      }
+      catch {
+        return null
+      }
+    },
+    { default: () => null },
+  )
+
+  watch(initialCart, (cart) => {
+    if (cart) applyCart(cart)
+  }, { immediate: true })
 
   function persist() {
     if (!import.meta.client) return

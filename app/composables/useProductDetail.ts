@@ -13,6 +13,7 @@ import type {
   WarrantyOption,
 } from '~/data/product'
 import { getProductDetail, mockProductDetail } from '~/data/product'
+import { ApiError } from '~/composables/useApi'
 import { resolveMediaUrl } from '~/utils/media'
 
 interface ApiColor {
@@ -341,14 +342,30 @@ export function useProductDetail(slug: Ref<string>) {
   const { data: product, pending, error, refresh } = useAsyncData<ProductDetail | undefined>(
     () => `shop-product-${slug.value}`,
     async () => {
+      const path = `/shop/products/${encodeURIComponent(slug.value)}`
+
       try {
-        const res = await api.get<ApiProduct>(`/shop/products/${encodeURIComponent(slug.value)}`)
+        let res
+        try {
+          res = await api.get<ApiProduct>(path)
+        }
+        catch (err) {
+          // A stale/expired bearer token must not break a public product page.
+          if (err instanceof ApiError && err.status === 401)
+            res = await api.get<ApiProduct>(path, { skipAuth: true })
+          else
+            throw err
+        }
+
         if (!res.data)
           return getProductDetail(slug.value)
 
         let comments: ApiComment[] = []
         try {
-          const commentsRes = await api.get<ApiComment[]>(`/shop/products/${res.data.id}/comments`)
+          const commentsRes = await api.get<ApiComment[]>(
+            `/shop/products/${res.data.id}/comments`,
+            { skipAuth: true },
+          )
           comments = Array.isArray(commentsRes.data) ? commentsRes.data : []
         }
         catch {

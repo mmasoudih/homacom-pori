@@ -3,40 +3,34 @@ import { searchCategoryTiles } from '~/data/search'
 
 export type SearchResultsStatus = 'loading' | 'ready'
 
-/** Search-results data source for the `/search` page. */
-export function useSearchResults() {
+/**
+ * SSR-backed search results for `/search`.
+ *
+ * The query is the async-data key, so the server renders the real result set
+ * (no skeleton/mock flash) and client-side query changes refetch.
+ */
+export function useSearchResults(term: Ref<string>) {
   const { fetchList } = useProductCatalog()
-  const status = ref<SearchResultsStatus>('loading')
-  const query = ref('')
-  const results = ref<SearchProduct[]>([])
-  /** Category tiles for the mobile «بر اساس دسته‌بندی» row. */
-  const categories = ref<SearchCategoryTile[]>([...searchCategoryTiles])
 
-  let requestId = 0
+  const { data, pending } = useAsyncData<SearchProduct[]>(
+    () => `shop-search-${term.value || 'all'}`,
+    async () => {
+      try {
+        return await fetchList(term.value.trim(), 24)
+      }
+      catch {
+        return []
+      }
+    },
+    {
+      watch: [term],
+      default: () => [],
+    },
+  )
 
-  async function load(term: string) {
-    const trimmed = term.trim()
-    query.value = trimmed
-    requestId += 1
-    const id = requestId
-    status.value = 'loading'
+  const results = computed(() => data.value)
+  const status = computed<SearchResultsStatus>(() => (pending.value ? 'loading' : 'ready'))
+  const categories = computed<SearchCategoryTile[]>(() => [...searchCategoryTiles])
 
-    // On the server, stay in the loading state so the markup is deterministic.
-    if (!import.meta.client) return
-
-    try {
-      const products = await fetchList(trimmed, 24)
-      if (id !== requestId) return
-      results.value = products
-      categories.value = [...searchCategoryTiles]
-      status.value = 'ready'
-    }
-    catch {
-      if (id !== requestId) return
-      results.value = []
-      status.value = 'ready'
-    }
-  }
-
-  return { query, status, results, categories, load }
+  return { query: term, status, results, categories }
 }

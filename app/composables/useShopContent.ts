@@ -57,13 +57,11 @@ export function useProductCategories() {
   const { data: categories, pending, error, refresh } = useAsyncData<Category[]>(
     'shop-product-categories',
     async () => {
-      const res = await api.get<ApiCategory[]>('/shop/public/product-category')
+      const res = await api.get<ApiCategory[]>('/shop/public/product-category', { skipAuth: true })
       const items = Array.isArray(res.data) ? res.data : []
       return items.length ? items.map(mapCategory) : megaCategories
     },
     {
-      server: false,
-      lazy: true,
       default: () => megaCategories,
     },
   )
@@ -79,7 +77,7 @@ export function useBlogNav() {
     'shop-blog-categories',
     async () => {
       try {
-        const header = await api.get<{ categories?: ApiBlogCategory[] }>('/shop/public/blog-header')
+        const header = await api.get<{ categories?: ApiBlogCategory[] }>('/shop/public/blog-header', { skipAuth: true })
         const headerCategories = header.data?.categories ?? []
         if (headerCategories.length)
           return headerCategories.map(mapBlogCategory)
@@ -88,13 +86,11 @@ export function useBlogNav() {
         // Fall through to the category endpoint below.
       }
 
-      const res = await api.get<ApiBlogCategory[]>('/shop/public/blog-category')
+      const res = await api.get<ApiBlogCategory[]>('/shop/public/blog-category', { skipAuth: true })
       const items = Array.isArray(res.data) ? res.data : []
       return items.length ? items.map(mapBlogCategory) : blogNav
     },
     {
-      server: false,
-      lazy: true,
       default: () => blogNav,
     },
   )
@@ -134,7 +130,7 @@ export function useBrands() {
   const { data: brandItems, pending, error, refresh } = useAsyncData<BrandItem[]>(
     'shop-brands',
     async () => {
-      const res = await api.get<ApiBrand[]>('/shop/brands')
+      const res = await api.get<ApiBrand[]>('/shop/brands', { skipAuth: true })
       const items = Array.isArray(res.data) ? res.data : []
       if (!items.length) return brandsPage.items
 
@@ -145,8 +141,6 @@ export function useBrands() {
       }))
     },
     {
-      server: false,
-      lazy: true,
       default: () => brandsPage.items,
     },
   )
@@ -166,7 +160,7 @@ export function useFaqs() {
   const { data: faqContent, pending, error, refresh } = useAsyncData<FaqContent>(
     'shop-faqs',
     async () => {
-      const res = await api.get<ApiFaqSubject[]>('/shop/faqs')
+      const res = await api.get<ApiFaqSubject[]>('/shop/faqs', { skipAuth: true })
       const subjects = Array.isArray(res.data) ? res.data : []
       if (!subjects.length)
         return { categories: faqCategories, items: faqItems }
@@ -194,8 +188,6 @@ export function useFaqs() {
       return { categories, items }
     },
     {
-      server: false,
-      lazy: true,
       default: () => ({ categories: faqCategories, items: faqItems }),
     },
   )
@@ -250,7 +242,7 @@ export function useHomeBanners() {
     'shop-home-banners',
     async () => {
       try {
-        const res = await api.get<ApiBanner[]>('/shop/banners')
+        const res = await api.get<ApiBanner[]>('/shop/banners', { skipAuth: true })
         const items = (res.data ?? []).map(item => ({ ...mapBanner(item, apiBase), position: item.position }))
         if (!items.length) return bannerSlots.value
 
@@ -275,7 +267,7 @@ export function useHomeBanners() {
         return bannerSlots.value
       }
     },
-    { server: false, lazy: true, default: () => bannerSlots.value },
+    { default: () => bannerSlots.value },
   )
 
   return { banners: data }
@@ -371,7 +363,7 @@ export function useShopColors() {
   const { data: colors } = useAsyncData<SearchColorOption[]>(
     'shop-colors',
     async () => {
-      const res = await api.get<ApiColor[]>('/shop/public/colors')
+      const res = await api.get<ApiColor[]>('/shop/public/colors', { skipAuth: true })
       const items = Array.isArray(res.data) ? res.data : []
       if (!items.length) return searchColorOptions
 
@@ -384,7 +376,7 @@ export function useShopColors() {
           dot: color.code,
         }))
     },
-    { server: false, lazy: true, default: () => searchColorOptions },
+    { default: () => searchColorOptions },
   )
 
   return { colors }
@@ -397,10 +389,10 @@ export function useSiteHeader() {
   const { data: siteHeader } = useAsyncData<ApiSiteHeader>(
     'shop-site-header',
     async () => {
-      const res = await api.get<ApiSiteHeader>('/shop/public/site-header')
+      const res = await api.get<ApiSiteHeader>('/shop/public/site-header', { skipAuth: true })
       return res.data ?? {}
     },
-    { server: false, lazy: true, default: () => ({}) },
+    { default: () => ({}) },
   )
 
   return { siteHeader }
@@ -413,10 +405,10 @@ export function useSiteFooter() {
   const { data: siteFooter } = useAsyncData<ApiSiteFooter>(
     'shop-footer',
     async () => {
-      const res = await api.get<ApiSiteFooter>('/shop/public/footer')
+      const res = await api.get<ApiSiteFooter>('/shop/public/footer', { skipAuth: true })
       return res.data ?? {}
     },
-    { server: false, lazy: true, default: () => ({}) },
+    { default: () => ({}) },
   )
 
   return { siteFooter }

@@ -83,7 +83,7 @@ export function useStates() {
       const res = await api.get<ApiLocate[]>('/address/states')
       return (res.data ?? []).map(mapLocate)
     },
-    { server: false, lazy: true, default: () => [] },
+    { default: () => [] },
   )
 
   return { states, pending, error, refresh }
@@ -102,7 +102,7 @@ export function useCities(parentId: Ref<number | null>) {
       })
       return (res.data ?? []).map(mapLocate)
     },
-    { watch: [parentId], server: false, lazy: true, default: () => [] },
+    { watch: [parentId], default: () => [] },
   )
 
   return { cities, pending, error, refresh }
@@ -120,9 +120,9 @@ export function useUserAddresses() {
     try {
       const res = await api.get<ApiAddress[]>('/shop/user/address')
       addresses.value = (res.data ?? []).map(mapAddress)
-      loaded.value = true
     }
     finally {
+      loaded.value = true
       pending.value = false
     }
   }

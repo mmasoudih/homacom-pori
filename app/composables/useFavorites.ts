@@ -96,9 +96,9 @@ export function useFavorites() {
       favorites.value = favoriteIds.value
         .map(id => byId.get(id))
         .filter((product): product is Product => !!product)
-      loaded.value = true
     }
     finally {
+      loaded.value = true
       pending.value = false
     }
   }

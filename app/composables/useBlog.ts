@@ -141,7 +141,7 @@ export function useBlogHome() {
     'shop-blog-home',
     async () => {
       try {
-        const res = await api.get<ApiBlogHome>('/shop/blogs')
+        const res = await api.get<ApiBlogHome>('/shop/blogs', { skipAuth: true })
         const latest = (res.data?.lastPosts ?? []).map(post => mapPost(post, apiBase))
         const categories = res.data?.categories ?? []
 
@@ -195,7 +195,7 @@ export function useBlogCategory(slug: Ref<string>, page: Ref<number>) {
       try {
         const res = await api.get<ApiBlogCollection>(
           `/shop/blogs/category/${encodeURIComponent(slug.value)}`,
-          { query: { 'filters[page]': page.value, 'filters[per_page]': 16 } },
+          { query: { 'filters[page]': page.value, 'filters[per_page]': 16 }, skipAuth: true },
         )
         const items = res.data?.items ?? []
         if (!items.length) throw new Error('empty')
@@ -203,7 +203,7 @@ export function useBlogCategory(slug: Ref<string>, page: Ref<number>) {
         let title = items[0]?.categories?.find(category => category.slug === slug.value)?.title
         if (!title) {
           try {
-            const categories = await api.get<ApiBlogCategoryRef[]>('/shop/public/blog-category')
+            const categories = await api.get<ApiBlogCategoryRef[]>('/shop/public/blog-category', { skipAuth: true })
             title = categories.data?.find(category => category.slug === slug.value)?.title
           }
           catch {
@@ -289,7 +289,7 @@ export function useBlogPost(slug: Ref<string>, categorySlug: Ref<string>) {
     () => `shop-blog-post-${slug.value}`,
     async () => {
       try {
-        const res = await api.get<ApiBlogDetail>(`/shop/blogs/${encodeURIComponent(slug.value)}`)
+        const res = await api.get<ApiBlogDetail>(`/shop/blogs/${encodeURIComponent(slug.value)}`, { skipAuth: true })
         if (!res.data?.post) throw new Error('not found')
 
         const article = mapArticle(res.data.post, apiBase)

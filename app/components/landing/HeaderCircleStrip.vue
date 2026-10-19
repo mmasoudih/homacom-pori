@@ -15,7 +15,7 @@ const config = useRuntimeConfig();
 // placeholder circles keep the strip usable instead of leaving it empty.
 const { data: storiesResponse } = await useFetch<{ data?: StoryApiItem[] }>(
   () => `${config.public.apiBase}/shop/stories`,
-  { key: "shop-stories", default: () => ({ data: [] }), lazy: true, server: false },
+  { key: "shop-stories", default: () => ({ data: [] }) },
 );
 
 const displayItems = computed<StoryItem[]>(() => {

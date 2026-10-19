@@ -10,8 +10,8 @@ const {
   remove: removeFavorite,
 } = useFavorites()
 
-onMounted(() => {
-  loadFavorites().catch(err => toast.error(apiErrorMessage(err, 'دریافت علاقه‌مندی‌ها انجام نشد.')))
+await loadFavorites().catch(() => {
+  // Keep the empty state when the API is unavailable.
 })
 
 const isEmpty = computed(

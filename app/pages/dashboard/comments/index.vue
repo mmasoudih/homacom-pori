@@ -17,8 +17,8 @@ const {
   remove: deleteComment,
 } = useUserComments()
 
-onMounted(() => {
-  loadComments().catch(err => toast.error(apiErrorMessage(err, 'دریافت دیدگاه‌ها انجام نشد.')))
+await loadComments().catch(() => {
+  // Keep the empty state when the API is unavailable.
 })
 
 const tabs = computed(() => baseTabs.map(tab => ({

@@ -19,9 +19,8 @@ const {
 const { departments, load: loadDepartments } = useTicketDepartments()
 const dialogOpen = ref(false)
 
-onMounted(() => {
-  Promise.all([loadTickets(), loadDepartments()])
-    .catch(err => toast.error(apiErrorMessage(err, 'دریافت تیکت‌ها انجام نشد.')))
+await Promise.all([loadTickets(), loadDepartments()]).catch(() => {
+  // Keep the empty state when the API is unavailable.
 })
 
 const isEmpty = computed(

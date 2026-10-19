@@ -1,7 +1,6 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { CheckoutAddress } from '~/data/checkout'
 import {
-  checkoutAddresses,
   creditProviders,
   deliveryTimeSlots,
   getDeliveryDays,
@@ -35,9 +34,7 @@ export function useCheckout() {
   const step = ref<CheckoutStep>('shipping')
 
   // Step 1 — saved addresses live in state so the flow can add new ones.
-  const addresses = useState<CheckoutAddress[]>('checkout-addresses', () =>
-    checkoutAddresses.map(address => ({ ...address })),
-  )
+  const addresses = useState<CheckoutAddress[]>('checkout-addresses', () => [])
   const addressId = ref(addresses.value.find(address => address.isDefault)?.id ?? addresses.value[0]?.id ?? '')
   const legalEntity = ref(false)
   const shippingMethodId = ref('')
@@ -47,26 +44,26 @@ export function useCheckout() {
 
   // Replace the designed addresses with the user's saved addresses once loaded.
   const { addresses: savedAddresses, load: loadSavedAddresses } = useUserAddresses()
-  if (import.meta.client) {
-    onMounted(async () => {
-      try {
-        await loadSavedAddresses()
-        if (!savedAddresses.value.length) return
-        addresses.value = savedAddresses.value.map(address => ({
-          id: address.id,
-          city: address.title,
-          address: address.address,
-          postalCode: address.postalCode,
-          recipient: address.nickname ?? '',
-          phone: address.mobile ?? '',
-          isDefault: address.isDefault,
-        }))
-        addressId.value = addresses.value.find(address => address.isDefault)?.id ?? addresses.value[0]?.id ?? ''
-      }
-      catch {
-        // Keep the designed addresses when the API is unavailable.
-      }
-    })
+
+  async function loadCheckoutAddresses() {
+    try {
+      await loadSavedAddresses()
+      addresses.value = savedAddresses.value.map(address => ({
+        id: address.id,
+        city: address.title,
+        address: address.address,
+        postalCode: address.postalCode,
+        recipient: address.nickname ?? '',
+        phone: address.mobile ?? '',
+        isDefault: address.isDefault,
+      }))
+      addressId.value = addresses.value.find(address => address.isDefault)?.id ?? addresses.value[0]?.id ?? ''
+    }
+    catch {
+      // No session / offline: start with an empty address book.
+      addresses.value = []
+      addressId.value = ''
+    }
   }
 
   // Step 2
@@ -209,6 +206,7 @@ export function useCheckout() {
     onlineTransactionLimit,
     selectShippingMethod,
     toggleCreditProvider,
+    loadCheckoutAddresses,
     goToPayment,
     backToShipping,
     reset,

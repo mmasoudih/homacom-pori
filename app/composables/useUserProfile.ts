@@ -1,5 +1,4 @@
 import type { AccountProfile, LegalInfo } from '~/data/account'
-import { accountProfile } from '~/data/account'
 import { toEnglishDigits, toPersianDigits } from '~/utils/format'
 import { isoToJalali, jalaliToIso } from '~/utils/jalali'
 
@@ -17,6 +16,23 @@ interface ApiProfile {
   company_economic_code?: string | null
   company_ceo?: string | null
   company_tel?: string | null
+}
+
+function emptyProfile(): AccountProfile {
+  return {
+    firstName: '',
+    lastName: '',
+    birthYear: '',
+    birthMonth: '',
+    birthDay: '',
+    birthDate: '',
+    nationalId: '',
+    email: '',
+    cardNumber: '',
+    shebaNumber: '',
+    legal: null,
+    hasPassword: false,
+  }
 }
 
 function persianPart(value: number, pad = false): string {
@@ -40,7 +56,6 @@ function mapProfile(data: ApiProfile): AccountProfile {
     : null
 
   return {
-    ...accountProfile,
     firstName: data.fname ?? '',
     lastName: data.lname ?? '',
     birthYear: jalali ? persianPart(jalali.jy) : '',
@@ -58,29 +73,39 @@ function mapProfile(data: ApiProfile): AccountProfile {
   }
 }
 
-/** Read + update the authenticated user's profile. */
+/**
+ * Read + update the authenticated user's profile.
+ *
+ * One keyed async-data request is shared by the account page and dashboard
+ * shell, so SSR renders the real profile (no mock flash) and edits propagate
+ * to every consumer.
+ */
 export function useUserProfile() {
   const api = useApi()
-  const profile = ref<AccountProfile>({
-    ...accountProfile,
-    legal: accountProfile.legal ? { ...accountProfile.legal } : null,
-  })
-  const pending = ref(false)
-  const loaded = ref(false)
+
+  const { data, pending, refresh } = useAsyncData<ApiProfile | null>(
+    'user-profile',
+    async () => {
+      try {
+        const res = await api.get<ApiProfile>('/shop/user/profile/me')
+        return res.data ?? null
+      }
+      catch {
+        return null
+      }
+    },
+    { default: () => null },
+  )
+
+  const profile = ref<AccountProfile>(emptyProfile())
+  watch(data, (value) => {
+    if (value) profile.value = mapProfile(value)
+  }, { immediate: true })
+
+  const loaded = computed(() => !pending.value)
 
   async function load() {
-    pending.value = true
-    try {
-      const res = await api.get<ApiProfile>('/shop/user/profile/me')
-      if (res.data) profile.value = mapProfile(res.data)
-      loaded.value = true
-    }
-    catch {
-      // Keep the designed fallback profile when the API is unavailable.
-    }
-    finally {
-      pending.value = false
-    }
+    if (!data.value) await refresh()
   }
 
   async function saveName(payload: { firstName: string, lastName: string }) {
@@ -88,18 +113,29 @@ export function useUserProfile() {
       fname: payload.firstName,
       lname: payload.lastName,
     })
-    profile.value.firstName = payload.firstName
-    profile.value.lastName = payload.lastName
+    if (data.value) data.value = { ...data.value, fname: payload.firstName, lname: payload.lastName }
   }
 
   async function saveEmail(payload: { email: string }) {
     await api.put('/shop/user/profile/email', { email: payload.email })
-    profile.value.email = payload.email
+    if (data.value) data.value = { ...data.value, email: payload.email }
   }
 
   async function saveNationalId(payload: { nationalId: string }) {
     await api.put('/shop/user/profile/national-code', { code_melli: payload.nationalId })
-    profile.value.nationalId = payload.nationalId
+    if (data.value) data.value = { ...data.value, code_melli: payload.nationalId }
+  }
+
+  async function saveBirthdate(payload: { year: string, month: string, day: string, birthDate: string }) {
+    const year = Number(toEnglishDigits(payload.year))
+    const month = Number(toEnglishDigits(payload.month))
+    const day = Number(toEnglishDigits(payload.day))
+
+    if (year && month && day) {
+      const birthday = jalaliToIso(year, month, day)
+      await api.put('/shop/user/profile/birthday', { birthday })
+      if (data.value) data.value = { ...data.value, birthday }
+    }
   }
 
   async function saveCompany(payload: LegalInfo) {
@@ -111,21 +147,17 @@ export function useUserProfile() {
       company_ceo: payload.ceo ?? `${profile.value.firstName} ${profile.value.lastName}`.trim(),
       company_tel: payload.phone,
     })
-    profile.value.legal = { ...payload }
-  }
-
-  async function saveBirthdate(payload: { year: string, month: string, day: string, birthDate: string }) {
-    const year = Number(toEnglishDigits(payload.year))
-    const month = Number(toEnglishDigits(payload.month))
-    const day = Number(toEnglishDigits(payload.day))
-
-    if (year && month && day)
-      await api.put('/shop/user/profile/birthday', { birthday: jalaliToIso(year, month, day) })
-
-    profile.value.birthYear = payload.year
-    profile.value.birthMonth = payload.month
-    profile.value.birthDay = payload.day
-    profile.value.birthDate = payload.birthDate
+    if (data.value) {
+      data.value = {
+        ...data.value,
+        company_name: payload.organizationName,
+        company_register_id: payload.registrationId,
+        company_national_code: payload.nationalId,
+        company_economic_code: payload.economicCode ?? '',
+        company_ceo: payload.ceo ?? '',
+        company_tel: payload.phone,
+      }
+    }
   }
 
   return { profile, pending, loaded, load, saveName, saveEmail, saveNationalId, saveBirthdate, saveCompany }

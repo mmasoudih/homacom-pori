@@ -89,7 +89,7 @@ export function useProductCatalog() {
 
   async function fetchPrice(slug: string) {
     try {
-      const res = await api.get<ApiProductDetail>(`/shop/products/${encodeURIComponent(slug)}`)
+      const res = await api.get<ApiProductDetail>(`/shop/products/${encodeURIComponent(slug)}`, { skipAuth: true })
       const stocks = res.data?.stocks ?? []
       const stock = stocks.find(item => item.is_default === 'yes' || item.is_default === true)
         ?? stocks.find(item => num(item.quantity) > 0)
@@ -109,15 +109,21 @@ export function useProductCatalog() {
     }
   }
 
-  async function fetchList(term: string, limit = 12, sort?: string): Promise<SearchProduct[]> {
+  async function fetchList(
+    term: string,
+    limit = 12,
+    sort?: string,
+    extraFilters?: Record<string, string | number>,
+  ): Promise<SearchProduct[]> {
     const query: Record<string, string | number> = {
       'filters[per_page]': limit,
       'filters[page]': 1,
+      ...extraFilters,
     }
     if (term) query['filters[s]'] = term
     if (sort) query['filters[sort]'] = sort
 
-    const res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query })
+    const res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query, skipAuth: true })
     const items = res.data?.items ?? []
     const prices = await Promise.allSettled(items.map(item => fetchPrice(item.slug)))
 
@@ -163,7 +169,7 @@ export interface LandingProductCard {
   discount?: string
 }
 
-function toLandingCard(product: SearchProduct): LandingProductCard {
+export function toLandingCard(product: SearchProduct): LandingProductCard {
   return {
     id: product.id,
     image: product.image,
@@ -177,24 +183,30 @@ function toLandingCard(product: SearchProduct): LandingProductCard {
 /** Newest + best-selling rows for the landing page (design mock as fallback). */
 export function useLandingProducts() {
   const { fetchList } = useProductCatalog()
-  const newest = ref<LandingProductCard[]>([])
-  const bestsellers = ref<LandingProductCard[]>([])
-  const loaded = ref(false)
 
-  onMounted(async () => {
-    try {
-      const [newestList, bestsellerList] = await Promise.all([
-        fetchList('', 6, 'newest'),
-        fetchList('', 6),
-      ])
-      newest.value = newestList.map(toLandingCard)
-      bestsellers.value = bestsellerList.map(toLandingCard)
-      loaded.value = true
-    }
-    catch {
-      // The page keeps the designed rows when the API is unavailable.
-    }
-  })
+  const { data, pending } = useAsyncData<{ newest: LandingProductCard[], bestsellers: LandingProductCard[] }>(
+    'shop-landing-products',
+    async () => {
+      try {
+        const [newestList, bestsellerList] = await Promise.all([
+          fetchList('', 6, 'newest'),
+          fetchList('', 6),
+        ])
+        return {
+          newest: newestList.map(toLandingCard),
+          bestsellers: bestsellerList.map(toLandingCard),
+        }
+      }
+      catch {
+        return { newest: [], bestsellers: [] }
+      }
+    },
+    { default: () => ({ newest: [], bestsellers: [] }) },
+  )
+
+  const newest = computed(() => data.value.newest)
+  const bestsellers = computed(() => data.value.bestsellers)
+  const loaded = computed(() => !pending.value)
 
   return { newest, bestsellers, loaded }
 }

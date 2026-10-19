@@ -42,6 +42,9 @@ independently.
 - [x] Normalize relative media URLs (`resolveMediaUrl`).
 - [x] Direct browser calls confirmed working: API reflects `Origin` in CORS and
       allows `authorization,content-type`.
+- [x] Data reads are SSR (`useAsyncData` / top-level `await`), so the first
+      paint contains API data instead of designed mocks. Public endpoints skip
+      the bearer token; product detail retries without auth on a stale 401.
 
 ## Phase 1 — Auth (7 endpoints)
 
@@ -129,7 +132,8 @@ independently.
 - [x] `POST /api/shop/cart/set/payment-method` → checkout payment selection
       (`online` + wallet→`online`; installment→`mixed`, mapping needs confirmation)
 - [x] `POST /api/shop/cart/set-discount` (coupon apply/clear)
-- [x] Sync header badge + cart totals from API items
+- [x] Sync header badge + cart totals from API items (the cart itself is
+      SSR-hydrated when an auth/cart cookie exists)
 - [ ] Insurance / add-on services chosen **after** a line exists are local-only
       — the API only accepts `services[]` at `add-to-cart` time and has no
       update-services endpoint

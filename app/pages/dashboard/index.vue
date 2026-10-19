@@ -20,7 +20,6 @@ useHead({
           <DashboardProfileCard class="rounded-[20px] bg-T-50 p-4 lg:hidden" />
           <DashboardNavMenu class="-mt-3 rounded-[20px] bg-T-50 p-4 lg:hidden" />
 
-          <DashboardRecentlyViewed />
         </div>
       </div>
     </main>

@@ -107,9 +107,9 @@ export function useTickets() {
         query: { 'filters[per_page]': 100 },
       })
       tickets.value = (res.data ?? []).map(mapTicket)
-      loaded.value = true
     }
     finally {
+      loaded.value = true
       pending.value = false
     }
   }
@@ -168,9 +168,12 @@ export function useTicketDetail(id: Ref<string>) {
         ...base,
         messages: mappedMessages.length ? mappedMessages : base.messages,
       }
-      loaded.value = true
+    }
+    catch {
+      ticket.value = undefined
     }
     finally {
+      loaded.value = true
       pending.value = false
     }
   }

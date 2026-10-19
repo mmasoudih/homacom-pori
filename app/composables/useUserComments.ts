@@ -71,9 +71,9 @@ export function useUserComments() {
           mood: null,
         }))
 
-      loaded.value = true
     }
     finally {
+      loaded.value = true
       loading.value = false
     }
   }

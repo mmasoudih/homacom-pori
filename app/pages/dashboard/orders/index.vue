@@ -2,8 +2,6 @@
 import { IconSearch } from '@tabler/icons-vue'
 import { typographyVariants } from '~/components/ui/typography'
 import { orderTabs, returnRequests } from '~/data/orders'
-import { toast } from 'vue-sonner'
-import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,8 +12,8 @@ const search = ref('')
 
 const { orders, loaded, load: loadOrders } = useOrders()
 
-onMounted(() => {
-  loadOrders().catch(err => toast.error(apiErrorMessage(err, 'دریافت سفارش‌ها انجام نشد.')))
+await loadOrders().catch(() => {
+  // Keep the empty state when the API is unavailable.
 })
 
 const filteredOrders = computed(() => {

@@ -3,11 +3,7 @@ const route = useRoute()
 
 const query = computed(() => String(route.query.q ?? '').trim())
 
-const { status, results, categories, load } = useSearchResults()
-
-watch(query, (value) => {
-  load(value)
-}, { immediate: true })
+const { status, results, categories } = useSearchResults(query)
 
 useHead(() => ({
   title: query.value ? `جستجو برای «${query.value}» | هماکام` : 'همه محصولات | هماکام',

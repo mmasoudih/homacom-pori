@@ -24,6 +24,10 @@ Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
 
 **Also needed**
 
+- **Category filter is broken:** `filters[categories][]` returns
+  `filters.categories.0 انتخاب شده، معتبر نیست` for every id (8, 12, 103, 105,
+  …). Landing category panels therefore share a general product pool. Fix or
+  document the accepted category ids/slugs.
 - Document/implement the accepted `filters[sort]` values. Verified working:
   `newest`, `cheapest`, `expensive`. `best-selling`, `most-viewed`, `sales`,
   `views` return 422. The «پرفروش‌ترین» landing row currently falls back to the

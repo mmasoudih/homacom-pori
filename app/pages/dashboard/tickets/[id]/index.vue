@@ -13,8 +13,8 @@ const {
   close,
 } = useTicketDetail(id)
 
-onMounted(() => {
-  loadTicket().catch(err => toast.error(apiErrorMessage(err, 'دریافت تیکت انجام نشد.')))
+await loadTicket().catch(() => {
+  // The not-found state is rendered below.
 })
 
 const closed = computed(() => ticket.value?.status === 'closed')

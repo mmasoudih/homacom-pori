@@ -36,8 +36,8 @@ async function saveAddress(payload: import('~/composables/useAddresses').Address
   }
 }
 
-onMounted(() => {
-  loadAddresses().catch(err => toast.error(apiErrorMessage(err, 'دریافت آدرس‌ها انجام نشد.')))
+await loadAddresses().catch(() => {
+  // Keep the empty state when the API is unavailable.
 })
 
 const isEmpty = computed(

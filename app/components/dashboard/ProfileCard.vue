@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
-import { dashboardUser, wallet } from '~/data/dashboard'
+import { wallet } from '~/data/dashboard'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
-const balance = ref(wallet.balance)
+const { profile } = useUserProfile()
+const authUser = useCookie<{ mobile?: string, nickname?: string | null } | null>('auth_user')
+
+const displayName = computed(() =>
+  [profile.value.firstName, profile.value.lastName].filter(Boolean).join(' ')
+  || authUser.value?.nickname
+  || 'کاربر هماکام',
+)
+const mobile = computed(() => authUser.value?.mobile ?? '')
+
+// No wallet endpoint yet — do not show a fabricated balance.
+const balance = ref(0)
 const fundsOpen = ref(false)
 
 function onCharged(amount: number) {
@@ -17,8 +28,8 @@ function onCharged(amount: number) {
     <div class="relative flex items-center gap-3">
       <img src="/icons/user-avatar.svg" alt="" class="size-11 shrink-0 rounded-full">
       <div class="flex min-w-0 flex-col gap-0.5">
-        <UiTypography as="span" size="lg" weight="semibold" class="truncate">{{ dashboardUser.name }}</UiTypography>
-        <span class="truncate text-[11px] text-T-600" dir="ltr">{{ toPersianDigits(dashboardUser.mobile) }}</span>
+        <UiTypography as="span" size="lg" weight="semibold" class="truncate">{{ displayName }}</UiTypography>
+        <span class="truncate text-[11px] text-T-600" dir="ltr">{{ toPersianDigits(mobile) }}</span>
       </div>
       <button
         type="button"

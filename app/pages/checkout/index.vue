@@ -56,6 +56,7 @@ const {
   goToPayment,
   backToShipping,
   reset,
+  loadCheckoutAddresses,
 } = useCheckout()
 
 const discountTotal = computed(() => rows.value.find(row => row.key === 'discount')?.value ?? 0)
@@ -94,9 +95,9 @@ const route = useRoute()
 const api = useApi()
 const { states, refresh: refreshStates } = useStates()
 const { create: createAddress } = useUserAddresses()
-const { profile, load: loadProfile } = useUserProfile()
+const { profile } = useUserProfile()
 
-onMounted(loadProfile)
+await loadCheckoutAddresses()
 
 // Keep the server cart in sync with the current checkout selection. The final
 // submit endpoint is still missing, but the cart already stores these choices.

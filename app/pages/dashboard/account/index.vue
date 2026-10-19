@@ -11,7 +11,6 @@ type EditField = 'name' | 'birthdate' | 'national-id' | 'email' | 'bank'
 
 const {
   profile,
-  load: loadProfile,
   saveName: updateName,
   saveEmail: updateEmail,
   saveNationalId: updateNationalId,
@@ -19,7 +18,6 @@ const {
   saveCompany: updateCompany,
 } = useUserProfile()
 
-onMounted(loadProfile)
 
 const image = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)

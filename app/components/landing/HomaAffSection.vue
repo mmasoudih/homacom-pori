@@ -1,12 +1,26 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { homaAffProducts } from '~/data/landing'
+import { toLandingCard } from '~/composables/useProducts'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+
+const { fetchList } = useProductCatalog()
+const { data } = await useAsyncData('landing-homa-aff', async () => {
+  try {
+    const items = await fetchList('', 10, undefined, { 'filters[homa_off]': 1 })
+    return items.map(toLandingCard)
+  }
+  catch {
+    return []
+  }
+}, { default: () => [] })
+
+const products = computed(() => (data.value.length ? data.value : homaAffProducts))
 
 const cardRounding = (i: number) => [
   i === 0 ? 'rounded-none rounded-tr-3xl rounded-br-3xl' : '',
-  i === homaAffProducts.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
-  i > 0 && i < homaAffProducts.length - 1 ? 'rounded-none' : '',
+  i === products.value.length - 1 ? 'rounded-none rounded-tl-3xl rounded-bl-3xl' : '',
+  i > 0 && i < products.value.length - 1 ? 'rounded-none' : '',
 ]
 </script>
 
@@ -43,7 +57,7 @@ const cardRounding = (i: number) => [
     >
       <CarouselContent class="ms-0">
         <CarouselItem
-          v-for="(product, i) in homaAffProducts"
+          v-for="(product, i) in products"
           :key="i"
           class="w-[180px] shrink-0 basis-auto ps-0"
         >
@@ -70,7 +84,7 @@ const cardRounding = (i: number) => [
     >
       <CarouselContent class="ms-0">
         <CarouselItem
-          v-for="(product, i) in homaAffProducts"
+          v-for="(product, i) in products"
           :key="i"
           class="w-[270px] shrink-0 basis-auto ps-0"
         >
