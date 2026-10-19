@@ -1,5 +1,7 @@
 export interface BrandItem {
   name: string
+  /** Latin brand name, used when the API has no logo image. */
+  titleEn?: string
   logo: string
 }
 

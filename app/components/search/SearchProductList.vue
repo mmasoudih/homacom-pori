@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { SearchProduct } from '~/data/search'
-import { DEMO_PRODUCT_ID } from '~/data/product'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 withDefaults(
@@ -18,7 +17,7 @@ withDefaults(
   <ul v-if="layout === 'list'" class="flex flex-col gap-[7px]">
     <li v-for="product in products" :key="product.id">
       <NuxtLink
-        :to="`/product/${DEMO_PRODUCT_ID}`"
+        :to="`/product/${product.id}`"
         class="group relative flex h-[68px] w-full items-center gap-3 rounded-xl border border-T-400 bg-T-50 p-1 text-T-900"
       >
         <!-- Image -->
@@ -90,7 +89,7 @@ withDefaults(
       <Product
         variant="vertical"
         :product="product"
-        :href="`/product/${DEMO_PRODUCT_ID}`"
+        :href="`/product/${product.id}`"
         :show-colors="false"
         show-compare
         class="h-full"

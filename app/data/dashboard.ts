@@ -1,5 +1,4 @@
 import type { Product } from '~/utils/product'
-import { notificationBadgeCount } from './notifications'
 import { DEMO_PRODUCT_ID } from './product'
 
 export interface DashboardUser {
@@ -57,7 +56,7 @@ export const wallet: WalletInfo = {
 }
 
 /** Unread badge count shown over the header bell. */
-export const unreadNotifications = 7
+export const unreadNotifications = 0
 
 export const orderStats: OrderStat[] = [
   { key: 'current', label: 'سفارش‌های جاری', count: 3 },
@@ -71,7 +70,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { key: 'favorites', label: 'مورد علاقه‌ها', icon: 'favorites', href: '/dashboard/favorites' },
   { key: 'addresses', label: 'لیست آدرس‌ها', icon: 'addresses', href: '/dashboard/addresses' },
   { key: 'comments', label: 'دیدگاه‌های من', icon: 'comments', href: '/dashboard/comments' },
-  { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '/dashboard/notifications', badge: notificationBadgeCount },
+  { key: 'notifications', label: 'اعلان‌ها', icon: 'notifications', href: '/dashboard/notifications' },
   { key: 'support', label: 'پشتیبانی', icon: 'support', href: '/dashboard/tickets' },
   { key: 'account', label: 'اطلاعات حساب کاربری', icon: 'account', href: '/dashboard/account' },
   { key: 'logout', label: 'خروج از حساب کاربری', icon: 'logout', href: '#', danger: true },

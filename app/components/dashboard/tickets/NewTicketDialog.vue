@@ -5,11 +5,13 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { NewTicketPayload } from '~/data/tickets'
-import { ticketSubjects } from '~/data/tickets'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean
-}>()
+  departments?: Array<{ id: number, title: string }>
+}>(), {
+  departments: () => [],
+})
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -55,7 +57,6 @@ function submit() {
     description: description.value,
     attachment: attachment.value,
   })
-  toast.success('تیکت شما ثبت شد.')
   close()
 }
 </script>
@@ -80,15 +81,15 @@ function submit() {
         </div>
 
         <div class="flex flex-col gap-2">
-          <UiTypography as="span" size="lg" weight="regular" color="default">موضوع</UiTypography>
+          <UiTypography as="span" size="lg" weight="regular" color="default">بخش پشتیبانی</UiTypography>
           <div class="relative">
             <select
               v-model="topic"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
-              <option value="" disabled>انتخاب موضوع</option>
-              <option v-for="s in ticketSubjects" :key="s.value" :value="s.value">
-                {{ s.label }}
+              <option value="" disabled>انتخاب بخش</option>
+              <option v-for="s in departments" :key="s.id" :value="s.id">
+                {{ s.title }}
               </option>
             </select>
             <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />

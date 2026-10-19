@@ -2,7 +2,6 @@ import type { SearchFingerprintValue, SearchProduct } from '~/data/search'
 import {
   searchBrandOptions,
   searchCategoryOptions,
-  searchColorOptions,
   searchFingerprintOptions,
   searchStorageOptions,
 } from '~/data/search'
@@ -18,7 +17,6 @@ export interface SearchFilterChip {
 
 const CATEGORY_LABELS = new Map(searchCategoryOptions.map(o => [o.id, o.label]))
 const BRAND_LABELS = new Map(searchBrandOptions.map(o => [o.id, o.label]))
-const COLOR_LABELS = new Map(searchColorOptions.map(o => [o.id, o.label]))
 const FINGERPRINT_LABELS = new Map(
   searchFingerprintOptions.map(o => [o.value, o.label] as const),
 )
@@ -29,6 +27,7 @@ const STORAGE_LABELS = new Map(searchStorageOptions.map(o => [o.id, o.label]))
  * (client-side) on top of the products the search resolved.
  */
 export function useSearchFilters(source: Ref<SearchProduct[]>) {
+  const { colors: shopColors } = useShopColors()
   const onlyAvailable = ref(false)
   const categories = ref<string[]>([])
   const brands = ref<string[]>([])
@@ -125,7 +124,8 @@ export function useSearchFilters(source: Ref<SearchProduct[]>) {
       chips.push({ key: `brand:${id}`, label: BRAND_LABELS.get(id) ?? id })
     }
     if (color.value) {
-      chips.push({ key: `color:${color.value}`, label: COLOR_LABELS.get(color.value) ?? color.value })
+      const colorLabels = new Map(shopColors.value.map(option => [option.id, option.label]))
+      chips.push({ key: `color:${color.value}`, label: colorLabels.get(color.value) ?? color.value })
     }
     if (fingerprint.value) {
       const label = FINGERPRINT_LABELS.get(fingerprint.value) ?? fingerprint.value

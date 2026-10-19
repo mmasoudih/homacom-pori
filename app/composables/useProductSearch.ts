@@ -1,15 +1,13 @@
 import type { SearchCategoryTile, SearchProduct } from '~/data/search'
-import { searchCatalog } from '~/utils/search'
+import { searchCategoryTiles } from '~/data/search'
 
 export type SearchStatus = 'idle' | 'loading' | 'ready'
 
-/**
- * Simulated request latency so the loading skeleton is exercised. Replace the
- * body of `run()` with an `await $fetch(...)` call and this drops away.
- */
-const SEARCH_LATENCY = 350
+const SEARCH_LATENCY = 300
 
+/** Header search suggestions backed by the products endpoint. */
 export function useProductSearch() {
+  const { fetchList } = useProductCatalog()
   const query = ref('')
   const status = ref<SearchStatus>('idle')
   const results = ref<SearchProduct[]>([])
@@ -26,7 +24,6 @@ export function useProductSearch() {
     categories.value = []
   }
 
-  /** Run a search for `value` (debounced-by-reset; stale responses are dropped). */
   function run(value: string) {
     const trimmed = value.trim()
     clearTimeout(timer)
@@ -47,12 +44,20 @@ export function useProductSearch() {
 
     const id = requestId
 
-    timer = setTimeout(() => {
-      if (id !== requestId) return
-      const found = searchCatalog(trimmed)
-      results.value = found.products
-      categories.value = found.categories
-      status.value = 'ready'
+    timer = setTimeout(async () => {
+      try {
+        const products = await fetchList(trimmed, 6)
+        if (id !== requestId) return
+        results.value = products
+        categories.value = searchCategoryTiles.slice(0, 4)
+        status.value = 'ready'
+      }
+      catch {
+        if (id !== requestId) return
+        results.value = []
+        categories.value = []
+        status.value = 'ready'
+      }
     }, SEARCH_LATENCY)
   }
 

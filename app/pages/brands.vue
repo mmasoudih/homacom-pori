@@ -6,15 +6,30 @@ useHead({
   title: 'برندها | هماکام',
 })
 
+const { brandItems } = useBrands()
+
 const searchQuery = ref('')
 const currentPage = ref(1)
-const totalPages = 120
+const pageSize = 40
 
-const visibleBrands = computed(() => {
-  const q = searchQuery.value.trim()
+const filteredBrands = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
   if (!q)
-    return brandsPage.items
-  return brandsPage.items.filter(item => item.name.includes(q))
+    return brandItems.value
+
+  return brandItems.value.filter(item =>
+    item.name.includes(q)
+    || item.titleEn?.toLowerCase().includes(q),
+  )
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredBrands.value.length / pageSize)))
+const visibleBrands = computed(() =>
+  filteredBrands.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize),
+)
+
+watch(searchQuery, () => {
+  currentPage.value = 1
 })
 </script>
 
@@ -74,6 +89,7 @@ const visibleBrands = computed(() => {
           v-for="(brand, i) in visibleBrands"
           :key="`${brand.name}-${i}`"
           :name="brand.name"
+          :title-en="brand.titleEn"
           :logo="brand.logo"
         />
       </div>

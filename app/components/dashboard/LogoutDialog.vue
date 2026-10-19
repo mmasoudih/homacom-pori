@@ -2,6 +2,7 @@
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useAuth } from '~/composables/useAuth'
 
 defineProps<{
   open: boolean
@@ -11,14 +12,14 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const token = useCookie('auth_token')
+const { logout } = useAuth()
 
 function close() {
   emit('update:open', false)
 }
 
 async function confirm() {
-  token.value = null
+  await logout()
   close()
   toast.success('از حساب کاربری خود خارج شدید.')
   await navigateTo('/')

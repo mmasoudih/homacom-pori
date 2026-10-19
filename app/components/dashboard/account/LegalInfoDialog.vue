@@ -24,6 +24,8 @@ const form = reactive<LegalInfo>({
   city: '',
   province: '',
   postalAddress: '',
+  economicCode: '',
+  ceo: '',
 })
 
 const cities = computed(() => (form.province ? citiesByProvince[form.province] ?? [] : []))
@@ -40,6 +42,8 @@ watch(
         city: props.value?.city ?? '',
         province: props.value?.province ?? '',
         postalAddress: props.value?.postalAddress ?? '',
+        economicCode: props.value?.economicCode ?? '',
+        ceo: props.value?.ceo ?? '',
       })
     }
   },
@@ -58,7 +62,8 @@ function close() {
 }
 
 function submit() {
-  if (!form.organizationName.trim() || !form.nationalId.trim()) return
+  if (!form.organizationName.trim() || !form.nationalId.trim() || !form.registrationId.trim()
+    || !form.economicCode?.trim() || !form.ceo?.trim() || !form.phone.trim()) return
   emit('submit', { ...form })
   close()
 }
@@ -87,6 +92,16 @@ function submit() {
         <div class="flex flex-col gap-2">
           <span class="text-[13px] text-T-800">شناسه ثبت</span>
           <Input v-model="form.registrationId" inputmode="numeric" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-[13px] text-T-800">کد اقتصادی</span>
+          <Input v-model="form.economicCode" inputmode="numeric" class="h-11 rounded-xl border-T-400 text-[13px]" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-[13px] text-T-800">نام مدیرعامل</span>
+          <Input v-model="form.ceo" class="h-11 rounded-xl border-T-400 text-[13px]" />
         </div>
 
         <div class="flex flex-col gap-2">

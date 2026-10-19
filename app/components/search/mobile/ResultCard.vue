@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import type { SearchProduct } from '~/data/search'
-import { searchColorOptions } from '~/data/search'
-import { DEMO_PRODUCT_ID } from '~/data/product'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const props = defineProps<{
   product: SearchProduct
 }>()
 
-const colorMap = new Map(searchColorOptions.map(option => [option.id, option]))
+const { colors: shopColors } = useShopColors()
+const colorMap = computed(() => new Map(shopColors.value.map(option => [option.id, option])))
 
 const colors = computed(() =>
-  props.product.colorIds.map(id => colorMap.get(id) ?? { id, label: 'رنگ محصول', dot: '#e5e7eb' }),
+  props.product.colorIds.map(id => colorMap.value.get(id) ?? { id, label: 'رنگ محصول', dot: '#e5e7eb' }),
 )
 </script>
 
 <template>
   <!-- Search hits are mock entries, so they all link to the demo PDP. -->
   <NuxtLink
-    :to="`/product/${DEMO_PRODUCT_ID}`"
+    :to="`/product/${product.id}`"
     class="group flex items-stretch gap-3 py-5"
   >
     <!-- Image + colours (start/right column in RTL) -->

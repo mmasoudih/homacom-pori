@@ -9,10 +9,15 @@ import {
   shippingMethods,
 } from '~/data/checkout'
 import { formatPriceFa } from '~/utils/format'
+import { apiErrorMessage } from '~/composables/useApi'
+import { normalizeSearchText } from '~/utils/search'
+import { sanitizeMobileInput } from '~/utils/auth'
 
 const {
   isEmpty,
   clear: clearCart,
+  setAddress: persistAddress,
+  setPaymentMethod: persistPaymentMethod,
 } = useCart()
 
 const { setResult } = useCheckoutResult()
@@ -51,6 +56,7 @@ const {
   goToPayment,
   backToShipping,
   reset,
+  loadCheckoutAddresses,
 } = useCheckout()
 
 const discountTotal = computed(() => rows.value.find(row => row.key === 'discount')?.value ?? 0)
@@ -86,6 +92,24 @@ const shippingOpen = ref(false)
 const creditOpen = ref(false)
 
 const route = useRoute()
+const api = useApi()
+const { states, refresh: refreshStates } = useStates()
+const { create: createAddress } = useUserAddresses()
+const { profile } = useUserProfile()
+
+await loadCheckoutAddresses()
+
+// Keep the server cart in sync with the current checkout selection. The final
+// submit endpoint is still missing, but the cart already stores these choices.
+watch(addressId, (id) => {
+  if (!id || !/^\d+$/.test(id)) return
+  persistAddress(id).catch(() => {})
+})
+
+watch(paymentMethod, (method) => {
+  const apiMethod = method === 'online' || method === 'wallet' ? 'online' : 'mixed'
+  persistPaymentMethod(apiMethod).catch(() => {})
+})
 
 onMounted(() => {
   if (isEmpty.value) navigateTo('/cart')
@@ -139,18 +163,86 @@ function settlePayment() {
   navigateTo('/checkout/success', { replace: true })
 }
 
-function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
-  addAddress(values)
-  toast.success('آدرس جدید ثبت شد.')
+async function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
+  const province = values.province?.trim() ?? ''
+  const cityName = values.cityName?.trim() ?? ''
+
+  if (!states.value.length) {
+    try {
+      await refreshStates()
+    }
+    catch {
+      // Fall through to the "state not found" error below.
+    }
+  }
+
+  const state = states.value.find(item =>
+    normalizeSearchText(item.name) === normalizeSearchText(province),
+  )
+  if (!state) {
+    toast.error('استان انتخاب‌شده در سامانه یافت نشد.')
+    return
+  }
+
+  try {
+    const cities = await api.get<Array<{ id: number, name: string }>>('/address/cities', {
+      query: { 'filters[parent_id]': state.id },
+    })
+    const city = (cities.data ?? []).find(item =>
+      normalizeSearchText(item.name) === normalizeSearchText(cityName),
+    )
+    if (!city) {
+      toast.error('شهر انتخاب‌شده در سامانه یافت نشد.')
+      return
+    }
+
+    if (!profile.value.nationalId) {
+      toast.error('برای ثبت آدرس، ابتدا کد ملی را در اطلاعات حساب کاربری ثبت کنید.')
+      return
+    }
+
+    const mobile = sanitizeMobileInput(values.phone)
+    if (mobile.length !== 11) {
+      toast.error('شماره موبایل تحویل‌گیرنده معتبر نیست.')
+      return
+    }
+
+    await createAddress({
+      title: values.city || 'آدرس جدید',
+      state: state.id,
+      city: city.id,
+      address: values.street || values.address,
+      lat: values.lat ?? 35.6892,
+      lng: values.lng ?? 51.389,
+      mobile,
+      nickname: values.recipient || '',
+      code_melli: profile.value.nationalId,
+      zip_code: values.postalCode || null,
+      plaque: values.plaque ?? null,
+      unit: values.unit ?? null,
+    })
+
+    addAddress(values)
+    toast.success('آدرس جدید ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت آدرس انجام نشد.'))
+  }
 }
 
-function applyDiscount() {
+async function applyDiscount() {
   if (!discountCode.value.trim()) {
     toast.error('کد تخفیف را وارد کنید.')
     return
   }
-  applyPromoCode(discountCode.value)
-  toast.success('کد تخفیف اعمال شد.')
+
+  try {
+    await applyPromoCode(discountCode.value)
+    toast.success('کد تخفیف اعمال شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'کد تخفیف اعمال نشد.'))
+  }
 }
 </script>
 

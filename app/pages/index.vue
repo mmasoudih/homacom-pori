@@ -2,15 +2,21 @@
 import {
   newestProducts,
   bestsellerProducts,
-  banners2,
-  banners4,
-  banners3,
-  stripBanner,
   bestsellerFilters,
 } from '~/data/landing'
 
-useHead({
-  title: 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال',
+const { banners } = useHomeBanners()
+const { newest, bestsellers } = useLandingProducts()
+
+const seoTitle = 'فروشگاه اینترنتی هماکام | خرید آنلاین لوازم دیجیتال'
+const seoDescription = 'خرید آنلاین گوشی موبایل، لپ‌تاپ، ساعت هوشمند، هدفون، کنسول بازی و لوازم جانبی از فروشگاه اینترنتی هماکام؛ ضمانت اصالت کالا، ارسال سریع و خرید اقساطی.'
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogType: 'website',
 })
 </script>
 
@@ -29,29 +35,29 @@ useHead({
       applied exactly once.
     -->
     <main class="flex w-full flex-col items-center lg:px-6">
-      <LandingHeroCarousel class=" pb-5 lg:pb-6" />
+      <LandingHeroCarousel :slides="banners.hero.map(item => item.image)" class=" pb-5 lg:pb-6" />
 
       <LandingCategoriesSection id="categories" class="order-1 w-full lg:order-none" />
 
       <LandingHomaAffSection class="order-2 py-5 lg:order-none lg:py-6" />
 
-      <LandingBannerRow :items="banners2" :columns="2" class="order-3 w-full lg:order-none lg:max-w-[1440px]" />
+      <LandingBannerRow :items="banners.two" :columns="2" class="order-3 w-full lg:order-none lg:max-w-[1440px]" />
 
       <LandingProductsCarousel
         title="جدیدترین محصولات"
-        :products="newestProducts"
+        :products="newest.length ? newest : newestProducts"
         :per-view="5"
         class="order-4 w-full lg:order-none"
       />
 
       <!-- Strip banner -->
       <a
-        :href="stripBanner.href"
+        :href="banners.strip.href"
         class="order-3 block w-full max-w-[1440px] py-5 lg:order-none lg:mx-auto lg:max-w-[1350px] lg:py-6"
       >
         <img
-          :src="stripBanner.image"
-          :alt="stripBanner.alt"
+          :src="banners.strip.image"
+          :alt="banners.strip.alt"
           class="h-auto w-full rounded-none lg:rounded-[20px]"
         >
       </a>
@@ -59,7 +65,7 @@ useHead({
       <LandingBestOfCategorySection class="order-5 w-full lg:order-none" />
 
       <LandingBannerRow
-        :items="banners4"
+        :items="banners.four"
         :columns="4"
         :mobile-columns="2"
         class="order-7 w-full lg:order-none"
@@ -67,14 +73,14 @@ useHead({
 
       <LandingProductsCarousel
         title="پرفروش‌ترین محصولات"
-        :products="bestsellerProducts"
+        :products="bestsellers.length ? bestsellers : bestsellerProducts"
         :pills="bestsellerFilters"
         class="order-7 w-full lg:order-none"
       />
 
       <LandingOffersSection id="offers" class="order-8 w-full lg:order-none" />
 
-      <LandingBannerRow :items="banners3" :columns="3" centered class="order-7 hidden w-full lg:order-none lg:grid" />
+      <LandingBannerRow :items="banners.three" :columns="3" centered class="order-7 hidden w-full lg:order-none lg:grid" />
 
       <LandingBrandsSection class="order-10 w-full lg:order-none" />
 

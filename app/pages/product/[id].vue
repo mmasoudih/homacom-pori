@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
-import { getProductDetail } from '~/data/product'
 import type { Seller } from '~/data/product'
 import { DEMO_COMPARE_PRODUCT_ID } from '~/data/compare'
 import { cartLineId } from '~/composables/useCart'
@@ -8,24 +7,30 @@ import { cartLineId } from '~/composables/useCart'
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => String(route.params.id))
+const siteUrl = String(useRuntimeConfig().public.siteUrl).replace(/\/+$/, '')
 
-const product = computed(() => getProductDetail(id.value))
-const notFound = computed(() => !product.value)
+const { product, pending: loading, notFound } = useProductDetail(id)
 
-// Simulated fetch so the skeleton state renders per the Figma flow.
-const loading = ref(true)
-let loadingTimer: ReturnType<typeof setTimeout> | undefined
-onMounted(() => {
-  loadingTimer = setTimeout(() => {
-    loading.value = false
-  }, 700)
+const seoTitle = computed(() =>
+  product.value ? `${product.value.title} | هماکام` : 'کالا یافت نشد | هماکام',
+)
+const seoDescription = computed(() =>
+  product.value
+    ? `خرید ${product.value.title} از فروشگاه اینترنتی هماکام با ضمانت اصالت کالا، ارسال سریع و امکان خرید اقساطی.`
+    : 'کالای مورد نظر در فروشگاه اینترنتی هماکام یافت نشد.',
+)
+const seoImage = computed(() => {
+  const src = product.value?.images.find(item => item.type === 'image')?.src
+  if (!src) return undefined
+  return /^https?:\/\//.test(src) ? src : `${siteUrl}${src}`
 })
-onUnmounted(() => clearTimeout(loadingTimer))
-
-useHead({
-  title: computed(() =>
-    product.value ? `${product.value.title} | هماکام` : 'کالا یافت نشد | هماکام',
-  ),
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogType: 'website',
+  ogImage: seoImage,
 })
 
 // --- Selection state --------------------------------------------------------
@@ -120,7 +125,6 @@ function removeServiceById(serviceId: string) {
 watch(
   id,
   () => {
-    loading.value = true
     selectedWarrantyId.value = product.value?.defaultWarrantyId ?? ''
     selectedColor.value = ''
     selectedInsuranceId.value = null
@@ -238,6 +242,8 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
               :images="product.images"
               :alt="product.title"
               :compare-id="DEMO_COMPARE_PRODUCT_ID"
+              :product-id="product.stockId ? Number(product.id) : null"
+              :is-favorite="!!product.isFavorite"
             />
 
             <ProductDetailInfoBox
@@ -367,6 +373,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
       v-if="product"
       v-model:open="dialogs.comment"
       :product="product"
+      :product-id="product.stockId ? Number(product.id) : null"
     />
 
     <ProductDetailInsuranceDialog

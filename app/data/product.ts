@@ -24,6 +24,8 @@ export type GalleryItemType = 'image' | 'video' | 'view360'
 export interface GalleryItem {
   type: GalleryItemType
   src?: string
+  /** Poster shown before a video starts playing. */
+  poster?: string
 }
 
 export interface WarrantyOption {
@@ -86,6 +88,8 @@ export type SellerType = 'cash' | 'installment' | 'credit'
 
 export interface Seller {
   id: string
+  /** Backend stock id used by add-to-cart. */
+  stockId?: number
   name: string
   logo: string
   creditLabel: string
@@ -95,6 +99,10 @@ export interface Seller {
   oldPrice?: number
   discount?: number
   type: SellerType
+  /** Colour hex code of the stock. */
+  colorValue?: string
+  /** Warranty id of the stock. */
+  warrantyId?: string
 }
 
 export interface StickyLink {
@@ -143,6 +151,10 @@ export type CommentSort = 'useful' | 'newest' | 'oldest' | 'lowest' | 'highest'
 
 export interface ProductDetail {
   id: string
+  /** Default backend stock id used by add-to-cart. */
+  stockId?: number
+  /** Authenticated favourite state from the API. */
+  isFavorite?: boolean
   title: string
   englishTitle: string
   breadcrumb: string[]
@@ -214,8 +226,8 @@ const GALLERY: GalleryItem[] = [
   { type: 'image', src: '/figma/fill-e393cbb3afd42faa.png' },
   { type: 'image', src: '/figma/fill-eedc0bf76b5dc7cd.png' },
   { type: 'image', src: '/figma/fill-603959b7e3e05165.png' },
-  { type: 'video' },
-  { type: 'view360' },
+  { type: 'video', src: '/videos/product-demo.mp4', poster: '/figma/fill-e393cbb3afd42faa.png' },
+  { type: 'view360', src: '/figma/fill-e393cbb3afd42faa.png' },
 ]
 
 const SPEC_CHIPS: SpecChip[] = [

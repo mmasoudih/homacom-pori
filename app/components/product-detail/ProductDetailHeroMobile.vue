@@ -11,7 +11,8 @@ import {
   IconCoins,
   IconPhoto,
   IconVideo,
-  IconRefresh,
+  IconRotate360,
+  IconZoomIn,
 } from '@tabler/icons-vue'
 import Fade from 'embla-carousel-fade'
 import type { ProductDetail, ServiceCatalogItem } from '~/data/product'
@@ -20,6 +21,8 @@ import { getDiscountPercent } from '~/utils/product'
 import { cn } from '~/lib/utils'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import type { CarouselApi } from '@/components/ui/carousel'
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -46,6 +49,7 @@ const emit = defineEmits<{
 }>()
 
 const galleryIndex = ref(0)
+const lightboxOpen = ref(false)
 const imageCount = computed(() => props.product.images.length)
 const canNavigate = computed(() => imageCount.value > 1)
 const fadePlugins = [Fade()]
@@ -59,6 +63,11 @@ function onGalleryInit(api: CarouselApi) {
   api.on('reInit', () => {
     galleryIndex.value = api.selectedScrollSnap()
   })
+}
+
+function openLightbox(index: number) {
+  galleryIndex.value = index
+  lightboxOpen.value = true
 }
 
 const discountPercent = computed(() =>
@@ -100,20 +109,51 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
         <CarouselItem
           v-for="(image, i) in product.images"
           :key="`${image.type}-${i}`"
-          class="flex basis-full items-center justify-center ps-0 transition-opacity duration-200"
+          class="relative flex basis-full items-center justify-center ps-0 transition-opacity duration-200"
         >
-          <ProductImage
+          <button
+            v-if="image.type === 'image'"
+            type="button"
+            class="flex size-full items-center justify-center"
+            :aria-label="t('product.lightbox')"
+            @click="openLightbox(i)"
+          >
+            <ProductImage
+              :src="image.src"
+              :alt="product.title"
+              container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
+              image-class="max-h-[92%] max-w-[92%]"
+            />
+            <span class="absolute bottom-3 end-3 flex size-8 items-center justify-center rounded-full bg-T-900/50 text-white">
+              <IconZoomIn class="size-4" />
+            </span>
+          </button>
+
+          <video
+            v-else-if="image.type === 'video'"
+            :src="image.src"
+            :poster="image.poster"
+            controls
+            autoplay
+            muted
+            loop
+            playsinline
+            class="aspect-square w-full max-w-[370px] bg-T-50 object-contain"
+          />
+
+          <ProductDetailProduct360
+            v-else
             :src="image.src"
             :alt="product.title"
-            container-class="aspect-square w-full max-w-[370px] rounded-none bg-transparent"
-            image-class="max-h-[92%] max-w-[92%]"
+            class="aspect-square w-full max-w-[370px]"
           />
+
           <div
             v-if="image.type !== 'image'"
-            class="absolute bottom-3 flex items-center gap-1 rounded-full bg-T-900/70 px-3 py-1.5 text-[11px] text-white"
+            class="pointer-events-none absolute start-3 bottom-3 flex items-center gap-1 rounded-full bg-T-900/70 px-3 py-1.5 text-[11px] text-white"
           >
-            <component :is="image.type === 'video' ? IconVideo : IconRefresh" class="size-3.5" />
-            {{ image.type === 'video' ? 'ویدیوی محصول' : 'نمای ۳۶۰ درجه' }}
+            <component :is="image.type === 'video' ? IconVideo : IconRotate360" class="size-3.5" />
+            {{ image.type === 'video' ? t('product.videoAlt') : t('product.view360') }}
           </div>
         </CarouselItem>
       </CarouselContent>
@@ -429,6 +469,13 @@ function pickTab(id: 'review' | 'specs' | 'comments') {
         />
       </button>
     </div>
+
+    <ProductDetailLightbox
+      v-model:open="lightboxOpen"
+      :images="product.images"
+      :start-index="galleryIndex"
+      :alt="product.title"
+    />
   </div>
 </template>
 

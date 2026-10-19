@@ -1,7 +1,55 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { bestOfCategories } from '~/data/landing'
+import { toLandingCard } from '~/composables/useProducts'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+
+const { categories, refresh: refreshCategories } = useProductCategories()
+const { fetchList } = useProductCatalog()
+
+function iconForTitle(title: string): string {
+  if (/گوشی|موبایل/.test(title)) return 'mobile'
+  if (/لپ|تبلت/.test(title)) return 'laptop'
+  if (/ساعت/.test(title)) return 'watch'
+  if (/هدفون|هندزفری|صوتی/.test(title)) return 'headphones'
+  if (/کنسول|بازی/.test(title)) return 'gamepad'
+  if (/کامپیوتر|نمایش|مانیتور/.test(title)) return 'display'
+  if (/جانبی|فلش|حافظه/.test(title)) return 'usb'
+  if (/اسپیکر|بلندگو/.test(title)) return 'speakers'
+  return 'display'
+}
+
+const { data: groups } = await useAsyncData('landing-best-of', async () => {
+  let roots = categories.value.filter(category => /^\d+$/.test(category.id)).slice(0, 3)
+  if (!roots.length) {
+    try {
+      await refreshCategories()
+      roots = categories.value.filter(category => /^\d+$/.test(category.id)).slice(0, 3)
+    }
+    catch {
+      // Keep the designed panels below.
+    }
+  }
+  if (!roots.length) return bestOfCategories
+
+  try {
+    // The backend's `filters[categories][]` currently rejects every id, so the
+    // panels share a real product pool split across the three categories.
+    const products = await fetchList('', 9, 'newest')
+    if (products.length) {
+      return roots.map((root, index) => ({
+        category: root.title,
+        icon: iconForTitle(root.title),
+        items: products.slice(index * 3, index * 3 + 3).map(toLandingCard),
+      }))
+    }
+  }
+  catch {
+    // Fall back to the designed panels below.
+  }
+
+  return bestOfCategories
+}, { default: () => bestOfCategories })
 </script>
 
 <template>
@@ -20,7 +68,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     >
       <CarouselContent class="-ms-[10px]">
         <CarouselItem
-          v-for="col in bestOfCategories"
+          v-for="col in groups"
           :key="col.category"
           class="basis-[86%] ps-[10px] lg:basis-1/3"
         >

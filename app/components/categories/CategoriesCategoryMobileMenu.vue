@@ -7,7 +7,7 @@ import {
   IconChevronUp,
   IconPackage,
 } from '@tabler/icons-vue'
-import { megaCategories, type Category } from '~/data/categories'
+import type { Category } from '~/data/categories'
 import mobileIcon from '../../../public/icons/category-menu/mobile.svg?raw'
 import laptopIcon from '../../../public/icons/category-menu/laptop.svg?raw'
 import smartWatchIcon from '../../../public/icons/category-menu/watch.svg?raw'
@@ -25,6 +25,8 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
+const { categories } = useProductCategories()
+
 /** Same raw line icons the desktop landing grid uses, so the rail matches. */
 const railIcons: Record<string, string> = {
   mobile: mobileIcon,
@@ -39,12 +41,12 @@ const railIcons: Record<string, string> = {
 
 const overlayEl = ref<HTMLElement | null>(null)
 
-const activeRootId = ref(megaCategories[0]?.id ?? '')
+const activeRootId = ref(categories.value[0]?.id ?? '')
 const activeChild = ref<Category | null>(null)
 const expandedIds = ref<Set<string>>(new Set())
 
 const activeRoot = computed(
-  () => megaCategories.find((c) => c.id === activeRootId.value) ?? megaCategories[0]!,
+  () => categories.value.find((c) => c.id === activeRootId.value) ?? categories.value[0]!,
 )
 const rootItems = computed(() => activeRoot.value.children ?? [])
 const groupItems = computed(() => activeChild.value?.children ?? [])
@@ -52,7 +54,7 @@ const groupItems = computed(() => activeChild.value?.children ?? [])
 const groupHasNested = computed(() => groupItems.value.some((item) => (item.children?.length ?? 0) > 0))
 
 function reset() {
-  activeRootId.value = megaCategories[0]?.id ?? ''
+  activeRootId.value = categories.value[0]?.id ?? ''
   activeChild.value = null
   expandedIds.value = new Set()
 }
@@ -151,7 +153,7 @@ onBeforeUnmount(() => {
           <aside class="scrollbar-none w-[100px] shrink-0 overflow-y-auto px-3 pb-28 pt-1">
             <div class="flex flex-col gap-3">
               <button
-                v-for="cat in megaCategories"
+                v-for="cat in categories"
                 :key="cat.id"
                 type="button"
                 class="flex w-full flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-colors"

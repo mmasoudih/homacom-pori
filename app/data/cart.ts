@@ -28,6 +28,10 @@ export interface CartServiceGroup {
 
 export interface CartItem {
   id: string
+  /** Backend cart-item id (needed for add/sub/remove calls). */
+  apiId?: number
+  /** Backend stock id for the line. */
+  stockId?: number
   title: string
   href: string
   image: string

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { searchColorOptions } from '~/data/search'
-
 withDefaults(defineProps<{
   modelValue: string | null
   class?: string
@@ -12,7 +10,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string | null]
 }>()
 
-const options = searchColorOptions
+const { colors: options } = useShopColors()
 </script>
 
 <template>

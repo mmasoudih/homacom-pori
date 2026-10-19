@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
-import type { OrderStatTone } from '~/data/dashboard'
-import { orderStats } from '~/data/dashboard'
+import type { OrderStat, OrderStatTone } from '~/data/dashboard'
 import { toPersianDigits } from '~/utils/format'
 
 const statIcon: Record<OrderStatTone, string> = {
@@ -15,6 +14,27 @@ const statHref: Record<OrderStatTone, string> = {
   delivered: '/dashboard/orders?tab=delivered',
   returned: '/dashboard/orders?tab=returned',
 }
+
+const { orders, load } = useOrders()
+await load()
+
+const orderStats = computed<OrderStat[]>(() => [
+  {
+    key: 'current',
+    label: 'سفارش‌های جاری',
+    count: orders.value.filter(order => order.status === 'awaiting_payment' || order.status === 'processing').length,
+  },
+  {
+    key: 'delivered',
+    label: 'تحویل داده شده',
+    count: orders.value.filter(order => order.status === 'delivered').length,
+  },
+  {
+    key: 'returned',
+    label: 'کالاهای مرجوع شده',
+    count: 0,
+  },
+])
 </script>
 
 <template>

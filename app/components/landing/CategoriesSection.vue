@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { categories } from '~/data/landing'
 import { toPersianDigits } from '~/utils/format'
 import mobileIcon from '../../../public/icons/mobile.svg?raw'
 import laptopIcon from '../../../public/icons/laptop.svg?raw'
@@ -10,6 +9,29 @@ import displayIcon from '../../../public/icons/display.svg?raw'
 import usbDriveIcon from '../../../public/icons/usb-drive.svg?raw'
 import speakersIcon from '../../../public/icons/speakers.svg?raw'
 import arrowUpLeftSmall from '../../../public/icons/arrow-up-left-small.svg?raw'
+
+const { categories: apiCategories } = useProductCategories()
+
+function iconForTitle(title: string): string {
+  if (/گوشی|موبایل/.test(title)) return 'mobile'
+  if (/لپ|تبلت/.test(title)) return 'laptop'
+  if (/ساعت/.test(title)) return 'watch'
+  if (/هدفون|هندزفری|صوتی/.test(title)) return 'headphones'
+  if (/کنسول|بازی/.test(title)) return 'gamepad'
+  if (/کامپیوتر|نمایش|مانیتور/.test(title)) return 'display'
+  if (/جانبی|فلش|حافظه/.test(title)) return 'usb'
+  if (/اسپیکر|بلندگو/.test(title)) return 'speakers'
+  return 'display'
+}
+
+const categories = computed(() =>
+  apiCategories.value.slice(0, 8).map((category, index) => ({
+    title: category.title,
+    count: String(category.children?.length ?? ''),
+    icon: iconForTitle(category.title),
+    accent: index === 2,
+  })),
+)
 
 const iconMap: Record<string, string> = {
   headphones: headphonesIcon,
@@ -32,7 +54,7 @@ const iconMap: Record<string, string> = {
       <a
         v-for="cat in categories"
         :key="cat.title"
-        href="#"
+        :href="`/search?q=${encodeURIComponent(cat.title)}`"
         class="group flex flex-col items-center gap-[6px]"
       >
         <span
@@ -62,7 +84,7 @@ const iconMap: Record<string, string> = {
       >
         <!-- Content card -->
         <a
-          href="#"
+          :href="`/search?q=${encodeURIComponent(cat.title)}`"
           class="col-span-2 col-start-2 row-start-1 my-[5px] flex items-center justify-start rounded-[20px] border-2 border-T-400 bg-T-50 pl-[45px] pr-10 transition-colors group-hover:border-R-50"
           dir="rtl"
         >

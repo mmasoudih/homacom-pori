@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { IconChevronDown, IconMenu, IconSearch } from '@tabler/icons-vue'
-import { blogNav, blogShopCta } from '~/data/blog'
+import { blogShopCta } from '~/data/blog'
 
 const route = useRoute()
+const { navItems } = useBlogNav()
 
 /** Slug of the open desktop dropdown ('' = none). */
 const openSlug = ref('')
@@ -59,7 +60,7 @@ async function toggleMobileSearch() {
       </NuxtLink>
 
       <nav ref="navEl" class="relative ms-10 flex items-center gap-[34px]">
-        <div v-for="item in blogNav" :key="item.slug" class="relative">
+        <div v-for="item in navItems" :key="item.slug" class="relative">
           <button
             type="button"
             class="flex items-center gap-2 text-[15px] font-medium transition-colors"

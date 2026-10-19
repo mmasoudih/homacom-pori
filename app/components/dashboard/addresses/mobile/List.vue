@@ -7,6 +7,7 @@ defineProps<{
 
 const emit = defineEmits<{
   remove: [id: string]
+  edit: [address: import('~/data/addresses').Address]
 }>()
 </script>
 
@@ -17,6 +18,7 @@ const emit = defineEmits<{
       :key="address.id"
       :address="address"
       @remove="emit('remove', $event)"
+      @edit="emit('edit', $event)"
     />
   </div>
 </template>

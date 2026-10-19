@@ -6,7 +6,7 @@ import { searchableProducts } from '~/data/search'
 //
 // The product picker reuses the shared `searchableProducts` catalog so the
 // «۱۴ کالا» count and search behaviour match the header search. Spec values
-// are generated deterministically per product (seeded by category) so every
+// are generated deterministically per product type (`tileId`) so every
 // catalog entry can be compared without hand-authoring 14 × N rows.
 // ---------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ interface SpecProfile {
   flash: string
 }
 
-/** Deterministic per-category spec profile (mock — swap for real product specs). */
+/** Deterministic per-product-type spec profile (mock — swap for real product specs). */
 const SPEC_PROFILES: Record<string, SpecProfile> = {
   mobile: {
     ram: '۱۲ گیگابایت',
@@ -150,7 +150,7 @@ const DEFAULT_PROFILE: SpecProfile = {
 }
 
 function profileFor(product: SearchProduct): SpecProfile {
-  return SPEC_PROFILES[product.categoryId] ?? DEFAULT_PROFILE
+  return SPEC_PROFILES[product.tileId] ?? DEFAULT_PROFILE
 }
 
 /** Resolve a spec value for a product + spec key. */
@@ -167,18 +167,10 @@ export function specValue(product: SearchProduct, key: string): string {
  * than toggles off an item that is already on the list.
  */
 export const initialCompareIds: string[] = [
-  'search-ideapad',
   'search-galaxy-a25',
-  'search-sony-headphone',
+  'search-macbook-air',
+  'search-airpods-pro',
 ]
-
-/** Marketing band copy («فروشگاه اینترنتی هماکام»). */
-export const compareSeo = {
-  title: 'فروشگاه اینترنتی هماکام',
-  body: 'کلیه لوازم مورد نیاز خود نظیر گجت‌ها، موبایل و لپ‌تاپ، لوازم خانگی برقی و غیربرقی، سکه و طلا، زیبایی و سلامت، اسباب‌بازی و شیرینی، صنایع دستی و … را با ورود به فروشگاه آنلاین هماکام به سادگی و با خیال راحت تهیه کنید.',
-  moreLabel: 'نمایش بیشتر',
-  lessLabel: 'نمایش کمتر',
-}
 
 /** Maximum number of products that can be compared at once. */
 export const COMPARE_MAX = 4
@@ -191,8 +183,8 @@ export function getCompareProduct(id: string): SearchProduct | undefined {
   return searchableProducts.find(product => product.id === id)
 }
 
-/** Mock color swatches per category (the picker catalog has no color data). */
-const CATEGORY_SWATCHES: Record<string, string[]> = {
+/** Mock color swatches per product type (the picker catalog has no color data). */
+const TYPE_SWATCHES: Record<string, string[]> = {
   mobile: ['#1d1d1f', '#ffffff', '#6fa8dc'],
   laptops: ['#1d1d1f', '#c8ccd2'],
   tablets: ['#1d1d1f', '#ffffff'],
@@ -203,5 +195,5 @@ const CATEGORY_SWATCHES: Record<string, string[]> = {
 
 /** Swatch palette used by the picker rows for a given product. */
 export function compareColors(product: SearchProduct): string[] {
-  return CATEGORY_SWATCHES[product.categoryId] ?? []
+  return TYPE_SWATCHES[product.tileId] ?? []
 }

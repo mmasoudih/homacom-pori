@@ -2,6 +2,8 @@
 import { onClickOutside, useElementSize, useEventListener, useWindowScroll } from '@vueuse/core'
 import { IconBell, IconSearch, IconUser } from '@tabler/icons-vue'
 import { headerNav } from '~/data/landing'
+import { resolveMediaUrl } from '~/utils/media'
+import { toTelHref } from '~/utils/auth'
 import { toPersianDigits } from '~/utils/format'
 import type { SearchCategoryTile } from '~/data/search'
 import { unreadNotifications } from '~/data/dashboard'
@@ -16,6 +18,39 @@ withDefaults(defineProps<{
 }>(), {
   quickCategories: false,
 })
+
+const { siteHeader } = useSiteHeader()
+const config = useRuntimeConfig()
+const apiBase = String(config.public.apiBase || '')
+
+const navItems = computed(() => {
+  const linked = (siteHeader.value.menus ?? []).filter(menu => !!menu.link)
+  if (!linked.length) return headerNav
+
+  return linked.map(menu => ({
+    label: menu.title,
+    labelKey: '',
+    icon: menu.icon || 'grid',
+    href: menu.link!,
+    mega: false,
+  }))
+})
+
+const logoSrc = computed(() =>
+  resolveMediaUrl(siteHeader.value.logo, apiBase) || '/icons/logo.svg',
+)
+
+const phone = computed(() => siteHeader.value.tel || siteHeader.value.mobile || '0121-3250789')
+const phoneDisplay = computed(() => {
+  const digits = phone.value.replace(/\D/g, '')
+  return digits.length === 11 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : phone.value
+})
+const phoneParts = computed(() => {
+  const dash = phoneDisplay.value.indexOf('-')
+  if (dash === -1) return { lead: phoneDisplay.value, rest: '' }
+  return { lead: phoneDisplay.value.slice(0, dash + 1), rest: phoneDisplay.value.slice(dash + 1) }
+})
+const telHref = computed(() => toTelHref(phone.value))
 
 const navIcons: Record<string, string> = {
   coins: coinsFront,
@@ -209,7 +244,7 @@ onMounted(() => {
             class="relative flex size-12 items-center justify-center rounded-full border border-T-400 text-foreground transition-colors hover:bg-secondary"
             :aria-expanded="cartOpen"
             aria-haspopup="dialog"
-            aria-label="سبد خرید"
+            :aria-label="$t('nav.cart')"
             @click="cartOpen = !cartOpen"
           >
             <img src="/icons/shopping-bag.svg" alt="" class="size-6">
@@ -233,14 +268,14 @@ onMounted(() => {
             <NuxtLink
               to="/dashboard"
               class="flex size-11 items-center justify-center rounded-full bg-T-200 text-T-600 transition-colors hover:bg-T-300"
-              aria-label="حساب کاربری"
+              :aria-label="$t('nav.account')"
             >
               <IconUser class="size-6" />
             </NuxtLink>
             <NuxtLink
               to="/dashboard"
               class="relative flex size-11 items-center justify-center rounded-full border border-T-400 text-T-700 transition-colors hover:bg-secondary"
-              aria-label="اعلان‌ها"
+              :aria-label="$t('nav.notifications')"
             >
               <IconBell class="size-5" />
               <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
@@ -255,11 +290,7 @@ onMounted(() => {
             dir="rtl"
           >
             <NuxtLink to="/auth/login" class="hover:text-primary">
-              <UiTypography as="span" size="lg" weight="medium" color="inherit">ورود</UiTypography>
-            </NuxtLink>
-            <span class="text-T-500">|</span>
-            <NuxtLink to="/auth/register" class="hover:text-primary">
-              <UiTypography as="span" size="lg" weight="medium" color="inherit">ثبت‌نام</UiTypography>
+              <UiTypography as="span" size="lg" weight="medium" color="inherit">{{ $t('common.loginOrRegister') }}</UiTypography>
             </NuxtLink>
           </div>
         </div>
@@ -280,7 +311,7 @@ onMounted(() => {
 
         <!-- Logo -->
         <a href="#" class="col-start-1 row-start-1 mt-4 justify-self-start self-start">
-          <img src="/icons/logo.svg" alt="هماکام" class="h-[52px] w-[70px] object-contain">
+          <img :src="logoSrc" alt="هماکام" class="h-[52px] w-[70px] object-contain">
         </a>
       </div>
 
@@ -301,7 +332,7 @@ onMounted(() => {
           >
             <!-- Nav -->
             <nav class="flex items-center gap-8">
-              <template v-for="item in headerNav" :key="item.label">
+              <template v-for="item in navItems" :key="item.label">
                 <button
                   v-if="item.mega"
                   :ref="(el) => (megaTriggerEl = el as HTMLElement | null)"
@@ -313,7 +344,7 @@ onMounted(() => {
                   @click="toggleMega"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
-                  {{ item.label }}
+                  {{ item.labelKey ? $t(item.labelKey) : item.label }}
                 </button>
                 <NuxtLink
                   v-else
@@ -321,25 +352,24 @@ onMounted(() => {
                   class="group flex items-center gap-2 text-[15px] font-medium text-foreground transition-colors hover:text-primary"
                 >
                   <span class="text-T-600 transition-colors group-hover:text-R-300 [&>svg]:block [&>svg]:size-5" aria-hidden="true" v-html="navIcons[item.icon]" />
-                  {{ item.label }}
+                  {{ item.labelKey ? $t(item.labelKey) : item.label }}
                 </NuxtLink>
               </template>
             </nav>
 
             <!-- Phone -->
             <a
-              href="tel:0121-3250789"
+              :href="telHref"
               class="flex items-center gap-2 text-foreground"
               dir="ltr"
             >
               <img src="/icons/phone-call.svg" alt="" class="size-5">
               <UiTypography as="span" size="lg" weight="bold" tracking="wide">
-                <span class="text-R-300">{{ toPersianDigits('0121') }}</span>{{ toPersianDigits('-3250789') }}
+                <span class="text-R-300">{{ toPersianDigits(phoneParts.lead) }}</span>{{ toPersianDigits(phoneParts.rest) }}
               </UiTypography>
             </a>
           </div>
 
-          <div v-if="quickCategories" class="w-full h-0.5 rounded-full bg-T-400 my-2"/>
           <!-- Quick-access circle strip (home only) -->
           <LandingHeaderCircleStrip v-if="quickCategories" class="w-full pb-[20px]" />
 
@@ -354,11 +384,11 @@ onMounted(() => {
         <button
           type="button"
           class="flex h-11 flex-1 items-center gap-2 rounded-full border border-T-400 bg-T-200 px-4"
-          aria-label="جستجو در محصولات"
+          :aria-label="$t('nav.searchProducts')"
           @click="openSearch"
         >
           <IconSearch class="size-5 shrink-0 text-T-600" />
-          <span class="text-[15px] text-T-600">جستجو در</span>
+          <span class="text-[15px] text-T-600">{{ $t('nav.searchIn') }}</span>
           <svg
             width="56"
             height="20"
@@ -378,7 +408,7 @@ onMounted(() => {
           v-if="authed"
           to="/dashboard"
           class="relative ms-3 flex size-11 shrink-0 items-center justify-center rounded-full bg-T-200 text-T-600"
-          aria-label="حساب کاربری"
+          :aria-label="$t('nav.account')"
         >
           <IconUser class="size-6" />
           <span class="absolute -top-1 -end-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">

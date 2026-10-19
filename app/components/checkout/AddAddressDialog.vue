@@ -220,6 +220,13 @@ function submit() {
     postalCode: form.value.postalCode.trim(),
     recipient: isOther ? form.value.recipientName.trim() : checkoutCurrentUser.name,
     phone: isOther ? form.value.recipientPhone.trim() : checkoutCurrentUser.phone,
+    province: form.value.province.trim(),
+    cityName: form.value.city.trim(),
+    street: form.value.street.trim(),
+    plaque: form.value.plaque.trim() || undefined,
+    unit: form.value.unit.trim() || undefined,
+    lat: chosen.value?.lat,
+    lng: chosen.value?.lng,
   }
 
   emit('created', address)

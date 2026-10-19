@@ -1,45 +1,41 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import type { Ticket, TicketMessage } from '~/data/tickets'
-import { findTicket } from '~/data/tickets'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
 
 const id = computed(() => String(route.params.id))
-const ticket = ref<Ticket | undefined>()
-const notFound = ref(false)
+const {
+  ticket,
+  notFound,
+  load: loadTicket,
+  reply,
+  close,
+} = useTicketDetail(id)
 
-watchEffect(() => {
-  const base = findTicket(id.value)
-  if (!base) {
-    notFound.value = true
-    ticket.value = undefined
-    return
-  }
-  notFound.value = false
-  ticket.value = { ...base, messages: [...base.messages] }
+await loadTicket().catch(() => {
+  // The not-found state is rendered below.
 })
 
 const closed = computed(() => ticket.value?.status === 'closed')
 
-function closeTicket() {
-  if (!ticket.value) return
-  ticket.value = { ...ticket.value, status: 'closed' }
-  toast.success('تیکت بسته شد.')
+async function closeTicket() {
+  try {
+    await close()
+    toast.success('تیکت بسته شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'بستن تیکت انجام نشد.'))
+  }
 }
 
-let messageSeq = 100
-
-function sendMessage(text: string) {
-  if (!ticket.value) return
-  messageSeq += 1
-  const message: TicketMessage = {
-    id: `${ticket.value.id}-message-${messageSeq}`,
-    author: 'user',
-    body: text,
-    date: '۱۴۰۴ مهر ۲۸ - ۱۰:۳۵',
+async function sendMessage(text: string) {
+  try {
+    await reply(text)
   }
-  ticket.value.messages = [...ticket.value.messages, message]
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ارسال پیام انجام نشد.'))
+  }
 }
 
 useHead({ title: 'جزئیات تیکت | هماکام' })

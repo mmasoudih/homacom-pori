@@ -1,8 +1,19 @@
 export interface Address {
   id: string
   title: string
+  /** Human-readable full address. */
   address: string
   postalCode: string
+  /** Raw fields used to prefill the edit form. */
+  stateId?: number
+  cityId?: number
+  addressLine?: string
+  mobile?: string
+  nickname?: string
+  codeMelli?: string
+  lat?: string | null
+  lng?: string | null
+  isDefault?: boolean
 }
 
 function item(index: number): Address {

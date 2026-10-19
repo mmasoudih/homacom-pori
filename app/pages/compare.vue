@@ -1,59 +1,62 @@
 <script setup lang="ts">
-import { COMPARE_MAX, compareSpecGroups } from '~/data/compare'
+import { COMPARE_MAX, compareSpecGroups } from "~/data/compare";
 
-const { items, remove } = useCompare()
+const { items, remove } = useCompare();
 
-const dialogOpen = ref(false)
+const dialogOpen = ref(false);
 
-const columnCount = COMPARE_MAX
+const canAdd = computed(() => items.value.length < COMPARE_MAX);
 
 useHead({
-  title: 'مقایسه محصولات | هماکام',
-})
+  title: "مقایسه محصولات | هماکام",
+});
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <main class="mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pb-28 pt-6 lg:px-6 lg:pb-16 lg:pt-10">
-      <h1 class="text-end text-[18px] font-bold text-T-900 lg:text-[20px]">
+    <main
+      class="mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pt-3 lg:px-[45px] lg:pb-16 lg:pt-0"
+    >
+      <h1
+        class="sr-only text-start text-[22px] font-bold text-T-900 lg:not-sr-only lg:mt-[34px]"
+      >
         مقایسه محصولات
       </h1>
 
-      <!-- Product slots -->
-      <div class="-mx-4 mt-5 overflow-hidden rounded-[20px] border border-T-400 bg-T-50 lg:mx-0">
-        <div class="overflow-x-auto">
-          <div class="grid w-max grid-cols-[repeat(4,50vw)] gap-px bg-T-300 lg:w-full lg:grid-cols-[repeat(4,minmax(0,1fr))]">
-            <template v-for="i in columnCount" :key="i">
-              <CompareProductSlot
-                v-if="items[i - 1]"
-                :product="items[i - 1]!"
-                @remove="remove"
-              />
-              <CompareAddSlot
-                v-else-if="i - 1 === items.length"
-                @add="dialogOpen = true"
-              />
-              <div v-else class="bg-T-50" />
-            </template>
+      <!-- Product slots — full-bleed on mobile, white card on desktop -->
+      <section
+        class="-mx-4 mt-0 overflow-hidden rounded-[20px] bg-T-50 lg:mx-0 lg:mt-[34px] lg:px-6 lg:py-8 lg:shadow-[0_0_20px_rgba(0,0,0,0.08),0_0_4px_rgba(0,0,0,0.03)]"
+      >
+        <div
+          class="flex gap-0 overflow-x-auto scrollbar-none lg:gap-4 lg:overflow-visible"
+        >
+          <div
+            v-for="product in items"
+            :key="product.id"
+            class="w-1/2 shrink-0 lg:w-[calc((100%-3rem)/4)]"
+          >
+            <CompareProductSlot :product="product" @remove="remove" />
+          </div>
+          <div v-if="canAdd" class="w-1/2 shrink-0 lg:w-[calc((100%-3rem)/4)]">
+            <CompareAddSlot @add="dialogOpen = true" />
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Specs comparison -->
       <CompareSpecsTable
         v-if="items.length"
-        class="mt-6"
+        class="mt-[26px] lg:mt-[45px]"
         :products="items"
-        :column-count="columnCount"
         :spec-groups="compareSpecGroups"
       />
-
-      <!-- Marketing band -->
-      <CompareSeoBand class="mt-6" />
     </main>
-
+    <!-- Marketing band — the same shared component used on the landing page -->
+    <div class="">
+      <LandingCeoSection />
+    </div>
     <LandingSiteFooter />
     <LandingMobileBottomNav />
 

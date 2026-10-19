@@ -2,29 +2,14 @@
 import { IconArrowLeft, IconBox, IconFileInvoice } from '@tabler/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import type { Order, OrderStatus } from '~/data/orders'
-import { findOrder, orderStatusMeta } from '~/data/orders'
+import { orderStatusMeta } from '~/data/orders'
 import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id))
 
-const order = ref<Order | undefined>(undefined)
-const notFound = ref(false)
-
-watchEffect(() => {
-  const base = findOrder(id.value)
-  if (!base) {
-    notFound.value = true
-    order.value = undefined
-    return
-  }
-
-  notFound.value = false
-  const override = route.query.status as OrderStatus | undefined
-  order.value = { ...base, status: override && override in orderStatusMeta ? override : base.status }
-})
+const { order, notFound } = useOrderDetail(id)
 
 const cancelOpen = ref(false)
 

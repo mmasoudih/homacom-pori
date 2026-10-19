@@ -17,21 +17,45 @@ interface OfferProduct {
   discount?: number
 }
 
-const offerProducts: OfferProduct[] = flatOffers.map((cell, i) => ({
+const fallbackOfferProducts: OfferProduct[] = flatOffers.map((cell, i) => ({
   image: cell.image,
   title: '',
   price: PRICE,
   ...(offersMeta[i]?.hasOld ? { oldPrice: OLD_PRICE, discount: DISCOUNT } : {}),
 }))
 
-// Transpose the two rows into columns of two so the desktop carousel renders a
-// 2-row grid while still scrolling by column.
-const rowLength = offersGridRows[0]?.length ?? 0
-const offerColumns: OfferProduct[][] = Array.from({ length: rowLength }, (_, col) =>
-  [offerProducts[col], offerProducts[col + rowLength]].filter(
-    (product): product is OfferProduct => product !== undefined,
-  ),
-)
+const { fetchList } = useProductCatalog()
+const { data } = await useAsyncData('landing-offers', async () => {
+  try {
+    return await fetchList('', 12, undefined, { 'filters[homa_off]': 1 })
+  }
+  catch {
+    return []
+  }
+}, { default: () => [] })
+
+const offerProducts = computed<OfferProduct[]>(() => {
+  if (!data.value.length) return fallbackOfferProducts
+  return data.value.map(product => ({
+    image: product.image,
+    title: product.title,
+    price: product.price,
+    oldPrice: product.oldPrice,
+    discount: product.discount,
+  }))
+})
+
+// Two rows per column so the desktop carousel scrolls by column.
+const offerColumns = computed<OfferProduct[][]>(() => {
+  const list = offerProducts.value
+  const rows = 2
+  const columnCount = Math.ceil(list.length / rows)
+  return Array.from({ length: columnCount }, (_, column) => {
+    const first = list[column * rows]
+    const second = list[column * rows + 1]
+    return [first, second].filter((product): product is OfferProduct => !!product)
+  })
+})
 </script>
 
 <template>

@@ -8,6 +8,9 @@ export interface LegalInfo {
   city: string
   province: string
   postalAddress: string
+  /** Required by the company-information endpoint. */
+  economicCode?: string
+  ceo?: string
 }
 
 export interface AccountProfile {
