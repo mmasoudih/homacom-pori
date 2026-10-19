@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import type { CommentTabKey } from '~/data/comments'
+import type { CommentTabKey, MyComment, PendingComment } from '~/data/comments'
 import { commentTabs as baseTabs } from '~/data/comments'
 import { apiErrorMessage } from '~/composables/useApi'
 
@@ -33,7 +33,7 @@ const showEmpty = computed(() =>
 )
 
 const dialogOpen = ref(false)
-const dialogComment = ref<{ title: string, image: string } | null>(null)
+const dialogComment = ref<MyComment | PendingComment | null>(null)
 
 watch(activeTab, (tab) => {
   router.replace({ query: { ...route.query, tab: tab === 'mine' ? undefined : tab } })
@@ -49,9 +49,13 @@ async function removeComment(id: string) {
   }
 }
 
-function openDialog(comment: { title: string, image: string }) {
+function openDialog(comment: MyComment | PendingComment) {
   dialogComment.value = comment
   dialogOpen.value = true
+}
+
+function onCommentSubmitted() {
+  loadComments().catch(err => toast.error(apiErrorMessage(err, 'دریافت دیدگاه‌ها انجام نشد.')))
 }
 
 useHead({
@@ -120,6 +124,6 @@ useHead({
       </template>
     </DashboardCommentsMobileShell>
 
-    <DashboardCommentsCommentDialog v-model:open="dialogOpen" :comment="dialogComment" />
+    <DashboardCommentsCommentDialog v-model:open="dialogOpen" :comment="dialogComment" @submitted="onCommentSubmitted" />
   </div>
 </template>

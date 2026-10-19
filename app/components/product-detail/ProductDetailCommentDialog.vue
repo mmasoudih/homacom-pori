@@ -17,14 +17,26 @@ const props = withDefaults(
     product: CommentDialogProduct
     /** Backend product id; when set the comment is posted to the API. */
     productId?: number | null
+    /** When set, the dialog edits this comment instead of creating one. */
+    commentId?: string | null
+    initialRating?: number
+    initialText?: string
+    initialPositives?: string[]
+    initialNegatives?: string[]
   }>(),
   {
     productId: null,
+    commentId: null,
+    initialRating: 0,
+    initialText: '',
+    initialPositives: () => [],
+    initialNegatives: () => [],
   },
 )
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  'submitted': []
 }>()
 
 const ratings = [
@@ -46,10 +58,10 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      rating.value = 0
-      text.value = ''
-      positives.value = []
-      negatives.value = []
+      rating.value = props.initialRating
+      text.value = props.initialText
+      positives.value = [...props.initialPositives]
+      negatives.value = [...props.initialNegatives]
       positiveDraft.value = ''
       negativeDraft.value = ''
     }
@@ -74,26 +86,39 @@ async function submit() {
     return
   }
 
-  if (props.productId) {
-    try {
-      const api = useApi()
+  try {
+    const api = useApi()
+    const body = {
+      title: text.value.trim().slice(0, 80),
+      content: text.value.trim(),
+      score: rating.value,
+      strength: positives.value,
+      weakness: negatives.value,
+    }
+
+    if (props.commentId) {
+      await api.put(`/shop/user/comments/${encodeURIComponent(props.commentId)}`, body)
+    }
+    else if (props.productId) {
       await api.post('/shop/user/comments', {
-        title: text.value.trim().slice(0, 80),
-        content: text.value.trim(),
+        ...body,
         relate_to: 'product',
         relate_id: props.productId,
-        score: rating.value,
-        strength: positives.value,
-        weakness: negatives.value,
       })
     }
-    catch (err) {
-      toast.error(apiErrorMessage(err, 'ارسال دیدگاه انجام نشد.'))
-      return
-    }
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, props.commentId ? 'ویرایش دیدگاه انجام نشد.' : 'ارسال دیدگاه انجام نشد.'))
+    return
   }
 
-  toast.success('نظر شما با موفقیت ارسال شد و پس از تایید نمایش داده خواهد شد', { icon: toastIcons.message })
+  toast.success(
+    props.commentId
+      ? 'دیدگاه شما ویرایش شد.'
+      : 'نظر شما با موفقیت ارسال شد و پس از تایید نمایش داده خواهد شد',
+    { icon: toastIcons.message },
+  )
+  emit('submitted')
   emit('update:open', false)
 }
 

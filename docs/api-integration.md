@@ -186,7 +186,7 @@ independently.
 - [x] `GET /api/shop/user/comments` → dashboard comments (mine + pending)
 - [x] `POST /api/shop/user/comments` → product comment form
 - [x] `DELETE /api/shop/user/comments/{id}` → dashboard delete
-- [ ] `PUT /api/shop/user/comments/{id}` → dashboard edit dialog (still local)
+- [x] `PUT /api/shop/user/comments/{id}` → dashboard edit dialog
 - [ ] Comment likes/dislikes are not present in `UserCommentResource`
       (dashboard shows 0/0).
 
