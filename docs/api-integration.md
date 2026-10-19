@@ -109,12 +109,14 @@ independently.
 
 ## Phase 8 — Profile
 
-- [ ] `GET /api/shop/user/profile/me` → dashboard profile/account
-- [ ] `PUT /api/shop/user/profile/base-information`
-- [ ] `PUT /api/shop/user/profile/email`
-- [ ] `PUT /api/shop/user/profile/national-code`
-- [ ] `PUT /api/shop/user/profile/birthday`
-- [ ] `PUT /api/shop/user/profile/company-information`
+- [x] `GET /api/shop/user/profile/me` → dashboard profile/account
+      (Jalali birthdate conversion + mock fallback)
+- [x] `PUT /api/shop/user/profile/base-information`
+- [x] `PUT /api/shop/user/profile/email`
+- [x] `PUT /api/shop/user/profile/national-code`
+- [x] `PUT /api/shop/user/profile/birthday`
+- [ ] `PUT /api/shop/user/profile/company-information` (read-only mapping for now;
+      the legal form has fields the API does not accept)
 
 ## Phase 9 — Favorites
 

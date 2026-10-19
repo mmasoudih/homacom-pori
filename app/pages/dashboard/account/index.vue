@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import type { AccountProfile, LegalInfo } from '~/data/account'
-import { accountProfile } from '~/data/account'
+import type { LegalInfo } from '~/data/account'
+import { apiErrorMessage } from '~/composables/useApi'
 
 useHead({
   title: 'اطلاعات حساب کاربری | هماکام',
@@ -9,10 +9,16 @@ useHead({
 
 type EditField = 'name' | 'birthdate' | 'national-id' | 'email' | 'bank'
 
-const profile = ref<AccountProfile>({
-  ...accountProfile,
-  legal: accountProfile.legal ? { ...accountProfile.legal } : null,
-})
+const {
+  profile,
+  load: loadProfile,
+  saveName: updateName,
+  saveEmail: updateEmail,
+  saveNationalId: updateNationalId,
+  saveBirthdate: updateBirthdate,
+} = useUserProfile()
+
+onMounted(loadProfile)
 
 const image = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -50,28 +56,44 @@ function onEdit(field: EditField) {
   else open.bank = true
 }
 
-function saveName(payload: { firstName: string, lastName: string }) {
-  profile.value.firstName = payload.firstName
-  profile.value.lastName = payload.lastName
-  toast.success('نام و نام خانوادگی با موفقیت ثبت شد.')
+async function saveName(payload: { firstName: string, lastName: string }) {
+  try {
+    await updateName(payload)
+    toast.success('نام و نام خانوادگی با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت نام و نام خانوادگی انجام نشد.'))
+  }
 }
 
-function saveBirthdate(payload: { year: string, month: string, day: string, birthDate: string }) {
-  profile.value.birthYear = payload.year
-  profile.value.birthMonth = payload.month
-  profile.value.birthDay = payload.day
-  profile.value.birthDate = payload.birthDate
-  toast.success('تاریخ تولد با موفقیت ثبت شد.')
+async function saveBirthdate(payload: { year: string, month: string, day: string, birthDate: string }) {
+  try {
+    await updateBirthdate(payload)
+    toast.success('تاریخ تولد با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت تاریخ تولد انجام نشد.'))
+  }
 }
 
-function saveNationalId(payload: { nationalId: string }) {
-  profile.value.nationalId = payload.nationalId
-  toast.success('کد ملی با موفقیت ثبت شد.')
+async function saveNationalId(payload: { nationalId: string }) {
+  try {
+    await updateNationalId(payload)
+    toast.success('کد ملی با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت کد ملی انجام نشد.'))
+  }
 }
 
-function saveEmail(payload: { email: string }) {
-  profile.value.email = payload.email
-  toast.success('ایمیل با موفقیت ثبت شد.')
+async function saveEmail(payload: { email: string }) {
+  try {
+    await updateEmail(payload)
+    toast.success('ایمیل با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت ایمیل انجام نشد.'))
+  }
 }
 
 function saveBank(payload: { cardNumber: string, shebaNumber: string }) {
