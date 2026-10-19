@@ -75,6 +75,9 @@ Mostly sufficient. Remaining asks:
 
 ## 4. Checkout & orders
 
+**Checkout frontend status:** addresses and coupon now use the cart API;
+shipping/payment methods are still designed mocks. The submit step is blocked.
+
 **Blocked — endpoints do not exist in the spec**
 
 - Create order / submit checkout (`POST /shop/order` or similar).

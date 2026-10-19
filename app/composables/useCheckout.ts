@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { CheckoutAddress } from '~/data/checkout'
 import {
   checkoutAddresses,
@@ -9,6 +9,7 @@ import {
   shippingMethods,
   walletBalance,
 } from '~/data/checkout'
+import { useUserAddresses } from '~/composables/useAddresses'
 
 export type CheckoutStep = 'shipping' | 'payment'
 export type PaymentMethod = 'online' | 'wallet' | 'installment'
@@ -20,7 +21,16 @@ export type PaymentMethod = 'online' | 'wallet' | 'installment'
  * truth while the user is on `/checkout`.
  */
 export function useCheckout() {
-  const { itemsTotal, discountTotal, insuranceTotal, servicesTotal } = useCart()
+  const {
+  itemsTotal,
+  discountTotal,
+  insuranceTotal,
+  servicesTotal,
+  couponCode: promoCode,
+  couponDiscount: promoDiscount,
+  applyCoupon,
+  clearCoupon,
+} = useCart()
 
   const step = ref<CheckoutStep>('shipping')
 
@@ -35,6 +45,30 @@ export function useCheckout() {
   const timeSlot = ref('')
   const deliveryDays = ref(getDeliveryDays())
 
+  // Replace the designed addresses with the user's saved addresses once loaded.
+  const { addresses: savedAddresses, load: loadSavedAddresses } = useUserAddresses()
+  if (import.meta.client) {
+    onMounted(async () => {
+      try {
+        await loadSavedAddresses()
+        if (!savedAddresses.value.length) return
+        addresses.value = savedAddresses.value.map(address => ({
+          id: address.id,
+          city: address.title,
+          address: address.address,
+          postalCode: address.postalCode,
+          recipient: address.nickname ?? '',
+          phone: address.mobile ?? '',
+          isDefault: address.isDefault,
+        }))
+        addressId.value = addresses.value.find(address => address.isDefault)?.id ?? addresses.value[0]?.id ?? ''
+      }
+      catch {
+        // Keep the designed addresses when the API is unavailable.
+      }
+    })
+  }
+
   // Step 2
   const paymentMethod = ref<PaymentMethod>('online')
   const gatewayId = ref('mellat')
@@ -42,9 +76,6 @@ export function useCheckout() {
   const creditProviderId = ref('')
   const discountCode = ref('')
   const discountOpen = ref(false)
-  /** Applied promo code + its amount (demo: any code is worth 500,000). */
-  const promoCode = ref('')
-  const promoDiscount = ref(0)
 
   const address = computed(
     () => addresses.value.find(item => item.id === addressId.value) ?? null,
@@ -74,21 +105,16 @@ export function useCheckout() {
     itemsTotal.value + insuranceTotal.value + servicesTotal.value + shippingCost.value - promoDiscount.value,
   ))
 
-  /** Demo promo value — the design's «OFF-Homa-500» chip says 500,000 Tomans. */
-  const PROMO_DISCOUNT = 500_000
-
-  function applyPromoCode(code: string) {
-    const normalized = code.trim().toUpperCase()
+  async function applyPromoCode(code: string) {
+    const normalized = code.trim()
     if (!normalized) return 0
-    promoCode.value = normalized
-    promoDiscount.value = PROMO_DISCOUNT
+    await applyCoupon(normalized)
     discountCode.value = normalized
-    return PROMO_DISCOUNT
+    return promoDiscount.value
   }
 
-  function clearPromoCode() {
-    promoCode.value = ''
-    promoDiscount.value = 0
+  async function clearPromoCode() {
+    await clearCoupon()
     discountCode.value = ''
   }
 

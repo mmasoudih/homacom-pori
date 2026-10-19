@@ -150,8 +150,13 @@ independently.
 - [ ] **Blocked:** no order cancel, invoice, or return-request endpoints in spec.
 - [ ] **Blocked:** no payment gateway init/callback endpoint in spec.
 - [ ] Returns tab still renders the designed mock data.
-- [ ] Checkout totals/coupon/shipping/payment are not yet persisted to the cart
-      before submit (no submit endpoint to attach them to).
+- [x] Checkout loads the user's saved addresses from the API
+- [x] Checkout promo code applies via `POST /cart/set-discount` (real coupon
+      amount now comes from `totals`), with the designed promo as visual fallback
+- [ ] Checkout shipping methods, delivery slots, gateways, wallets and
+      installment providers are still designed mocks (no endpoints).
+- [ ] Checkout totals/shipping/payment cannot be persisted before submit (no
+      submit endpoint).
 
 ## Phase 8 — Profile
 

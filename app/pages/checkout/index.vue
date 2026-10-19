@@ -9,6 +9,7 @@ import {
   shippingMethods,
 } from '~/data/checkout'
 import { formatPriceFa } from '~/utils/format'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const {
   isEmpty,
@@ -144,13 +145,19 @@ function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
   toast.success('آدرس جدید ثبت شد.')
 }
 
-function applyDiscount() {
+async function applyDiscount() {
   if (!discountCode.value.trim()) {
     toast.error('کد تخفیف را وارد کنید.')
     return
   }
-  applyPromoCode(discountCode.value)
-  toast.success('کد تخفیف اعمال شد.')
+
+  try {
+    await applyPromoCode(discountCode.value)
+    toast.success('کد تخفیف اعمال شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'کد تخفیف اعمال نشد.'))
+  }
 }
 </script>
 
