@@ -1,8 +1,6 @@
-interface ApiEnvelope<T = unknown> {
-  success?: boolean
-  message?: string
-  data?: T
-}
+import { apiErrorMessage, useApi } from '~/composables/useApi'
+
+export { apiErrorMessage as authErrorMessage } from '~/composables/useApi'
 
 interface AuthUser {
   id?: number
@@ -18,34 +16,13 @@ interface AuthSessionData {
   user?: AuthUser
 }
 
-interface ApiErrorPayload {
-  message?: string
-  errors?: Record<string, string[]>
-  error?: Record<string, string[]>
-  msg?: string
-}
-
-/** Pull a human-readable message out of a Laravel validation error payload. */
-export function authErrorMessage(err: unknown, fallback: string): string {
-  const payload = (err as { data?: ApiErrorPayload })?.data
-  const fieldErrors = payload?.errors ?? payload?.error
-  const firstFieldError = fieldErrors
-    ? Object.values(fieldErrors).flat().at(0)
-    : undefined
-
-  return firstFieldError || payload?.message || payload?.msg || fallback
-}
-
-function useApiBase() {
-  return useRuntimeConfig().public.apiBase
-}
-
 export function useAuth() {
+  const api = useApi()
+  const token = useCookie<string | null>('auth_token')
+  const authUser = useCookie<Pick<AuthUser, 'id' | 'mobile' | 'nickname'> | null>('auth_user')
+
   const sendOtp = async (mobile: string) => {
-    const res = await $fetch<ApiEnvelope>(`${useApiBase()}/auth/login`, {
-      method: 'POST',
-      body: { mobile },
-    })
+    const res = await api.post('/auth/login', { mobile })
 
     if (res?.success === false)
       throw new Error(res.message || 'ارسال کد تأیید با خطا مواجه شد. لطفاً دوباره تلاش کنید.')
@@ -55,9 +32,9 @@ export function useAuth() {
 
   const verifyCode = async (mobile: string, code: string) => {
     try {
-      const res = await $fetch<ApiEnvelope<AuthSessionData>>(`${useApiBase()}/auth/verify`, {
-        method: 'POST',
-        body: { mobile, active_code: code },
+      const res = await api.post<AuthSessionData>('/auth/verify', {
+        mobile,
+        active_code: code,
       })
 
       if (res?.success === false || !res.data?.token)
@@ -66,36 +43,33 @@ export function useAuth() {
       return res
     }
     catch (err: unknown) {
-      throw new Error(authErrorMessage(err, 'کد تأیید صحیح نیست.'), { cause: err })
+      throw new Error(apiErrorMessage(err, 'کد تأیید صحیح نیست.'), { cause: err })
     }
   }
 
   /** Login with the mobile number + password pair from the CRM API. */
   const loginWithPassword = async (mobile: string, password: string) => {
     try {
-      const res = await $fetch<ApiEnvelope<AuthSessionData>>(`${useApiBase()}/auth/login-with-password`, {
-        method: 'POST',
-        body: { mobile, password },
+      const res = await api.post<AuthSessionData>('/auth/login-with-password', {
+        mobile,
+        password,
       })
 
-      const token = res.data?.token
-      if (res?.success === false || !token)
+      const sessionToken = res.data?.token
+      if (res?.success === false || !sessionToken)
         throw new Error(res?.message || 'ورود با رمز عبور انجام نشد.')
 
-      return { ...res, token, user: res.data?.user }
+      return { ...res, token: sessionToken, user: res.data?.user }
     }
     catch (err: unknown) {
-      throw new Error(authErrorMessage(err, 'ورود با رمز عبور انجام نشد.'), { cause: err })
+      throw new Error(apiErrorMessage(err, 'ورود با رمز عبور انجام نشد.'), { cause: err })
     }
   }
 
   /** Ask the backend to send a password-reset code to the mobile number. */
   const requestPasswordReset = async (mobile: string) => {
     try {
-      const res = await $fetch<ApiEnvelope>(`${useApiBase()}/auth/forgot-password`, {
-        method: 'POST',
-        body: { mobile },
-      })
+      const res = await api.post('/auth/forgot-password', { mobile })
 
       if (res?.success === false)
         throw new Error(res.message || 'ارسال کد بازیابی با خطا مواجه شد.')
@@ -103,7 +77,7 @@ export function useAuth() {
       return res
     }
     catch (err: unknown) {
-      throw new Error(authErrorMessage(err, 'ارسال کد بازیابی با خطا مواجه شد.'), { cause: err })
+      throw new Error(apiErrorMessage(err, 'ارسال کد بازیابی با خطا مواجه شد.'), { cause: err })
     }
   }
 
@@ -115,14 +89,11 @@ export function useAuth() {
     passwordConfirmation: string
   }) => {
     try {
-      const res = await $fetch<ApiEnvelope>(`${useApiBase()}/auth/reset-password`, {
-        method: 'POST',
-        body: {
-          mobile: payload.mobile,
-          active_code: payload.code,
-          password: payload.password,
-          password_confirmation: payload.passwordConfirmation,
-        },
+      const res = await api.post('/auth/reset-password', {
+        mobile: payload.mobile,
+        active_code: payload.code,
+        password: payload.password,
+        password_confirmation: payload.passwordConfirmation,
       })
 
       if (res?.success === false)
@@ -131,9 +102,28 @@ export function useAuth() {
       return res
     }
     catch (err: unknown) {
-      throw new Error(authErrorMessage(err, 'تغییر رمز عبور با خطا مواجه شد.'), { cause: err })
+      throw new Error(apiErrorMessage(err, 'تغییر رمز عبور با خطا مواجه شد.'), { cause: err })
     }
   }
 
-  return { sendOtp, verifyCode, loginWithPassword, requestPasswordReset, resetPassword }
+  /**
+   * Revoke the token on the server, then always clear the local session so a
+   * network failure cannot trap the user in a logged-in state.
+   */
+  const logout = async () => {
+    try {
+      if (token.value) await api.post('/auth/logout')
+    }
+    catch {
+      // Ignore network/server failures — local sign-out is what matters.
+    }
+    finally {
+      token.value = null
+      authUser.value = null
+    }
+  }
+
+  return { sendOtp, verifyCode, loginWithPassword, requestPasswordReset, resetPassword, logout }
 }
+
+export type { AuthSessionData, AuthUser }

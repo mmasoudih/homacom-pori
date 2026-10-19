@@ -13,22 +13,21 @@ independently.
 - [x] Auth partially wired in `app/composables/useAuth.ts`: login, verify,
       login-with-password, forgot-password, reset-password.
 - [x] `auth_token` cookie written on login.
-- [ ] **No request sends `Authorization`** yet.
-- [ ] No API client wrapper, auth middleware, `X-Cart-Token` handling,
-      refresh or logout.
+- [x] Shared API client sends `Authorization` (with 401 refresh/retry).
+- [x] Auth middleware, `X-Cart-Token` support, refresh and logout.
 - [ ] Everything else is mock data under `app/data/*` and `app/composables/use*.ts`.
 
 ## Phase 0 — Shared infrastructure
 
-- [ ] Typed API client (`useApi`) wrapping `$fetch` with `apiBase`.
-- [ ] Auto-attach `Authorization: Bearer <auth_token>` from cookie (client + SSR).
-- [ ] Central error normalizer for `{ success, message, data }` and
+- [x] Typed API client (`useApi`) wrapping `$fetch` with `apiBase`.
+- [x] Auto-attach `Authorization: Bearer <auth_token>` from cookie (client + SSR).
+- [x] Central error normalizer for `{ success, message, data }` and
       401/403/422/429.
-- [ ] 401 → `POST /auth/refresh`, retry once; on failure clear token.
-- [ ] Persist `X-Cart-Token` for guest cart; send on cart endpoints.
-- [ ] Auth middleware for `/dashboard/**` with redirect-back support.
-- [ ] Shared API types (`ApiEnvelope`, `ApiPagination`, resources as needed).
-- [ ] Normalize media URLs and pagination (`data.items` + `data.pagination`).
+- [x] 401 → `POST /auth/refresh`, retry once; on failure clear token.
+- [x] Persist `X-Cart-Token` for guest cart; send on cart endpoints.
+- [x] Auth middleware for `/dashboard/**` with redirect-back support.
+- [x] Shared API types (`ApiEnvelope`, `ApiPagination`, `ApiError`).
+- [ ] Normalize media URLs and pagination per page (Phase 2+).
 - [ ] Decide direct browser calls vs Nitro proxy (CORS/token safety).
 
 ## Phase 1 — Auth (7 endpoints)
@@ -38,9 +37,8 @@ independently.
 - [x] `POST /api/auth/login-with-password` → `app/pages/auth/login-with-password.vue`
 - [x] `POST /api/auth/forgot-password` → `app/pages/auth/forgot-password.vue`
 - [x] `POST /api/auth/reset-password` → `app/pages/auth/reset-password.vue`
-- [ ] `POST /api/auth/logout` → `app/components/dashboard/LogoutDialog.vue`
-      (currently only clears the cookie)
-- [ ] `POST /api/auth/refresh` → API client interceptor
+- [x] `POST /api/auth/logout` → `app/components/dashboard/LogoutDialog.vue`
+- [x] `POST /api/auth/refresh` → API client interceptor
 - [ ] Verify token expiry (`token_expire`) and hydrate user via
       `GET /api/shop/user/profile/me`
 
