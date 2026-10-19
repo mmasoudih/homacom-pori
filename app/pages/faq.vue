@@ -6,14 +6,19 @@ useHead({
   title: 'سوالات متداول | هماکام',
 })
 
+const { faqContent } = useFaqs()
+
 const activeCategory = ref(-1)
 const searchQuery = ref('')
 
+const categories = computed(() => faqContent.value.categories)
+const items = computed(() => faqContent.value.items)
+
 const filteredItems = computed(() => {
   const q = searchQuery.value.trim()
-  const categoryId = faqPage.categories[activeCategory.value]?.id
+  const categoryId = categories.value[activeCategory.value]?.id
 
-  return faqPage.items.filter((item) => {
+  return items.value.filter((item) => {
     const matchesCategory = !categoryId || item.categoryId === categoryId
     const matchesQuery = !q || item.question.includes(q) || item.answer.includes(q)
     return matchesCategory && matchesQuery
@@ -61,7 +66,7 @@ const filteredItems = computed(() => {
       <!-- Category chips -->
       <PagesChipRow
         :active="activeCategory"
-        :items="faqPage.categories"
+        :items="categories"
         class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
         content-color="default"
         @select="(i: number) => (activeCategory = activeCategory === i ? -1 : i)"

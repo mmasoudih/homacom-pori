@@ -138,8 +138,8 @@ independently.
 
 ## Phase 12 — Static/CMS pages (no endpoints in spec)
 
-- [ ] `GET /api/shop/faqs` → `faq.vue`
-- [ ] `GET /api/shop/brands` → `brands.vue`, `landing/BrandsSection`
+- [x] `GET /api/shop/faqs` → `faq.vue` (mock content as fallback)
+- [x] `GET /api/shop/brands` → `brands.vue`, `landing/BrandsSection`
 - [ ] Confirm backend for: about, terms, guarantee, installment, contact, branch,
       collaboration, notifications
 - [ ] Keep mock or move to CMS — decision needed
