@@ -118,12 +118,21 @@ independently.
 
 ## Phase 7 — Checkout & orders (partly blocked)
 
-- [ ] `GET /api/shop/order?status=&type=` → `dashboard/orders/index.vue` tabs
-- [ ] `GET /api/shop/order/{invoice}` → order detail, pay, return pages
-- [ ] Wire checkout totals/coupon/shipping/payment to cart endpoints
+- [x] `GET /api/shop/order?status=&type=` → `dashboard/orders/index.vue`
+      (merges the tab statuses; `type=sales`)
+- [x] `GET /api/shop/order/{invoice}` → order detail (mapped available fields;
+      mock order kept as fallback for demo ids)
+- [ ] **Needed:** list endpoint should allow an "all"/group filter and return
+      pagination; today every tab costs one request per status.
+- [ ] **Needed in order payload:** invoice code, delivery date, receiver
+      name/phone/address, shipping method/cost, transactions, item image,
+      colour, warranty, and product slug (currently only id/title/qty/price).
 - [ ] **Blocked:** no create-order / checkout-submit endpoint in spec.
-- [ ] **Blocked:** no return-request endpoints in spec.
+- [ ] **Blocked:** no order cancel, invoice, or return-request endpoints in spec.
 - [ ] **Blocked:** no payment gateway init/callback endpoint in spec.
+- [ ] Returns tab still renders the designed mock data.
+- [ ] Checkout totals/coupon/shipping/payment are not yet persisted to the cart
+      before submit (no submit endpoint to attach them to).
 
 ## Phase 8 — Profile
 

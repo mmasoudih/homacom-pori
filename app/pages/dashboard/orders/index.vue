@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { IconSearch } from '@tabler/icons-vue'
 import { typographyVariants } from '~/components/ui/typography'
-import { orderTabs, orders, returnRequests } from '~/data/orders'
+import { orderTabs, returnRequests } from '~/data/orders'
+import { toast } from 'vue-sonner'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,21 +12,22 @@ const activeTab = ref((route.query.tab as string) || 'all')
 const page = ref(1)
 const search = ref('')
 
-const currentStatuses = ['awaiting_payment', 'processing', 'shipping']
+const { orders, loaded, load: loadOrders } = useOrders()
 
-const tabCount = computed(() => orderTabs.find(t => t.key === activeTab.value)?.count ?? 0)
-const pages = computed(() => Math.max(1, Math.ceil(tabCount.value / 10)))
+onMounted(() => {
+  loadOrders().catch(err => toast.error(apiErrorMessage(err, 'دریافت سفارش‌ها انجام نشد.')))
+})
 
 const filteredOrders = computed(() => {
   const term = search.value.trim().toLowerCase()
 
   const list = activeTab.value === 'current'
-    ? orders.filter(o => currentStatuses.includes(o.status))
+    ? orders.value.filter(o => o.status === 'awaiting_payment' || o.status === 'processing')
     : activeTab.value === 'delivered'
-      ? orders.filter(o => o.status === 'delivered')
+      ? orders.value.filter(o => o.status === 'delivered')
       : activeTab.value === 'cancelled'
-        ? orders.filter(o => o.status === 'cancelled')
-        : orders
+        ? orders.value.filter(o => o.status === 'cancelled')
+        : orders.value
 
   if (!term) return list
   return list.filter(o =>
@@ -32,6 +35,22 @@ const filteredOrders = computed(() => {
     || o.items.some(i => i.title.toLowerCase().includes(term)),
   )
 })
+
+const pages = computed(() => Math.max(1, Math.ceil(filteredOrders.value.length / 10)))
+const pagedOrders = computed(() =>
+  filteredOrders.value.slice((page.value - 1) * 10, page.value * 10),
+)
+
+const tabs = computed(() => orderTabs.map(tab => ({
+  ...tab,
+  count: tab.key === 'returned'
+    ? returnRequests.length
+    : tab.key === 'all'
+      ? orders.value.length
+      : tab.key === 'current'
+        ? orders.value.filter(order => order.status === 'awaiting_payment' || order.status === 'processing').length
+        : orders.value.filter(order => order.status === tab.key).length,
+})))
 
 const filteredReturns = computed(() => {
   const term = search.value.trim().toLowerCase()
@@ -45,7 +64,7 @@ const filteredReturns = computed(() => {
 const isReturnTab = computed(() => activeTab.value === 'returned')
 const showEmpty = computed(() =>
   route.query.empty === '1'
-  || (isReturnTab.value ? filteredReturns.value.length === 0 : filteredOrders.value.length === 0),
+  || (loaded.value && (isReturnTab.value ? filteredReturns.value.length === 0 : filteredOrders.value.length === 0)),
 )
 
 watch(activeTab, (tab) => {
@@ -79,7 +98,7 @@ useHead({
         </div>
 
         <!-- Tabs -->
-        <DashboardOrdersTabs v-model="activeTab" :tabs="orderTabs" />
+        <DashboardOrdersTabs v-model="activeTab" :tabs="tabs" />
 
         <!-- List -->
         <div v-if="showEmpty" class="mt-2">
@@ -97,7 +116,7 @@ useHead({
             </template>
             <template v-else>
               <DashboardOrdersOrderCard
-                v-for="order in filteredOrders"
+                v-for="order in pagedOrders"
                 :key="order.id"
                 :order="order"
               />
@@ -123,7 +142,7 @@ useHead({
 
       <!-- Tabs -->
       <div class="mb-4 border-b border-T-300 pb-3">
-        <DashboardOrdersMobileTabs v-model="activeTab" :tabs="orderTabs" />
+        <DashboardOrdersMobileTabs v-model="activeTab" :tabs="tabs" />
       </div>
 
       <!-- List -->
@@ -140,7 +159,7 @@ useHead({
       </template>
       <div v-else class="flex flex-col">
         <DashboardOrdersMobileOrderCard
-          v-for="order in filteredOrders"
+          v-for="order in pagedOrders"
           :key="order.id"
           :order="order"
         />
