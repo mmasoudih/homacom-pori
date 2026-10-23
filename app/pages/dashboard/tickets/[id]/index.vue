@@ -29,9 +29,9 @@ async function closeTicket() {
   }
 }
 
-async function sendMessage(text: string) {
+async function sendMessage(text: string, file?: File | null) {
   try {
-    await reply(text)
+    await reply(text, file)
   }
   catch (err) {
     toast.error(apiErrorMessage(err, 'ارسال پیام انجام نشد.'))

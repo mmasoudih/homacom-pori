@@ -15,6 +15,9 @@ interface ApiTicketMessage {
   content: string
   created_at?: string | null
   user_id?: number | null
+  is_support?: boolean | null
+  file_url?: string | null
+  user?: { id?: number | null } | null
 }
 
 interface ApiTicket {
@@ -47,7 +50,7 @@ function formatDate(value?: string | null): string {
 
 function mapStatus(status?: string | null): TicketStatus {
   if (status === 'closed') return 'closed'
-  if (status === 'answered' || status === 'replied') return 'answered'
+  if (status === 'answer') return 'answered'
   return 'waiting'
 }
 
@@ -56,12 +59,18 @@ function mapMessage(
   supporterId?: number | null,
   fallbackAuthor: 'user' | 'support' = 'user',
 ): TicketMessage {
-  const author = supporterId && message.user_id === supporterId ? 'support' : fallbackAuthor
+  const author = message.is_support
+    ? 'support'
+    : message.user_id && supporterId && message.user_id === supporterId
+      ? 'support'
+      : fallbackAuthor
+
   return {
     id: String(message.id),
     author,
     body: message.content,
     date: formatDate(message.created_at),
+    fileUrl: message.file_url ?? undefined,
   }
 }
 
@@ -135,7 +144,7 @@ export function useTickets() {
   return { tickets, pending, loaded, load, create, close }
 }
 
-/** One ticket + its messages (there is no single-ticket endpoint). */
+/** One ticket + its messages via the dedicated single-ticket endpoint. */
 export function useTicketDetail(id: Ref<string>) {
   const api = useApi()
   const ticket = ref<Ticket | undefined>(undefined)
@@ -145,29 +154,8 @@ export function useTicketDetail(id: Ref<string>) {
   async function load() {
     pending.value = true
     try {
-      const list = await api.get<ApiTicket[]>('/shop/user/ticket', {
-        query: { 'filters[per_page]': 100 },
-      })
-      const match = (list.data ?? []).find(item => String(item.id) === id.value)
-      if (!match) {
-        ticket.value = undefined
-        loaded.value = true
-        return
-      }
-
-      const base = mapTicket(match)
-      const messages = await api.get<ApiTicketMessage[]>(
-        `/shop/user/ticket/${encodeURIComponent(id.value)}/messages`,
-      )
-      const supporterId = match.supporter?.id ?? null
-      const mappedMessages = (messages.data ?? []).map(message =>
-        mapMessage(message, supporterId, 'user'),
-      )
-
-      ticket.value = {
-        ...base,
-        messages: mappedMessages.length ? mappedMessages : base.messages,
-      }
+      const res = await api.get<ApiTicket>(`/shop/user/ticket/${encodeURIComponent(id.value)}`)
+      ticket.value = res.data ? mapTicket(res.data) : undefined
     }
     catch {
       ticket.value = undefined
@@ -178,8 +166,12 @@ export function useTicketDetail(id: Ref<string>) {
     }
   }
 
-  async function reply(content: string) {
-    await api.post(`/shop/user/ticket/${encodeURIComponent(id.value)}/reply`, { content })
+  async function reply(content: string, file?: File | null) {
+    const form = new FormData()
+    form.append('content', content)
+    if (file) form.append('file', file)
+
+    await api.post(`/shop/user/ticket/${encodeURIComponent(id.value)}/reply`, form)
     await load()
   }
 

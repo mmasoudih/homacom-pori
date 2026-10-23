@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IconPaperclip } from '@tabler/icons-vue'
 import type { TicketMessage } from '~/data/tickets'
 import { cn } from '~/lib/utils'
 
@@ -25,5 +26,16 @@ const isUser = computed(() => props.message.author === 'user')
     >
       {{ message.body }}
     </UiTypography>
+
+    <a
+      v-if="message.fileUrl"
+      :href="message.fileUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-medium text-primary underline-offset-2 hover:underline"
+    >
+      <IconPaperclip class="size-4" />
+      پیوست پیام
+    </a>
   </div>
 </template>

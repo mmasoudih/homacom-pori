@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import type { NewTicketPayload } from '~/data/tickets'
+import type { NewTicketPayload, TicketPriority } from '~/data/tickets'
+import { ticketPriorityOptions } from '~/data/tickets'
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -27,6 +28,7 @@ const subject = ref('')
 const topic = ref('')
 const description = ref('')
 const attachment = ref('')
+const priority = ref<TicketPriority>('medium')
 
 watch(
   () => props.open,
@@ -36,6 +38,7 @@ watch(
       topic.value = ''
       description.value = ''
       attachment.value = ''
+      priority.value = 'medium'
     }
   },
 )
@@ -59,6 +62,7 @@ function submit() {
     topic: topic.value,
     description: description.value.trim(),
     attachment: attachment.value,
+    priority: priority.value,
   })
   close()
 }
@@ -99,6 +103,21 @@ const sheetShell
                 <option value="" disabled>انتخاب بخش</option>
                 <option v-for="item in departments" :key="item.id" :value="item.id">
                   {{ item.title }}
+                </option>
+              </select>
+              <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <UiTypography as="span" size="lg" weight="regular" color="default">اولویت</UiTypography>
+            <div class="relative">
+              <select
+                v-model="priority"
+                class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
+              >
+                <option v-for="option in ticketPriorityOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
                 </option>
               </select>
               <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />

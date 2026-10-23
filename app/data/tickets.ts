@@ -14,6 +14,8 @@ export interface TicketMessage {
   author: TicketAuthor
   body: string
   date: string
+  /** Absolute attachment URL returned by `TicketMessageResource.file_url`. */
+  fileUrl?: string
 }
 
 export interface Ticket {
@@ -31,11 +33,25 @@ export interface TicketSubject {
   label: string
 }
 
+export type TicketPriority = 'low' | 'medium' | 'top'
+
+export interface TicketPriorityOption {
+  value: TicketPriority
+  label: string
+}
+
+export const ticketPriorityOptions: TicketPriorityOption[] = [
+  { value: 'low', label: 'کم' },
+  { value: 'medium', label: 'متوسط' },
+  { value: 'top', label: 'زیاد' },
+]
+
 export interface NewTicketPayload {
   subject: string
   topic: string
   description: string
   attachment: string
+  priority: TicketPriority
 }
 
 export const ticketStatusMeta: Record<TicketStatus, TicketStatusMeta> = {
