@@ -107,6 +107,21 @@ export function useAuth() {
   }
 
   /**
+   * Persist the session from a login/verify response.
+   *
+   * `authUser` only keeps the non-sensitive display fields; the profile is
+   * re-hydrated from `/shop/user/profile/me`.
+   */
+  const setSession = (tokenValue: string, user?: AuthUser | null) => {
+    token.value = tokenValue
+    authUser.value = {
+      id: user?.id,
+      mobile: user?.mobile,
+      nickname: user?.nickname,
+    }
+  }
+
+  /**
    * Revoke the token on the server, then always clear the local session so a
    * network failure cannot trap the user in a logged-in state.
    */
@@ -123,7 +138,7 @@ export function useAuth() {
     }
   }
 
-  return { sendOtp, verifyCode, loginWithPassword, requestPasswordReset, resetPassword, logout }
+  return { sendOtp, verifyCode, loginWithPassword, requestPasswordReset, resetPassword, setSession, logout }
 }
 
 export type { AuthSessionData, AuthUser }

@@ -54,7 +54,7 @@ watch(code, (value) => {
   if (clean !== value) code.value = clean
 })
 
-const { sendOtp, verifyCode } = useAuth()
+const { sendOtp, verifyCode, setSession } = useAuth()
 
 const isResending = ref(false)
 
@@ -66,17 +66,9 @@ const onSubmit = handleSubmit(async (formValues) => {
 
   try {
     const res = await verifyCode(mobile.value, formValues.code)
-    if (res.data?.token) {
-      const token = useCookie('auth_token')
-      token.value = res.data.token
+    if (res.data?.token)
+      setSession(res.data.token, { ...res.data.user, mobile: res.data.user?.mobile ?? mobile.value })
 
-      const authUser = useCookie<{ id?: number, mobile?: string, nickname?: string | null } | null>('auth_user')
-      authUser.value = {
-        id: res.data.user?.id,
-        mobile: res.data.user?.mobile ?? mobile.value,
-        nickname: res.data.user?.nickname,
-      }
-    }
     await router.push('/')
   }
   catch (err: unknown) {

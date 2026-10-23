@@ -17,7 +17,7 @@ import { IRAN_MOBILE_REGEX, MOBILE_MAX_LENGTH, sanitizeMobileInput } from '~/uti
 
 const { t } = useI18n()
 const router = useRouter()
-const { loginWithPassword } = useAuth()
+const { loginWithPassword, setSession } = useAuth()
 
 useSeoMeta({
   title: () => `${t('auth.passwordLoginTitle')} | ${t('common.brand')}`,
@@ -54,15 +54,10 @@ watch(mobile, (value) => {
 const onSubmit = handleSubmit(async (values) => {
   try {
     const res = await loginWithPassword(sanitizeMobileInput(values.mobile), values.password)
-    const token = useCookie('auth_token')
-    token.value = res.token ?? ''
-
-    const authUser = useCookie<{ id?: number, mobile?: string, nickname?: string | null } | null>('auth_user')
-    authUser.value = {
-      id: res.user?.id,
+    setSession(res.token ?? '', {
+      ...res.user,
       mobile: res.user?.mobile ?? sanitizeMobileInput(values.mobile),
-      nickname: res.user?.nickname,
-    }
+    })
 
     await router.push('/')
   }
