@@ -66,6 +66,7 @@ const emit = defineEmits<{
           <div class="flex items-center gap-2">
             <CartQtyStepper
               :quantity="item.quantity"
+              :min-quantity="item.minQuantity"
               :max-quantity="item.maxQuantity"
               @increment="emit('increment')"
               @decrement="emit('decrement')"

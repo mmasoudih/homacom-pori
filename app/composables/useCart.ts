@@ -19,6 +19,8 @@ export interface AddToCartOptions {
   /** Selected service ids (`ServiceCatalogItem.id`). */
   serviceIds?: string[]
   quantity?: number
+  /** Explicit backend stock id; resolved from the seller when omitted. */
+  stockId?: number
   /** When set, the line carries that seller's offer instead of the product price. */
   seller?: Seller | null
 }
@@ -46,6 +48,9 @@ interface ApiCartItem {
   id: number
   title: string
   image?: string | null
+  product_id?: number | null
+  product_slug?: string | null
+  stock_id?: number | null
   customer_price?: string | number | null
   real_price?: string | number | null
   quantity: number
@@ -56,7 +61,10 @@ interface ApiCartItem {
     real_price?: string | number | null
     discount?: number | null
     max_in_cart?: number | null
+    min_in_cart?: number | null
+    quantity?: number | null
     color?: { title?: string | null, code?: string | null } | null
+    size?: { title?: string | null } | null
     warranty?: { title?: string | null } | null
     store?: { title?: string | null } | null
   } | null
@@ -92,9 +100,9 @@ function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
   return {
     id: String(item.id),
     apiId: item.id,
-    stockId: stock?.id,
+    stockId: item.stock_id ?? stock?.id,
     title: item.title,
-    href: '#',
+    href: item.product_slug ? `/product/${item.product_slug}` : '#',
     image: resolveMediaUrl(item.image, apiBase),
     color: { name: color?.title ?? '', value: color?.code ?? '' },
     warranty: warranty?.title ?? '',
@@ -102,6 +110,7 @@ function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
     oldPrice: realPrice > price ? realPrice : undefined,
     discount: stock?.discount ?? undefined,
     quantity: num(item.quantity),
+    minQuantity: num(stock?.min_in_cart) || undefined,
     maxQuantity: stock?.max_in_cart ?? undefined,
     sellerName: stock?.store?.title ?? undefined,
     insurance: null,
@@ -328,8 +337,11 @@ export function useCart() {
    * for mock products that have no backend stock id).
    */
   async function addProduct(options: AddToCartOptions): Promise<string> {
-    const quantity = Math.max(1, options.quantity ?? 1)
-    const stockId = options.seller?.stockId ?? options.product.stockId
+    const quantity = Math.max(
+      options.product.minOrderQuantity ?? 1,
+      options.quantity ?? 1,
+    )
+    const stockId = options.stockId ?? options.seller?.stockId ?? options.product.stockId
 
     if (!stockId) {
       const id = addLocal(options, quantity)
@@ -407,7 +419,8 @@ export function useCart() {
 
   async function decrement(id: string) {
     const item = find(id)
-    if (!item || item.quantity <= 1) return
+    const min = item?.minQuantity ?? 1
+    if (!item || item.quantity <= min) return
 
     if (item.apiId) {
       try {

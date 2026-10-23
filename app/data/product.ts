@@ -73,6 +73,10 @@ export interface ServiceCatalogItem {
   id: string
   label: string
   price: number
+  /** Pre-discount price when the service has an active `off_price`. */
+  oldPrice?: number
+  /** Backend `service_type` (`physical` / `digital`, …). */
+  serviceType?: string
   /** When set, a «جزئیات بیمه» link opens the insurance-info dialog. */
   detailLink?: string
 }
@@ -81,6 +85,10 @@ export interface ServiceCategory {
   id: string
   title: string
   icon: 'sim' | 'insurance' | 'invoice' | 'warranty' | 'charger' | 'accessory' | 'games' | 'apps'
+  /** Backend `selection_mode`: only one item can be picked in this group. */
+  selectionMode?: 'single' | 'multiple'
+  /** Backend `max_selections` cap for `multiple` groups. */
+  maxSelections?: number | null
   items: ServiceCatalogItem[]
 }
 
@@ -153,6 +161,10 @@ export interface ProductDetail {
   id: string
   /** Default backend stock id used by add-to-cart. */
   stockId?: number
+  /** Minimum quantity the backend accepts (`stock.min_in_cart`). */
+  minOrderQuantity?: number
+  /** Per-stock purchase cap (`stock.max_in_cart`). */
+  maxOrderQuantity?: number
   /** Authenticated favourite state from the API. */
   isFavorite?: boolean
   title: string
