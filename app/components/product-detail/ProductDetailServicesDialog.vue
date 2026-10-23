@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import {
   IconPackage,
   IconFileText,
@@ -57,10 +58,24 @@ watch(
   { immediate: true },
 )
 
-function toggle(id: string) {
-  if (draft.value.has(id))
+function countInGroup(category: ServiceCategory): number {
+  return category.items.filter(item => draft.value.has(item.id)).length
+}
+
+function toggle(category: ServiceCategory, id: string) {
+  if (draft.value.has(id)) {
     draft.value.delete(id)
-  else draft.value.add(id)
+  }
+  else {
+    if (category.selectionMode === 'single') {
+      for (const item of category.items) draft.value.delete(item.id)
+    }
+    else if (category.maxSelections != null && countInGroup(category) >= category.maxSelections) {
+      toast.error(`حداکثر ${category.maxSelections} مورد از «${category.title}» قابل انتخاب است.`)
+      return
+    }
+    draft.value.add(id)
+  }
   draft.value = new Set(draft.value)
 }
 
@@ -161,7 +176,7 @@ const dialogShell
                     <UiCheckbox
                       :model-value="draft.has(item.id)"
                       class="size-[18px]"
-                      @update:model-value="toggle(item.id)"
+                      @update:model-value="toggle(category, item.id)"
                     />
                     <span class="text-[12.5px] text-T-900">{{ item.label }}</span>
                   </label>
@@ -175,7 +190,8 @@ const dialogShell
                       <IconFileText class="size-3.5" />
                       جزئیات بیمه
                     </button>
-                    <span v-if="item.price" class="text-[12px] text-T-700">
+                    <span v-if="item.price" class="flex items-center gap-2 text-[12px] text-T-700">
+                      <span v-if="item.oldPrice" class="text-T-500 line-through">{{ formatPrice(item.oldPrice) }}</span>
                       {{ formatPrice(item.price) }} تومان
                     </span>
                   </span>

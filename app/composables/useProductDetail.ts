@@ -43,6 +43,7 @@ interface ApiStock {
   discount?: number | null
   quantity?: number | null
   max_in_cart?: number | null
+  min_in_cart?: number | null
   is_default?: string | boolean | null
   color?: ApiColor | null
   warranty?: ApiWarranty | null
@@ -55,12 +56,17 @@ interface ApiServiceItem {
   title: string
   description?: string | null
   price?: string | number | null
+  off_price?: string | number | null
+  off_price_ended_at?: string | null
+  service_type?: string | null
 }
 
 interface ApiServiceGroup {
   id: number
   name: string
   icon?: string | null
+  selection_mode?: 'single' | 'multiple' | string | null
+  max_selections?: number | null
   items?: ApiServiceItem[]
 }
 
@@ -104,6 +110,8 @@ interface ApiComment {
   content: string
   score?: number | null
   status?: string | null
+  reaction_up?: number | null
+  reaction_down?: number | null
   created_at?: string | null
   user?: { nickname?: string | null } | null
 }
@@ -152,15 +160,31 @@ const SERVICE_ICONS: ServiceCategory['icon'][] = [
   'sim',
 ]
 
+function activeServicePrice(item: ApiServiceItem): { price: number, oldPrice?: number } {
+  const price = num(item.price)
+  const offPrice = num(item.off_price)
+  const endedAt = item.off_price_ended_at ? new Date(item.off_price_ended_at) : null
+  const offActive = offPrice > 0
+    && offPrice < price
+    && (!endedAt || Number.isNaN(endedAt.getTime()) || endedAt.getTime() > Date.now())
+
+  return offActive ? { price: offPrice, oldPrice: price } : { price }
+}
+
 function mapServiceCatalog(groups: ApiServiceGroup[]): ServiceCategory[] {
   return groups.map((group, index) => ({
     id: `service-group-${group.id}`,
     title: group.name,
     icon: SERVICE_ICONS[index % SERVICE_ICONS.length]!,
+    ...(group.selection_mode === 'single' || group.selection_mode === 'multiple'
+      ? { selectionMode: group.selection_mode }
+      : {}),
+    maxSelections: group.max_selections ?? null,
     items: (group.items ?? []).map<ServiceCatalogItem>(item => ({
       id: String(item.id),
       label: item.title,
-      price: num(item.price),
+      ...activeServicePrice(item),
+      serviceType: item.service_type ?? undefined,
     })),
   }))
 }
@@ -172,7 +196,7 @@ function mapServicePackages(groups: ApiServiceGroup[]): ServicePackage[] {
       provider: group.name,
       name: item.title,
       description: item.description ?? '',
-      price: num(item.price),
+      ...activeServicePrice(item),
     })),
   )
 }
@@ -194,8 +218,8 @@ function mapComments(comments: ApiComment[]): { summary: CommentsSummary, items:
       rating: score,
       text: comment.content,
       recommends: score >= 4,
-      likes: 0,
-      dislikes: 0,
+      likes: num(comment.reaction_up),
+      dislikes: num(comment.reaction_down),
     }
   })
 
@@ -211,8 +235,9 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
   const base = mockProductDetail
   const stocks = api.stocks ?? []
   const inStockStocks = stocks.filter(stock => num(stock.quantity) > 0)
-  const defaultStock = stocks.find(stock => stock.is_default === 'yes' || stock.is_default === true)
+  const defaultStock = inStockStocks.find(stock => stock.is_default === 'yes' || stock.is_default === true)
     ?? inStockStocks[0]
+    ?? stocks.find(stock => stock.is_default === 'yes' || stock.is_default === true)
     ?? stocks[0]
 
   const price = num(defaultStock?.customer_price)
@@ -300,6 +325,8 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
     ...base,
     id: String(api.id),
     stockId: defaultStock?.id,
+    minOrderQuantity: Math.max(1, num(defaultStock?.min_in_cart)),
+    maxOrderQuantity: num(defaultStock?.max_in_cart) || undefined,
     isFavorite: !!api.is_favorite,
     title: api.title,
     englishTitle: api.title_en ?? base.englishTitle,

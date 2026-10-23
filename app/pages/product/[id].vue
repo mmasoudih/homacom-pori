@@ -87,12 +87,26 @@ const currentLineId = computed(() =>
     : '',
 )
 
+/** Stock that matches the selected colour + warranty (falls back to default). */
+const selectedStockId = computed(() => {
+  const current = product.value
+  if (!current) return undefined
+
+  const color = selectedColor.value || current.colors[0]?.value
+  const warrantyId = selectedWarranty.value?.id
+
+  return current.sellers.find(seller => seller.colorValue === color && seller.warrantyId === warrantyId)?.stockId
+    ?? current.sellers.find(seller => seller.colorValue === color)?.stockId
+    ?? current.sellers.find(seller => seller.warrantyId === warrantyId)?.stockId
+    ?? current.stockId
+})
+
 /** How many of the current selection are already in the cart. */
 const currentQuantity = computed(
   () => cartItems.value.find(item => item.id === currentLineId.value)?.quantity ?? 0,
 )
 
-function addSelectionToCart(quantity = 1) {
+function addSelectionToCart(quantity?: number) {
   if (!product.value) return
   addProduct({
     product: product.value,
@@ -100,7 +114,8 @@ function addSelectionToCart(quantity = 1) {
     warrantyId: selectedWarranty.value?.id,
     insuranceId: selectedInsuranceId.value,
     serviceIds: addedServiceIds.value,
-    quantity,
+    stockId: selectedStockId.value,
+    quantity: quantity ?? product.value.minOrderQuantity ?? 1,
   })
 }
 
@@ -334,7 +349,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           />
 
           <!-- ================== Insurance / benefits ===================== -->
-          <HomaInsuranceBanner class="mt-12 hidden w-full max-w-[1440px] lg:block" />
+          <ProductDetailHomaInsuranceBanner class="mt-12 hidden w-full max-w-[1440px] lg:block" />
 
           <ProductDetailInPersonBenefits
             :title="product.inPersonBenefits.title"
