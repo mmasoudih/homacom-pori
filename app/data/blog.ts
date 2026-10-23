@@ -409,6 +409,8 @@ export interface BlogComment {
 }
 
 export interface BlogArticle {
+  /** Backend post id (used for comments). */
+  apiId?: number
   slug: string
   categorySlug: string
   /** Chip label shown on the cover. */
@@ -422,6 +424,7 @@ export interface BlogArticle {
   lead: string
   body: BlogBlock[]
   comments: BlogComment[]
+  commentsTotal?: number
 }
 
 export const blogArticle: BlogArticle = {

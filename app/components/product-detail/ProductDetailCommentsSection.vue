@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { toast } from 'vue-sonner'
 import {
   IconStarFilled,
   IconThumbUp,
@@ -15,6 +16,8 @@ import {
   IconArrowBackUp,
 } from '@tabler/icons-vue'
 import type { CommentSort, ProductComment, ProductDetail } from '~/data/product'
+import { apiErrorMessage } from '~/composables/useApi'
+import { useCommentReaction } from '~/composables/useUserComments'
 import { cn } from '~/lib/utils'
 
 const props = withDefaults(
@@ -57,6 +60,46 @@ const items = computed<ProductComment[]>(() => {
 const summary = computed(() => props.product.comments.summary)
 const maxDistribution = computed(() => Math.max(...summary.value.distribution, 1))
 const hasComments = computed(() => items.value.length > 0)
+
+interface CommentVote {
+  likes: number
+  dislikes: number
+  vote: 'up' | 'down' | null
+}
+
+const { react } = useCommentReaction()
+const votes = reactive<Record<string, CommentVote>>({})
+
+function currentVote(comment: ProductComment): CommentVote {
+  return votes[comment.id] ?? {
+    likes: comment.likes,
+    dislikes: comment.dislikes,
+    vote: null,
+  }
+}
+
+function likesOf(comment: ProductComment) {
+  return currentVote(comment).likes
+}
+
+function dislikesOf(comment: ProductComment) {
+  return currentVote(comment).dislikes
+}
+
+async function vote(comment: ProductComment, type: 'up' | 'down') {
+  try {
+    const result = await react(comment.id, type)
+    if (!result) return
+    votes[comment.id] = {
+      likes: result.reaction_up,
+      dislikes: result.reaction_down,
+      vote: result.reaction,
+    }
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت بازخورد انجام نشد.'))
+  }
+}
 
 /** Index 0 => 5-star … index 4 => 1-star. */
 function starCount(star: number) {
@@ -227,16 +270,20 @@ function starCount(star: number) {
               <div class="flex items-center gap-2.5">
                 <button
                   type="button"
-                  class="flex h-[40px] items-center gap-2 rounded-lg border border-T-300 px-3.5 text-[12.5px] text-T-700 transition-colors hover:border-T-500"
+                  class="flex h-[40px] items-center gap-2 rounded-lg border px-3.5 text-[12.5px] transition-colors hover:border-T-500"
+                  :class="currentVote(comment).vote === 'up' ? 'border-primary text-primary' : 'border-T-300 text-T-700'"
+                  @click="vote(comment, 'up')"
                 >
-                  {{ comment.likes }}
+                  {{ likesOf(comment) }}
                   <IconThumbUp class="size-4.5" />
                 </button>
                 <button
                   type="button"
-                  class="flex h-[40px] items-center gap-2 rounded-lg border border-T-300 px-3.5 text-[12.5px] text-T-700 transition-colors hover:border-T-500"
+                  class="flex h-[40px] items-center gap-2 rounded-lg border px-3.5 text-[12.5px] transition-colors hover:border-T-500"
+                  :class="currentVote(comment).vote === 'down' ? 'border-primary text-primary' : 'border-T-300 text-T-700'"
+                  @click="vote(comment, 'down')"
                 >
-                  {{ comment.dislikes }}
+                  {{ dislikesOf(comment) }}
                   <IconThumbDown class="size-4.5" />
                 </button>
               </div>
@@ -368,14 +415,24 @@ function starCount(star: number) {
             پاسخ ({{ comment.reply ? 1 : 0 }})
           </span>
           <div class="flex items-center gap-2">
-            <span class="flex h-[30px] items-center gap-1.5 rounded-lg border border-T-300 px-2.5 text-[11.5px] text-T-700">
-              {{ comment.likes }}
+            <button
+              type="button"
+              class="flex h-[30px] items-center gap-1.5 rounded-lg border px-2.5 text-[11.5px] transition-colors"
+              :class="currentVote(comment).vote === 'up' ? 'border-primary text-primary' : 'border-T-300 text-T-700'"
+              @click="vote(comment, 'up')"
+            >
+              {{ likesOf(comment) }}
               <IconThumbUp class="size-4" />
-            </span>
-            <span class="flex h-[30px] items-center gap-1.5 rounded-lg border border-T-300 px-2.5 text-[11.5px] text-T-700">
-              {{ comment.dislikes }}
+            </button>
+            <button
+              type="button"
+              class="flex h-[30px] items-center gap-1.5 rounded-lg border px-2.5 text-[11.5px] transition-colors"
+              :class="currentVote(comment).vote === 'down' ? 'border-primary text-primary' : 'border-T-300 text-T-700'"
+              @click="vote(comment, 'down')"
+            >
+              {{ dislikesOf(comment) }}
               <IconThumbDown class="size-4" />
-            </span>
+            </button>
           </div>
         </div>
       </article>

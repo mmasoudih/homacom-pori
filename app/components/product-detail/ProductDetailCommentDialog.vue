@@ -17,6 +17,8 @@ const props = withDefaults(
     product: CommentDialogProduct
     /** Backend product id; when set the comment is posted to the API. */
     productId?: number | null
+    /** Backend relation type; blog posts use `post`. */
+    relateTo?: 'product' | 'post'
     /** When set, the dialog edits this comment instead of creating one. */
     commentId?: string | null
     initialRating?: number
@@ -26,6 +28,7 @@ const props = withDefaults(
   }>(),
   {
     productId: null,
+    relateTo: 'product',
     commentId: null,
     initialRating: 0,
     initialText: '',
@@ -102,7 +105,7 @@ async function submit() {
     else if (props.productId) {
       await api.post('/shop/user/comments', {
         ...body,
-        relate_to: 'product',
+        relate_to: props.relateTo,
         relate_id: props.productId,
       })
     }

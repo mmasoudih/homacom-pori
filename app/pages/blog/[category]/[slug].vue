@@ -13,10 +13,21 @@ const route = useRoute()
 const slug = computed(() => String(route.params.slug))
 const categorySlug = computed(() => String(route.params.category))
 
-const { articleData } = useBlogPost(slug, categorySlug)
+const { articleData, refresh } = useBlogPost(slug, categorySlug)
 const article = computed(() => articleData.value.article)
 const sidebar = computed(() => articleData.value.sidebar)
 const related = computed(() => articleData.value.related)
+
+const commentOpen = ref(false)
+const commentProduct = computed(() => ({
+  title: article.value.title,
+  images: [{ src: article.value.image }],
+}))
+
+async function onCommentSubmitted() {
+  commentOpen.value = false
+  await refresh()
+}
 
 useHead({
   title: () => `${article.value.title} | بلاگ هماکام`,
@@ -37,6 +48,7 @@ function segmentClass(tone?: BlogInlineSegment['tone']) {
 </script>
 
 <template>
+  <div>
   <BlogShell>
     <div class="flex w-full flex-col items-center">
       <div class="mx-auto w-full max-w-[1440px] px-4 lg:px-6">
@@ -64,7 +76,7 @@ function segmentClass(tone?: BlogInlineSegment['tone']) {
               <IconMessageDots class="size-5" />
               {{ article.views }}
             </span>
-            <span class="flex items-center gap-2">
+            <span v-if="article.rating" class="flex items-center gap-2">
               <IconStarFilled class="size-[18px] text-T-600" />
               {{ article.rating }} امتیاز
             </span>
@@ -89,7 +101,7 @@ function segmentClass(tone?: BlogInlineSegment['tone']) {
                 <IconMessageDots class="size-[18px]" />
                 {{ article.views }}
               </span>
-              <span class="flex items-center gap-1.5">
+              <span v-if="article.rating" class="flex items-center gap-1.5">
                 <IconStarFilled class="size-[17px] text-T-600" />
                 {{ article.rating }} امتیاز
               </span>
@@ -154,7 +166,12 @@ function segmentClass(tone?: BlogInlineSegment['tone']) {
           </div>
 
           <!-- Comments -->
-          <BlogComments class="mt-10 lg:mt-[54px]" :comments="article.comments" />
+          <BlogComments
+            class="mt-10 lg:mt-[54px]"
+            :comments="article.comments"
+            :total="article.commentsTotal"
+            @add="commentOpen = true"
+          />
         </article>
 
         <!-- ============================== Sidebar ============================= -->
@@ -169,4 +186,13 @@ function segmentClass(tone?: BlogInlineSegment['tone']) {
       />
     </div>
   </BlogShell>
+
+  <ProductDetailCommentDialog
+    v-model:open="commentOpen"
+    :product="commentProduct"
+    :product-id="article.apiId ?? null"
+    relate-to="post"
+    @submitted="onCommentSubmitted"
+  />
+  </div>
 </template>
