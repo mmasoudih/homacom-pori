@@ -33,9 +33,9 @@ const { data: groups } = await useAsyncData('landing-best-of', async () => {
   if (!roots.length) return bestOfCategories
 
   try {
-    // The backend's `filters[categories][]` currently rejects every id, so the
+    // The backend's `filters[categories][]` still rejects every id (422), so the
     // panels share a real product pool split across the three categories.
-    const products = await fetchList('', 9, 'newest')
+    const products = await fetchList('', 9, 'more_invoice')
     if (products.length) {
       return roots.map((root, index) => ({
         category: root.title,

@@ -17,6 +17,12 @@ export interface SearchProduct {
   price: number
   oldPrice?: number
   discount?: number
+  /** Default buyable stock from the list payload (`cheapest_stock.id`). */
+  stockId?: number
+  /** Minimum quantity the backend accepts for that stock. */
+  minQuantity?: number
+  /** Per-stock purchase cap. */
+  maxQuantity?: number
   /**
    * Category facet id — one of `searchCategoryOptions`. In this mock the
    * category tree is brand-based (آیفون / سامسونگ / آنر …), exactly like the
