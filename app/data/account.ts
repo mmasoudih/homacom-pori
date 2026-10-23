@@ -8,7 +8,12 @@ export interface LegalInfo {
   city: string
   province: string
   postalAddress: string
-  /** Required by the company-information endpoint. */
+  /** Backend ids used by `PUT /shop/user/profile/legal-information`. */
+  stateId?: number
+  cityId?: number
+  /** Gregorian `YYYY-MM-DD` (`company_establishment_date`). */
+  establishmentDate?: string
+  /** Required by the legal-information endpoint. */
   economicCode?: string
   ceo?: string
 }
@@ -16,6 +21,8 @@ export interface LegalInfo {
 export interface AccountProfile {
   firstName: string
   lastName: string
+  /** Relative or absolute avatar URL from the profile payload. */
+  avatar?: string
   birthYear: string
   birthMonth: string
   birthDay: string

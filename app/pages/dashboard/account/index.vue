@@ -16,11 +16,27 @@ const {
   saveNationalId: updateNationalId,
   saveBirthdate: updateBirthdate,
   saveCompany: updateCompany,
+  saveBank: updateBank,
+  uploadAvatar,
+  requestPasswordCode,
+  savePassword: updatePassword,
 } = useUserProfile()
 
 
 const image = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
+const uploadingAvatar = ref(false)
+
+watch(
+  () => profile.value.avatar,
+  (avatar) => {
+    if (!uploadingAvatar.value) image.value = avatar ?? null
+  },
+  { immediate: true },
+)
+
+const passwordCodeSent = ref(false)
+const sendingPasswordCode = ref(false)
 
 const open = reactive({
   name: false,
@@ -32,19 +48,44 @@ const open = reactive({
   password: false,
 })
 
+watch(
+  () => open.password,
+  (isOpen) => {
+    if (!isOpen) passwordCodeSent.value = false
+  },
+)
+
 function pickImage() {
   fileInput.value?.click()
 }
 
-function onImageChange(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) image.value = URL.createObjectURL(file)
-  ;(event.target as HTMLInputElement).value = ''
+async function onImageChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+
+  const preview = URL.createObjectURL(file)
+  image.value = preview
+  uploadingAvatar.value = true
+
+  try {
+    const uploaded = await uploadAvatar(file)
+    image.value = uploaded ?? null
+    toast.success('تصویر پروفایل به‌روزرسانی شد.')
+  }
+  catch (err) {
+    image.value = profile.value.avatar ?? null
+    toast.error(apiErrorMessage(err, 'بارگذاری تصویر پروفایل انجام نشد.'))
+  }
+  finally {
+    uploadingAvatar.value = false
+    URL.revokeObjectURL(preview)
+  }
 }
 
 function removeImage() {
-  image.value = null
-  toast.success('تصویر پروفایل حذف شد.')
+  toast.info('حذف تصویر پروفایل از این صفحه هنوز توسط سرور پشتیبانی نمی‌شود.')
 }
 
 function onEdit(field: EditField) {
@@ -95,10 +136,14 @@ async function saveEmail(payload: { email: string }) {
   }
 }
 
-function saveBank(payload: { cardNumber: string, shebaNumber: string }) {
-  profile.value.cardNumber = payload.cardNumber
-  profile.value.shebaNumber = payload.shebaNumber
-  toast.success('اطلاعات حساب بانکی با موفقیت ثبت شد.')
+async function saveBank(payload: { cardNumber: string, shebaNumber: string }) {
+  try {
+    await updateBank(payload)
+    toast.success('اطلاعات حساب بانکی با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت اطلاعات حساب بانکی انجام نشد.'))
+  }
 }
 
 async function saveLegal(payload: LegalInfo) {
@@ -111,9 +156,30 @@ async function saveLegal(payload: LegalInfo) {
   }
 }
 
-function savePassword(_payload: { password: string }) {
-  profile.value.hasPassword = true
-  toast.success('رمز عبور با موفقیت ثبت شد.')
+async function sendPasswordCode() {
+  sendingPasswordCode.value = true
+  try {
+    await requestPasswordCode()
+    passwordCodeSent.value = true
+    toast.success('کد تایید به شماره موبایل شما ارسال شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ارسال کد تایید انجام نشد.'))
+  }
+  finally {
+    sendingPasswordCode.value = false
+  }
+}
+
+async function savePassword(payload: { code: string, password: string }) {
+  try {
+    await updatePassword(payload)
+    passwordCodeSent.value = false
+    toast.success('رمز عبور با موفقیت ثبت شد.')
+  }
+  catch (err) {
+    toast.error(apiErrorMessage(err, 'ثبت رمز عبور انجام نشد.'))
+  }
 }
 </script>
 
@@ -122,7 +188,7 @@ function savePassword(_payload: { password: string }) {
     <input
       ref="fileInput"
       type="file"
-      accept="image/jpeg,image/png"
+      accept="image/jpeg,image/png,image/webp,image/gif"
       class="hidden"
       @change="onImageChange"
     >
@@ -187,6 +253,9 @@ function savePassword(_payload: { password: string }) {
     />
     <DashboardAccountPasswordDialog
       v-model:open="open.password"
+      :code-sent="passwordCodeSent"
+      :sending-code="sendingPasswordCode"
+      @send-code="sendPasswordCode"
       @submit="savePassword"
     />
   </div>
