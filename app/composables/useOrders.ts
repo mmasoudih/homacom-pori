@@ -21,14 +21,26 @@ interface ApiOrder {
 }
 
 const ORDER_STATUSES = [
+  'completing',
+  'waiting',
   'waiting_payment',
-  'processing',
   'paid',
+  'cancel_customer',
+  'cancel_store',
+  'cancel_operator',
+  'processing',
   'preparing',
+  'stock',
+  'packaging',
+  'ready_for_send',
+  'send_to_center',
   'sending',
   'delivery',
-  'cancel_customer',
   'returned',
+  'refer_request',
+  'refer_accept',
+  'refer_reject',
+  'refer_done',
 ] as const
 
 const FALLBACK_IMAGE = '/figma/fill-e393cbb3afd42faa.png'
