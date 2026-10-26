@@ -10,6 +10,7 @@ import {
   findBlogCategory,
   postsByCategory,
 } from '~/data/blog'
+import { ApiError } from '~/composables/useApi'
 import { toPersianDigits } from '~/utils/format'
 import { resolveMediaUrl } from '~/utils/media'
 
@@ -29,8 +30,12 @@ interface ApiBlogPost {
   img?: string | null
   thumbnail?: string | null
   view?: number | null
+  /** Decorative admin value, not a score (0–9 in the wild). */
   star?: number | null
+  /** Cached SUM of approved-comment scores; may be stale/null. */
   total_rating?: number | null
+  /** Derived 0–5 mean score of approved comments; null when unrated. */
+  rate?: number | null
   comment_status?: string | null
   published_at?: string | null
   created_at?: string | null
@@ -107,6 +112,7 @@ function mapBlogComment(comment: ApiBlogComment): BlogComment {
     author: comment.nickname || comment.user?.nickname || 'کاربر هماکام',
     date: formatDate(comment.created_at),
     text: comment.content,
+    pending: comment.status === 'pending',
     rating: score >= 1 && score <= 5 ? score : undefined,
     pros: comment.strength?.length ? comment.strength : undefined,
     cons: comment.weakness?.length ? comment.weakness : undefined,
@@ -287,7 +293,7 @@ function mapArticle(post: ApiBlogPost, apiBase: string): BlogArticle {
   const category = post.categories?.[0]
   const body = parseBody(post.content)
   const lead = post.excerpt || post.summary || body.find(block => block.kind === 'paragraph')?.segments[0]?.text || ''
-  const star = Number(post.star ?? 0)
+  const rate = post.rate != null ? Number(post.rate) : 0
 
   return {
     apiId: post.id,
@@ -299,7 +305,7 @@ function mapArticle(post: ApiBlogPost, apiBase: string): BlogArticle {
     author: post.author_nickname || 'هماکام',
     date: formatDate(post.published_at || post.created_at),
     views: `${toPersianDigits(Number(post.view ?? 0))} بازدید`,
-    rating: star >= 1 && star <= 5 ? star : 0,
+    rating: Number.isFinite(rate) ? rate : 0,
     lead,
     body,
     comments: [],
@@ -323,10 +329,22 @@ export function useBlogPost(slug: Ref<string>, categorySlug: Ref<string>) {
         if (!article.categorySlug) article.categorySlug = categorySlug.value
 
         try {
-          const comments = await api.get<ApiBlogComment[]>(
-            `/shop/blogs/${encodeURIComponent(String(res.data.post.id))}/comments`,
-            { query: { 'filters[per_page]': 100 }, skipAuth: true },
-          )
+          const commentsPath = `/shop/blogs/${encodeURIComponent(String(res.data.post.id))}/comments`
+          const query = { 'filters[per_page]': 100 }
+
+          // Send the bearer token so the thread includes the viewer's own
+          // pending comments; retry anonymously if the token is stale.
+          let comments
+          try {
+            comments = await api.get<ApiBlogComment[]>(commentsPath, { query })
+          }
+          catch (err) {
+            if (err instanceof ApiError && err.status === 401)
+              comments = await api.get<ApiBlogComment[]>(commentsPath, { query, skipAuth: true })
+            else
+              throw err
+          }
+
           article.comments = (comments.data ?? []).map(mapBlogComment)
           article.commentsTotal = article.comments.length
         }

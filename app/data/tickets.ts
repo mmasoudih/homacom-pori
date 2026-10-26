@@ -24,6 +24,12 @@ export interface Ticket {
   subject: string
   department: string
   status: TicketStatus
+  /** Persian label from the API enum object (`status.label`). */
+  statusLabel?: string
+  /** API priority value (`low` / `medium` / `top`). */
+  priority?: string
+  /** Persian label from the API enum object (`priority.label`). */
+  priorityLabel?: string
   date: string
   messages: TicketMessage[]
 }

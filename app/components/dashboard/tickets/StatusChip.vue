@@ -5,8 +5,11 @@ import { cn } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
   status: TicketStatus
+  /** Persian label supplied by the API enum object. */
+  label?: string
   class?: string
 }>(), {
+  label: '',
   class: '',
 })
 
@@ -27,6 +30,6 @@ const meta = computed(() => ticketStatusMeta[props.status])
       props.class,
     )"
   >
-    {{ meta.label }}
+    {{ props.label || meta.label }}
   </span>
 </template>

@@ -8,13 +8,18 @@ const authUser = useCookie<{ mobile?: string, nickname?: string | null } | null>
 
 const displayName = computed(() =>
   [profile.value.firstName, profile.value.lastName].filter(Boolean).join(' ')
+  || profile.value.nickname
   || authUser.value?.nickname
   || 'کاربر هماکام',
 )
-const mobile = computed(() => authUser.value?.mobile ?? '')
+const mobile = computed(() => profile.value.mobile || authUser.value?.mobile || '')
 
-// No wallet endpoint yet — do not show a fabricated balance.
-const balance = ref(0)
+// `profile/me` now returns `credit`, so the wallet card shows the real balance.
+const balance = ref(profile.value.credit)
+watch(() => profile.value.credit, (credit) => {
+  if (credit) balance.value = credit
+}, { immediate: true })
+
 const fundsOpen = ref(false)
 
 function onCharged(amount: number) {

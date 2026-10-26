@@ -20,13 +20,20 @@ interface ApiTicketMessage {
   user?: { id?: number | null } | null
 }
 
+/** `TicketResource` enum object (2026-10-25): `{ value, label }`. */
+interface ApiEnum {
+  value: string
+  label: string
+}
+
 interface ApiTicket {
   id: number
   subject: string
   department?: ApiDepartment | null
-  priority?: string | null
+  /** Enum object now; the flat string is kept for older payloads. */
+  priority?: ApiEnum | string | null
   priority_fa?: string | null
-  status?: string | null
+  status?: ApiEnum | string | null
   status_fa?: string | null
   created_at?: string | null
   messages?: ApiTicketMessage[]
@@ -48,9 +55,19 @@ function formatDate(value?: string | null): string {
   return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium', timeStyle: 'short' }).format(date)
 }
 
-function mapStatus(status?: string | null): TicketStatus {
-  if (status === 'closed') return 'closed'
-  if (status === 'answer') return 'answered'
+function enumValue(value?: ApiEnum | string | null): string {
+  if (!value) return ''
+  return typeof value === 'string' ? value : value.value
+}
+
+function enumLabel(value?: ApiEnum | string | null): string {
+  return typeof value === 'object' && value ? value.label : ''
+}
+
+function mapStatus(status?: ApiEnum | string | null): TicketStatus {
+  const value = enumValue(status)
+  if (value === 'closed') return 'closed'
+  if (value === 'answer') return 'answered'
   return 'waiting'
 }
 
@@ -82,6 +99,9 @@ function mapTicket(ticket: ApiTicket): Ticket {
     subject: ticket.subject,
     department: ticket.department?.title ?? '',
     status: mapStatus(ticket.status),
+    statusLabel: enumLabel(ticket.status) || ticket.status_fa || undefined,
+    priority: enumValue(ticket.priority) || undefined,
+    priorityLabel: enumLabel(ticket.priority) || ticket.priority_fa || undefined,
     date: formatDate(ticket.created_at),
     messages: (ticket.messages ?? []).map(message => mapMessage(message, supporterId)),
   }

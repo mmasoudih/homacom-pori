@@ -16,7 +16,7 @@ const emit = defineEmits<{
   <article class="rounded-[12px] border border-T-400 bg-T-50 p-4">
     <div class="flex items-center justify-between gap-3">
       <h3 class="text-[13.5px] font-bold text-T-900">{{ ticket.subject }}</h3>
-      <DashboardTicketsStatusChip :status="ticket.status" />
+      <DashboardTicketsStatusChip :status="ticket.status" :label="ticket.statusLabel" />
     </div>
 
     <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-T-700">

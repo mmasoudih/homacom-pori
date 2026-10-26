@@ -396,6 +396,8 @@ export interface BlogComment {
   author: string
   date: string
   text: string
+  /** The viewer's own comment, awaiting moderation. */
+  pending?: boolean
   /** Star rating (1-5). Brand/admin entries have none. */
   rating?: number
   /** Brand or admin entry: renders the «ادمین» badge, logo avatar and no rating. */

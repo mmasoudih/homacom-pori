@@ -1,278 +1,157 @@
-# Backend gaps — follow-up after the 2026-10-23 backend update
+# Backend gaps — follow-up after the 2026-10-25 backend update
 
-Companion to `docs/api-integration.md`. This version re-tests every item from
-the previous gap list against the live API after the backend changes.
+Companion to `docs/api-integration.md`. This version replaces the 2026-10-23
+gap list with the backend changes delivered on **2026-10-25** and the frontend
+work applied on **2026-10-26**.
 
 Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
-Checked: **2026-10-23** with a real customer bearer token.
+Sources:
 
-Legend: **Resolved** · **Partial** · **Open** · **Blocked**
+- backend change note **2026-10-25** (`API-CHANGES-2026-10-25.pdf`);
+- the refreshed OpenAPI document (fetched 2026-10-26);
+- the 2026-10-23 live probe results for the remaining open items.
+
+Legend: **Resolved** · **Partial** · **Open**
 
 ---
 
-## Resolved
+## Resolved in this round
 
-| # | Change | Evidence |
-| --- | --- | --- |
-| 1 | Product list returns `cheapest_stock` (`id`, `customer_price`, `discount`, `quantity`, `min_in_cart`, `max_in_cart`, `is_default`), real `colors[]` with `id`/`code`/`title`, `rate`, `score`, `order_count`, `view_count`, `categories`, `brand` | `GET /shop/products?per_page=1` |
-| 2 | Product list accepts `filters[sort]=more_invoice`, `more_view_count`, `cheapest`, `expensive`, `newest` | all return 200 |
-| 3 | Product list returns `pagination` | `data.pagination` |
-| 4 | Product list filters `colors[]`, `only_exists`, `price_more_than`, `price_less_than`, `brands[]`, `ids[]`, `vip`, `homa_off` work | 200 with filtered counts |
-| 5 | Product detail exposes `is_favorite` for authenticated requests | `is_favorite: true` after favoriting |
-| 6 | Product detail stocks expose `min_in_cart` / `max_in_cart`; the API enforces the minimum (422 below it) | `stock.min_in_cart`, `quantity نباید کوچکتر از N باشد` |
-| 7 | `service_groups[]` now include `selection_mode`, `max_selections`; items include `off_price`, `off_price_ended_at`, `service_type` | `GET /shop/products/{slug}` |
-| 8 | Product comments include `reaction_up` / `reaction_down`; the reaction endpoint toggles | `POST /shop/user/comments/{id}/reaction` → `{reaction_up, reaction_down, reaction}` |
-| 9 | Favorites now return the full related `item` (including `cheapest_stock`) | `GET /shop/user/favorite?filters[relate_to]=product` |
-| 10 | Favorite toggle no longer needs `action`; `POST` with `relate_to` + `relate_id` toggles | `data.added` true/false |
-| 11 | Cart totals include services and coupon | `totals.payable_price = sub_total − discount_price` |
-| 12 | Single ticket endpoint exists with messages and `is_support` | `GET /shop/user/ticket/{id}` (OpenAPI + 404 shape verified) |
-| 13 | Ticket `priority` / `status` enums are documented (`low/medium/top`, `new/answer/waiting/closed`) | OpenAPI `TicketResource` |
-| 14 | Ticket reply accepts an optional attachment (`file`, max 5 MB, multipart) | OpenAPI reply body |
-| 15 | `GET/PUT /shop/user/profile/legal-information` replaces `company-information` and adds `company_state_id`, `company_city_id`, `company_address`, `company_establishment_date` | `GET` returns the full object |
-| 16 | `PUT /shop/user/profile/bank-information` | 200, returns card/sheba/avatar |
-| 17 | Authenticated password change: `POST reset-password/send-code` + `POST reset-password` (`active_code`, `password`, confirmation) | OpenAPI |
-| 18 | Avatar upload: `POST /shop/user/profile/avatar` (multipart, jpg/png/webp/gif, max 2 MB) | OpenAPI |
-| 19 | Blog comments endpoint: `GET /shop/blogs/{id}/comments` | 200 `data: []` / active comments |
-| 20 | Blog comments create through `POST /shop/user/comments` with `relate_to: "post"` | 201 (`"blog"` is rejected with 422) |
-| 21 | `GET /shop/public/blog-header` exists; frontend already prefers it | 200 |
+| # | Backend change | Evidence | Frontend change |
+| --- | --- | --- | --- |
+| 1 | `GET /shop/order` no longer 500s. `status` is optional and accepts `all`; `type` is optional; `?page=` returns 15/page with paginator metadata in headers. No params returns every order, newest first. | backend note §1 | `useOrders.load()` now makes **one** request (`status=all&type=sales`); tabs group client-side. The 20 parallel status requests are gone. |
+| 2 | `GET /shop/order/{invoice}` returns the full `UserOrderResponse`: receiver/address block, shipping/carrier, payment fields and items. | backend note §2 | `useOrderDetail()` maps the full payload; the `findOrder()` demo fallback is removed. |
+| 3 | `GET /shop/products?filters[categories][]=…` accepts every id from `/shop/public/product-category`, children included. | backend note §3 · OpenAPI `filters[categories][]` | `BestOfCategorySection` requests one 3-product pool per category panel. |
+| 4 | `POST /shop/cart/set/payment-method` (slash) is now an alias of `set-payment-method`. All five values valid: `online`, `pay_in_delivery`, `pay_in_person`, `mixed`, `manual`; guest + authenticated. | backend note §4 · OpenAPI path present | Checkout already calls the slash URL; it now persists (still maps wallet→`online`, installment→`mixed`). |
+| 5 | `ticket_departments` seeded with four active rows (ids 1–4: پشتیبانی، مالی، فنی، فروش). `POST /shop/user/ticket` with `department_id` 1–4 succeeds. | backend note §5 | The existing department select/create flow works; no code change needed. **Production must run the seeder once at deploy.** |
+| 6 | `POST /shop/cart/add-qty` / `sub-qty` require `stock_id` (`exists:shop_stock`); `quantity` is validated against the stock min/max and the resulting line quantity is enforced. | backend note §6 | `increment()` sends `stock_id` + `quantity: max(1, min_in_cart)`; `decrement()` sends `stock_id`. The + button now works on `min_in_cart > 1` lines. |
+| 7 | Invalid coupon returns user-facing text instead of the raw `shop::messages.coupon_not_found` key. EN: “The discount code is not valid”; FA: «کد تخفیف معتبر نمیباشد». | backend note §7 | No code change — `apiErrorMessage` already surfaces the API message. |
+| 8 | `CartItemResource` grew from 10 to 19 keys: `cart_id`, `product_id`, `product_slug`, `stock_id`, `related_cart_item_id`, `color`, `size`, `warranty` (resolved from stock relations). | backend note §8 · OpenAPI `CartItemResource` | Cart lines link with `product_slug`; `color`/`size`/`warranty` are mapped and rendered in the item meta rows. |
+| 9 | `GET /shop/user/profile/me` grew from 13 to 22 keys: `mobile`, `nickname`, `username`, `credit` (float), `bank_card_number`, `bank_shaba_number`, `has_password` (bool), `avatar` (absolute URL or null), `currency` (`IRT`). | backend note §9 | Account page prefills bank card/sheba/avatar/has-password without the separate bank GET. Dashboard profile card now uses `mobile`/`nickname` and the real `credit` balance. Avatar DELETE remains hidden (still 405). |
+| 10 | `TicketResource.status` and `.priority` are enum **objects** `{ value, label }` (`new`/`answer`/`waiting`/`closed`, `low`/`medium`/`top`). | backend note §10 · OpenAPI `TicketResource` | `useTickets` reads `.value` for comparisons and `.label` for display; the status chip accepts the API label. Flat strings are still tolerated. |
+| 11 | Product detail `suggested[]` entries are full product objects with `img` (absolute), `title`, `slug` and `cheapest_stock` (`customer_price`, `quantity`, `min_in_cart`, `max_in_cart`, or null when out of stock). | backend note §11 | `suggested[]` maps into the «در کنارش خریداری شده» row with real image, price and an out-of-stock badge. The designed mocks are only a fallback. |
+| 12 | `GET /shop/public/site-header`, `/blog-header`, `/footer` expand menu `link` server-side to an absolute URL. | backend note §12 | Header/footer already prefer menus that carry links; no change needed. The five footer group headers intentionally keep an empty link (dropdown parents) — children carry the links. |
+| 13 | Blog payload documents `star` (decorative, 0–9, not a score), `total_rating` (cached SUM, may be stale/null) and new `rate` (derived 0–5 mean, null when unrated). | backend note §13 · OpenAPI `BlogResource` | Article rating reads `rate`; the 1–5 heuristic and `star` fallback are removed. |
+| 14 | `GET /shop/products` items include `is_favorite` when the request carries an `Authorization` header. Guests get no key. | backend note §14 · OpenAPI header note | `fetchList()` now sends the bearer token (401 → retry without auth); list cards render a real favourite heart only when the key is present. |
+| 15 | `GET /shop/blogs/{id}/comments` and `/shop/products/{id}/comments` return published comments for everyone **plus the authenticated viewer's own pending comments**. | backend note §15 | Blog comments map `status: pending`, show a «دیدگاه شما در انتظار تایید است» banner and a pending badge on those rows. |
 
 ### Notes on the resolved items
 
-- `cheapest_stock` has **no `real_price`**. The frontend derives the
-  struck-through price from `discount` (treated as a percentage).
-- `color` objects in the list now carry real API ids, so the search colour
-  facet (`/shop/public/colors`) matches. The colour *titles* are still dummy
-  data (`"Dr."`, `"Mrs."`, `title_en: "LavenderBlush"`).
-- The list payload still has no storage/`حافظه داخلی` label. `size` is physical
-  dimensions (`length/width/height/weight`), and the cart `stock.size` is a
-  variant size (`"XL"`, `"Mrs."`), not storage.
-- `suggested` products still have `img: null` and no price (`GET
-  /shop/products/{slug}`), so the «در کنارش خریداری شده» row still uses the
-  designed mocks.
-- `profile/me` still does **not** return bank/avatar/has-password, although the
-  login response does. See the open items below.
+- **Orders pagination:** the list uses `?page=` at 15/page and puts paginator
+  metadata in response headers. The dashboard still paginates the already-loaded
+  set at 10/page client-side; switching to server pages is possible without a
+  contract change.
+- **Order detail shape:** the OpenAPI `UserOrderResponse` schema is still the
+  older minimal shape. The mapper reads both the documented blocks
+  (`receiver`, `shipping`, `payment`, `transactions`) and flat aliases
+  (`receiver_name`, `shipping_method`, `paid_amount`, …) so either serialization
+  renders.
+- **`add-qty` / `sub-qty`:** the OpenAPI request schema still lists only
+  `cart_item_id`/`quantity`; `stock_id` is required at runtime per the change
+  note. The spec should catch up.
+- **Ticket enum objects:** `status_fa`/`priority_fa` are gone from the object
+  shape; the client keeps reading them only as a legacy fallback.
+- **Categories:** panel requests are not cached across panels; each panel now
+  costs one list request (three on the landing page) instead of one shared pool.
 
 ---
 
 ## Still open
 
-### 1. Category filter is still broken (high priority)
-
-Every id is rejected, including ids that the product payload itself returns
-and ids from `/shop/public/product-category`:
-
-```http
-GET /shop/products?filters[categories][]=1
-GET /shop/products?filters[categories][]=2
-GET /shop/products?filters[categories][]=8
-GET /shop/products?filters[categories][]=103
-GET /shop/products?filters[categories][]=104
-GET /shop/products?filters[categories][]=105
-```
-
-All return:
-
-```json
-{ "message": "filters.categories.0 انتخاب شده، معتبر نیست." }
-```
-
-`filters[categories]=2` returns «باید آرایه باشد», while `filters[category]=2`
-and `filters[category_id]=2` are silently ignored (unfiltered 200). The
-landing «بهترین‌های هر دسته‌بندی» panels therefore still share one pool.
-
-**Ask:** make the category rule accept existing category ids (including child
-categories), or document the exact accepted ids/slugs and the expected
-parameter name.
-
-### 2. Cart item projection still does not match the OpenAPI schema
-
-The live `CartItemResource` contains only:
-
-```
-id, title, image, customer_price, real_price, quantity,
-services, services_total, line_total, stock
-```
-
-The schema documents top-level `product_id`, `stock_id`, `color`, `size`,
-`warranty`, but the live response does not include them. There is no
-`product_slug` anywhere, so cart line titles cannot link to the PDP and still
-render `href="#"`. The nested `stock` does contain `id`, `color`, `size`,
-`warranty`, `min_in_cart`, `max_in_cart`.
-
-Example check:
-
-```http
-GET /shop/cart
-# item keys: customer_price,id,image,line_total,quantity,real_price,services,services_total,stock,title
-```
-
-**Ask:** align the resource with the docs (at minimum `product_id` and
-`product_slug`), or remove the fields from the schema.
-
-### 3. Cart services / insurance cannot be changed after add-to-cart
+### 1. Cart services / insurance cannot be changed after add-to-cart
 
 `add-to-cart` accepts `services[]`, but there is still no endpoint to update or
 remove services/insurance on an existing line. The cart's «افزودن خدمت» /
-«افزودن بیمه» dialogs remain local-only.
+«افزودن بیمه» dialogs remain local-only and are lost on the next cart response.
 
 **Ask:** provide a line-update endpoint, or confirm the intended flow.
 
-### 4. `POST /shop/cart/set/payment-method` returns 404 for every value
+### 2. Checkout / orders — endpoints still absent
 
-Tested authenticated and as guest, with and without `cart_token` / `cart_id`,
-for `online`, `wallet`, `installment`:
+No create-order / checkout-submit endpoint, no payment gateway
+init/callback/verify, no order cancel or invoice download, and no
+return-request endpoints (create/list/detail/cancel) in the spec. Shipping
+methods, delivery days/time slots and their prices are also absent, as are
+wallet balance / installment providers / credit providers.
 
-```json
-{ "success": false, "message": "موردی یافت نشد", "data": null } // HTTP 404
-```
+**Ask:** confirm the intended checkout sequence and publish the endpoints.
 
-The cart itself works and the auth token is valid, so this looks like a
-backend lookup/config bug (possibly no payment-method rows). The enum still
-only documents `online | pay_in_delivery | pay_in_person | mixed | manual`;
-wallet/installment need a documented mapping.
+### 3. Blog search is still ignored
 
-### 5. Coupon error message is an untranslated key
+`GET /shop/blogs?filters[s]=…` is accepted but returns the same 8 posts for
+every query. `/blog/search.vue` therefore filters the loaded home payload
+client-side.
 
-```http
-POST /shop/cart/set-discount {"coupon_code":"NOPE"}
-```
+**Ask:** apply `filters[s]` or add a dedicated search endpoint.
 
-returns HTTP 422 with:
+### 4. Blog category title still needs the extra request
 
-```json
-{ "success": false, "message": "shop::messages.coupon_not_found", "data": null }
-```
+`GET /shop/blogs/category/{category}` returns only `items` + `pagination`; the
+page still calls `GET /shop/public/blog-category` to resolve the title. The
+category tree is small, so this is cosmetic, but the title belongs in the
+category response.
 
-**Ask:** return a user-facing Persian message and document the
-invalid/expired/not-usable cases.
+### 5. Tickets — delete / create attachment
 
-### 6. Orders API currently fails with HTTP 500
+- No delete-ticket endpoint (the dashboard action still closes the ticket).
+- The create-ticket body does not accept a file (only reply does); the create
+  dialog's attachment picker remains UI-only.
 
-For the tested customer account, every order request returns
-`500 {"message":"Server Error"}`:
+### 6. Avatar delete still returns 405
 
-```http
-GET /shop/order?status=waiting&type=sales
-GET /shop/order?status=paid&type=sales
-GET /shop/order?status=delivery&type=sales
-GET /shop/order?status=returned&type=sales
-GET /shop/order?status=waiting&type=purchase
-GET /shop/order?status=waiting&type=refer
-GET /shop/order/1
-```
+`profile/me` now exposes `avatar`, but there is still no DELETE endpoint, so the
+account page keeps the remove action informational.
 
-`status=all` still returns 422 («وضعیت انتخاب شده، معتبر نیست»). The list still
-requires both `status` and `type` and returns no pagination; the UI therefore
-still fires one request per status and paginates client-side.
+### 7. Comment status values are still undocumented
 
-Still absent from the spec (unchanged):
+The UI treats `pending` and `rejected` specially and everything else as
+approved. The order answers / product-comment status enum should be documented
+so the moderation states are not inferred.
 
-- create order / submit checkout
-- payment gateway init/callback/verify
-- order cancel, invoice download
-- return request create/list/detail/cancel
-- shipping methods, delivery days/time slots and prices
-- wallet balance / installment providers / credit providers
+### 8. Static / CMS pages and notifications
 
-Order detail still lacks `invoice`/`code`, `delivery_date`, receiver
-name/phone/full address, `shipping`, `transactions[]`, item
-image/color/warranty/`product_slug`, and `status_fa`.
+No endpoints for about, terms, guarantee, installment, contact, branch or
+collaboration. Notifications have no endpoint either. Compare remains
+client-side only (no persistence endpoint).
 
-**Ask:** fix the 500s first, then add an `all`/group filter + pagination.
-
-### 7. Profile read payload is missing bank/avatar/has-password
-
-`GET /shop/user/profile/me` returns only:
-
-```
-id, fname, lname, email, code_melli, birthday, type,
-company_name, company_register_id, company_national_code,
-company_economic_code, company_ceo, company_tel
-```
-
-It does **not** return `bank_card_number`, `bank_shaba_number`, `avatar` or
-`has_password`, even though the login response does. There is no `GET` for
-bank info (only `PUT`). Consequences:
-
-- after a page reload the account page cannot prefill card/sheba/avatar;
-- `hasPassword` is unknown until the user changes the password;
-- avatar removal has no endpoint (the upload response can only set it).
-
-**Ask:** add those four fields to `profile/me`, add a `GET` for bank info (or
-accept that it is write-only), and add avatar delete if the UI must support it.
-
-### 8. Favorites list still has no `is_favorite` on products
-
-`item` is now included (good), and product detail exposes `is_favorite`, but the
-product list/detail response for list cards still has no `is_favorite`, so list
-hearts cannot be pre-filled.
-
-### 9. Ticket creation is blocked by empty departments
-
-`GET /shop/user/ticket/departments` returns `data: []`, so
-`POST /shop/user/ticket` fails:
-
-```json
-{ "message": "department id انتخاب شده، معتبر نیست" }
-```
-
-**Ask:** seed/expose active ticket departments. Also:
-
-- no delete-ticket endpoint (the dashboard action still closes the ticket);
-- create-ticket body does not accept a file (only reply does);
-- `TicketResource` has `status`/`priority` but no `status_fa`/labels.
-
-### 10. Blog and CMS
-
-- **Blog category title:** `GET /shop/blogs/category/{category}` returns only
-  `items` + `pagination`; the page still needs an extra
-  `GET /shop/public/blog-category` for the title.
-- **Blog search:** `GET /shop/blogs?filters[s]=…` is accepted but ignored
-  (same 8 posts for every query); there is no dedicated search endpoint.
-- **Blog rating:** `star` (e.g. 6) and `total_rating` (e.g. 131) still cannot
-  produce a 0–5 score; the frontend hides the rating unless it is 1–5.
-- **Blog header menu links:** `menus[]` items still have `link: null` and only
-  `title`, so the designed navigation cannot be replaced.
-- **Header/footer menus:** same problem — `link`, `target`, `class`, `icon`
-  are null; footer `menu_1..4` are single title-only entries.
-- **Static pages:** still no endpoints for about, terms, guarantee,
-  installment, contact, branch, collaboration.
-- **Notifications:** still no endpoint.
-- **Compare:** still client-side only (no persistence endpoint).
-
-### 11. Auth / transport
+### 9. Auth / transport
 
 - Refresh-token behaviour is unchanged: `POST /auth/refresh` uses the current
   bearer token and returns `{ token }`; the client retries once on 401.
 - `token_expire` is returned as `YYYY-MM-DD HH:mm:ss`. A token whose
-  `token_expire` was already in the past still worked during this check, so
-  either expiry is not enforced or the timezone/format needs documenting.
+  `token_expire` was already in the past still worked during the 2026-10-23
+  check, so either expiry is not enforced or the timezone/format needs
+  documenting.
 - CORS still needs the production origin allow-listed.
-- The backend should confirm whether `success: false` can accompany HTTP 200;
-  the client treats it as an error.
+- Confirm whether `success: false` can accompany HTTP 200; the client treats it
+  as an error.
 
-### 12. Assets
+### 10. Assets
 
 Still mixed: product galleries are absolute
 (`https://new.ahoma.ir/storage/...`), while footer logos/store images are
 relative (`uploads/...`). The client resolves relative paths against the API
-origin; standardising or documenting the storage origin would remove the
-guesswork.
+origin; standardising the storage origin would remove the guesswork.
+
+### 11. Guest cart merge
+
+Guest carts work with a client-generated `cart_token` sent as `X-Cart-Token`,
+but login-time guest→user cart merge still needs confirmation.
 
 ---
 
 ## Suggested priority for the backend
 
-1. Fix `GET /shop/order*` 500s and add `status=all` + pagination.
-2. Fix `filters[categories][]` (landing panels depend on it).
-3. Fix `POST /cart/set/payment-method` (checkout cannot persist payment).
-4. Seed ticket departments.
-5. Add `product_id` + `product_slug` to `CartItemResource`.
-6. Add bank/avatar/has-password to `profile/me`.
-7. Return user-facing coupon errors.
-8. Add services/insurance update for an existing cart line.
-9. Add `is_favorite` to product list items.
-10. Populate menu links and blog category titles; add blog search and rating.
+1. Checkout submit + payment gateway init/callback/verify (blocks the whole
+   checkout flow).
+2. Cart line update for services/insurance.
+3. Order cancel, invoice download, return-request endpoints.
+4. Blog `filters[s]` search + category title in the collection response.
+5. Ticket delete + create-ticket attachment.
+6. Avatar DELETE.
+7. Document comment status values and the five payment-method meanings
+   (`online`, `pay_in_delivery`, `pay_in_person`, `mixed`, `manual`).
+8. Static pages / notifications / compare persistence.
 
 ---
 
@@ -282,36 +161,42 @@ guesswork.
 BASE=https://new.ahoma.ir/api
 TOKEN='<customer bearer token>'
 
-# category filter
+# orders — one call, every order (no more 20 parallel requests)
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/order?status=all&type=sales"
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/order?status=all&type=sales&page=2"
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/order/1"
+
+# category filter (ids from /shop/public/product-category)
 curl -g "$BASE/shop/products?filters[categories][]=8&filters[per_page]=1"
 
-# sorts
-for s in more_invoice more_view_count cheapest expensive newest; do
-  curl -s "$BASE/shop/products?filters[sort]=$s&filters[per_page]=1" >/dev/null
-done
+# cart line quantity (stock_id is required)
+curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"cart_item_id":1,"stock_id":45,"quantity":10}' "$BASE/shop/cart/add-qty"
 
-# cart item projection
-curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/cart"
-
-# payment method
+# payment method (slash alias)
 curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d '{"payment_method":"online"}' "$BASE/shop/cart/set/payment-method"
 
-# coupon error
+# cart item projection (19 keys)
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/cart"
+
+# coupon error (user-facing text)
 curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d '{"coupon_code":"NOPE"}' "$BASE/shop/cart/set-discount"
 
-# orders
-curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/order?status=paid&type=sales"
-
-# departments
+# ticket departments + create
 curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/user/ticket/departments"
+curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"subject":"تست","department_id":1,"priority":"medium","content":"متن پیام تست"}' \
+  "$BASE/shop/user/ticket"
 
-# profile read
+# profile read (22 keys)
 curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/user/profile/me"
 
-# blog comments create relation
-curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"title":"t","content":"test comment body","relate_to":"post","relate_id":1,"score":5}' \
-  "$BASE/shop/user/comments"
+# list is_favorite (authenticated only)
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/products?filters[per_page]=1"
+
+# blog rate + own pending comments
+curl -s "$BASE/shop/blogs/1"
+curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/blogs/1/comments"
 ```

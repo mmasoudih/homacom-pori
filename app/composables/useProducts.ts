@@ -1,4 +1,5 @@
 import type { SearchProduct } from '~/data/search'
+import { ApiError } from '~/composables/useApi'
 import { resolveMediaUrl } from '~/utils/media'
 
 interface ApiCheapestStock {
@@ -21,6 +22,8 @@ interface ApiProductSummary {
   view_count?: number | null
   /** Rating score (0–5), not an invoice count. */
   score?: number | null
+  /** Present only for authenticated list requests. */
+  is_favorite?: boolean | null
   order_count?: number | null
   created_at?: string | null
   brand?: { id: number, title: string, title_en?: string | null } | null
@@ -114,9 +117,9 @@ export function useProductCatalog() {
     term: string,
     limit = 12,
     sort?: string,
-    extraFilters?: Record<string, string | number>,
+    extraFilters?: Record<string, string | number | Array<string | number>>,
   ): Promise<SearchProduct[]> {
-    const query: Record<string, string | number> = {
+    const query: Record<string, string | number | Array<string | number>> = {
       'filters[per_page]': limit,
       'filters[page]': 1,
       ...extraFilters,
@@ -124,7 +127,20 @@ export function useProductCatalog() {
     if (term) query['filters[s]'] = term
     if (sort) query['filters[sort]'] = sort
 
-    const res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query, skipAuth: true })
+    // The list is public, but sending the bearer token makes every item carry
+    // `is_favorite`. A stale token must not break the listing: retry once
+    // without auth on a 401.
+    let res
+    try {
+      res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query })
+    }
+    catch (err) {
+      if (err instanceof ApiError && err.status === 401)
+        res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query, skipAuth: true })
+      else
+        throw err
+    }
+
     const items = res.data?.items ?? []
 
     return items.map((item) => {
@@ -136,6 +152,7 @@ export function useProductCatalog() {
 
       return {
         id: item.slug,
+        apiId: item.id,
         title: item.title,
         image: resolveMediaUrl(item.img, apiBase),
         price: price.price,
@@ -149,6 +166,9 @@ export function useProductCatalog() {
         tileId: item.categories?.[0]?.title ?? 'products',
         colorIds: mapColorIds(item.colors),
         inStock: quantity > 0 && item.status === 'active',
+        // Guests never receive the key — keep it `undefined` so list hearts
+        // only render for authenticated responses.
+        isFavorite: typeof item.is_favorite === 'boolean' ? item.is_favorite : undefined,
         hasFingerprint: false,
         sales: num(item.order_count),
         views: num(item.view_count),

@@ -39,6 +39,8 @@ export interface CartItem {
     name: string
     value: string
   }
+  /** Variant size / storage returned by `CartItemResource.size`. */
+  size?: string
   warranty: string
   /** Shown as «اقساط:» in the item meta rows. */
   installment?: string

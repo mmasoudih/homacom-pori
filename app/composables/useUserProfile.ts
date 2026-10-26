@@ -14,6 +14,11 @@ interface ApiProfile {
   fname?: string | null
   lname?: string | null
   email?: string | null
+  mobile?: string | null
+  nickname?: string | null
+  username?: string | null
+  credit?: number | string | null
+  currency?: string | null
   code_melli?: string | null
   birthday?: string | null
   type?: string | null
@@ -52,6 +57,11 @@ function emptyProfile(): AccountProfile {
     firstName: '',
     lastName: '',
     avatar: undefined,
+    mobile: '',
+    nickname: '',
+    username: '',
+    credit: 0,
+    currency: 'IRT',
     birthYear: '',
     birthMonth: '',
     birthDay: '',
@@ -115,6 +125,11 @@ function mapProfile(payload: ProfilePayload, apiBase: string): AccountProfile {
     firstName: data.fname ?? '',
     lastName: data.lname ?? '',
     avatar: data.avatar ? resolveMediaUrl(data.avatar, apiBase) : undefined,
+    mobile: data.mobile ?? '',
+    nickname: data.nickname ?? '',
+    username: data.username ?? '',
+    credit: Number(data.credit) || 0,
+    currency: data.currency ?? 'IRT',
     birthYear: jalali ? persianPart(jalali.jy) : '',
     birthMonth: jalali ? persianPart(jalali.jm, true) : '',
     birthDay: jalali ? persianPart(jalali.jd, true) : '',

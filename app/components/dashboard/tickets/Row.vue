@@ -19,7 +19,7 @@ const emit = defineEmits<{
       # {{ toPersianDigits(ticket.code) }}
     </UiTypography>
     <td class="border-b border-T-300 px-3 py-4">
-      <DashboardTicketsStatusChip :status="ticket.status" />
+      <DashboardTicketsStatusChip :status="ticket.status" :label="ticket.statusLabel" />
     </td>
     <UiTypography as="td" size="md" weight="regular" color="default" class="border-b border-T-300 px-3 py-4">
       {{ ticket.date }}

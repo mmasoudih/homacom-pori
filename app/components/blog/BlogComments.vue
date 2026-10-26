@@ -56,6 +56,7 @@ const pageItems = computed(() =>
   sorted.value.slice((page.value - 1) * perPage, page.value * perPage),
 )
 const totalCount = computed(() => props.total ?? props.comments.length)
+const hasPending = computed(() => props.comments.some(comment => comment.pending))
 
 watch([activeSort, () => props.comments.length], () => {
   page.value = 1
@@ -118,6 +119,14 @@ function toggleExpanded(id: string) {
 
     <div class="h-px w-full bg-T-400" />
 
+    <!-- The thread now includes the viewer's own pending comments. -->
+    <p
+      v-if="hasPending"
+      class="rounded-lg bg-[#FFF7E6] px-4 py-2.5 text-[13px] text-[#B7791F]"
+    >
+      دیدگاه شما در انتظار تایید است.
+    </p>
+
     <!-- Comment list -->
     <div class="flex flex-col gap-3">
       <article
@@ -145,7 +154,13 @@ function toggleExpanded(id: string) {
 
           <div class="flex items-center gap-4">
             <span
-              v-if="comment.admin"
+              v-if="comment.pending"
+              class="flex h-7 items-center rounded-lg bg-[#FFF7E6] px-3 text-[12.5px] font-bold text-[#B7791F]"
+            >
+              در انتظار تایید
+            </span>
+            <span
+              v-else-if="comment.admin"
               class="flex h-7 items-center rounded-lg bg-R-10 px-3 text-[12.5px] font-bold text-primary"
             >
               ادمین

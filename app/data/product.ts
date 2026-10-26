@@ -223,6 +223,8 @@ export interface ProductDetail {
     oldPrice?: number
     discount?: number
     colors?: string[]
+    /** Availability from `suggested[].cheapest_stock`; undefined when unknown. */
+    inStock?: boolean
   }>
 }
 

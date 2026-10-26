@@ -16,6 +16,8 @@ const colorMap = computed(() => new Map(shopColors.value.map(option => [option.i
  */
 const product = computed<Product>(() => ({
   id: props.product.id,
+  apiId: props.product.apiId,
+  isFavorite: props.product.isFavorite,
   title: props.product.title,
   image: props.product.image,
   price: props.product.price,
@@ -33,6 +35,7 @@ const product = computed<Product>(() => ({
   <Product
     variant="vertical"
     discount-placement="inline"
+    show-favorite
     :product="product"
     :href="`/product/${product.id}`"
     image-class="bg-transparent"

@@ -8,6 +8,7 @@ Work is done in phases. Each phase is committed separately so it can be reverted
 independently.
 
 **Backend asks / missing data:** see [`api-backend-gaps.md`](./api-backend-gaps.md).
+**Last updated:** 2026-10-26 (backend changes of 2026-10-25 applied).
 
 ## Current state (audit)
 
@@ -24,10 +25,15 @@ independently.
 - [x] 2026-10-23 backend update applied: product-list prices/stock, cart
       min/max, favorites `item`, comment reactions, blog comments, single
       ticket, legal/bank/password/avatar profile endpoints.
+- [x] 2026-10-25 backend update applied: orders list/detail, category filter,
+      payment method, ticket departments, cart quantity contract, coupon
+      message, cart item projection, `profile/me`, ticket enum objects,
+      product `suggested[]`, menu links, blog `rate`, list `is_favorite`, own
+      pending comments.
 - [ ] Still designed-mock: checkout submit/payment/returns, notifications,
       insurance/services after add-to-cart, static CMS pages, address forms.
-- [ ] Blocked by backend bugs: order list/detail (HTTP 500), ticket
-      departments (empty), payment-method selection (HTTP 404).
+- [x] No blocking backend bugs remain for the wired endpoints (the 2026-10-23
+      order 500s, empty ticket departments and payment-method 404 are fixed).
 
 ## Phase 0 — Shared infrastructure
 
@@ -89,6 +95,9 @@ independently.
       mock product kept as fallback)
 - [x] Product detail honours `min_in_cart` and picks the stock matching the
       selected colour + warranty.
+- [x] `suggested[]` entries carry real `img`, `title`, `slug` and
+      `cheapest_stock`; the «در کنارش خریداری شده» row shows price and
+      availability instead of the designed mocks.
 - [x] `GET /api/shop/products/{id}/comments` → comments section/sheet
       (likes/dislikes come from `reaction_up` / `reaction_down`)
 - [x] `POST /api/shop/user/comments/{id}/reaction` → comment thumbs
@@ -96,8 +105,8 @@ independently.
 - [x] Debounced header search suggestions
 - [ ] `useSearchFilters` facets are still applied client-side; API brand ids
       are mapped by title, unsupported brands fall out of facets
-- [ ] `filters[categories][]` still rejects every id (backend bug) — the
-      landing category panels share one product pool
+- [x] `filters[categories][]` accepts real category ids (children included) —
+      the landing category panels each fetch their own product pool
 
 ## Phase 4 — Blog
 
@@ -111,8 +120,10 @@ independently.
       client-side (the backend accepts `filters[s]` but ignores it)
 - [x] Blog comments → `GET /api/shop/blogs/{id}/comments`; new comments post to
       `/shop/user/comments` with `relate_to: "post"`
-- [ ] Blog article rating (API exposes `star`/`total_rating` but no 0–5 score;
-      the UI hides the rating unless it is 1–5)
+- [x] Blog article rating reads the new 0–5 `rate` field; `star`/`total_rating`
+      are documented as decorative/cached and no longer drive the UI
+- [x] Own pending comments appear in the blog comment thread with a
+      «دیدگاه شما در انتظار تایید است» banner and per-comment badge
 - [ ] Blog category title still needs the extra `/shop/public/blog-category`
       request
 
@@ -136,14 +147,15 @@ independently.
       still use the local fallback)
 - [x] `GET /api/shop/cart` (server + guest `X-Cart-Token`)
 - [x] `POST /api/shop/cart/add-to-cart` (`stock_id`, `quantity`, `services[]`)
-- [x] `POST /api/shop/cart/add-qty` / `sub-qty`
+- [x] `POST /api/shop/cart/add-qty` / `sub-qty` now send the required
+      `stock_id`; `+` sends `quantity: max(1, min_in_cart)` so lines above the
+      minimum step correctly
 - [x] `DELETE /api/shop/cart/item` (line remove + clear)
 - [x] `POST /api/shop/cart/set-user-address` → checkout address selection
-- [ ] `POST /api/shop/cart/set/payment-method` currently returns HTTP 404 for
-      every value (`online`, `wallet`, `installment`); checkout keeps the
-      selection locally and the backend needs to fix the endpoint
+- [x] `POST /api/shop/cart/set/payment-method` persists the selection (slash
+      alias of `set-payment-method`; all five enum values valid)
 - [x] `POST /api/shop/cart/set-discount` (coupon apply/clear; invalid coupon
-      returns the untranslated `shop::messages.coupon_not_found` key)
+      now returns the user-facing Persian message)
 - [x] Sync header badge + cart totals from API items (the cart itself is
       SSR-hydrated when an auth/cart cookie exists)
 - [x] Cart stepper enforces `stock.min_in_cart` / `max_in_cart`; adding a
@@ -151,9 +163,9 @@ independently.
 - [ ] Insurance / add-on services chosen **after** a line exists are local-only
       — the API only accepts `services[]` at `add-to-cart` time and has no
       update-services endpoint
-- [ ] Cart item response has no `product_id`/`product_slug` (and the live
-      payload does not match the OpenAPI `CartItemResource`), so cart line
-      titles still link to `#`
+- [x] Cart item response carries `product_id`, `product_slug`, `stock_id`,
+      `related_cart_item_id`, `color`, `size` and `warranty`; cart line titles
+      link to `/product/<slug>` and the meta rows render the real variant
 - [x] Checkout promo code applies through `applyCoupon()`; the real discount
       comes from the cart response
 - [ ] Guest carts work with a client-generated `cart_token` (sent as
@@ -161,19 +173,17 @@ independently.
 - [x] Cart API totals confirmed to include services and the coupon
       (`payable_price = sub_total − discount_price`)
 
-## Phase 7 — Checkout & orders (partly blocked)
+## Phase 7 — Checkout & orders (orders fixed; checkout still blocked)
 
-- [x] `GET /api/shop/order?status=&type=` → `dashboard/orders/index.vue`
-      (merges all 20 documented statuses; `type=sales`)
-- [x] `GET /api/shop/order/{invoice}` → order detail (mapped available fields;
-      mock order kept as fallback for demo ids)
-- [ ] **Blocked:** on 2026-10-23 every order request returned HTTP 500 for the
-      test account (list with `sales`/`purchase`/`refer` and one detail id).
-- [ ] **Needed:** list endpoint should allow an "all"/group filter and return
-      pagination; today every tab costs one request per status.
-- [ ] **Needed in order payload:** invoice code, delivery date, receiver
-      name/phone/address, shipping method/cost, transactions, item image,
-      colour, warranty, and product slug (currently only id/title/qty/price).
+- [x] `GET /api/shop/order?status=all&type=sales` → `dashboard/orders/index.vue`
+      (one request; tabs group client-side)
+- [x] `GET /api/shop/order/{invoice}` → order detail (full `UserOrderResponse`:
+      receiver/address, shipping/carrier, payment, transactions, items; demo
+      fallback removed)
+- [x] `status` is optional and accepts `all`; `type` is optional; `?page=`
+      returns 15/page with paginator metadata in headers
+- [x] Order items carry image, colour, warranty and product slug; the detail
+      payload includes invoice/code, delivery date, receiver and shipping cost
 - [ ] **Blocked:** no create-order / checkout-submit endpoint in spec.
 - [ ] **Blocked:** no order cancel, invoice, or return-request endpoints in spec.
 - [ ] **Blocked:** no payment gateway init/callback endpoint in spec.
@@ -183,8 +193,8 @@ independently.
       amount now comes from `totals`), with the designed promo as visual fallback
 - [ ] Checkout shipping methods, delivery slots, gateways, wallets and
       installment providers are still designed mocks (no endpoints).
-- [ ] Checkout totals/shipping/payment cannot be persisted before submit (no
-      submit endpoint); `set/payment-method` is additionally returning 404.
+- [ ] Checkout totals/shipping cannot be persisted before submit (no submit
+      endpoint); the payment method now persists through `set/payment-method`.
 
 ## Phase 8 — Profile
 
@@ -200,9 +210,11 @@ independently.
 - [x] `POST /api/shop/user/profile/reset-password/send-code` +
       `POST /api/shop/user/profile/reset-password` (two-step password dialog)
 - [x] `POST /api/shop/user/profile/avatar` (multipart upload + preview)
-- [ ] `profile/me` still omits `bank_card_number`, `bank_shaba_number`, `avatar`
-      and `has_password`; after a reload the account page cannot prefill them.
-      There is no GET for bank info and no avatar delete.
+- [x] `profile/me` returns `mobile`, `nickname`, `username`, `credit`,
+      `currency`, `bank_card_number`, `bank_shaba_number`, `avatar` and
+      `has_password`; the account page prefills them after reload and the
+      dashboard wallet shows the real credit balance
+- [ ] Avatar delete still returns 405 (the remove action stays informational)
 
 ## Phase 9 — Favorites
 
@@ -213,8 +225,8 @@ independently.
       (`relate_to` + `relate_id` only)
 - [x] Wire the product-detail heart to `useFavorites().toggle()`
 - [x] Reflect `is_favorite` from the product-detail response
-- [ ] Product **list** items still have no `is_favorite`, so listing hearts
-      cannot be pre-filled.
+- [x] Product **list** items carry `is_favorite` for authenticated requests;
+      search cards render a real heart and guests get no key
 
 ## Phase 10 — User comments
 
@@ -225,14 +237,15 @@ independently.
 - [x] `POST /api/shop/user/comments/{id}/reaction` → product comment thumbs
       (`reaction_up` / `reaction_down` now mapped; same type removes)
 - [x] `GET /api/shop/blogs/{id}/comments` → article comments
-      (create uses `relate_to: "post"`; only approved comments are returned)
+      (create uses `relate_to: "post"`; approved comments plus the viewer's own
+      pending ones)
 - [ ] Comment status values are still undocumented (the UI treats `pending`
       and `rejected` specially; everything else as approved)
 
 ## Phase 11 — Tickets
 
 - [x] `GET /api/shop/user/ticket/departments` → new-ticket department select
-      (currently returns an empty array from the backend)
+      (four seeded departments, ids 1–4; production must run the seeder once)
 - [x] `GET /api/shop/user/ticket` (status, department, q, sort, pagination)
 - [x] `GET /api/shop/user/ticket/{ticket}` → single ticket + messages
 - [x] `POST /api/shop/user/ticket`
@@ -244,18 +257,19 @@ independently.
       statuses are mapped
 - [x] New-ticket form has a `low/medium/top` priority selector
 - [ ] No delete-ticket endpoint: the list's delete action closes the ticket.
-- [ ] `ticket/departments` returns an empty array, so creating a ticket fails
-      with 422 until departments are seeded.
+- [x] `ticket/departments` is seeded, so ticket creation succeeds again.
 - [ ] Create-ticket body does not accept a file (only reply does); the create
       dialog's attachment picker remains UI-only.
-- [ ] `TicketResource` has no `status_fa`/label field.
+- [x] `TicketResource.status` / `.priority` are `{ value, label }` objects; the
+      status chip displays the API label (flat-string payloads still accepted).
 
 ## Phase 12 — Static/CMS pages (no endpoints in spec)
 
 - [x] `GET /api/shop/faqs` → `faq.vue` (mock content as fallback)
 - [x] `GET /api/shop/brands` → `brands.vue`, `landing/BrandsSection`
-- [ ] Header/footer menu items still have `link: null`; designed navigation
-      stays as fallback.
+- [x] Header/footer/blog menu `link` values are resolved absolute URLs; the
+      designed navigation is only a fallback for link-less rows (the footer's
+      five group headers are dropdown parents by design).
 - [ ] Blog category title still requires the extra
       `GET /shop/public/blog-category` call.
 - [ ] Blog `filters[s]` is ignored by the backend.
@@ -268,14 +282,23 @@ independently.
 1. **CORS**: confirmed for local dev; production origin must be allowed.
 2. **Checkout/order creation, returns, payment, notifications** are absent from
    the spec — see `api-backend-gaps.md`.
-3. **Order API returns HTTP 500** for every list/detail request as of
-   2026-10-23; the list still requires both `status` and `type`.
+3. **Orders are fixed** (2026-10-25): one `status=all` request returns every
+   order; detail returns the full `UserOrderResponse`.
 4. **Guest cart** works with a client-generated `cart_token`; login-time merge
    still needs confirmation.
 5. **Product list prices/stock no longer need an N+1** — `cheapest_stock` is
    used directly. Favorites also return the related `item`.
-6. **Category filter still broken**: `filters[categories][]` rejects every id.
-7. **Payment method selection** returns 404 for every value.
-8. **Ticket departments** are empty, blocking ticket creation.
-9. **OpenAPI codegen**: types are hand-written per feature; consider
-   `openapi-typescript` once the payloads stabilise.
+6. **Category filter is fixed**: `filters[categories][]` accepts real ids and
+   each landing panel fetches its own pool.
+7. **Payment method selection is fixed**: the slash alias persists all five
+   enum values.
+8. **Ticket departments are seeded** (ids 1–4) and ticket creation works.
+9. **Cart quantity contract**: `add-qty`/`sub-qty` require `stock_id`;
+   `quantity` is validated against the stock min/max.
+10. **Ticket enums are objects** (`{ value, label }`) for `status` and
+    `priority`; flat strings remain tolerated.
+11. **Remaining blockers**: checkout submit, payment gateway, returns, cart
+    line service updates, ticket delete/attachment, static pages and
+    notifications — all absent from the spec.
+12. **OpenAPI codegen**: types are hand-written per feature; consider
+    `openapi-typescript` once the payloads stabilise.

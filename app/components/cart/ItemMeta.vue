@@ -3,6 +3,7 @@ import type { CartItem } from '~/data/cart'
 
 defineProps<{
   color: CartItem['color']
+  size?: string
   warranty: string
   installment?: string
   seller?: string
@@ -16,6 +17,12 @@ defineProps<{
       <img src="/icons/color-swatch.svg" alt="" class="size-4 shrink-0 lg:size-5">
       <UiTypography as="span" size="xsMd" color="muted" class="leading-[18px]">رنگ:</UiTypography>
       <UiTypography as="span" size="xsMd" class="leading-[18px]">{{ color.name }}</UiTypography>
+    </div>
+
+    <div v-if="size" class="flex h-6 items-center gap-1.5">
+      <img src="/icons/color-swatch.svg" alt="" class="size-4 shrink-0 lg:size-5">
+      <UiTypography as="span" size="xsMd" color="muted" class="leading-[18px]">سایز:</UiTypography>
+      <UiTypography as="span" size="xsMd" class="leading-[18px]">{{ size }}</UiTypography>
     </div>
 
     <div class="flex h-6 items-center gap-1.5">

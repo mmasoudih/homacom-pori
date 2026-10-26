@@ -46,11 +46,13 @@ interface ApiCartService {
 
 interface ApiCartItem {
   id: number
+  cart_id?: number | null
   title: string
   image?: string | null
   product_id?: number | null
   product_slug?: string | null
   stock_id?: number | null
+  related_cart_item_id?: number | null
   customer_price?: string | number | null
   real_price?: string | number | null
   quantity: number
@@ -69,6 +71,7 @@ interface ApiCartItem {
     store?: { title?: string | null } | null
   } | null
   color?: { title?: string | null, code?: string | null } | null
+  size?: { title?: string | null } | null
   warranty?: { title?: string | null } | null
 }
 
@@ -93,6 +96,7 @@ function cloneGroups(groups: CartServiceGroup[]): CartServiceGroup[] {
 function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
   const stock = item.stock
   const color = stock?.color ?? item.color
+  const size = stock?.size ?? item.size
   const warranty = stock?.warranty ?? item.warranty
   const price = num(item.customer_price ?? stock?.customer_price)
   const realPrice = num(item.real_price ?? stock?.real_price)
@@ -105,6 +109,7 @@ function mapCartItem(item: ApiCartItem, apiBase: string): CartItem {
     href: item.product_slug ? `/product/${item.product_slug}` : '#',
     image: resolveMediaUrl(item.image, apiBase),
     color: { name: color?.title ?? '', value: color?.code ?? '' },
+    size: size?.title ?? '',
     warranty: warranty?.title ?? '',
     price,
     oldPrice: realPrice > price ? realPrice : undefined,
@@ -400,9 +405,12 @@ export function useCart() {
 
     if (item.apiId) {
       try {
+        // `stock_id` is required and `quantity` is validated against the
+        // stock's min/max, so a +1 on a `min_in_cart = 10` line must send 10.
         const res = await api.post<ApiCart>('/shop/cart/add-qty', {
           cart_item_id: item.apiId,
-          quantity: 1,
+          stock_id: item.stockId,
+          quantity: Math.max(1, item.minQuantity ?? 1),
           cart_token: ensureCartToken(),
         })
         applyCart(res.data)
@@ -426,6 +434,7 @@ export function useCart() {
       try {
         const res = await api.post<ApiCart>('/shop/cart/sub-qty', {
           cart_item_id: item.apiId,
+          stock_id: item.stockId,
           quantity: 1,
           cart_token: ensureCartToken(),
         })

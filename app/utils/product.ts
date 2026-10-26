@@ -14,6 +14,8 @@ export interface ProductColor {
  */
 export interface Product {
   id?: string | number
+  /** Backend product id (needed for the favourite toggle). */
+  apiId?: number
   title: string
   image?: string
   price: string | number
@@ -21,6 +23,8 @@ export interface Product {
   discount?: string | number
   colors?: Array<string | ProductColor>
   discountExpiresAt?: string | Date
+  /** `undefined` for guests — the list payload omits the key entirely. */
+  isFavorite?: boolean
 }
 
 export type ProductVariant = 'vertical' | 'horizontal' | 'minimal'

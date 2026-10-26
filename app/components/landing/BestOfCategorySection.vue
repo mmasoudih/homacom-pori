@@ -33,16 +33,28 @@ const { data: groups } = await useAsyncData('landing-best-of', async () => {
   if (!roots.length) return bestOfCategories
 
   try {
-    // The backend's `filters[categories][]` still rejects every id (422), so the
-    // panels share a real product pool split across the three categories.
-    const products = await fetchList('', 9, 'more_invoice')
-    if (products.length) {
-      return roots.map((root, index) => ({
+    // `filters[categories][]` now accepts real category ids (including child
+    // categories), so every panel gets its own pool.
+    const pools = await Promise.allSettled(
+      roots.map(root => fetchList('', 3, 'more_invoice', {
+        'filters[categories][]': [root.id],
+      })),
+    )
+
+    const panels = roots.map((root, index) => {
+      const result = pools[index]
+      const products = result?.status === 'fulfilled' ? result.value : []
+      return {
         category: root.title,
         icon: iconForTitle(root.title),
-        items: products.slice(index * 3, index * 3 + 3).map(toLandingCard),
-      }))
-    }
+        items: products.length
+          ? products.slice(0, 3).map(toLandingCard)
+          : (bestOfCategories[index]?.items ?? []),
+      }
+    })
+
+    if (panels.some(panel => panel.items.length))
+      return panels
   }
   catch {
     // Fall back to the designed panels below.

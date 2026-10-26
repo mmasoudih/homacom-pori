@@ -23,6 +23,13 @@ export interface AccountProfile {
   lastName: string
   /** Relative or absolute avatar URL from the profile payload. */
   avatar?: string
+  mobile: string
+  nickname: string
+  username: string
+  /** Wallet/credit balance returned by `profile/me`. */
+  credit: number
+  /** Currency code (`IRT`). */
+  currency: string
   birthYear: string
   birthMonth: string
   birthDay: string
@@ -41,6 +48,11 @@ export interface AccountProfile {
 export const accountProfile: AccountProfile = {
   firstName: 'پوریا',
   lastName: 'قنبری',
+  mobile: '',
+  nickname: '',
+  username: '',
+  credit: 0,
+  currency: 'IRT',
   birthYear: '۱۳۷۴',
   birthMonth: '۰۲',
   birthDay: '۲۶',
