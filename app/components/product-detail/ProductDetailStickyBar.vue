@@ -33,6 +33,7 @@ const emit = defineEmits<{
 const isAvailable = computed(() => props.product.stockStatus === 'available')
 
 const added = computed(() => props.quantity > 0)
+const minQuantity = computed(() => props.product.minOrderQuantity ?? 1)
 
 const discountPercent = computed(() =>
   props.product.oldPrice ? props.product.price - props.product.oldPrice : 0,
@@ -48,7 +49,7 @@ function increment() {
 }
 
 function decrement() {
-  if (props.quantity > 1) emit('decrement')
+  if (props.quantity > minQuantity.value) emit('decrement')
   else emit('remove')
 }
 
@@ -126,7 +127,7 @@ function notifyMe() {
         </button>
         <span class="text-[14px] font-bold text-T-900">{{ toPersianDigits(quantity) }}</span>
         <button
-          v-if="quantity > 1"
+          v-if="quantity > minQuantity"
           type="button"
           class="flex size-6 items-center justify-center text-T-900"
           aria-label="کاهش تعداد"

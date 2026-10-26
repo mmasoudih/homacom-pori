@@ -1,42 +1,129 @@
-import type { Order, OrderItem, OrderStatus } from '~/data/orders'
-import { findOrder } from '~/data/orders'
+import type { Order, OrderItem, OrderStatus, OrderTransaction } from '~/data/orders'
 import { toPersianDigits } from '~/utils/format'
+import { resolveMediaUrl } from '~/utils/media'
 
 interface ApiOrderItem {
   id: number
   product_id?: number | null
+  product_slug?: string | null
   title: string
+  image?: string | null
+  img?: string | null
+  color?: { title?: string | null, code?: string | null } | string | null
+  warranty?: { title?: string | null } | string | null
   quantity: number
-  price: number
+  price: number | string
 }
 
+interface ApiAddress {
+  name?: string | null
+  full_name?: string | null
+  nickname?: string | null
+  mobile?: string | null
+  phone?: string | null
+  tel?: string | null
+  address?: string | null
+  full_address?: string | null
+  plaque?: string | null
+  floor?: string | null
+  unit?: string | null
+  state?: { name?: string | null } | null
+  city?: { name?: string | null } | null
+}
+
+type ApiReceiver = ApiAddress
+
+interface ApiShipping {
+  method?: string | null
+  title?: string | null
+  name?: string | null
+  carrier?: string | null
+  cost?: number | string | null
+  price?: number | string | null
+  discount?: number | string | null
+  delivery_date?: string | null
+}
+
+interface ApiPayment {
+  total?: number | string | null
+  total_amount?: number | string | null
+  paid?: number | string | null
+  paid_amount?: number | string | null
+  percent?: number | string | null
+}
+
+interface ApiOrderTransaction {
+  id?: number | null
+  status?: string | null
+  bank?: string | null
+  bank_name?: string | null
+  gateway?: string | null
+  tracking_code?: string | null
+  reference_id?: string | null
+  transaction_id?: string | null
+  amount?: number | string | null
+  price?: number | string | null
+  method?: string | null
+  payment_method?: string | null
+  datetime?: string | null
+  created_at?: string | null
+}
+
+/** Full `UserOrderResponse` (see the 2026-10-25 backend changes). */
 interface ApiOrder {
   id: number
+  invoice?: string | number | null
+  code?: string | number | null
   user_id?: number | null
-  total_amount: number
+  total_amount?: number | string | null
+  payable_amount?: number | string | null
   status: string
   type: string
   created_at?: string | null
+  delivery_date?: string | null
+  delivery_code?: string | null
+  postal_tracking?: string | null
+  tracking_code?: string | null
   items?: ApiOrderItem[]
+  receiver?: ApiReceiver | null
+  receiver_name?: string | null
+  receiver_mobile?: string | null
+  receiver_phone?: string | null
+  receiver_address?: string | null
+  /** Full address block or the flat string; both serializations are seen. */
+  address?: ApiAddress | string | null
+  user_address?: ApiAddress | null
+  shipping?: ApiShipping | null
+  shipping_method?: string | null
+  shipping_cost?: number | string | null
+  shipping_discount?: number | string | null
+  payment?: ApiPayment | null
+  paid_amount?: number | string | null
+  transactions?: ApiOrderTransaction[]
 }
-
-const ORDER_STATUSES = [
-  'waiting_payment',
-  'processing',
-  'paid',
-  'preparing',
-  'sending',
-  'delivery',
-  'cancel_customer',
-  'returned',
-] as const
 
 const FALLBACK_IMAGE = '/figma/fill-e393cbb3afd42faa.png'
 
+function num(value: unknown): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function text(value: unknown): string {
+  return typeof value === 'string' ? value : ''
+}
+
+function titleOf(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value && typeof value === 'object')
+    return text((value as { title?: string | null }).title)
+  return ''
+}
+
 function mapStatus(status: string): OrderStatus {
-  if (status === 'waiting_payment') return 'awaiting_payment'
+  if (status === 'waiting_payment' || status === 'pending') return 'awaiting_payment'
   if (status.startsWith('cancel_') || status === 'returned') return 'cancelled'
-  if (status === 'delivery') return 'delivered'
+  if (status === 'delivery' || status === 'delivered') return 'delivered'
   return 'processing'
 }
 
@@ -47,50 +134,139 @@ function formatDate(value?: string | null): string {
   return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(date)
 }
 
-function mapItem(item: ApiOrderItem): OrderItem {
+function mapItem(item: ApiOrderItem, apiBase: string): OrderItem {
+  const color = item.color
+
   return {
     id: String(item.id),
     title: item.title,
-    image: FALLBACK_IMAGE,
-    color: '',
-    colorHex: '#d4d4d8',
-    warranty: '',
-    productCode: item.product_id ? String(item.product_id) : '',
-    quantity: item.quantity,
-    price: Number(item.price) || 0,
+    image: resolveMediaUrl(item.image ?? item.img, apiBase) || FALLBACK_IMAGE,
+    color: titleOf(color),
+    colorHex: color && typeof color === 'object' ? color.code ?? '#d4d4d8' : '#d4d4d8',
+    warranty: titleOf(item.warranty),
+    productCode: item.product_slug || (item.product_id ? String(item.product_id) : ''),
+    quantity: num(item.quantity),
+    price: num(item.price),
   }
 }
 
-function mapOrder(order: ApiOrder): Order {
+function mapTransactions(transactions: ApiOrderTransaction[] | undefined): OrderTransaction[] {
+  return (transactions ?? []).map((transaction, index) => ({
+    id: String(transaction.id ?? index + 1),
+    status: transaction.status === 'failed' ? 'failed' : 'success',
+    bank: text(transaction.bank ?? transaction.bank_name ?? transaction.gateway),
+    trackingCode: text(
+      transaction.tracking_code ?? transaction.reference_id ?? transaction.transaction_id,
+    ),
+    amount: num(transaction.amount ?? transaction.price),
+    method: text(transaction.method ?? transaction.payment_method) || undefined,
+    datetime: transaction.created_at
+      ? formatDate(transaction.created_at)
+      : text(transaction.datetime) || undefined,
+  }))
+}
+
+function joinAddress(block: ApiAddress | null | undefined, fallback: string): string {
+  if (!block) return fallback
+
+  const parts = [
+    block.state?.name,
+    block.city?.name,
+    block.address ?? block.full_address,
+    block.plaque ? `پلاک ${block.plaque}` : null,
+    block.floor ? `طبقه ${block.floor}` : null,
+    block.unit ? `واحد ${block.unit}` : null,
+  ]
+
+  return parts.filter((part): part is string => !!part).join('، ') || fallback
+}
+
+function mapOrder(order: ApiOrder, apiBase: string): Order {
   const status = mapStatus(order.status)
-  const amount = Number(order.total_amount) || 0
+  const amount = num(order.total_amount ?? order.payable_amount)
+  const receiver = order.receiver
+  const addressBlock = order.user_address
+    ?? (order.address && typeof order.address === 'object' ? order.address : null)
+  const addressText = typeof order.address === 'string' ? order.address : ''
+  const shipping = order.shipping
+  const payment = order.payment
+  const paid = num(
+    payment?.paid ?? payment?.paid_amount ?? order.paid_amount,
+  )
+
+  let paymentInfo: Order['payment']
+  if (payment || status === 'awaiting_payment') {
+    const total = num(payment?.total ?? payment?.total_amount) || amount
+    paymentInfo = {
+      total,
+      paid,
+      percent: payment?.percent != null
+        ? num(payment.percent)
+        : total > 0
+          ? Math.round((paid / total) * 100)
+          : 0,
+    }
+  }
 
   return {
     id: String(order.id),
-    code: String(order.id),
+    code: String(order.invoice ?? order.code ?? order.id),
     status,
     amount,
     date: formatDate(order.created_at),
-    deliveredAt: '',
-    items: (order.items ?? []).map(mapItem),
-    transactions: [],
-    receiver: { name: '', phone: '', address: '' },
-    shipping: { method: '', discount: 0, cost: 0, deliveryDate: '' },
-    payment: status === 'awaiting_payment'
-      ? { total: amount, paid: 0, percent: 0 }
-      : undefined,
+    deliveredAt: formatDate(order.delivery_date),
+    items: (order.items ?? []).map(item => mapItem(item, apiBase)),
+    transactions: mapTransactions(order.transactions),
+    receiver: {
+      name: text(
+        receiver?.name
+        ?? receiver?.full_name
+        ?? receiver?.nickname
+        ?? addressBlock?.nickname
+        ?? order.receiver_name,
+      ),
+      phone: text(
+        receiver?.mobile
+        ?? receiver?.phone
+        ?? addressBlock?.mobile
+        ?? addressBlock?.phone
+        ?? order.receiver_mobile
+        ?? order.receiver_phone,
+      ),
+      address: joinAddress(
+        addressBlock ?? receiver,
+        text(order.receiver_address ?? addressText),
+      ),
+    },
+    shipping: {
+      method: text(
+        shipping?.method
+        ?? shipping?.title
+        ?? shipping?.name
+        ?? shipping?.carrier
+        ?? order.shipping_method,
+      ),
+      discount: num(shipping?.discount ?? order.shipping_discount),
+      cost: num(shipping?.cost ?? shipping?.price ?? order.shipping_cost),
+      deliveryDate: formatDate(order.delivery_date ?? shipping?.delivery_date),
+    },
+    payment: paymentInfo,
+    deliveryCode: text(order.delivery_code) || undefined,
+    postalTracking: text(order.postal_tracking ?? order.tracking_code) || undefined,
   }
 }
 
 /**
  * Orders list for the dashboard.
  *
- * The API requires a single `status` per request, so the "all" view merges the
- * statuses that the design's tabs care about. This is documented as a backend
- * gap (a group/all filter or pagination-aware list would be cheaper).
+ * One request (`status=all&type=sales`) returns every order of the authenticated
+ * user, newest first. The tabs are grouped client-side; the backend no longer
+ * needs one request per status (2026-10-25).
  */
 export function useOrders() {
   const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
   const orders = ref<Order[]>([])
   const pending = ref(false)
   const loaded = ref(false)
@@ -98,20 +274,13 @@ export function useOrders() {
   async function load() {
     pending.value = true
     try {
-      const responses = await Promise.allSettled(
-        ORDER_STATUSES.map(status =>
-          api.get<ApiOrder[]>('/shop/order', { query: { status, type: 'sales' } }),
-        ),
-      )
+      const res = await api.get<ApiOrder[]>('/shop/order', {
+        query: { status: 'all', type: 'sales' },
+      })
 
-      const merged = new Map<string, Order>()
-      for (const response of responses) {
-        if (response.status !== 'fulfilled') continue
-        for (const order of response.value.data ?? [])
-          merged.set(String(order.id), mapOrder(order))
-      }
-
-      orders.value = [...merged.values()].sort((a, b) => Number(b.id) - Number(a.id))
+      orders.value = (res.data ?? [])
+        .map(order => mapOrder(order, apiBase))
+        .sort((a, b) => Number(b.id) - Number(a.id))
       loaded.value = true
     }
     finally {
@@ -122,24 +291,26 @@ export function useOrders() {
   return { orders, pending, loaded, load }
 }
 
-/** One order by its invoice/id, with the designed mock order as fallback. */
+/** One order by its invoice/id — the full `UserOrderResponse`, no mock fallback. */
 export function useOrderDetail(invoice: Ref<string>) {
   const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
 
   const { data, pending, error, refresh } = useAsyncData<Order | undefined>(
     () => `shop-order-${invoice.value}`,
     async () => {
       try {
         const res = await api.get<ApiOrder>(`/shop/order/${encodeURIComponent(invoice.value)}`)
-        return res.data ? mapOrder(res.data) : findOrder(invoice.value)
+        return res.data ? mapOrder(res.data, apiBase) : undefined
       }
       catch {
-        return findOrder(invoice.value)
+        return undefined
       }
     },
     {
       watch: [invoice],
-      default: () => findOrder(invoice.value),
+      default: () => undefined,
     },
   )
 

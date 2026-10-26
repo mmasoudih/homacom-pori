@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { computed, reactive, watch } from 'vue'
 import { IconChevronDown } from '@tabler/icons-vue'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import type { LegalInfo } from '~/data/account'
-import { citiesByProvince, provinces } from '~/data/account'
+import { useCities, useStates } from '~/composables/useAddresses'
 
 const props = defineProps<{
   open: boolean
@@ -16,6 +17,8 @@ const emit = defineEmits<{
   'submit': [payload: LegalInfo]
 }>()
 
+const { states } = useStates()
+
 const form = reactive<LegalInfo>({
   organizationName: '',
   nationalId: '',
@@ -26,9 +29,13 @@ const form = reactive<LegalInfo>({
   postalAddress: '',
   economicCode: '',
   ceo: '',
+  stateId: undefined,
+  cityId: undefined,
+  establishmentDate: undefined,
 })
 
-const cities = computed(() => (form.province ? citiesByProvince[form.province] ?? [] : []))
+const stateId = computed<number | null>(() => form.stateId ?? null)
+const { cities } = useCities(stateId)
 
 watch(
   () => props.open,
@@ -44,16 +51,51 @@ watch(
         postalAddress: props.value?.postalAddress ?? '',
         economicCode: props.value?.economicCode ?? '',
         ceo: props.value?.ceo ?? '',
+        stateId: props.value?.stateId,
+        cityId: props.value?.cityId,
+        establishmentDate: props.value?.establishmentDate,
       })
     }
   },
   { immediate: true },
 )
 
+// Resolve names → ids when the payload predates the id fields.
 watch(
-  () => form.province,
-  () => {
-    if (!cities.value.some(city => city.value === form.city)) form.city = ''
+  [states, () => props.open],
+  ([items, open]) => {
+    if (!open || form.stateId != null || !form.province) return
+    const match = items.find(state => state.name === form.province)
+    if (match) form.stateId = match.id
+  },
+  { immediate: true },
+)
+
+watch(
+  [cities, () => props.open],
+  ([items, open]) => {
+    if (!open || form.cityId != null || !form.city) return
+    const match = items.find(city => city.name === form.city)
+    if (match) form.cityId = match.id
+  },
+  { immediate: true },
+)
+
+watch(
+  () => form.stateId,
+  (next, previous) => {
+    form.province = states.value.find(state => state.id === next)?.name ?? ''
+    if (previous != null && previous !== next) {
+      form.cityId = undefined
+      form.city = ''
+    }
+  },
+)
+
+watch(
+  () => form.cityId,
+  (next) => {
+    form.city = cities.value.find(city => city.id === next)?.name ?? ''
   },
 )
 
@@ -113,11 +155,11 @@ function submit() {
           <span class="text-[13px] text-T-800">شهر محل دفتر مرکزی</span>
           <div class="relative">
             <select
-              v-model="form.city"
+              v-model="form.cityId"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
-              <option value="" disabled>انتخاب شهر</option>
-              <option v-for="o in cities" :key="o.value" :value="o.value">{{ o.label }}</option>
+              <option :value="undefined" disabled>انتخاب شهر</option>
+              <option v-for="o in cities" :key="o.id" :value="o.id">{{ o.name }}</option>
             </select>
             <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />
           </div>
@@ -127,11 +169,11 @@ function submit() {
           <span class="text-[13px] text-T-800">نام استان</span>
           <div class="relative">
             <select
-              v-model="form.province"
+              v-model="form.stateId"
               class="h-11 w-full appearance-none rounded-xl border border-T-400 bg-T-50 px-3 pe-9 text-[13px] text-T-800 outline-none focus:border-primary"
             >
-              <option value="" disabled>انتخاب استان</option>
-              <option v-for="o in provinces" :key="o.value" :value="o.value">{{ o.label }}</option>
+              <option :value="undefined" disabled>انتخاب استان</option>
+              <option v-for="o in states" :key="o.id" :value="o.id">{{ o.name }}</option>
             </select>
             <IconChevronDown class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-T-500" />
           </div>

@@ -17,9 +17,13 @@ const props = withDefaults(defineProps<{
   total?: number
   class?: string
 }>(), {
-  total: 180,
+  total: undefined,
   class: '',
 })
+
+const emit = defineEmits<{
+  add: []
+}>()
 
 const sorts = [
   { id: 'newest', label: 'جدیدترین' },
@@ -31,6 +35,32 @@ const sorts = [
 const activeSort = ref<string>('newest')
 const expanded = ref<string[]>([])
 const page = ref(1)
+const perPage = 10
+
+const sorted = computed(() => {
+  const list = [...props.comments]
+  switch (activeSort.value) {
+    case 'oldest':
+      return list.reverse()
+    case 'highest':
+      return list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+    case 'lowest':
+      return list.sort((a, b) => (a.rating ?? 0) - (b.rating ?? 0))
+    default:
+      return list
+  }
+})
+
+const pages = computed(() => Math.max(1, Math.ceil(sorted.value.length / perPage)))
+const pageItems = computed(() =>
+  sorted.value.slice((page.value - 1) * perPage, page.value * perPage),
+)
+const totalCount = computed(() => props.total ?? props.comments.length)
+const hasPending = computed(() => props.comments.some(comment => comment.pending))
+
+watch([activeSort, () => props.comments.length], () => {
+  page.value = 1
+})
 
 function isExpanded(id: string) {
   return expanded.value.includes(id)
@@ -58,6 +88,7 @@ function toggleExpanded(id: string) {
       <button
         type="button"
         class="flex h-11 items-center gap-2 rounded-full border border-primary px-5 text-[14px] font-medium text-primary transition-colors hover:bg-R-10"
+        @click="emit('add')"
       >
         <IconPencilPlus class="size-5" />
         افزودن دیدگاه
@@ -83,15 +114,23 @@ function toggleExpanded(id: string) {
         </button>
       </div>
 
-      <span class="text-[13.5px] text-T-700">{{ toPersianDigits(total) }} دیدگاه</span>
+      <span class="text-[13.5px] text-T-700">{{ toPersianDigits(totalCount) }} دیدگاه</span>
     </div>
 
     <div class="h-px w-full bg-T-400" />
 
+    <!-- The thread now includes the viewer's own pending comments. -->
+    <p
+      v-if="hasPending"
+      class="rounded-lg bg-[#FFF7E6] px-4 py-2.5 text-[13px] text-[#B7791F]"
+    >
+      دیدگاه شما در انتظار تایید است.
+    </p>
+
     <!-- Comment list -->
     <div class="flex flex-col gap-3">
       <article
-        v-for="comment in comments"
+        v-for="comment in pageItems"
         :key="comment.id"
         class="overflow-hidden rounded-2xl border border-T-400 bg-T-50"
       >
@@ -115,7 +154,13 @@ function toggleExpanded(id: string) {
 
           <div class="flex items-center gap-4">
             <span
-              v-if="comment.admin"
+              v-if="comment.pending"
+              class="flex h-7 items-center rounded-lg bg-[#FFF7E6] px-3 text-[12.5px] font-bold text-[#B7791F]"
+            >
+              در انتظار تایید
+            </span>
+            <span
+              v-else-if="comment.admin"
               class="flex h-7 items-center rounded-lg bg-R-10 px-3 text-[12.5px] font-bold text-primary"
             >
               ادمین
@@ -188,6 +233,6 @@ function toggleExpanded(id: string) {
       </article>
     </div>
 
-    <AppPagination v-model:page="page" :pages="125" class="mt-4" />
+    <AppPagination v-if="pages > 1" v-model:page="page" :pages="pages" class="mt-4" />
   </section>
 </template>

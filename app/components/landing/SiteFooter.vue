@@ -8,6 +8,7 @@ import { resolveMediaUrl } from "~/utils/media";
 
 const { t } = useI18n();
 const { siteFooter } = useSiteFooter();
+const apiBase = String(useRuntimeConfig().public.apiBase || '');
 
 // Contact details come from the shop API; the designed mock values remain as a
 // fallback so the footer never renders empty on a cold/offline API.
@@ -32,7 +33,7 @@ const contactAddress = computed(
 );
 
 const footerLogo = computed(() =>
-  resolveMediaUrl(siteFooter.value.logo, String(useRuntimeConfig().public.apiBase || '')) || '/homacom-logo.png',
+  resolveMediaUrl(siteFooter.value.logo, apiBase) || '/homacom-logo.png',
 );
 
 const footerMenus = ['menu_1', 'menu_2', 'menu_3', 'menu_4'] as const;

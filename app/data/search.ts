@@ -12,11 +12,19 @@ export type SearchFingerprintValue = 'has' | 'none'
 
 export interface SearchProduct {
   id: string
+  /** Numeric backend id (the `id` above is the slug used in URLs). */
+  apiId?: number
   title: string
   image: string
   price: number
   oldPrice?: number
   discount?: number
+  /** Default buyable stock from the list payload (`cheapest_stock.id`). */
+  stockId?: number
+  /** Minimum quantity the backend accepts for that stock. */
+  minQuantity?: number
+  /** Per-stock purchase cap. */
+  maxQuantity?: number
   /**
    * Category facet id — one of `searchCategoryOptions`. In this mock the
    * category tree is brand-based (آیفون / سامسونگ / آنر …), exactly like the
@@ -31,6 +39,8 @@ export interface SearchProduct {
   colorIds: string[]
   /** Drives the «فقط کالاهای موجود» toggle. */
   inStock: boolean
+  /** Favourite state from the list payload; absent for guest requests. */
+  isFavorite?: boolean
   /** Drives the «اثر انگشت» facet. */
   hasFingerprint: boolean
   /**

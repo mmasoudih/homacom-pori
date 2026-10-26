@@ -5,11 +5,12 @@ import { toPersianDigits } from '~/utils/format'
 const props = withDefaults(
   defineProps<{
     quantity: number
+    minQuantity?: number
     maxQuantity?: number
     size?: 'desktop' | 'mobile'
     class?: string
   }>(),
-  { maxQuantity: undefined, size: 'desktop', class: '' },
+  { minQuantity: 1, maxQuantity: undefined, size: 'desktop', class: '' },
 )
 
 const emit = defineEmits<{
@@ -21,8 +22,9 @@ const emit = defineEmits<{
 const atMax = computed(
   () => props.maxQuantity != null && props.quantity >= props.maxQuantity,
 )
-/** Matches the design: a minus at 2+, the red trash only on the last unit. */
-const canDecrement = computed(() => props.quantity > 1)
+const atMin = computed(() => props.quantity <= (props.minQuantity ?? 1))
+/** The minus becomes a trash at the smallest allowed quantity. */
+const canDecrement = computed(() => !atMin.value)
 </script>
 
 <template>

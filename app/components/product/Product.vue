@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ClassValue } from 'clsx'
-import { IconArrowsLeftRight } from '@tabler/icons-vue'
+import { IconArrowsLeftRight, IconHeart, IconHeartFilled } from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
 import type { Product, ProductTone, ProductVariant } from '~/utils/product'
 import { discountBadgeClass, normalizeColors, resolveDiscount, toNumber } from '~/utils/product'
 import { toPersianDigits } from '~/utils/format'
@@ -28,6 +29,8 @@ const props = withDefaults(
     showCountdown?: boolean
     /** Renders a compare toggle in the image corner (vertical variant only). */
     showCompare?: boolean
+    /** Renders the favourite heart when the list payload supplied `is_favorite`. */
+    showFavorite?: boolean
     /** When set, the card renders as a link pointing to this route. */
     href?: string
     class?: ClassValue
@@ -46,6 +49,7 @@ const props = withDefaults(
     showOriginalPrice: undefined,
     showCountdown: undefined,
     showCompare: false,
+    showFavorite: false,
     href: '',
     class: '',
   },
@@ -116,6 +120,29 @@ const inlineBadgeSizeClass = computed(() =>
 const { has: inCompare, toggle: toggleCompare } = useCompare()
 const compareId = computed(() => (props.product.id != null ? String(props.product.id) : ''))
 const compareActive = computed(() => !!compareId.value && inCompare(compareId.value))
+
+// --- Favourite heart (list cards, authenticated only) ----------------------
+const favoritesApi = useFavorites()
+const favoriteActive = ref(props.product.isFavorite ?? false)
+watch(() => props.product.isFavorite, value => { favoriteActive.value = value ?? false })
+
+const canFavorite = computed(() =>
+  props.showFavorite
+  && props.product.isFavorite !== undefined
+  && !!props.product.apiId,
+)
+
+function toggleFavorite() {
+  const id = props.product.apiId
+  if (!id) return
+
+  favoritesApi.toggle(id)
+    .then((added) => {
+      favoriteActive.value = added
+      if (added) toast.success('به علاقه‌مندی‌ها اضافه شد.')
+    })
+    .catch(() => toast.error('تغییر علاقه‌مندی انجام نشد.'))
+}
 </script>
 
 <template>
@@ -170,6 +197,20 @@ const compareActive = computed(() => !!compareId.value && inCompare(compareId.va
         class="absolute bottom-2 start-2 flex items-center justify-center rounded-lg px-1.5 py-0.5 text-[12.5px] font-extrabold"
         :class="discountBadgeClass(tone)"
       >{{ toPersianDigits(discount!) }}٪</span>
+
+      <!-- Favourite: bottom-inline-end corner -->
+      <button
+        v-if="canFavorite"
+        type="button"
+        class="absolute bottom-2 end-2 z-10 flex size-8 items-center justify-center rounded-full border border-T-400 bg-T-50/90 transition-colors"
+        :class="favoriteActive ? 'text-primary' : 'text-T-600 hover:border-primary hover:text-primary'"
+        :aria-pressed="favoriteActive"
+        aria-label="افزودن به علاقه‌مندی‌ها"
+        @click.stop.prevent="toggleFavorite"
+      >
+        <IconHeartFilled v-if="favoriteActive" class="size-4" />
+        <IconHeart v-else class="size-4" />
+      </button>
     </div>
 
     <UiTypography

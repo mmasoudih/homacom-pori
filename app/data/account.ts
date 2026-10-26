@@ -8,7 +8,12 @@ export interface LegalInfo {
   city: string
   province: string
   postalAddress: string
-  /** Required by the company-information endpoint. */
+  /** Backend ids used by `PUT /shop/user/profile/legal-information`. */
+  stateId?: number
+  cityId?: number
+  /** Gregorian `YYYY-MM-DD` (`company_establishment_date`). */
+  establishmentDate?: string
+  /** Required by the legal-information endpoint. */
   economicCode?: string
   ceo?: string
 }
@@ -16,6 +21,15 @@ export interface LegalInfo {
 export interface AccountProfile {
   firstName: string
   lastName: string
+  /** Relative or absolute avatar URL from the profile payload. */
+  avatar?: string
+  mobile: string
+  nickname: string
+  username: string
+  /** Wallet/credit balance returned by `profile/me`. */
+  credit: number
+  /** Currency code (`IRT`). */
+  currency: string
   birthYear: string
   birthMonth: string
   birthDay: string
@@ -34,6 +48,11 @@ export interface AccountProfile {
 export const accountProfile: AccountProfile = {
   firstName: 'پوریا',
   lastName: 'قنبری',
+  mobile: '',
+  nickname: '',
+  username: '',
+  credit: 0,
+  currency: 'IRT',
   birthYear: '۱۳۷۴',
   birthMonth: '۰۲',
   birthDay: '۲۶',

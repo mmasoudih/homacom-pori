@@ -71,6 +71,7 @@ function goCheckout() {
           <CartItemMeta
             class="self-start"
             :color="item.color"
+            :size="item.size"
             :warranty="item.warranty"
             :installment="item.installment"
             :seller="item.sellerName"

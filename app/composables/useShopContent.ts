@@ -118,14 +118,11 @@ interface ApiFaqSubject {
 
 const faqIcons = ['package', 'credit', 'delivery', 'return', 'user', 'tag', 'products'] as const
 
-function absoluteMedia(path?: string | null): string {
-  const config = useRuntimeConfig()
-  return resolveMediaUrl(path, String(config.public.apiBase || ''))
-}
-
 /** Brand list, falling back to the designed mock list when the API is empty. */
 export function useBrands() {
   const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
 
   const { data: brandItems, pending, error, refresh } = useAsyncData<BrandItem[]>(
     'shop-brands',
@@ -137,7 +134,7 @@ export function useBrands() {
       return items.map(item => ({
         name: item.title,
         titleEn: item.title_en ?? undefined,
-        logo: absoluteMedia(item.img),
+        logo: resolveMediaUrl(item.img, apiBase),
       }))
     },
     {

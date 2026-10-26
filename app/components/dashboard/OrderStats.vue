@@ -16,7 +16,9 @@ const statHref: Record<OrderStatTone, string> = {
 }
 
 const { orders, load } = useOrders()
-await load()
+await load().catch(() => {
+  // Keep the zero-count stats when the API is unavailable.
+})
 
 const orderStats = computed<OrderStat[]>(() => [
   {

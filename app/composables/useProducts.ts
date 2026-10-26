@@ -1,5 +1,16 @@
 import type { SearchProduct } from '~/data/search'
+import { ApiError } from '~/composables/useApi'
 import { resolveMediaUrl } from '~/utils/media'
+
+interface ApiCheapestStock {
+  id: number
+  customer_price?: string | number | null
+  discount?: number | null
+  quantity?: number | null
+  min_in_cart?: number | null
+  max_in_cart?: number | null
+  is_default?: string | boolean | null
+}
 
 interface ApiProductSummary {
   id: number
@@ -9,20 +20,16 @@ interface ApiProductSummary {
   img?: string | null
   status?: string | null
   view_count?: number | null
+  /** Rating score (0–5), not an invoice count. */
   score?: number | null
+  /** Present only for authenticated list requests. */
+  is_favorite?: boolean | null
+  order_count?: number | null
   created_at?: string | null
   brand?: { id: number, title: string, title_en?: string | null } | null
   categories?: Array<{ id: number, title: string }>
   colors?: Array<{ id?: number, title?: string | null, title_en?: string | null, code?: string | null }>
-}
-
-interface ApiProductDetail {
-  stocks?: Array<{
-    customer_price?: string | number | null
-    real_price?: string | number | null
-    quantity?: number | null
-    is_default?: string | boolean | null
-  }>
+  cheapest_stock?: ApiCheapestStock | null
 }
 
 const BRAND_IDS: Record<string, string> = {
@@ -87,25 +94,22 @@ export function useProductCatalog() {
   const config = useRuntimeConfig()
   const apiBase = String(config.public.apiBase || '')
 
-  async function fetchPrice(slug: string) {
-    try {
-      const res = await api.get<ApiProductDetail>(`/shop/products/${encodeURIComponent(slug)}`, { skipAuth: true })
-      const stocks = res.data?.stocks ?? []
-      const stock = stocks.find(item => item.is_default === 'yes' || item.is_default === true)
-        ?? stocks.find(item => num(item.quantity) > 0)
-        ?? stocks[0]
-      const price = num(stock?.customer_price)
-      const oldPrice = num(stock?.real_price)
-      return {
-        price,
-        oldPrice: oldPrice > price ? oldPrice : undefined,
-        discount: oldPrice > price && price > 0
-          ? Math.round(((oldPrice - price) / oldPrice) * 100)
-          : undefined,
-      }
-    }
-    catch {
-      return { price: 0, oldPrice: undefined, discount: undefined }
+  /**
+   * `cheapest_stock` carries the price and the purchase bounds, but the list
+   * payload has no `real_price`, so the struck-through price is derived from
+   * the percentage discount.
+   */
+  function listPrice(stock?: ApiCheapestStock | null) {
+    const price = num(stock?.customer_price)
+    const discount = num(stock?.discount)
+    const oldPrice = discount > 0 && discount < 100 && price > 0
+      ? Math.round(price / (1 - discount / 100))
+      : undefined
+
+    return {
+      price,
+      oldPrice: oldPrice && oldPrice > price ? oldPrice : undefined,
+      discount: oldPrice && oldPrice > price ? Math.round(discount) : undefined,
     }
   }
 
@@ -113,9 +117,9 @@ export function useProductCatalog() {
     term: string,
     limit = 12,
     sort?: string,
-    extraFilters?: Record<string, string | number>,
+    extraFilters?: Record<string, string | number | Array<string | number>>,
   ): Promise<SearchProduct[]> {
-    const query: Record<string, string | number> = {
+    const query: Record<string, string | number | Array<string | number>> = {
       'filters[per_page]': limit,
       'filters[page]': 1,
       ...extraFilters,
@@ -123,31 +127,50 @@ export function useProductCatalog() {
     if (term) query['filters[s]'] = term
     if (sort) query['filters[sort]'] = sort
 
-    const res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query, skipAuth: true })
-    const items = res.data?.items ?? []
-    const prices = await Promise.allSettled(items.map(item => fetchPrice(item.slug)))
+    // The list is public, but sending the bearer token makes every item carry
+    // `is_favorite`. A stale token must not break the listing: retry once
+    // without auth on a 401.
+    let res
+    try {
+      res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query })
+    }
+    catch (err) {
+      if (err instanceof ApiError && err.status === 401)
+        res = await api.get<{ items: ApiProductSummary[] }>('/shop/products', { query, skipAuth: true })
+      else
+        throw err
+    }
 
-    return items.map((item, index) => {
-      const price = prices[index]?.status === 'fulfilled'
-        ? prices[index].value
-        : { price: 0, oldPrice: undefined, discount: undefined }
+    const items = res.data?.items ?? []
+
+    return items.map((item) => {
+      const stock = item.cheapest_stock
+      const price = listPrice(stock)
       const brandId = mapBrandId(item.brand?.title)
       const createdAt = item.created_at ? new Date(item.created_at).getTime() : 0
+      const quantity = num(stock?.quantity)
 
       return {
         id: item.slug,
+        apiId: item.id,
         title: item.title,
         image: resolveMediaUrl(item.img, apiBase),
         price: price.price,
         oldPrice: price.oldPrice,
         discount: price.discount,
+        stockId: stock?.id,
+        minQuantity: num(stock?.min_in_cart) || 1,
+        maxQuantity: num(stock?.max_in_cart) || undefined,
         categoryId: brandId,
         brandId,
         tileId: item.categories?.[0]?.title ?? 'products',
         colorIds: mapColorIds(item.colors),
-        inStock: item.status === 'active',
+        inStock: quantity > 0 && item.status === 'active',
+        // Guests never receive the key — keep it `undefined` so list hearts
+        // only render for authenticated responses.
+        isFavorite: typeof item.is_favorite === 'boolean' ? item.is_favorite : undefined,
         hasFingerprint: false,
-        sales: num(item.score),
+        sales: num(item.order_count),
         views: num(item.view_count),
         addedAt: Number.isFinite(createdAt) ? createdAt : 0,
         keywords: [item.title_en, item.brand?.title, item.brand?.title_en]
@@ -190,7 +213,7 @@ export function useLandingProducts() {
       try {
         const [newestList, bestsellerList] = await Promise.all([
           fetchList('', 6, 'newest'),
-          fetchList('', 6),
+          fetchList('', 6, 'more_invoice'),
         ])
         return {
           newest: newestList.map(toLandingCard),

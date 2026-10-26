@@ -213,6 +213,13 @@ const payable = computed(
       افزودن به سبد خرید
     </button>
 
+    <p
+      v-if="(product.minOrderQuantity ?? 1) > 1"
+      class="-mt-2 text-center text-[11.5px] text-T-600"
+    >
+      حداقل خرید این کالا {{ product.minOrderQuantity }} عدد است.
+    </p>
+
     <!-- Selected color + warranty -->
     <div class="flex flex-col gap-2.5">
       <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">

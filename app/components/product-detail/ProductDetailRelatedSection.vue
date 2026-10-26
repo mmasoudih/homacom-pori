@@ -37,8 +37,14 @@ const props = withDefaults(
           :key="item.id"
           class="w-[184px] shrink-0 basis-auto ps-3 lg:w-[254px] lg:ps-4"
         >
-          <NuxtLink :to="`/product/${item.id}`" class="block h-full">
+          <NuxtLink :to="`/product/${item.id}`" class="relative block h-full">
             <Product :product="item" class="h-full" />
+            <span
+              v-if="item.inStock === false"
+              class="absolute bottom-2 start-2 rounded-lg bg-T-200 px-2 py-0.5 text-[12px] font-bold text-T-600"
+            >
+              ناموجود
+            </span>
           </NuxtLink>
         </CarouselItem>
       </CarouselContent>

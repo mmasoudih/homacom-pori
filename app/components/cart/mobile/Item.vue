@@ -30,6 +30,7 @@ const emit = defineEmits<{
         <CartItemMeta
           class="self-start"
           :color="item.color"
+          :size="item.size"
           :warranty="item.warranty"
           :installment="item.installment"
           :seller="item.sellerName"
@@ -70,6 +71,7 @@ const emit = defineEmits<{
         <CartQtyStepper
           size="mobile"
           :quantity="item.quantity"
+          :min-quantity="item.minQuantity"
           :max-quantity="item.maxQuantity"
           @increment="emit('increment')"
           @decrement="emit('decrement')"

@@ -56,7 +56,7 @@ async function createTicket(payload: NewTicketPayload) {
     await createTicketApi({
       subject: payload.subject,
       departmentId,
-      priority: 'medium',
+      priority: payload.priority,
       content: payload.description,
     })
     toast.success('تیکت شما ثبت شد.')

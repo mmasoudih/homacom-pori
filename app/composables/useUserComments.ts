@@ -12,6 +12,8 @@ interface ApiUserComment {
   related_img?: string | null
   created_at?: string | null
   nickname?: string | null
+  reaction_up?: number | null
+  reaction_down?: number | null
 }
 
 const FALLBACK_IMAGE = '/figma/fill-e393cbb3afd42faa.png'
@@ -58,8 +60,8 @@ export function useUserComments() {
           rating: Number(comment.score) || 0,
           text: comment.content,
           status: mapStatus(comment.status),
-          likes: 0,
-          dislikes: 0,
+          likes: Number(comment.reaction_up) || 0,
+          dislikes: Number(comment.reaction_down) || 0,
         }))
 
       pending.value = comments
@@ -85,4 +87,26 @@ export function useUserComments() {
   }
 
   return { mine, pending, loading, loaded, load, remove }
+}
+
+export interface CommentReactionResult {
+  comment_id: number
+  reaction: 'up' | 'down' | null
+  reaction_up: number
+  reaction_down: number
+}
+
+/** Like/dislike a comment (same type again removes the reaction). */
+export function useCommentReaction() {
+  const api = useApi()
+
+  async function react(commentId: string | number, type: 'up' | 'down') {
+    const res = await api.post<CommentReactionResult>(
+      `/shop/user/comments/${encodeURIComponent(String(commentId))}/reaction`,
+      { type },
+    )
+    return res.data
+  }
+
+  return { react }
 }

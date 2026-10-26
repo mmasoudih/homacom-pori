@@ -396,6 +396,8 @@ export interface BlogComment {
   author: string
   date: string
   text: string
+  /** The viewer's own comment, awaiting moderation. */
+  pending?: boolean
   /** Star rating (1-5). Brand/admin entries have none. */
   rating?: number
   /** Brand or admin entry: renders the «ادمین» badge, logo avatar and no rating. */
@@ -409,6 +411,8 @@ export interface BlogComment {
 }
 
 export interface BlogArticle {
+  /** Backend post id (used for comments). */
+  apiId?: number
   slug: string
   categorySlug: string
   /** Chip label shown on the cover. */
@@ -422,6 +426,7 @@ export interface BlogArticle {
   lead: string
   body: BlogBlock[]
   comments: BlogComment[]
+  commentsTotal?: number
 }
 
 export const blogArticle: BlogArticle = {
