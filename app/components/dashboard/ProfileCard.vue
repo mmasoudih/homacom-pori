@@ -21,10 +21,6 @@ watch(() => profile.value.credit, (credit) => {
 }, { immediate: true })
 
 const fundsOpen = ref(false)
-
-function onCharged(amount: number) {
-  balance.value += amount
-}
 </script>
 
 <template>
@@ -54,21 +50,30 @@ function onCharged(amount: number) {
       </span>
     </div>
 
-    <button
-      type="button"
-      class="mt-3 flex w-full items-center justify-start gap-1 text-[#5A6AFF] transition-colors"
-      @click="fundsOpen = true"
-    >
-      <UiTypography as="span" size="md" weight="medium" color="inherit">افزایش موجودی کیف پول</UiTypography>
-      <IconChevronLeft class="size-4" />
-    </button>
+    <div class="mt-3 flex items-center justify-between gap-2">
+      <NuxtLink
+        to="/dashboard/wallet"
+        class="flex items-center gap-1 text-T-600 transition-colors hover:text-primary"
+      >
+        <UiTypography as="span" size="md" weight="medium" color="inherit">تاریخچه تراکنش‌ها</UiTypography>
+        <IconChevronLeft class="size-4" />
+      </NuxtLink>
+
+      <button
+        type="button"
+        class="flex items-center justify-start gap-1 text-[#5A6AFF] transition-colors"
+        @click="fundsOpen = true"
+      >
+        <UiTypography as="span" size="md" weight="medium" color="inherit">افزایش موجودی کیف پول</UiTypography>
+        <IconChevronLeft class="size-4" />
+      </button>
+    </div>
 
     <DashboardAddFundsDialog
       v-model:open="fundsOpen"
       :balance="balance"
       :min="wallet.minCharge"
       :max="wallet.maxCharge"
-      @charged="onCharged"
     />
   </div>
 </template>

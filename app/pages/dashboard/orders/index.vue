@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { IconSearch } from '@tabler/icons-vue'
-import { typographyVariants } from '~/components/ui/typography'
+import { toast } from 'vue-sonner'
+import type { OrderPaymentStatus } from '~/data/orders'
 import { orderTabs, returnRequests } from '~/data/orders'
+import { typographyVariants } from '~/components/ui/typography'
+import { apiErrorMessage } from '~/composables/useApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,10 +13,25 @@ const activeTab = ref((route.query.tab as string) || 'all')
 const page = ref(1)
 const search = ref('')
 
+/**
+ * Optional invoice-payment filter (`?payment=waiting_payment|slice_payment|done`).
+ *
+ * The designed tabs group by order status; the API's `payment_status` axis
+ * (paid / unpaid / instalment) is exposed through this query parameter and
+ * applied server-side.
+ */
+const paymentFilter = computed<OrderPaymentStatus | 'all'>(() => {
+  const value = String(route.query.payment || '')
+  return value === 'waiting_payment' || value === 'slice_payment' || value === 'done'
+    ? value
+    : 'all'
+})
+
 const { orders, loaded, load: loadOrders } = useOrders()
 
-await loadOrders().catch(() => {
-  // Keep the empty state when the API is unavailable.
+await loadOrders({ type: 'sales', paymentStatus: paymentFilter.value }).catch((err) => {
+  // A 422 here means the filters were rejected; never fall back silently.
+  toast.error(apiErrorMessage(err, 'دریافت سفارش‌ها انجام نشد.'))
 })
 
 const filteredOrders = computed(() => {

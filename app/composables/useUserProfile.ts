@@ -303,6 +303,7 @@ export function useUserProfile() {
     pending,
     loaded,
     load,
+    refresh,
     saveName,
     saveEmail,
     saveNationalId,

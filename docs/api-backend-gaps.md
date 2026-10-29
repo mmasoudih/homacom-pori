@@ -2,8 +2,12 @@
 
 Companion to `docs/api-integration.md`. Rounds:
 
-- **2026-10-29** — shop/payment API changes (`api-changes.pdf`, 2026-10-29),
-  frontend applied the same day. Also wires the previously blocked
+- **2026-10-29 (round 2)** — shop/payment API changes (`api-changes-28.pdf`,
+  2026-10-29): `payment_status` order filter, reduced checkout payload,
+  `/payment-result?pid=`, wallet transactions + charge. Frontend applied the
+  same day.
+- **2026-10-29 (round 1)** — shop/payment API changes (`api-changes.pdf`,
+  2026-10-29), frontend applied the same day. Also wires the previously blocked
   `POST /shop/cart/checkout`.
 - **2026-10-25** — orders/tickets/cart quantity round (frontend 2026-10-26),
   kept below for history; the cart-quantity contract there is superseded.
@@ -12,9 +16,94 @@ Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
 
 Legend: **Resolved** · **Partial** · **Open**
 
+## Blockers at a glance
+
+### Payment & orders (2026-10-29 round 2)
+
+| # | Blocker | What it blocks | Current frontend behaviour | Ask (backend) |
+| --- | --- | --- | --- | --- |
+| 1 | No `pid` → invoice resolver | Trustworthy `/payment-result?pid=…` | Reads the newest invoice (`per_page=1`) + refreshes the profile | `GET /shop/payment/{pid}` → target (`invoice`/wallet charge) + final state, **or** add `invoice_id`/`hash_id` to the bank return URL |
+| 2 | No “pay an existing invoice” endpoint | Retry after `payment.success=false`; unpaid invoices | Order detail links to a mock pay page | `POST /shop/order/{invoice}/pay` returning the same `payment` shape as checkout |
+| 3 | Wallet-charge callback contract unverified | Confirming a top-up; failure handling | Dialog shows `payment.message`; balance only via profile refresh on return | Document the return link for `POST /wallet/charge` and the failure payload (and whether `payment.data`/`token` applies) |
+| 4 | Gateway POST field names unverified | Non-Mellat gateways | POST form when `payment.data` is an object with scalars, else GET `payment.url` | Per-gateway field reference (`RefId`, …) and which gateways are GET-only |
+| 5 | No `meta`/`links`/`total` on list endpoints | Real server-side pagination/counts | Short-page rule; orders fetch eagerly (cap 10 × 100), wallet load-more | Optional `meta` block or `X-Total-Count` (flat `data` can stay) |
+| 6 | `type` rejects `all` (`422`) | A unified all-orders view | Dashboard always sends `type=sales`; other types need separate calls | Allow `type=all`, or one combined list endpoint |
+
+### Other open items
+
+| # | Area | Blocker | Impact | Ask |
+| --- | --- | --- | --- | --- |
+| 7 | Cart | No line update for `services[]`/insurance | «افزودن خدمت/بیمه» dialogs are local-only and reset on the next cart response | Line-update endpoint, or confirm the intended flow |
+| 8 | Orders | No cancel / invoice download / return-request endpoints | Those actions stay mock (delete-ticket style workarounds) | Publish the remaining order-lifecycle endpoints |
+| 9 | Tickets | No delete-ticket; create body takes no file | Dashboard “delete” closes the ticket; create attachment is UI-only | DELETE endpoint + `file` on create |
+| 10 | Profile | Avatar `DELETE` returns 405 | Remove-avatar action is informational | Implement DELETE |
+| 11 | Blog | `filters[s]` ignored; category response has no title | Search filters the loaded page client-side; extra category request | Apply the filter; include the category title |
+| 12 | Comments | Order-answer / comment status enum undocumented | `pending`/`rejected` special-cased, everything else treated as approved | Document the status values |
+| 13 | Static | No CMS endpoints; no notifications; compare not persisted | Pages use designed content; bell has no feed | Endpoints (or confirm CMS is out of scope) |
+| 14 | Auth | `token_expire` format/timezone; `success:false` with HTTP 200; production CORS | Client retries once on 401 and treats `success:false` as an error | Confirm expiry enforcement + allow-list the production origin |
+| 15 | Assets | Mixed absolute vs relative media URLs | Client resolves relative paths against the API origin | Standardise the storage origin |
+
 ---
 
-## 2026-10-29 round
+## 2026-10-29 round 2 (`api-changes-28.pdf`)
+
+### Resolved in this round
+
+| # | Backend change | Evidence | Frontend change |
+| --- | --- | --- | --- |
+| 1 | `GET /shop/order`: new `payment_status` filter (`all`/`waiting_payment`/`slice_payment`/`done`), fixed newest-first sort, stricter validation (`status`/`type`/`payment_status`/`per_page` 1…100/`page` ≥1; bad values → 422), **no `meta`/`links`**. `type=all` is invalid. | PDF round 2 §2 · OpenAPI | `useOrders.load({ status, type, paymentStatus, page, perPage, allPages })` validates client-side, omits `all`, loops pages until one is short (cap 10 × 100), and no longer re-sorts. Dashboard passes `type: 'sales'` and an optional `?payment=`; 422 → toast. `payment_status`, `gate`, `payment_method`, `payable_price`, `paid_price`, `shipping_title` mapped. |
+| 2 | `POST /shop/cart/checkout` payload reduced to `{ payment_method_id, device?, cart_token? }`; 201 `{ invoice, payment }`. `invoice` omits `status`/`payment_status`/`paid_price`/`created_at`. `payment.success=false` means the invoice exists but the gateway refused. | PDF round 2 §3 · OpenAPI | Checkout sends the detected device (`detectDevice()`); `payment.success=false` clears the cart, shows the API message and routes to the created invoice instead of a fake receipt. |
+| 3 | After settlement: `paid_price` rises, `payment_status` → `done`/`slice_payment`, `status` → `processing`, `gate` set and `payment_method` becomes `manual`. | PDF round 2 §3.3 | Order detail shows **وضعیت پرداخت** (from `payment_status`) and **درگاه پرداخت** (from `gate`, labelled via `gatewayLabel`); `payment_method` is never displayed. |
+| 4 | `GET /shop/wallet/transactions` added: flat array, filters nested under `filters[...]` (`in_out`, `reason`, `payment_method`, `sort`, `per_page`, `page`), `reason_title` resolved server-side, `amount` always positive. Unknown filter value → 422 keyed `filters.*`. | PDF round 2 §4 · OpenAPI | New `useWallet()` + `app/pages/dashboard/wallet` (linked from the dashboard profile card): ledger rows coloured by `in_out`, `reason_title` labels, `filters[in_out]` chips, `loadMore()` while a full page returns. |
+| 5 | `POST /shop/wallet/charge` added: `{ amount, payment_method_id, device }` → `payment` (same gateway shape); wallet-type methods (`myCredit`) are rejected; balance credited only after the callback (`charge_credit` row). | PDF round 2 §5 · OpenAPI | `AddFundsDialog` picks an online gateway, calls the real endpoint and redirects; the fake `charged` emit and local balance bump are gone. |
+| 6 | Gateway return page is the front link `/payment-result?pid=<hashed payment id>`. | PDF round 2 §6 | New `app/pages/payment-result.vue`: reads `pid`, refreshes the profile (wallet balance) and renders success / partial / not-confirmed with a receipt and links to orders + wallet. |
+
+### Notes
+
+- **`payment_status` is not a tab axis in this design.** The Figma tabs group
+  by order status (`all/current/delivered/cancelled/returned`), so the API's
+  advice to "build paid/unpaid/instalment tabs on `payment_status`" is only
+  partially applied: the filter is wired through `load({ paymentStatus })` and
+  an optional `?payment=` query param, while the designed tabs keep grouping
+  client-side.
+- **Eager order list.** The dashboard has numbered client-side pagination, so
+  it fetches pages until a short one (max 1000 orders) instead of driving a
+  load-more UI. Wallet, which is a natural load-more list, does use the
+  short-page rule with `loadMore()`.
+- **`per_page` range** is enforced client-side (clamped to 1…100) because the
+  backend answers 422 rather than clamping.
+- **Sign of amounts** comes from `in_out`, never from the number: `amount` is
+  positive for both directions.
+
+### Still open after this round
+
+1. **`pid` has no resolver.** `/payment-result?pid=…` receives the hashed
+   payment id, but no endpoint maps it to an invoice/wallet transaction.
+   **Ask:** `GET /shop/payment/{pid}` returning the target (`invoice` or
+   `wallet charge`) and its final state, **or** include
+   `invoice_id`/`hash_id` (and a wallet marker) in the bank's return URL.
+   Until then the page uses a newest-invoice heuristic and a profile refresh,
+   which can show the wrong invoice (or a stale success after a wallet top-up).
+2. **No endpoint pays an existing invoice.** After `payment.success=false`, or
+   for an invoice left `waiting_payment`, the frontend can only link to the
+   order detail; `dashboard/orders/[id]/pay` stays a mock. **Ask:**
+   `POST /shop/order/{invoice}/pay` returning the same `payment` shape as
+   checkout.
+3. **Wallet callback semantics are unverified.** It is unclear which front link
+   a `POST /wallet/charge` redirect returns to, and whether the same
+   `payment.data`/`token` hand-off applies (the PDF only says "gateway
+   redirect"). Confirm the return URL shape, plus the failure payload when the
+   charge is not completed (currently the dialog only shows `payment.message`).
+4. **No list metadata (`meta`/`links`/`total`).** The short-page rule means one
+   extra request per list and no total/`last_page` for numbered pagination.
+   **Ask:** keep the flat array but add `X-Total-Count` or a `meta` block
+   (optional, backward compatible).
+5. **`type` cannot be "all"** (`type=all` → 422). Fine for the shop, but a
+   unified dashboard view would need a combined list request.
+
+---
+
+## 2026-10-29 round 1 (`api-changes.pdf`)
 
 ### Resolved in this round
 
@@ -56,9 +145,9 @@ Legend: **Resolved** · **Partial** · **Open**
 3. **Guest cart merge at login** — `checkout` accepts the guest `cart_token`,
    which suggests the merge happens at invoice time; confirm what happens to a
    guest cart after `POST /auth/verify`.
-4. **Wallet charge** (`POST /shop/wallet/charge`, `GET /shop/wallet/transactions`)
+4. ~~**Wallet charge** (`POST /shop/wallet/charge`, `GET /shop/wallet/transactions`)
    exists in the spec but is not wired; the dashboard «افزایش موجودی» dialog is
-   still a mock.
+   still a mock.~~ **Wired in round 2** — see the section above.
 
 ---
 

@@ -1,4 +1,4 @@
-import type { Order, OrderItem, OrderStatus, OrderTransaction } from '~/data/orders'
+import type { Order, OrderItem, OrderPaymentStatus, OrderStatus, OrderTransaction } from '~/data/orders'
 import { toPersianDigits } from '~/utils/format'
 import { resolveMediaUrl } from '~/utils/media'
 
@@ -100,6 +100,16 @@ interface ApiOrder {
   payment?: ApiPayment | null
   paid_amount?: number | string | null
   transactions?: ApiOrderTransaction[]
+  /** Invoice payment state (`waiting_payment` | `slice_payment` | `done`). */
+  payment_status?: string | null
+  /** Always `manual` after a gateway settlement — display `gate` instead. */
+  payment_method?: string | null
+  /** Gateway that actually handled the payment (`mellat`, `saman`, …). */
+  gate?: string | null
+  payable_price?: number | string | null
+  paid_price?: number | string | null
+  shipping_title?: string | null
+  invoice_date?: string | null
 }
 
 const FALLBACK_IMAGE = '/figma/fill-e393cbb3afd42faa.png'
@@ -125,6 +135,13 @@ function mapStatus(status: string): OrderStatus {
   if (status.startsWith('cancel_') || status === 'returned') return 'cancelled'
   if (status === 'delivery' || status === 'delivered') return 'delivered'
   return 'processing'
+}
+
+/** Invoice payment state (`payment_status`); `null` when the API omits it. */
+function mapPaymentStatus(value: unknown): OrderPaymentStatus | undefined {
+  return value === 'waiting_payment' || value === 'slice_payment' || value === 'done'
+    ? value
+    : undefined
 }
 
 function formatDate(value?: string | null): string {
@@ -215,6 +232,11 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
     amount,
     date: formatDate(order.created_at),
     deliveredAt: formatDate(order.delivery_date),
+    paymentStatus: mapPaymentStatus(order.payment_status),
+    gate: text(order.gate) || undefined,
+    paymentMethod: text(order.payment_method) || undefined,
+    payablePrice: num(order.payable_price) || amount,
+    paidPrice: num(order.paid_price ?? order.paid_amount ?? paid),
     items: (order.items ?? []).map(item => mapItem(item, apiBase)),
     transactions: mapTransactions(order.transactions),
     receiver: {
@@ -244,6 +266,7 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
         ?? shipping?.title
         ?? shipping?.name
         ?? shipping?.carrier
+        ?? order.shipping_title
         ?? order.shipping_method,
       ),
       discount: num(shipping?.discount ?? order.shipping_discount),
@@ -256,12 +279,63 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
   }
 }
 
+/** `GET /shop/order` filters (2026-10-29 contract). */
+export type OrderType = 'sales' | 'refer' | 'purchase'
+
+export interface OrdersQuery {
+  /** Order status filter ('all' or omitting it disables the filter). */
+  status?: string
+  /** `type=all` is not a valid value — omit the key for every type. */
+  type?: OrderType
+  /** Invoice payment state — the "paid / unpaid / instalment" axis. */
+  paymentStatus?: OrderPaymentStatus | 'all'
+  /** 1-based page. */
+  page?: number
+  /** 1…100 (the backend rejects anything outside that range). */
+  perPage?: number
+  /**
+   * Keep requesting pages until one returns fewer rows than `per_page`
+   * (the endpoint has no `meta`/`links`, so this is the only end signal).
+   * Defaults to `true` for the dashboard list, which paginates client-side.
+   */
+  allPages?: boolean
+}
+
+/** Hard stop for the page loop (10 × 100 rows). */
+const MAX_PAGES = 10
+
+const ORDER_STATUSES = new Set([
+  'all',
+  'completing',
+  'waiting',
+  'waiting_payment',
+  'paid',
+  'cancel_customer',
+  'cancel_store',
+  'cancel_operator',
+  'processing',
+  'preparing',
+  'stock',
+  'packaging',
+  'ready_for_send',
+  'send_to_center',
+  'sending',
+  'delivery',
+  'returned',
+  'refer_request',
+  'refer_accept',
+  'refer_reject',
+  'refer_done',
+])
+
 /**
  * Orders list for the dashboard.
  *
- * One request (`status=all&type=sales`) returns every order of the authenticated
- * user, newest first. The tabs are grouped client-side; the backend no longer
- * needs one request per status (2026-10-25).
+ * Filters follow the 2026-10-29 contract: `status`, `type`, `payment_status`,
+ * `per_page` (1…100) and `page`. The endpoint is always newest-first and has no
+ * pagination metadata, so the list is assembled by requesting pages until one
+ * comes back short. Every value is validated client-side first, because the
+ * backend answers a bad filter with a 422 instead of ignoring it.
  */
 export function useOrders() {
   const api = useApi()
@@ -271,16 +345,41 @@ export function useOrders() {
   const pending = ref(false)
   const loaded = ref(false)
 
-  async function load() {
+  async function load(query: OrdersQuery = {}) {
+    const perPage = Math.min(100, Math.max(1, Math.trunc(query.perPage ?? 100)))
+    const startPage = Math.max(1, Math.trunc(query.page ?? 1))
+    const allPages = query.allPages ?? true
+
+    const params: Record<string, string | number> = {
+      per_page: perPage,
+      page: startPage,
+    }
+    if (query.status && query.status !== 'all' && ORDER_STATUSES.has(query.status))
+      params.status = query.status
+    if (query.type) params.type = query.type
+    if (query.paymentStatus && query.paymentStatus !== 'all')
+      params.payment_status = query.paymentStatus
+
     pending.value = true
     try {
-      const res = await api.get<ApiOrder[]>('/shop/order', {
-        query: { status: 'all', type: 'sales' },
-      })
+      const rows: ApiOrder[] = []
+      let page = startPage
+      let fetched = 0
 
-      orders.value = (res.data ?? [])
-        .map(order => mapOrder(order, apiBase))
-        .sort((a, b) => Number(b.id) - Number(a.id))
+      while (true) {
+        const res = await api.get<ApiOrder[]>('/shop/order', {
+          query: { ...params, page },
+        })
+        const chunk = res.data ?? []
+        rows.push(...chunk)
+        fetched += 1
+
+        // Short page (or an empty array) means this was the last one.
+        if (!allPages || chunk.length < perPage || fetched >= MAX_PAGES) break
+        page += 1
+      }
+
+      orders.value = rows.map(order => mapOrder(order, apiBase))
       loaded.value = true
     }
     finally {

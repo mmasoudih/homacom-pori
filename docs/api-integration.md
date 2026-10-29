@@ -8,7 +8,7 @@ Work is done in phases. Each phase is committed separately so it can be reverted
 independently.
 
 **Backend asks / missing data:** see [`api-backend-gaps.md`](./api-backend-gaps.md).
-**Last updated:** 2026-10-26 (backend changes of 2026-10-25 applied).
+**Last updated:** 2026-10-29 (backend contract of 2026-10-29 — round 2, `api-changes-28.pdf` — applied).
 
 ## Current state (audit)
 
@@ -35,8 +35,11 @@ independently.
       cart `totals` + selection, rotating refresh tokens, absolute media URLs,
       new gateways (Tara/Azki) — and `POST /cart/checkout` unblocked the whole
       checkout flow.
-- [ ] Still designed-mock: returns tab, wallet charge/transactions,
-      notifications, insurance/services after add-to-cart, static CMS pages.
+- [x] Wallet is real (2026-10-29 round 2): balance from `profile.credit`,
+      ledger from `GET /shop/wallet/transactions`, top-up from
+      `POST /shop/wallet/charge` → gateway (`/dashboard/wallet`).
+- [ ] Still designed-mock: returns tab, notifications, insurance/services after
+      add-to-cart, paying an existing invoice, static CMS pages.
 - [x] No blocking backend bugs remain for the wired endpoints (the 2026-10-23
       order 500s, empty ticket departments and payment-method 404 are fixed).
 - [ ] Still open: gateway callback result payload, order cancel/invoice,
@@ -193,8 +196,20 @@ independently.
 
 ## Phase 7 — Checkout & orders (unblocked 2026-10-29)
 
-- [x] `GET /api/shop/order?status=all&type=sales` → `dashboard/orders/index.vue`
-      (one request; tabs group client-side)
+- [x] `GET /api/shop/order` → `dashboard/orders/index.vue`: `status`, `type`
+      (`sales|refer|purchase`, never `all`), `payment_status`
+      (`waiting_payment|slice_payment|done`), `per_page` 1…100 and `page`.
+      The endpoint has no `meta`/`links`, so `useOrders.load()` keeps requesting
+      pages until one comes back short (cap: 10 × 100 rows). The designed tabs
+      remain status-based and group client-side; the payment axis is exposed via
+      `?payment=` and `load({ paymentStatus })`. Bad filters are rejected
+      client-side and a 422 is surfaced as a toast.
+- [x] Sort is fixed server-side (`created_at desc, id desc`) — the client no
+      longer re-sorts by id.
+- [x] Order rows/detail map `payment_status`, `gate`, `payment_method`,
+      `payable_price`, `paid_price` and `shipping_title`; the order detail shows
+      a **وضعیت پرداخت** and a **درگاه پرداخت** row. `gate` is displayed instead
+      of `payment_method`, which the settlement step rewrites to `manual`.
 - [x] `GET /api/shop/order/{invoice}` → order detail (full `UserOrderResponse`:
       receiver/address, shipping/carrier, payment, transactions, items; demo
       fallback removed)
@@ -203,18 +218,29 @@ independently.
 - [x] Order items carry image, colour, warranty and product slug; the detail
       payload includes invoice/code, delivery date, receiver and shipping cost
 - [x] `POST /api/shop/cart/checkout` replaces the mock `settlePayment()`:
-      `payment_method_id` from the public payment-methods list (+ `device`,
-      `cart_token`); the response carries the invoice and the gateway hand-off
+      `{ payment_method_id, device?, cart_token? }` (device is detected, not
+      hard-coded); 201 returns `{ invoice, payment }`, where `invoice` omits
+      `status`/`payment_status`/`paid_price`
+- [x] `payment.success === false` keeps the created invoice: the cart is
+      cleared, the API message is shown, and the browser goes to the invoice so
+      the gateway can be retried — no phantom success.
 - [x] Gateway redirect helper (`app/utils/payment.ts`): POST form when
-      `payment.data` has fields, otherwise `window.location.assign(payment.url)`;
-      wallet/credit methods settle without a redirect
+      `payment.data` is an object with fields, otherwise
+      `window.location.assign(payment.url)`; a redirect nested in
+      `payment.data` (string / `data.url` / `data.data.url`) is honoured, and
+      non-object `data` is never turned into form fields
+- [x] `/payment-result?pid=<hashed payment id>` is the gateway return page: it
+      reads `pid`, fetches the newest invoice (`per_page=1`) and refreshes the
+      profile, then renders success / partial / not-confirmed states with a
+      receipt and links to the orders and the wallet. `pid` has no resolver
+      endpoint yet — see `api-backend-gaps.md`.
 - [x] `/checkout` is gated behind login (the auth middleware now covers
       `/checkout` as well as `/dashboard`) — both `set-shipping` and `checkout`
       are auth-only
 - [ ] **Blocked:** no order cancel, invoice, or return-request endpoints in spec.
-- [ ] **Blocked:** gateway callback/verify is server-to-server; the browser lands
-      back on the site with no result payload, so only the invoice id returned by
-      `checkout` links a payment to its order.
+- [ ] **Blocked:** no endpoint pays an existing invoice, so
+      `dashboard/orders/[id]/pay` stays a mock (the retry after a refused
+      gateway is therefore a dead end until that exists).
 - [ ] Returns tab still renders the designed mock data.
 - [x] Checkout loads the user's saved addresses from the API
 - [x] Checkout promo code applies via `POST /cart/set-discount` (real coupon
@@ -225,6 +251,26 @@ independently.
 - [x] Wallet balance comes from `profile.credit`; installment providers include
       Azki, online gateways include Tara (icons fall back / hide when `image` is
       `null`)
+
+### Wallet (2026-10-29 round 2)
+
+- [x] `GET /api/shop/wallet/transactions` → `app/pages/dashboard/wallet`
+      (`useWallet`). Filters are nested under `filters[...]` (`in_out`,
+      `reason`, `payment_method`, `sort`, `per_page`, `page`); validated
+      client-side because unknown values return 422 keyed `filters.*`.
+- [x] Ledger rows use `reason_title` (falling back to `reason` only when it is
+      empty — labels are never hard-coded), keep `amount` unsigned and take the
+      direction from `in_out`; amounts are coloured by direction
+      (`in` green / `out` red / `in_out` amber).
+- [x] Pagination without metadata: `load()` fetches page 1 (15 rows) and
+      `loadMore()` appends while a full page came back, so there is no
+      `meta.total`/`last_page` dependency.
+- [x] `POST /api/shop/wallet/charge` `{ amount, payment_method_id, device }` →
+      same `payment` shape, browser redirected to the gateway. `AddFundsDialog`
+      picks an online gateway (wallet methods such as `myCredit` are rejected by
+      the API), no longer fakes a credit, and tells the user the balance lands
+      after confirmation. The returned `/payment-result` page refreshes
+      `profile.credit`.
 
 ## Phase 8 — Profile
 
@@ -310,27 +356,43 @@ independently.
 ## Known gaps / decisions
 
 1. **CORS**: confirmed for local dev; production origin must be allowed.
-2. **Checkout is wired** (2026-10-29): `POST /cart/checkout` creates the invoice
-   and returns the gateway redirect. Returns, order cancel/refund and
-   notifications are still absent from the spec — see `api-backend-gaps.md`.
-3. **Orders are fixed** (2026-10-25): one `status=all` request returns every
-   order; detail returns the full `UserOrderResponse`.
+2. **Checkout is wired** (2026-10-29 round 2): `POST /cart/checkout` takes
+   `{ payment_method_id, device, cart_token? }` and returns the invoice plus the
+   gateway hand-off; `payment.success=false` is handled without faking a
+   receipt. Returns, order cancel/refund and paying an existing invoice are
+   still absent from the spec — see `api-backend-gaps.md`.
+3. **Orders are paginated without metadata** (2026-10-29 round 2): the list is
+   newest-first and has no `meta`/`links`, so the dashboard requests pages until
+   one is short (cap 10 × 100). `payment_status` is the paid/unpaid axis; the
+   designed tabs stay status-based, so the paid/unpaid split is only available
+   through `?payment=`.
 4. **Guest cart** works with a client-generated `cart_token`; the token is still
    sent on `checkout` so the server can move a guest cart to the account.
 5. **Product list prices/stock no longer need an N+1** — `cheapest_stock` is
    used directly. Favorites also return the related `item`.
 6. **Category filter is fixed**: `filters[categories][]` accepts real ids and
    each landing panel fetches its own pool.
-7. **Payment method selection is fixed**: the slash alias persists all five
-   enum values; the invoice's actual gateway is chosen by `payment_method_id`
-   at checkout.
-8. **Ticket departments are seeded** (ids 1–4) and ticket creation works.
-9. **Cart quantity contract** (2026-10-29): `add-qty`/`sub-qty` are delta calls
-   (`cart_item_id` only); min/max are enforced server-side.
-10. **Ticket enums are objects** (`{ value, label }`) for `status` and
+7. **Display `gate`, not `payment_method`**: settlement rewrites
+   `payment_method` to `manual`, so the order detail and the result page render
+   `gate`. The gateway is still selected by `payment_method_id` at checkout, and
+   `gate` is the field that records what actually ran.
+8. **`/payment-result?pid=…` cannot resolve `pid`**: the bank redirects with the
+   hashed payment id, but no endpoint maps it to an invoice. The page uses a
+   newest-invoice heuristic plus a profile refresh, so it is correct for the
+   common case but not authoritative — blocking ask in `api-backend-gaps.md`.
+9. **Wallet is real** (2026-10-29 round 2): `GET /wallet/transactions` drives
+   `/dashboard/wallet` (filters under `filters[...]`, `reason_title` labels,
+   colour by `in_out`) and `POST /wallet/charge` drives the top-up dialog. The
+   balance only moves after the gateway callback, so the client refreshes the
+   profile on return instead of crediting locally.
+10. **Ticket departments are seeded** (ids 1–4) and ticket creation works.
+11. **Cart quantity contract** (2026-10-29): `add-qty`/`sub-qty` are delta calls
+    (`cart_item_id` only); min/max are enforced server-side.
+12. **Ticket enums are objects** (`{ value, label }`) for `status` and
     `priority`; flat strings remain tolerated.
-11. **Remaining blockers**: gateway callback/result payload, returns, cart line
-    service updates, ticket delete/attachment, static pages and notifications —
-    all absent from the spec.
-12. **OpenAPI codegen**: types are hand-written per feature; consider
+13. **Remaining blockers**: `pid` resolver, paying an existing invoice, wallet
+    callback semantics, returns, cart line service updates, ticket
+    delete/attachment, static pages and notifications — all absent from the
+    spec.
+14. **OpenAPI codegen**: types are hand-written per feature; consider
     `openapi-typescript` once the payloads stabilise.

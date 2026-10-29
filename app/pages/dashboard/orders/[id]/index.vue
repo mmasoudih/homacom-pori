@@ -2,9 +2,10 @@
 import { IconArrowLeft, IconBox, IconFileInvoice } from '@tabler/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import { orderStatusMeta } from '~/data/orders'
+import { orderStatusMeta, paymentStatusMeta } from '~/data/orders'
 import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
+import { gatewayLabel } from '~/utils/payment'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id))
@@ -27,13 +28,23 @@ const mobileStatus = computed(() => (order.value ? orderStatusMeta[order.value.s
 
 const mobileInfoItems = computed<{ label: string; value: string; stacked?: boolean }[]>(() => {
   if (!order.value) return []
-  return [
+  const rows: { label: string; value: string; stacked?: boolean }[] = [
     { label: 'کد سفارش', value: toPersianDigits(order.value.code) },
     { label: 'تاریخ ثبت سفارش', value: order.value.date },
     { label: 'تحویل گیرنده', value: order.value.receiver.name },
     { label: 'شماره تلفن همراه', value: toPersianDigits(order.value.receiver.phone) },
-    { label: 'آدرس', value: order.value.receiver.address, stacked: true },
   ]
+
+  if (order.value.paymentStatus)
+    rows.push({ label: 'وضعیت پرداخت', value: paymentStatusMeta[order.value.paymentStatus].label })
+
+  // After settlement `payment_method` is `manual`; show the real gateway.
+  if (order.value.gate)
+    rows.push({ label: 'درگاه پرداخت', value: gatewayLabel(order.value.gate) })
+
+  rows.push({ label: 'آدرس', value: order.value.receiver.address, stacked: true })
+
+  return rows
 })
 
 const mobileAmountItems = computed<{ label: string; value: string }[]>(() => {

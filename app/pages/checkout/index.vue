@@ -179,7 +179,16 @@ async function settlePayment() {
     const payment = result.payment
 
     if (payment && payment.success === false) {
-      toast.error(payment.message || 'اتصال به درگاه پرداخت انجام نشد.')
+      // The invoice *was* created — only the gateway hand-off failed. The cart
+      // is consumed, so the retry happens from the invoice itself.
+      forgetCart()
+      reset()
+      toast.error(payment.message || 'اتصال به درگاه پرداخت انجام نشد.', {
+        description: 'فاکتور شما ثبت شد؛ پرداخت را می‌توانید از جزئیات سفارش پیگیری کنید.',
+      })
+      const invoiceId = result.invoice?.id
+      if (invoiceId)
+        await navigateTo(`/dashboard/orders/${invoiceId}`, { replace: true })
       return
     }
 

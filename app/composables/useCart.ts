@@ -6,6 +6,8 @@ import type { ProductDetail, Seller } from '~/data/product'
 import { apiErrorMessage } from '~/composables/useApi'
 import { getDiscountPercent } from '~/utils/product'
 import { resolveMediaUrl } from '~/utils/media'
+import type { GatewayRedirect } from '~/utils/payment'
+import { detectDevice } from '~/utils/payment'
 import { toastIcons } from '~/utils/toast'
 
 export interface AddToCartOptions {
@@ -167,14 +169,9 @@ export interface CheckoutInvoice {
   quantity?: number | null
 }
 
-export interface CheckoutPayment {
+export interface CheckoutPayment extends GatewayRedirect {
   /** `false` means the gateway refused the request (`message` explains why). */
   success?: boolean
-  gate?: string | null
-  url?: string | null
-  token?: string | null
-  message?: string | null
-  data?: Record<string, unknown> | null
 }
 
 export interface CheckoutResponse {
@@ -740,7 +737,7 @@ export function useCart() {
   async function checkout(input: { paymentMethodId: number | string, device?: 'web' | 'mobile' | 'desktop' | 'tablet' | 'pwa' }) {
     const res = await api.post<CheckoutResponse>('/shop/cart/checkout', {
       payment_method_id: Number(input.paymentMethodId),
-      device: input.device ?? 'web',
+      device: input.device ?? detectDevice(),
       cart_token: ensureCartToken(),
     })
 

@@ -11,6 +11,9 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled'
 
+/** Invoice `payment_status` (2026-10-29): the paid/unpaid axis. */
+export type OrderPaymentStatus = 'waiting_payment' | 'slice_payment' | 'done'
+
 export type ReturnStatus = 'review' | 'approved' | 'rejected' | 'completed'
 export type ReturnItemStatus = 'review' | 'approved' | 'rejected'
 
@@ -73,6 +76,14 @@ export interface Order {
   }
   /** Awaiting-payment ring data. */
   payment?: { total: number; paid: number; percent: number }
+  /** Invoice `payment_status` from the API. */
+  paymentStatus?: OrderPaymentStatus
+  /** Gateway that actually handled the payment (`mellat`, `saman`, …). */
+  gate?: string
+  /** Raw `payment_method`; the API rewrites it to `manual` after settlement. */
+  paymentMethod?: string
+  payablePrice?: number
+  paidPrice?: number
   /** Shipping-only tracking data. */
   deliveryCode?: string
   postalTracking?: string
@@ -127,6 +138,13 @@ export const orderStatusMeta: Record<OrderStatus, StatusMeta> = {
   shipping: { label: 'در حال ارسال', tone: 'sky', icon: 'truck', progress: 55, hideProgress: false },
   delivered: { label: 'تحویل داده شده', tone: 'emerald', icon: 'check', progress: 100, hideProgress: true },
   cancelled: { label: 'لغو شده', tone: 'red', icon: 'x', progress: 100, hideProgress: true },
+}
+
+/** Invoice payment-state chips (`payment_status`). */
+export const paymentStatusMeta: Record<OrderPaymentStatus, { label: string, tone: StatusTone }> = {
+  waiting_payment: { label: 'پرداخت نشده', tone: 'gold' },
+  slice_payment: { label: 'پرداخت جزئی', tone: 'amber' },
+  done: { label: 'پرداخت شده', tone: 'emerald' },
 }
 
 export const returnStatusMeta: Record<ReturnStatus, StatusMeta> = {
