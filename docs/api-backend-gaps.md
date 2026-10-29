@@ -1,21 +1,68 @@
-# Backend gaps — follow-up after the 2026-10-25 backend update
+# Backend gaps — follow-up after the 2026-10-29 backend update
 
-Companion to `docs/api-integration.md`. This version replaces the 2026-10-23
-gap list with the backend changes delivered on **2026-10-25** and the frontend
-work applied on **2026-10-26**.
+Companion to `docs/api-integration.md`. Rounds:
+
+- **2026-10-29** — shop/payment API changes (`api-changes.pdf`, 2026-10-29),
+  frontend applied the same day. Also wires the previously blocked
+  `POST /shop/cart/checkout`.
+- **2026-10-25** — orders/tickets/cart quantity round (frontend 2026-10-26),
+  kept below for history; the cart-quantity contract there is superseded.
 
 Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
-Sources:
-
-- backend change note **2026-10-25** (`API-CHANGES-2026-10-25.pdf`);
-- the refreshed OpenAPI document (fetched 2026-10-26);
-- the 2026-10-23 live probe results for the remaining open items.
 
 Legend: **Resolved** · **Partial** · **Open**
 
 ---
 
-## Resolved in this round
+## 2026-10-29 round
+
+### Resolved in this round
+
+| # | Backend change | Evidence | Frontend change |
+| --- | --- | --- | --- |
+| 1 | Three public lookups: `GET /shop/public/shipping-methods`, `/delivery-periods`, `/payment-methods` (`ShippingResource`, `DeliveryPeriodResource`, `PaymentMethodResource`). | PDF §1 · OpenAPI | New `useShopOptions()` (`useAsyncData('shop-options')`) feeds shipping methods, delivery slots and the three payment cards. Designed arrays in `data/checkout.ts` are only an offline fallback. |
+| 2 | `POST /shop/cart/set-shipping` — `{ shipping_id, receive_date (yyyy-mm-dd), delivery_period_id? }`; the period is required only for `type: delivery`. Auth only. | PDF §2.1 · OpenAPI | `useCart.setShipping()` + a watcher in `useCheckout` persists the selection as soon as it is complete. |
+| 3 | `add-qty` / `sub-qty` are **delta** calls: body is `{ cart_item_id, cart_token }` only; the line is deleted at zero and min/max are enforced server-side. | PDF §2.2 · OpenAPI request schema | `increment()` / `decrement()` send `cart_item_id` only. Supersedes the 2026-10-25 `stock_id` note. |
+| 4 | `CartResource` returns `address`, `payment_method(_fa)`, `shipping`, `delivery_period`, `receive_date` and a `totals` block. | PDF §3 · OpenAPI `CartResource` | `ApiCart` extended; `useCart` exposes `totals` / `selection`. Cart and checkout rows read `totals.products_total` / `services_total` / `payable_price`, falling back to local math. |
+| 5 | `POST /auth/refresh` rotates the token — the old one is revoked immediately. | PDF §4 · OpenAPI `/auth/refresh` | Already correct: `useApi.refreshToken()` overwrites `auth_token` in place and shares one in-flight refresh between concurrent 401s. Comment added. |
+| 6 | Media fields are absolute URLs (`https://host/storage/...`) or `null`. | PDF §5 | `resolveMediaUrl` already passes absolute URLs through and resolves legacy `storage/…` / `uploads/…` against the API origin. Gateway logos hide when `image` is `null`. |
+| 7 | Gateways grew: **Tara** (`type: online`) and **Azki** (`type: installment`). | PDF §6 | Both appear automatically from the public list; icons fall back to local marks when the backend has no `image`. |
+| 8 | `POST /shop/cart/checkout` `{ payment_method_id, device?, cart_token? }` → 201 `{ invoice, payment{ success, gate, url, token, message, data } }`. | OpenAPI (not in the PDF) | Replaces the mock `settlePayment()`: real invoice, then a gateway hand-off (POST form when `payment.data` is non-empty, else GET `payment.url`). `/checkout` is now behind the auth middleware. |
+
+### Notes
+
+- **Siblings, not nested:** the PDF snippet nests `delivery_period` inside
+  `shipping`; the OpenAPI `CartResource` puts `shipping`, `delivery_period` and
+  `receive_date` beside each other. `applySelection()` reads both shapes.
+- **`payment_method_id` is the gateway:** the checkout body takes the
+  `PaymentMethodResource.id` (not `key`/`bank`), so the picked gateway **is**
+  persisted on the invoice. The cart's five-value `payment_method` enum is
+  still sent through `set/payment-method` for older surfaces (wallet→`online`,
+  installment→`mixed`).
+- **Date chips** are derived from the server slots: the next real dates whose
+  weekday appears in `/public/delivery-periods`. Postal/in-person methods still
+  pick a `receive_date` but no period.
+
+### Still open after this round
+
+1. **Gateway callback has no result payload.** The bank callback is
+   server-to-server; the browser lands back on the site with nothing telling the
+   app whether the payment succeeded (and for which invoice). **Ask:** redirect
+   back to `/checkout/success?invoice=<hash_id>&status=…` (or expose a verify
+   endpoint) so the result page can confirm the payment instead of guessing.
+2. **Gateway POST field names are unverified.** `payment.data` + `token` are
+   returned, but no live gateway has been exercised yet; confirm which key each
+   gateway expects (`RefId` for Mellat, …) and whether any gateway is GET-only.
+3. **Guest cart merge at login** — `checkout` accepts the guest `cart_token`,
+   which suggests the merge happens at invoice time; confirm what happens to a
+   guest cart after `POST /auth/verify`.
+4. **Wallet charge** (`POST /shop/wallet/charge`, `GET /shop/wallet/transactions`)
+   exists in the spec but is not wired; the dashboard «افزایش موجودی» dialog is
+   still a mock.
+
+---
+
+## 2026-10-25 round — resolved in this round
 
 | # | Backend change | Evidence | Frontend change |
 | --- | --- | --- | --- |
@@ -66,15 +113,13 @@ remove services/insurance on an existing line. The cart's «افزودن خدم�
 
 **Ask:** provide a line-update endpoint, or confirm the intended flow.
 
-### 2. Checkout / orders — endpoints still absent
+### 2. Orders — cancel / invoice / returns still absent
 
-No create-order / checkout-submit endpoint, no payment gateway
-init/callback/verify, no order cancel or invoice download, and no
-return-request endpoints (create/list/detail/cancel) in the spec. Shipping
-methods, delivery days/time slots and their prices are also absent, as are
-wallet balance / installment providers / credit providers.
+`POST /shop/cart/checkout` now creates the invoice (see the 2026-10-29 round),
+but there is still no order cancel, invoice download, or return-request
+endpoint (create/list/detail/cancel) in the spec.
 
-**Ask:** confirm the intended checkout sequence and publish the endpoints.
+**Ask:** publish the remaining order-lifecycle endpoints.
 
 ### 3. Blog search is still ignored
 
@@ -142,8 +187,8 @@ but login-time guest→user cart merge still needs confirmation.
 
 ## Suggested priority for the backend
 
-1. Checkout submit + payment gateway init/callback/verify (blocks the whole
-   checkout flow).
+1. Gateway callback result payload + gateway POST field reference (blocks a
+   trustworthy payment result page).
 2. Cart line update for services/insurance.
 3. Order cancel, invoice download, return-request endpoints.
 4. Blog `filters[s]` search + category title in the collection response.
@@ -169,9 +214,21 @@ curl -s -H "Authorization: Bearer $TOKEN" "$BASE/shop/order/1"
 # category filter (ids from /shop/public/product-category)
 curl -g "$BASE/shop/products?filters[categories][]=8&filters[per_page]=1"
 
-# cart line quantity (stock_id is required)
+# cart line quantity (delta: one unit per call)
 curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"cart_item_id":1,"stock_id":45,"quantity":10}' "$BASE/shop/cart/add-qty"
+  -d '{"cart_item_id":1}' "$BASE/shop/cart/add-qty"
+
+# public checkout lookups
+curl -s "$BASE/shop/public/shipping-methods"
+curl -s "$BASE/shop/public/delivery-periods"
+curl -s "$BASE/shop/public/payment-methods"
+
+# shipping + checkout (payment_method_id from the list above)
+curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"shipping_id":1,"receive_date":"2026-11-02","delivery_period_id":3}' \
+  "$BASE/shop/cart/set-shipping"
+curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"payment_method_id":3,"device":"web"}' "$BASE/shop/cart/checkout"
 
 # payment method (slash alias)
 curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \

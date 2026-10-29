@@ -56,6 +56,8 @@ interface ApiCartItem {
   customer_price?: string | number | null
   real_price?: string | number | null
   quantity: number
+  line_total?: string | number | null
+  services_total?: string | number | null
   services?: ApiCartService[]
   stock?: {
     id: number
@@ -75,11 +77,109 @@ interface ApiCartItem {
   warranty?: { title?: string | null } | null
 }
 
+interface ApiDeliveryPeriod {
+  id: number
+  day: string
+  start_time: string
+  end_time: string
+}
+
+interface ApiCartShipping {
+  id: number
+  title?: string | null
+  img?: string | null
+  cost_price?: string | number | null
+  tax_percent?: number | string | null
+  up_to_free?: string | number | null
+  type?: 'postal' | 'present' | 'delivery' | 'in-person' | null
+  /** Older payloads nested the period here instead of beside `shipping`. */
+  delivery_period?: ApiDeliveryPeriod | null
+}
+
+interface ApiCartAddress {
+  id: number
+  title?: string | null
+  address?: string | null
+  zip_code?: string | null
+  nickname?: string | null
+  mobile?: string | null
+}
+
+/** Totals block of `CartResource` (authoritative for the cart/checkout rows). */
+export interface CartTotals {
+  productsTotal: number
+  servicesTotal: number
+  subTotal: number
+  discountPrice: number
+  payablePrice: number
+  rowsCount: number
+  quantity: number
+}
+
+interface ApiCartTotals {
+  products_total?: string | number | null
+  services_total?: string | number | null
+  sub_total?: string | number | null
+  discount_price?: string | number | null
+  payable_price?: string | number | null
+  rows_count?: string | number | null
+  quantity?: string | number | null
+}
+
+/** The shipping/address/payment selection currently stored on the cart. */
+export interface CartSelection {
+  shippingId: number | null
+  shippingTitle: string
+  receiveDate: string | null
+  deliveryPeriodId: number | null
+  deliveryPeriodLabel: string
+  addressId: number | null
+  paymentMethod: string | null
+  paymentMethodFa: string | null
+}
+
 interface ApiCart {
   id: number
   cart_token?: string | null
+  status?: string | null
   items?: ApiCartItem[]
-  coupon?: { code?: string | null, discount_price?: number | null } | null
+  address?: ApiCartAddress | null
+  payment_method?: string | null
+  payment_method_fa?: string | null
+  shipping?: ApiCartShipping | null
+  delivery_period?: ApiDeliveryPeriod | null
+  receive_date?: string | null
+  coupon?: { id?: number | null, code?: string | null, discount_price?: number | null } | null
+  totals?: ApiCartTotals | null
+}
+
+/** `POST /shop/cart/checkout` — the invoice plus the gateway hand-off. */
+export interface CheckoutInvoice {
+  id: number
+  hash_id?: string | null
+  payment_method?: string | null
+  total_customer_price?: number | null
+  total_tax_price?: number | null
+  total_coupon_price?: number | null
+  total_shipping_price?: number | null
+  payable_price?: number | null
+  rows_count?: number | null
+  quantity?: number | null
+}
+
+export interface CheckoutPayment {
+  /** `false` means the gateway refused the request (`message` explains why). */
+  success?: boolean
+  gate?: string | null
+  url?: string | null
+  token?: string | null
+  message?: string | null
+  data?: Record<string, unknown> | null
+}
+
+export interface CheckoutResponse {
+  invoice: CheckoutInvoice
+  payment: CheckoutPayment
 }
 
 const CART_STORAGE_KEY = 'homacom:cart:v1'
@@ -139,6 +239,19 @@ export function useCart() {
   const couponCode = useState<string>('cart-coupon-code', () => '')
   const couponDiscount = useState<number>('cart-coupon-discount', () => 0)
   const loading = useState<boolean>('cart-loading', () => false)
+  /** API totals block — authoritative once the backend answers. */
+  const totals = useState<CartTotals | null>('cart-totals', () => null)
+  /** Shipping/address/payment selection stored on the cart. */
+  const selection = useState<CartSelection>('cart-selection', () => ({
+    shippingId: null,
+    shippingTitle: '',
+    receiveDate: null,
+    deliveryPeriodId: null,
+    deliveryPeriodLabel: '',
+    addressId: null,
+    paymentMethod: null,
+    paymentMethodFa: null,
+  }))
 
   function ensureCartToken(): string {
     if (!cartToken.value) {
@@ -150,11 +263,56 @@ export function useCart() {
     return cartToken.value
   }
 
+  function mapTotals(value: ApiCartTotals | null | undefined): CartTotals | null {
+    if (!value) return null
+
+    const productsTotal = num(value.products_total)
+    const servicesTotal = num(value.services_total)
+    const subTotal = num(value.sub_total) || productsTotal + servicesTotal
+    const discountPrice = num(value.discount_price)
+
+    return {
+      productsTotal,
+      servicesTotal,
+      subTotal,
+      discountPrice,
+      payablePrice: value.payable_price == null
+        ? Math.max(0, subTotal - discountPrice)
+        : num(value.payable_price),
+      rowsCount: num(value.rows_count),
+      quantity: num(value.quantity),
+    }
+  }
+
+  /** `10:00:00` → `10:00`. */
+  function clock(value: string | null | undefined): string {
+    return (value ?? '').slice(0, 5)
+  }
+
+  /** Cart responses expose `shipping` + `delivery_period` beside each other. */
+  function applySelection(cart: ApiCart) {
+    const shipping = cart.shipping ?? null
+    const period = cart.delivery_period ?? shipping?.delivery_period ?? null
+
+    selection.value = {
+      shippingId: shipping?.id ?? null,
+      shippingTitle: shipping?.title ?? '',
+      receiveDate: cart.receive_date ?? null,
+      deliveryPeriodId: period?.id ?? null,
+      deliveryPeriodLabel: period ? `${clock(period.start_time)} الی ${clock(period.end_time)}` : '',
+      addressId: cart.address?.id ?? null,
+      paymentMethod: cart.payment_method ?? null,
+      paymentMethodFa: cart.payment_method_fa ?? null,
+    }
+  }
+
   function applyCart(cart: ApiCart | undefined | null) {
     if (!cart) return
     items.value = (cart.items ?? []).map(item => mapCartItem(item, apiBase))
     couponCode.value = cart.coupon?.code ?? ''
     couponDiscount.value = num(cart.coupon?.discount_price)
+    totals.value = mapTotals(cart.totals)
+    applySelection(cart)
     if (cart.cart_token) cartToken.value = cart.cart_token
   }
 
@@ -206,9 +364,8 @@ export function useCart() {
   const count = computed(() => items.value.reduce((sum, item) => sum + item.quantity, 0))
   const isEmpty = computed(() => items.value.length === 0)
 
-  const itemsTotal = computed(() =>
-    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0),
-  )
+  const itemsTotal = computed(() => totals.value?.productsTotal
+    ?? items.value.reduce((sum, item) => sum + item.price * item.quantity, 0))
 
   const discountTotal = computed(() =>
     items.value.reduce((sum, item) => {
@@ -225,18 +382,21 @@ export function useCart() {
     ),
   )
 
-  const servicesTotal = computed(() =>
-    items.value.reduce(
+  const servicesTotal = computed(() => totals.value?.servicesTotal
+    ?? items.value.reduce(
       (sum, item) =>
         sum + item.services.reduce((line, service) => line + service.price, 0) * item.quantity,
       0,
-    ),
-  )
+    ))
 
-  /** Items + insurance + services, minus the applied coupon. */
-  const payableTotal = computed(
-    () => Math.max(0, itemsTotal.value + insuranceTotal.value + servicesTotal.value - couponDiscount.value),
-  )
+  /**
+   * Items + insurance + services, minus the applied coupon.
+   *
+   * The API `totals.payable_price` wins when present (it also covers taxes the
+   * client cannot compute); local math is the fallback for mock lines.
+   */
+  const payableTotal = computed(() => totals.value?.payablePrice
+    ?? Math.max(0, itemsTotal.value + insuranceTotal.value + servicesTotal.value - couponDiscount.value))
 
   const summary = computed(() => [
     { key: 'items', label: 'مجموع قیمت کالاها', value: itemsTotal.value },
@@ -405,12 +565,9 @@ export function useCart() {
 
     if (item.apiId) {
       try {
-        // `stock_id` is required and `quantity` is validated against the
-        // stock's min/max, so a +1 on a `min_in_cart = 10` line must send 10.
+        // Delta contract: one unit per call, no `stock_id`/`quantity`.
         const res = await api.post<ApiCart>('/shop/cart/add-qty', {
           cart_item_id: item.apiId,
-          stock_id: item.stockId,
-          quantity: Math.max(1, item.minQuantity ?? 1),
           cart_token: ensureCartToken(),
         })
         applyCart(res.data)
@@ -432,10 +589,9 @@ export function useCart() {
 
     if (item.apiId) {
       try {
+        // Delta contract: −1 per call; the server drops the line at zero.
         const res = await api.post<ApiCart>('/shop/cart/sub-qty', {
           cart_item_id: item.apiId,
-          stock_id: item.stockId,
-          quantity: 1,
           cart_token: ensureCartToken(),
         })
         applyCart(res.data)
@@ -489,9 +645,30 @@ export function useCart() {
       }
     }
 
+    forget()
+  }
+
+  /**
+   * Drop the local cart without calling the API.
+   *
+   * Used after `checkout()` — the backend already closed (and emptied) the
+   * cart, so a delete request would only return an error.
+   */
+  function forget() {
     items.value = []
     couponCode.value = ''
     couponDiscount.value = 0
+    totals.value = null
+    selection.value = {
+      shippingId: null,
+      shippingTitle: '',
+      receiveDate: null,
+      deliveryPeriodId: null,
+      deliveryPeriodLabel: '',
+      addressId: null,
+      paymentMethod: null,
+      paymentMethodFa: null,
+    }
     persist()
   }
 
@@ -530,6 +707,45 @@ export function useCart() {
       cart_token: ensureCartToken(),
     })
     applyCart(res.data)
+  }
+
+  /**
+   * Choose the shipping method and receive date.
+   *
+   * `delivery_period_id` is required only when the method's type is `delivery`;
+   * the backend ignores it for postal/in-person methods. Auth only — guests
+   * have no cart row to store the selection on.
+   */
+  async function setShipping(input: {
+    shippingId: number | string
+    receiveDate: string
+    deliveryPeriodId?: number | string | null
+  }) {
+    const res = await api.post<ApiCart>('/shop/cart/set-shipping', {
+      shipping_id: Number(input.shippingId),
+      receive_date: input.receiveDate,
+      ...(input.deliveryPeriodId ? { delivery_period_id: Number(input.deliveryPeriodId) } : {}),
+      cart_token: ensureCartToken(),
+    })
+    applyCart(res.data)
+  }
+
+  /**
+   * Turn the cart into an invoice and open the gateway.
+   *
+   * Everything else (address, shipping, coupon) must already be on the cart;
+   * `paymentMethodId` is the `PaymentMethodResource.id` picked in the payment
+   * step. The response carries the gateway hand-off (`payment.url`/`token`).
+   */
+  async function checkout(input: { paymentMethodId: number | string, device?: 'web' | 'mobile' | 'desktop' | 'tablet' | 'pwa' }) {
+    const res = await api.post<CheckoutResponse>('/shop/cart/checkout', {
+      payment_method_id: Number(input.paymentMethodId),
+      device: input.device ?? 'web',
+      cart_token: ensureCartToken(),
+    })
+
+    if (!res.data) throw new Error(res.message || 'ثبت سفارش انجام نشد.')
+    return res.data
   }
 
   function setInsurance(itemId: string, insuranceId: string | null) {
@@ -579,6 +795,8 @@ export function useCart() {
     servicesTotal,
     payableTotal,
     summary,
+    totals,
+    selection,
     couponCode,
     couponDiscount,
     find,
@@ -590,10 +808,13 @@ export function useCart() {
     removeItem,
     removeAll,
     clear,
+    forget,
     applyCoupon,
     clearCoupon,
     setAddress,
     setPaymentMethod,
+    setShipping,
+    checkout,
     setInsurance,
     setServices,
     removeInsurance,

@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 import type { CheckoutAddress } from '~/data/checkout'
-import {
-  creditProviders,
-  discountCodePlaceholder,
-  installmentProviders,
-  paymentGateways,
-  shippingMethods,
-} from '~/data/checkout'
+import { creditProviders, discountCodePlaceholder } from '~/data/checkout'
 import { formatPriceFa } from '~/utils/format'
-import { apiErrorMessage } from '~/composables/useApi'
+import { ApiError, apiErrorMessage } from '~/composables/useApi'
 import { normalizeSearchText } from '~/utils/search'
 import { sanitizeMobileInput } from '~/utils/auth'
+import { redirectToGateway } from '~/utils/payment'
 
 const {
   isEmpty,
-  clear: clearCart,
+  forget: forgetCart,
   setAddress: persistAddress,
   setPaymentMethod: persistPaymentMethod,
+  checkout,
 } = useCart()
 
 const { setResult } = useCheckoutResult()
@@ -29,18 +25,26 @@ const {
   address,
   addAddress,
   legalEntity,
+  shippingMethods,
   shippingMethodId,
   shipping,
+  requiresPeriod,
   deliveryDays,
   deliveryDay,
-  timeSlot,
+  selectedDay,
+  deliveryPeriodId,
   timeSlots,
+  timeSlot,
+  gateways,
+  installments,
   paymentMethod,
+  paymentMethodId,
   gatewayId,
   installmentId,
   creditProviderId,
   discountCode,
   discountOpen,
+  submitting,
   promoCode,
   promoDiscount,
   applyPromoCode,
@@ -52,6 +56,8 @@ const {
   walletBalance,
   limitExceeded,
   selectShippingMethod,
+  selectDeliveryDay,
+  selectDeliveryPeriod,
   toggleCreditProvider,
   goToPayment,
   backToShipping,
@@ -61,13 +67,10 @@ const {
 
 const discountTotal = computed(() => rows.value.find(row => row.key === 'discount')?.value ?? 0)
 
-const selectedDay = computed(
-  () => deliveryDays.value.find(day => day.id === deliveryDay.value) ?? null,
-)
-
 const shippingSummary = computed(() => {
-  if (!shipping.value || !selectedDay.value || !timeSlot.value) return ''
-  return `${shipping.value.name} · ${selectedDay.value.weekday} ${selectedDay.value.day} ${selectedDay.value.month} · ساعت ${timeSlot.value}`
+  if (!shipping.value || !selectedDay.value) return ''
+  const slot = requiresPeriod.value && timeSlot.value ? ` · ساعت ${timeSlot.value}` : ''
+  return `${shipping.value.name} · ${selectedDay.value.weekday} ${selectedDay.value.day} ${selectedDay.value.month}${slot}`
 })
 
 const isShippingStep = computed(() => step.value === 'shipping')
@@ -84,7 +87,10 @@ const blockedLabel = computed(() => {
   return ''
 })
 
-const ctaLabel = computed(() => (isShippingStep.value ? 'ثبت سفارش' : 'پرداخت'))
+const ctaLabel = computed(() => {
+  if (!isShippingStep.value) return submitting.value ? 'در حال انتقال به درگاه…' : 'پرداخت'
+  return 'ثبت سفارش'
+})
 
 const addressOpen = ref(false)
 const addAddressOpen = ref(false)
@@ -100,7 +106,7 @@ const { profile } = useUserProfile()
 await loadCheckoutAddresses()
 
 // Keep the server cart in sync with the current checkout selection. The final
-// submit endpoint is still missing, but the cart already stores these choices.
+// invoice is created by `settlePayment()` below.
 watch(addressId, (id) => {
   if (!id || !/^\d+$/.test(id)) return
   persistAddress(id).catch(() => {})
@@ -130,7 +136,7 @@ function next() {
       return
     }
     if (!shippingReady.value) {
-      // Desktop shows the inline picker; mobile opens the shipping sheet.
+      // Desktop also opens the picker as a sheet so the CTA is never a dead end.
       shippingOpen.value = true
       return
     }
@@ -143,24 +149,62 @@ function next() {
     return
   }
 
-  if (paymentMethod.value === 'installment') {
-    if (!installmentId.value) {
-      creditOpen.value = true
-      return
-    }
-    settlePayment()
+  if (paymentMethod.value === 'installment' && !installmentId.value) {
+    creditOpen.value = true
     return
   }
 
   settlePayment()
 }
 
-/** Mock gateway: store the receipt, empty the cart and show the result page. */
-function settlePayment() {
-  setResult(createCheckoutResult(payable.value))
-  clearCart()
-  reset()
-  navigateTo('/checkout/success', { replace: true })
+/**
+ * Turn the cart into an invoice and hand the browser to the gateway.
+ *
+ * `payment_method_id` is the id from `GET /public/payment-methods`; the gateway
+ * response carries either a redirect `url` (with optional POST fields) or, for
+ * wallet/credit methods, no redirect at all.
+ */
+async function settlePayment() {
+  const methodId = paymentMethodId.value
+  if (!/^\d+$/.test(methodId)) {
+    toast.error('روش پرداخت انتخاب‌شده در دسترس نیست؛ لطفاً صفحه را دوباره بارگذاری کنید.')
+    return
+  }
+  if (submitting.value) return
+
+  submitting.value = true
+
+  try {
+    const result = await checkout({ paymentMethodId: methodId })
+    const payment = result.payment
+
+    if (payment && payment.success === false) {
+      toast.error(payment.message || 'اتصال به درگاه پرداخت انجام نشد.')
+      return
+    }
+
+    setResult(createCheckoutResult(result.invoice?.payable_price ?? payable.value))
+    forgetCart()
+    reset()
+
+    if (payment?.url) {
+      redirectToGateway(payment)
+      return
+    }
+
+    // Wallet / credit: the invoice is already settled server-side.
+    await navigateTo('/checkout/success', { replace: true })
+  }
+  catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      await navigateTo({ path: '/auth/login', query: { redirect: '/checkout' } })
+      return
+    }
+    toast.error(apiErrorMessage(err, 'ثبت سفارش انجام نشد.'))
+  }
+  finally {
+    submitting.value = false
+  }
 }
 
 async function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
@@ -341,10 +385,11 @@ async function applyDiscount() {
                   :days="deliveryDays"
                   :day-id="deliveryDay"
                   :time-slots="timeSlots"
-                  :time-id="timeSlot"
+                  :time-id="deliveryPeriodId"
+                  :requires-period="requiresPeriod"
                   @select="selectShippingMethod"
-                  @select-day="deliveryDay = $event"
-                  @select-time="timeSlot = $event"
+                  @select-day="selectDeliveryDay"
+                  @select-time="selectDeliveryPeriod"
                 />
               </div>
 
@@ -379,8 +424,8 @@ async function applyDiscount() {
                 v-model:method="paymentMethod"
                 v-model:gateway-id="gatewayId"
                 v-model:installment-id="installmentId"
-                :gateways="paymentGateways"
-                :installments="installmentProviders"
+                :gateways="gateways"
+                :installments="installments"
                 :wallet-balance="walletBalance"
                 :wallet-insufficient="walletInsufficient"
                 :limit-exceeded="paymentMethod === 'online' && limitExceeded"
@@ -491,6 +536,7 @@ async function applyDiscount() {
           :total="payable"
           :cta-label="ctaLabel"
           :blocked-label="blockedLabel"
+          :busy="submitting"
           class="sticky top-6 hidden lg:flex"
           @submit="next"
         />
@@ -547,7 +593,8 @@ async function applyDiscount() {
 
         <button
           type="button"
-          class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300"
+          class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300 disabled:opacity-60"
+          :disabled="submitting"
           @click="next"
         >
           <UiTypography as="span" size="lg" weight="bold" color="white">{{ ctaLabel }}</UiTypography>
@@ -568,7 +615,7 @@ async function applyDiscount() {
           v-else
           type="button"
           class="flex h-[42px] min-w-0 max-w-[217px] flex-1 items-center justify-center rounded-[12px] border border-[#F2DDB4] px-2 text-center"
-          @click="shippingOpen = true"
+          @click="next"
         >
           <UiTypography as="span" size="md" weight="medium" class="min-w-0 text-center leading-[17px] text-[#CF982C]">
             {{ blockedLabel }}
@@ -609,10 +656,11 @@ async function applyDiscount() {
       :days="deliveryDays"
       :day-id="deliveryDay"
       :time-slots="timeSlots"
-      :time-id="timeSlot"
+      :time-id="deliveryPeriodId"
+      :requires-period="requiresPeriod"
       @select="selectShippingMethod"
-      @select-day="deliveryDay = $event"
-      @select-time="timeSlot = $event"
+      @select-day="selectDeliveryDay"
+      @select-time="selectDeliveryPeriod"
     />
 
     <CheckoutNoCreditDialog v-model:open="creditOpen" />

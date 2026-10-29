@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DeliveryDay, ShippingMethod } from '~/data/checkout'
-import { formatPriceFa } from '~/utils/format'
+import type { DeliveryDay, DeliveryPeriod, ShippingMethod } from '~/data/checkout'
+import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 withDefaults(
   defineProps<{
@@ -8,24 +8,31 @@ withDefaults(
     methodId: string
     days: DeliveryDay[]
     dayId: string
-    timeSlots: readonly string[]
+    timeSlots: DeliveryPeriod[]
     timeId: string
+    /** Only `delivery` methods ask for a 30-minute slot. */
+    requiresPeriod?: boolean
     /** Expand the selected row with date/time chips (design: 25074). */
     expandable?: boolean
   }>(),
-  { expandable: true },
+  { expandable: true, requiresPeriod: true },
 )
 
 const emit = defineEmits<{
   select: [methodId: string]
   selectDay: [dayId: string]
-  selectTime: [slot: string]
+  selectTime: [periodId: string]
 }>()
 
+/** Designed marks for the seeded (offline) methods. */
 const logos: Record<string, string> = {
   tipax: '/icons/cart/ship-tipax.svg',
   'pishtaz-bike': '/icons/cart/ship-pishtaz.svg',
   bike: '/icons/cart/ship-bike.svg',
+}
+
+function logoFor(method: ShippingMethod): string {
+  return method.logo || logos[method.id] || ''
 }
 </script>
 
@@ -53,7 +60,8 @@ const logos: Record<string, string> = {
         >
 
         <img
-          :src="logos[method.id]"
+          v-if="logoFor(method)"
+          :src="logoFor(method)"
           alt=""
           class="h-6 w-auto max-w-[56px] shrink-0 object-contain"
         >
@@ -99,7 +107,7 @@ const logos: Record<string, string> = {
           </div>
         </div>
 
-        <div class="flex flex-col gap-3">
+        <div v-if="requiresPeriod" class="flex flex-col gap-3">
           <div class="flex items-center justify-start gap-1.5">
             <img src="/icons/cart/clock.svg" alt="" class="size-4 shrink-0">
             <UiTypography as="span" size="md" color="muted">ساعت ارسال را انتخاب کنید:</UiTypography>
@@ -108,15 +116,15 @@ const logos: Record<string, string> = {
           <div class="flex flex-wrap justify-start gap-2">
             <button
               v-for="slot in timeSlots"
-              :key="slot"
+              :key="slot.id"
               type="button"
               class="flex h-[37px] items-center gap-1.5 rounded-[12px] border px-4 transition-colors"
-              :class="slot === timeId ? 'border-R-300 bg-R-10' : 'border-T-300 bg-T-50 hover:border-T-500'"
-              @click="emit('selectTime', slot)"
+              :class="slot.id === timeId ? 'border-R-300 bg-R-10' : 'border-T-300 bg-T-50 hover:border-T-500'"
+              @click="emit('selectTime', slot.id)"
             >
-              <UiTypography as="span" size="lg" weight="medium" leading="none">{{ slot.split(' ')[0] }}</UiTypography>
+              <UiTypography as="span" size="lg" weight="medium" leading="none">{{ toPersianDigits(slot.start) }}</UiTypography>
               <UiTypography as="span" size="md" color="muted" leading="none">الی</UiTypography>
-              <UiTypography as="span" size="lg" weight="medium" leading="none">{{ slot.split(' ')[2] }}</UiTypography>
+              <UiTypography as="span" size="lg" weight="medium" leading="none">{{ toPersianDigits(slot.end) }}</UiTypography>
             </button>
           </div>
         </div>

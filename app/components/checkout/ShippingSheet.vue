@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DeliveryDay, ShippingMethod } from '~/data/checkout'
+import type { DeliveryDay, DeliveryPeriod, ShippingMethod } from '~/data/checkout'
 
 defineProps<{
   open: boolean
@@ -7,15 +7,17 @@ defineProps<{
   methodId: string
   days: DeliveryDay[]
   dayId: string
-  timeSlots: readonly string[]
+  timeSlots: DeliveryPeriod[]
   timeId: string
+  /** Only `delivery` methods ask for a 30-minute slot. */
+  requiresPeriod?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
   select: [methodId: string]
   selectDay: [dayId: string]
-  selectTime: [slot: string]
+  selectTime: [periodId: string]
 }>()
 
 const dialogShell
@@ -46,6 +48,7 @@ const dialogShell
           :day-id="dayId"
           :time-slots="timeSlots"
           :time-id="timeId"
+          :requires-period="requiresPeriod"
           @select="emit('select', $event)"
           @select-day="emit('selectDay', $event)"
           @select-time="emit('selectTime', $event)"
@@ -56,7 +59,7 @@ const dialogShell
         <button
           type="button"
           class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300 transition-colors hover:bg-R-400 disabled:opacity-50"
-          :disabled="!methodId || !dayId || !timeId"
+          :disabled="!methodId || !dayId || (requiresPeriod && !timeId)"
           @click="emit('update:open', false)"
         >
           <UiTypography as="span" size="lg" weight="bold" color="white">تایید</UiTypography>

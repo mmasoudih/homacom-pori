@@ -121,6 +121,13 @@ export function useApi() {
     }
   }
 
+  /**
+   * Exchange the session token for a fresh one.
+   *
+   * `POST /auth/refresh` rotates the token — the old value is revoked as soon
+   * as the new one is issued — so the cookie is overwritten in place and
+   * concurrent 401s share the same in-flight refresh attempt.
+   */
   async function refreshToken(): Promise<boolean> {
     if (!refreshInFlight) {
       refreshInFlight = (async () => {
