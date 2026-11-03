@@ -699,7 +699,7 @@ export function useCart() {
 
   /** Choose the payment method for the cart. */
   async function setPaymentMethod(method: 'online' | 'pay_in_delivery' | 'pay_in_person' | 'mixed' | 'manual') {
-    const res = await api.post<ApiCart>('/shop/cart/set/payment-method', {
+    const res = await api.post<ApiCart>('/shop/cart/set-payment-method', {
       payment_method: method,
       cart_token: ensureCartToken(),
     })

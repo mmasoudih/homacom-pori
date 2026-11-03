@@ -58,6 +58,7 @@ async function createTicket(payload: NewTicketPayload) {
       departmentId,
       priority: payload.priority,
       content: payload.description,
+      file: payload.file ?? null,
     })
     toast.success('تیکت شما ثبت شد.')
   }

@@ -61,6 +61,10 @@ export interface Order {
   id: string
   code: string
   status: OrderStatus
+  /** Raw API `status` (`waiting`, `delivery`, `refer_request`, …). */
+  rawStatus?: string
+  /** Raw API `type` (`sales` | `refer` | `purchase`). */
+  rawType?: string
   /** Amount shown on the list card + detail "مبلغ سفارش". */
   amount: number
   date: string
@@ -111,6 +115,12 @@ export interface ReturnRequest {
   amount: number
   items: ReturnItem[]
   postalCode: string
+  /** Invoice (`shop_invoice.id`) the return belongs to. */
+  invoiceId?: number
+  /** Raw API refer step (`start_refer`, `refer_accept`, …). */
+  step?: string
+  /** Customer note attached to the return request. */
+  description?: string
 }
 
 export interface PaymentMethod {

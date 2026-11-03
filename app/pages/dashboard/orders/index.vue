@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { IconSearch } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
-import type { OrderPaymentStatus } from '~/data/orders'
-import { orderTabs, returnRequests } from '~/data/orders'
+import type { Order, OrderPaymentStatus } from '~/data/orders'
+import { orderTabs } from '~/data/orders'
 import { typographyVariants } from '~/components/ui/typography'
 import { apiErrorMessage } from '~/composables/useApi'
 
@@ -28,22 +28,38 @@ const paymentFilter = computed<OrderPaymentStatus | 'all'>(() => {
 })
 
 const { orders, loaded, load: loadOrders } = useOrders()
+const { refers, loaded: refersLoaded, load: loadRefers } = useRefers()
 
-await loadOrders({ type: 'sales', paymentStatus: paymentFilter.value }).catch((err) => {
+// Orders and return requests are separate endpoints; the "مرجوع شده" tab reads
+// `GET /shop/order/refers`, every other tab reads `GET /shop/order`.
+await Promise.all([
+  loadOrders({ type: 'all', paymentStatus: paymentFilter.value }),
+  loadRefers(),
+]).catch((err) => {
   // A 422 here means the filters were rejected; never fall back silently.
   toast.error(apiErrorMessage(err, 'دریافت سفارش‌ها انجام نشد.'))
 })
 
+/**
+ * Tab membership follows the backend aliases (`status=current|delivered|cancelled`):
+ * `cancelled` is any `cancel_*`, `delivered` is `delivery`, and `current` is
+ * everything else except `refer_done`.
+ */
+function matchesTab(order: Order, tab: string): boolean {
+  if (tab === 'all') return true
+
+  const raw = order.rawStatus ?? ''
+  if (tab === 'cancelled') return raw.startsWith('cancel_')
+  if (tab === 'delivered') return raw === 'delivery' || raw === 'delivered'
+  if (tab === 'current')
+    return !raw.startsWith('cancel_') && raw !== 'delivery' && raw !== 'delivered' && raw !== 'refer_done'
+
+  return order.status === tab
+}
+
 const filteredOrders = computed(() => {
   const term = search.value.trim().toLowerCase()
-
-  const list = activeTab.value === 'current'
-    ? orders.value.filter(o => o.status === 'awaiting_payment' || o.status === 'processing')
-    : activeTab.value === 'delivered'
-      ? orders.value.filter(o => o.status === 'delivered')
-      : activeTab.value === 'cancelled'
-        ? orders.value.filter(o => o.status === 'cancelled')
-        : orders.value
+  const list = orders.value.filter(order => matchesTab(order, activeTab.value))
 
   if (!term) return list
   return list.filter(o =>
@@ -52,35 +68,40 @@ const filteredOrders = computed(() => {
   )
 })
 
-const pages = computed(() => Math.max(1, Math.ceil(filteredOrders.value.length / 10)))
-const pagedOrders = computed(() =>
-  filteredOrders.value.slice((page.value - 1) * 10, page.value * 10),
-)
-
-const tabs = computed(() => orderTabs.map(tab => ({
-  ...tab,
-  count: tab.key === 'returned'
-    ? returnRequests.length
-    : tab.key === 'all'
-      ? orders.value.length
-      : tab.key === 'current'
-        ? orders.value.filter(order => order.status === 'awaiting_payment' || order.status === 'processing').length
-        : orders.value.filter(order => order.status === tab.key).length,
-})))
-
 const filteredReturns = computed(() => {
   const term = search.value.trim().toLowerCase()
-  if (!term) return returnRequests
-  return returnRequests.filter(r =>
+  if (!term) return refers.value
+  return refers.value.filter(r =>
     r.trackingCode.toLowerCase().includes(term)
     || r.items.some(i => i.title.toLowerCase().includes(term)),
   )
 })
 
 const isReturnTab = computed(() => activeTab.value === 'returned')
+
+const pages = computed(() => Math.max(
+  1,
+  Math.ceil((isReturnTab.value ? filteredReturns.value.length : filteredOrders.value.length) / 10),
+))
+const pagedOrders = computed(() =>
+  filteredOrders.value.slice((page.value - 1) * 10, page.value * 10),
+)
+const pagedReturns = computed(() =>
+  filteredReturns.value.slice((page.value - 1) * 10, page.value * 10),
+)
+
+const tabs = computed(() => orderTabs.map(tab => ({
+  ...tab,
+  count: tab.key === 'returned'
+    ? refers.value.length
+    : orders.value.filter(order => matchesTab(order, tab.key)).length,
+})))
+
 const showEmpty = computed(() =>
   route.query.empty === '1'
-  || (loaded.value && (isReturnTab.value ? filteredReturns.value.length === 0 : filteredOrders.value.length === 0)),
+  || (isReturnTab.value
+    ? refersLoaded.value && filteredReturns.value.length === 0
+    : loaded.value && filteredOrders.value.length === 0),
 )
 
 watch(activeTab, (tab) => {
@@ -125,7 +146,7 @@ useHead({
           <div class="mt-6 flex flex-col gap-4">
             <template v-if="isReturnTab">
               <DashboardOrdersReturnCard
-                v-for="request in filteredReturns"
+                v-for="request in pagedReturns"
                 :key="request.id"
                 :request="request"
               />
@@ -167,7 +188,7 @@ useHead({
       <template v-if="isReturnTab">
         <div class="flex flex-col">
           <DashboardOrdersMobileReturnCard
-            v-for="request in filteredReturns"
+            v-for="request in pagedReturns"
             :key="request.id"
             :request="request"
           />

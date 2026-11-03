@@ -1,5 +1,7 @@
+import type { ApiList } from '~/composables/useApi'
 import type { WalletDirection, WalletTransaction } from '~/data/wallet'
 import type { GatewayRedirect } from '~/utils/payment'
+import { listPayload } from '~/composables/useApi'
 import { detectDevice } from '~/utils/payment'
 
 /** `WalletTransactionResource` (2026-10-29). */
@@ -100,8 +102,10 @@ function mapTransaction(row: ApiWalletTransaction): WalletTransaction {
  * Wallet ledger + top-up (`GET /shop/wallet/transactions`,
  * `POST /shop/wallet/charge`).
  *
- * The list is paginated without `meta`/`links`: `load()` fetches the first page
- * and `loadMore()` keeps appending until a page comes back short.
+ * The list is paginated with `data.items` + `data.pagination` (2026-11-02
+ * envelope): `load()` fetches the first page and `loadMore()` keeps appending
+ * while `pagination.has_more_pages` is true (bare-array responses fall back to a
+ * full-page heuristic).
  */
 export function useWallet() {
   const api = useApi()
@@ -133,13 +137,17 @@ export function useWallet() {
   async function fetchPage(reset: boolean) {
     pending.value = true
     try {
-      const res = await api.get<ApiWalletTransaction[]>('/shop/wallet/transactions', {
-        query: params(),
-      })
-      const rows = (res.data ?? []).map(mapTransaction)
+      const res = await api.get<ApiWalletTransaction[] | ApiList<ApiWalletTransaction>>(
+        '/shop/wallet/transactions',
+        { query: params() },
+      )
+      const { items, pagination } = listPayload<ApiWalletTransaction>(res.data)
+      const rows = items.map(mapTransaction)
 
       transactions.value = reset ? rows : [...transactions.value, ...rows]
-      hasMore.value = (res.data?.length ?? 0) >= perPage
+      hasMore.value = pagination
+        ? pagination.has_more_pages
+        : items.length >= perPage
       loaded.value = true
     }
     finally {

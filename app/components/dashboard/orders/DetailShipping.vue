@@ -17,11 +17,24 @@ const isShipping = computed(() => props.order.status === "shipping");
 const isAwaitingPayment = computed(
   () => props.order.status === "awaiting_payment",
 );
+/** `POST /order/{invoice}/cancel` accepts completing / waiting / waiting_payment / paid. */
+const CANCELLABLE = new Set([
+  "completing",
+  "waiting",
+  "waiting_payment",
+  "paid",
+]);
 const canCancel = computed(
   () =>
-    props.order.status === "processing" || props.order.status === "shipping",
+    CANCELLABLE.has(props.order.rawStatus ?? "")
+    || props.order.status === "awaiting_payment",
 );
-const canReturn = computed(() => props.order.status === "delivered");
+/** A return needs a paid, delivered invoice (refer guards are server-side too). */
+const canReturn = computed(
+  () =>
+    props.order.status === "delivered"
+    && props.order.paymentStatus === "done",
+);
 
 const items = computed(() => [
   { label: "مبلغ سفارش", value: `${formatPriceFa(props.order.amount)} تومان` },

@@ -397,7 +397,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
       :insurance="product.insurance"
     />
 
-    <ProductDetailNotifyDialog v-model:open="dialogs.notify" />
+    <ProductDetailNotifyDialog v-model:open="dialogs.notify" :slug="id" />
 
     <ProductDetailSellersSheet
       v-if="product"

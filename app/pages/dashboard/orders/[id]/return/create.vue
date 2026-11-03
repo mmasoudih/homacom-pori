@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { IconArrowRight, IconChevronDown, IconMinus, IconPlus, IconTrash } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
-import { findOrder, returnReasons } from '~/data/orders'
+import { apiErrorMessage } from '~/composables/useApi'
+import type { ReferPayloadItem } from '~/composables/useOrders'
+import { returnReasons } from '~/data/orders'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => String(route.params.id))
-const order = computed(() => findOrder(id.value))
+const { order } = useOrderDetail(id)
+const { refer: referOrder } = useOrderActions()
 
 interface ReturnForm {
   quantity: number
   reason: string
   description: string
-  images: string[]
 }
 
 const form = reactive<Record<string, ReturnForm>>({})
 const removedIds = ref<string[]>([])
+const submitting = ref(false)
 
 const selectedItems = computed(() => {
   const items = order.value?.items ?? []
@@ -28,7 +31,7 @@ const selectedItems = computed(() => {
 
 function entry(itemId: string): ReturnForm {
   if (!form[itemId]) {
-    form[itemId] = { quantity: 1, reason: returnReasons[0]!, description: '', images: [] }
+    form[itemId] = { quantity: 1, reason: returnReasons[0]!, description: '' }
   }
   return form[itemId]!
 }
@@ -38,25 +41,15 @@ watchEffect(() => {
 })
 
 function increment(itemId: string) {
-  form[itemId]!.quantity += 1
+  const row = selectedItems.value.find(item => item.id === itemId)
+  const target = form[itemId]!
+  // The API guards `count` against the invoice row's quantity.
+  if (row && target.quantity < row.quantity) target.quantity += 1
 }
 
 function decrement(itemId: string) {
-  const entry = form[itemId]!
-  if (entry.quantity > 1) entry.quantity -= 1
-}
-
-function onUpload(itemId: string, event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
-  const url = URL.createObjectURL(file)
-  form[itemId]!.images.push(url)
-  input.value = ''
-}
-
-function removeImage(itemId: string, index: number) {
-  form[itemId]?.images.splice(index, 1)
+  const target = form[itemId]!
+  if (target.quantity > 1) target.quantity -= 1
 }
 
 function removeItem(itemId: string) {
@@ -68,9 +61,40 @@ function goBack() {
   router.push(`/dashboard/orders/${id.value}/return`)
 }
 
-function submit() {
-  toast.success('درخواست مرجوعی شما ثبت شد.')
-  router.push('/dashboard/returns/success')
+async function submit() {
+  if (!order.value) return
+  if (!selectedItems.value.length) {
+    toast.error('حداقل یک کالا را برای مرجوعی انتخاب کنید.')
+    return
+  }
+
+  // The refer contract only accepts `item_id`, `count` and `description`; the
+  // reason select is folded into the description (there is no image upload).
+  const items: ReferPayloadItem[] = selectedItems.value.map((item) => {
+    const row = entry(item.id)
+    const count = Math.min(Math.max(1, row.quantity), item.quantity)
+    const description = [row.reason, row.description.trim()].filter(Boolean).join(' - ')
+
+    return {
+      item_id: Number(item.id),
+      count,
+      ...(description ? { description } : {}),
+    }
+  })
+
+  submitting.value = true
+  try {
+    const res = await referOrder(order.value.id, items)
+    toast.success(res.message || 'درخواست مرجوعی شما ثبت شد.')
+    router.push('/dashboard/returns/success')
+  }
+  catch (err) {
+    // 422 guards: unpaid, already requested, 24h window expired, bad item ids.
+    toast.error(apiErrorMessage(err, 'ثبت درخواست مرجوعی انجام نشد.'))
+  }
+  finally {
+    submitting.value = false
+  }
 }
 
 useHead({
@@ -135,7 +159,7 @@ useHead({
                   <IconMinus class="size-4" />
                 </button>
               </div>
-              <button type="button" aria-label="حذف" class="text-T-500 hover:text-primary">
+              <button type="button" aria-label="حذف" class="text-T-500 hover:text-primary" @click="removeItem(item.id)">
                 <IconTrash class="size-4" />
               </button>
             </div>
@@ -166,26 +190,6 @@ useHead({
           />
         </div>
 
-        <div class="mt-4 flex flex-col gap-2">
-          <span class="text-[12px] font-medium text-T-700">بارگذاری تصویر</span>
-          <div class="flex flex-wrap items-center gap-3">
-            <label
-              class="flex size-[72px] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-primary/50 text-primary transition-colors hover:bg-R-50"
-            >
-              <IconPlus class="size-5" />
-              <span class="text-[11px] font-semibold">افزودن</span>
-              <input type="file" accept="image/*" class="hidden" @change="onUpload(item.id, $event)">
-            </label>
-
-            <img
-              v-for="(image, index) in form[item.id]?.images ?? []"
-              :key="index"
-              :src="image"
-              alt="preview"
-              class="size-[72px] rounded-xl border border-T-400 object-cover"
-            >
-          </div>
-        </div>
       </section>
     </div>
 
@@ -200,10 +204,11 @@ useHead({
 
       <button
         type="button"
-        class="h-11 min-w-[160px] rounded-xl bg-primary px-6 text-[13px] font-bold text-white transition-colors hover:bg-primary/90"
+        class="h-11 min-w-[160px] rounded-xl bg-primary px-6 text-[13px] font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        :disabled="submitting"
         @click="submit"
       >
-        ثبت درخواست
+        {{ submitting ? 'در حال ثبت…' : 'ثبت درخواست' }}
       </button>
     </div>
   </DashboardOrdersBareShell>
@@ -220,15 +225,12 @@ useHead({
       :quantity="form[item.id]?.quantity ?? 1"
       :reason="form[item.id]?.reason ?? ''"
       :description="form[item.id]?.description ?? ''"
-      :images="form[item.id]?.images ?? []"
       @update:quantity="entry(item.id).quantity = $event"
       @update:reason="entry(item.id).reason = $event"
       @update:description="entry(item.id).description = $event"
       @increment="increment(item.id)"
       @decrement="decrement(item.id)"
       @remove="removeItem(item.id)"
-      @upload="onUpload(item.id, $event)"
-      @remove-image="removeImage(item.id, $event)"
     />
 
     <template #footer>
@@ -242,10 +244,11 @@ useHead({
         </button>
         <button
           type="button"
-          class="h-11 flex-1 rounded-xl bg-primary font-bold text-white"
+          class="h-11 flex-1 rounded-xl bg-primary font-bold text-white disabled:opacity-60"
+          :disabled="submitting"
           @click="submit"
         >
-          ثبت درخواست
+          {{ submitting ? 'در حال ثبت…' : 'ثبت درخواست' }}
         </button>
       </div>
     </template>

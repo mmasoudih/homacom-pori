@@ -56,7 +56,8 @@ export interface NewTicketPayload {
   subject: string
   topic: string
   description: string
-  attachment: string
+  /** Optional attachment uploaded as multipart `file` on create. */
+  file?: File | null
   priority: TicketPriority
 }
 

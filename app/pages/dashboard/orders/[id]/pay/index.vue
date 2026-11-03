@@ -1,40 +1,66 @@
 <script setup lang="ts">
-import {
-  IconCircleCheckFilled,
-  IconCoins,
-  IconCreditCard,
-  IconInfoCircle,
-  IconWallet,
-} from '@tabler/icons-vue'
-import type { Component } from 'vue'
+import { IconCircleCheckFilled, IconInfoCircle, IconWallet } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
-import { creditWallets, findOrder, paymentMethods } from '~/data/orders'
+import { apiErrorMessage } from '~/composables/useApi'
+import { useShopOptions } from '~/composables/useShopOptions'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
+import { redirectToGateway } from '~/utils/payment'
 
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => String(route.params.id))
-const order = computed(() => findOrder(id.value))
+const { order } = useOrderDetail(id)
+const { paymentOptions } = useShopOptions()
+const { repay } = useOrderActions()
 
-const methodIcons: Record<string, Component> = {
-  card: IconCreditCard,
-  wallet: IconWallet,
-  coins: IconCoins,
-}
+const selectedMethodId = ref('')
+const paying = ref(false)
 
-const selectedMethod = ref<'internet' | 'wallet' | 'installment'>('internet')
-const selectedBank = ref<'mellat' | 'seh'>('mellat')
-const selectedWallet = ref<string | null>('avazo')
+// Default to the first online gateway as soon as `/public/payment-methods`
+// resolves (the fallback list also works when the API is unreachable).
+watch(paymentOptions, (options) => {
+  if (selectedMethodId.value) return
+  const first = options.find(option => option.type === 'online') ?? options[0]
+  if (first) selectedMethodId.value = first.id
+}, { immediate: true })
 
 const totals = computed(() => {
-  const total = order.value?.payment?.total ?? order.value?.amount ?? 0
-  const paid = order.value?.payment?.paid ?? 0
+  const total = order.value?.payablePrice ?? order.value?.amount ?? 0
+  const paid = order.value?.paidPrice ?? order.value?.payment?.paid ?? 0
   return { total, paid, remaining: Math.max(0, total - paid) }
 })
 
-function pay() {
-  toast.success('پرداخت شما با موفقیت انجام شد.')
-  router.push(`/dashboard/orders/${id.value}/pay/success`)
+const selectedMethod = computed(
+  () => paymentOptions.value.find(option => option.id === selectedMethodId.value) ?? null,
+)
+
+async function pay() {
+  if (!order.value) return
+  if (!selectedMethodId.value) {
+    toast.error('روش پرداخت را انتخاب کنید.')
+    return
+  }
+
+  paying.value = true
+  try {
+    // `POST /order/{invoice}/repay` returns the same CheckoutResource shape as
+    // cart checkout, so the gateway hand-off is reused verbatim.
+    const res = await repay(order.value.id, selectedMethodId.value)
+    const handled = redirectToGateway(res.data!.payment)
+
+    if (!handled) {
+      // Wallet/credit methods settle server-side and return no redirect.
+      toast.success(res.message || res.data!.payment.message || 'پرداخت شما ثبت شد.')
+      router.push(`/dashboard/orders/${order.value.id}`)
+    }
+  }
+  catch (err) {
+    // 422: already paid, no longer payable or an invalid payment method.
+    toast.error(apiErrorMessage(err, 'شروع مجدد پرداخت انجام نشد.'))
+  }
+  finally {
+    paying.value = false
+  }
 }
 
 useHead({
@@ -66,106 +92,53 @@ useHead({
         <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
           <h2 class="text-[14px] font-bold text-T-900">روش پرداخت</h2>
 
-          <div class="mt-5 flex flex-col gap-3">
+          <div v-if="paymentOptions.length" class="mt-5 flex flex-col gap-3">
             <div
-              v-for="method in paymentMethods"
+              v-for="method in paymentOptions"
               :key="method.id"
               class="rounded-xl border p-4 transition-colors"
-              :class="selectedMethod === method.id ? 'border-primary/50' : 'border-T-400'"
+              :class="selectedMethodId === method.id ? 'border-primary/50' : 'border-T-400'"
               role="button"
               tabindex="0"
-              @click="selectedMethod = method.id"
-              @keydown.enter="selectedMethod = method.id"
+              @click="selectedMethodId = method.id"
+              @keydown.enter="selectedMethodId = method.id"
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="flex items-start gap-3">
-                  <span class="mt-0.5 text-T-700">
-                    <component :is="methodIcons[method.icon]" class="size-5" />
+                  <span class="mt-0.5 flex size-5 items-center justify-center text-T-700">
+                    <img
+                      v-if="method.logo"
+                      :src="method.logo"
+                      :alt="method.title"
+                      class="size-5 object-contain"
+                    >
+                    <IconWallet v-else class="size-5" />
                   </span>
                   <div class="flex flex-col gap-1">
                     <span class="text-[13px] font-bold text-T-900">{{ method.title }}</span>
-                    <span class="text-[11.5px] text-T-600">{{ method.description }}</span>
+                    <span class="text-[11.5px] text-T-600">{{ method.description || method.typeFa }}</span>
                   </div>
                 </div>
 
                 <span
                   class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2"
-                  :class="selectedMethod === method.id ? 'border-primary' : 'border-T-400'"
+                  :class="selectedMethodId === method.id ? 'border-primary' : 'border-T-400'"
                 >
-                  <span v-if="selectedMethod === method.id" class="size-2.5 rounded-full bg-primary" />
+                  <span v-if="selectedMethodId === method.id" class="size-2.5 rounded-full bg-primary" />
                 </span>
               </div>
 
-              <!-- Internet gateway banks -->
-              <div v-if="method.id === 'internet' && selectedMethod === 'internet'" class="mt-4 flex flex-col gap-3">
+              <div v-if="selectedMethodId === method.id && method.typeFa" class="mt-3">
                 <DashboardOrdersAlertNote>
-                  {{ method.note }}
-                </DashboardOrdersAlertNote>
-                <div class="flex flex-wrap justify-end gap-3">
-                  <button
-                    type="button"
-                    class="flex h-11 w-[150px] items-center justify-center gap-2 rounded-xl border bg-T-50 text-[12.5px] font-semibold transition-colors"
-                    :class="selectedBank === 'seh' ? 'border-primary text-primary' : 'border-T-400 text-T-700'"
-                    @click.stop="selectedBank = 'seh'"
-                  >
-                    درگاه بانک سیه
-                  </button>
-                  <button
-                    type="button"
-                    class="flex h-11 w-[150px] items-center justify-center gap-2 rounded-xl border text-[12.5px] font-semibold transition-colors"
-                    :class="selectedBank === 'mellat' ? 'border-primary bg-R-50 text-primary' : 'border-T-400 bg-T-50 text-T-700'"
-                    @click.stop="selectedBank = 'mellat'"
-                  >
-                    درگاه بانک ملت
-                  </button>
-                </div>
-              </div>
-
-              <!-- Wallet note -->
-              <div v-if="method.id === 'wallet' && selectedMethod === 'wallet'" class="mt-4">
-                <DashboardOrdersAlertNote>
-                  اعتبار شما کافی نیست. برای ادامه، می‌توانید موجودی کیف‌پول را شارژ کنید یا روش پرداخت اینترنتی را انتخاب کنید.
-                  <NuxtLink to="/dashboard" class="font-bold text-primary" @click.stop>کیف‌پول</NuxtLink>
+                  {{ method.typeFa }}
                 </DashboardOrdersAlertNote>
               </div>
             </div>
           </div>
 
-          <hr class="my-6 border-T-300">
-
-          <h2 class="text-[14px] font-bold text-T-900">استفاده از اعتبار</h2>
-
-          <div class="mt-5 flex flex-col gap-3">
-            <div
-              v-for="walletItem in creditWallets"
-              :key="walletItem.id"
-              class="flex items-center justify-between gap-3 rounded-xl border p-4 transition-colors"
-              :class="selectedWallet === walletItem.id ? 'border-primary/50' : 'border-T-400'"
-              role="button"
-              tabindex="0"
-              @click="selectedWallet = walletItem.id"
-              @keydown.enter="selectedWallet = walletItem.id"
-            >
-              <div class="flex items-center gap-3">
-                <span
-                  class="flex size-5 shrink-0 items-center justify-center rounded-full border-2"
-                  :class="selectedWallet === walletItem.id ? 'border-primary' : 'border-T-400'"
-                >
-                  <span v-if="selectedWallet === walletItem.id" class="size-2.5 rounded-full bg-primary" />
-                </span>
-                <div class="flex flex-col gap-1">
-                  <span class="text-[13px] font-bold text-T-900">{{ walletItem.name }}</span>
-                  <span class="text-[11.5px] text-T-600">
-                    موجودی: {{ formatPriceFa(walletItem.balance) }} تومان
-                  </span>
-                </div>
-              </div>
-
-              <span class="text-[15px] font-black" :class="walletItem.id === 'baloon' ? 'text-sky-500' : 'text-indigo-500'">
-                {{ walletItem.id === 'baloon' ? 'بالون' : 'آواژو' }}
-              </span>
-            </div>
-          </div>
+          <p v-else class="mt-5 text-[12.5px] text-T-600">
+            روش پرداخت فعالی یافت نشد. لطفا بعدا دوباره تلاش کنید.
+          </p>
         </section>
 
         <!-- Summary -->
@@ -176,9 +149,7 @@ useHead({
               <span class="font-bold text-T-900">{{ formatPriceFa(totals.total) }} تومان</span>
             </div>
             <div class="flex items-center justify-between gap-3 text-T-600">
-              <span class="flex items-center gap-1.5">
-                پرداخت‌شده (۲ تراکنش):
-              </span>
+              <span>پرداخت‌شده:</span>
               <span class="flex items-center gap-1.5 font-bold text-T-900">
                 {{ formatPriceFa(totals.paid) }} تومان
                 <IconCircleCheckFilled class="size-4 text-emerald-500" />
@@ -192,11 +163,16 @@ useHead({
 
           <button
             type="button"
-            class="mt-5 h-11 w-full rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90"
+            class="mt-5 h-11 w-full rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="paying || !paymentOptions.length"
             @click="pay"
           >
-            پرداخت
+            {{ paying ? 'در حال انتقال…' : 'پرداخت' }}
           </button>
+
+          <p v-if="selectedMethod" class="mt-3 text-center text-[11.5px] text-T-600">
+            {{ selectedMethod.title }}
+          </p>
         </aside>
       </div>
     </template>
@@ -216,18 +192,22 @@ useHead({
     :back-to="`/dashboard/orders/${id}`"
   >
     <DashboardOrdersMobileCheckoutSummary
-      v-model:selected-method="selectedMethod"
-      v-model:selected-bank="selectedBank"
-      v-model:selected-wallet="selectedWallet"
+      :methods="paymentOptions"
+      :selected-method="selectedMethodId"
       :order-code="order.code"
+      :total="totals.total"
+      :paid="totals.paid"
+      :remaining="totals.remaining"
+      @update:selected-method="selectedMethodId = $event"
     />
     <template #footer>
       <button
         type="button"
-        class="h-12 w-full rounded-xl bg-primary text-[13px] font-bold text-white"
+        class="h-12 w-full rounded-xl bg-primary text-[13px] font-bold text-white disabled:opacity-60"
+        :disabled="paying || !paymentOptions.length"
         @click="pay"
       >
-        پرداخت
+        {{ paying ? 'در حال انتقال…' : 'پرداخت' }}
       </button>
     </template>
   </DashboardOrdersMobileBareShell>

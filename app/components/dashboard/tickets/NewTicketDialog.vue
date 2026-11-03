@@ -22,14 +22,14 @@ const emit = defineEmits<{
 const subject = ref('')
 const topic = ref('')
 const description = ref('')
-const attachment = ref('')
+const file = ref<File | null>(null)
 const priority = ref<TicketPriority>('medium')
 
 function reset() {
   subject.value = ''
   topic.value = ''
   description.value = ''
-  attachment.value = ''
+  file.value = null
   priority.value = 'medium'
 }
 
@@ -46,7 +46,7 @@ function close() {
 
 function onFileChange(event: Event) {
   const target = event.target as HTMLInputElement
-  attachment.value = target.files?.[0]?.name ?? ''
+  file.value = target.files?.[0] ?? null
 }
 
 function submit() {
@@ -58,7 +58,7 @@ function submit() {
     subject: subject.value,
     topic: topic.value,
     description: description.value,
-    attachment: attachment.value,
+    file: file.value,
     priority: priority.value,
   })
   close()
@@ -128,7 +128,7 @@ function submit() {
       <div class="flex flex-col gap-2">
         <UiTypography as="span" size="lg" weight="regular" color="default">پیوست فایل (اختیاری)</UiTypography>
         <div class="flex h-11 items-center justify-between gap-3 rounded-xl border border-T-400 ps-3 text-[12.5px]">
-          <span class="truncate text-T-600">{{ attachment || 'فایلی انتخاب نشد' }}</span>
+          <span class="truncate text-T-600">{{ file?.name || 'فایلی انتخاب نشد' }}</span>
           <input
             id="ticket-file"
             type="file"
