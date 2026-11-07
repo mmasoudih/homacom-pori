@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { aboutPage } from '~/data/pages/about'
 
-useHead({
-  title: 'درباره ما | هماکام',
-})
+// Live copy from `GET /shop/public/about`; the designed page stays as the
+// fallback (and as the hero/sections above the API article).
+const { about } = useAboutPage()
+
+useHead(() => ({
+  title: about.value.seoAbout || 'درباره ما | هماکام',
+}))
 </script>
 
 <template>
@@ -89,6 +93,23 @@ useHead({
             {{ para }}
           </UiTypography>
         </template>
+
+        <!-- Live About Us copy (rich HTML, 2026-11-03) -->
+        <div
+          v-if="about.aboutUs"
+          class="about-rich mt-8 border-t border-T-300 pt-8"
+          v-html="about.aboutUs"
+        />
+
+        <a
+          v-if="about.aboutUsLink"
+          :href="about.aboutUsLink"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-6 inline-flex h-[42px] items-center justify-center rounded-[12px] bg-T-200 px-5 text-sm font-medium text-T-900 transition-colors hover:bg-T-300"
+        >
+          اطلاعات بیشتر
+        </a>
       </section>
 
       <!-- CEO / store description band (same as the landing page) -->
@@ -99,3 +120,51 @@ useHead({
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/* The API returns HTML-ish rich text; style it like the surrounding copy. */
+.about-rich :deep(h1),
+.about-rich :deep(h2),
+.about-rich :deep(h3) {
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.75rem;
+  color: var(--T-900);
+}
+
+.about-rich :deep(p) {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 30px;
+  color: var(--T-700);
+}
+
+.about-rich :deep(ul),
+.about-rich :deep(ol) {
+  margin-top: 1rem;
+  padding-inline-start: 1.5rem;
+  font-size: 1rem;
+  line-height: 30px;
+  color: var(--T-700);
+}
+
+.about-rich :deep(ul) {
+  list-style: disc;
+}
+
+.about-rich :deep(ol) {
+  list-style: decimal;
+}
+
+.about-rich :deep(a) {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.about-rich :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+</style>
