@@ -423,7 +423,11 @@ CMS, contact form, dashboard recently-viewed and the `pid` order-id resolver).
       `GET /shop/public/blog-category` call.
 - [ ] Blog `filters[s]` is ignored by the backend.
 - [ ] Terms, guarantee, installment, branch and collaboration still have no
-      endpoint (about/contact resolved 2026-11-03 — see gaps doc).
+      endpoint (about/contact resolved 2026-11-03 — see gaps doc); structured
+      payload requests: [`collaboration-page-content-contract.md`](./collaboration-page-content-contract.md),
+      [`installment-page-content-contract.md`](./installment-page-content-contract.md),
+      [`terms-page-content-contract.md`](./terms-page-content-contract.md),
+      [`guarantee-page-content-contract.md`](./guarantee-page-content-contract.md).
 - [ ] Notifications feed stays mock until an endpoint exists
 
 ## Known gaps / decisions
