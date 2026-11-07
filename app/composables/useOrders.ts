@@ -734,18 +734,31 @@ export function useReferDetail(id: Ref<string>) {
   return { refer, pending, loaded, notFound, load: fetch }
 }
 
-/** One order by its invoice/id — the full `UserOrderResponse`, no mock fallback. */
-export function useOrderDetail(invoice: Ref<string>) {
+/**
+ * One order by its invoice/id — the full `UserOrderResponse`, no mock fallback.
+ *
+ * Used by the order detail page and by `/payment-result`, where the gateway
+ * now redirects with a plain `pid=<order_id>` (2026-11-03).
+ */
+export async function fetchOrderById(invoice: string): Promise<Order | undefined> {
+  const id = invoice.trim()
+  if (!id) return undefined
+
   const api = useApi()
   const config = useRuntimeConfig()
   const apiBase = String(config.public.apiBase || '')
 
+  const res = await api.get<ApiOrder>(`/shop/order/${encodeURIComponent(id)}`)
+  return res.data ? mapOrder(res.data, apiBase) : undefined
+}
+
+/** Reactive wrapper over {@link fetchOrderById}. */
+export function useOrderDetail(invoice: Ref<string>) {
   const { data, pending, error, refresh } = useAsyncData<Order | undefined>(
     () => `shop-order-${invoice.value}`,
     async () => {
       try {
-        const res = await api.get<ApiOrder>(`/shop/order/${encodeURIComponent(invoice.value)}`)
-        return res.data ? mapOrder(res.data, apiBase) : undefined
+        return await fetchOrderById(invoice.value)
       }
       catch {
         return undefined

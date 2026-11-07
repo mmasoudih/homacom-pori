@@ -6,10 +6,11 @@ import { gatewayLabel } from '~/utils/payment'
 /**
  * Return page for every gateway payment.
  *
- * The bank handler redirects here as `/payment-result?pid=<hashed payment id>`.
- * There is no endpoint that resolves `pid` to an order (flagged to the backend),
- * so the page reads the newest invoice (`GET /shop/order?per_page=1`) and
- * refreshes the profile so wallet top-ups show their new balance.
+ * Since 2026-11-03 the bank handler redirects with a plain order id
+ * (`/payment-result?pid=<order_id>`), so the receipt is resolved directly from
+ * `GET /shop/order/{pid}`. A missing/unknown pid keeps the newest-invoice
+ * best-effort fallback, and the profile is refreshed so wallet top-ups show
+ * their new balance.
  */
 const route = useRoute()
 const pid = computed(() => String(route.query.pid || ''))
@@ -17,14 +18,24 @@ const pid = computed(() => String(route.query.pid || ''))
 const { orders, load } = useOrders()
 const { refresh: refreshProfile } = useUserProfile()
 
-// Best effort: a failed request (e.g. signed-out visitor) leaves the neutral
-// "not confirmed yet" state instead of breaking the page.
-await Promise.allSettled([
-  load({ perPage: 1, allPages: false }),
-  refreshProfile(),
-])
+const order = ref<Order | undefined>()
 
-const order = computed<Order | undefined>(() => orders.value[0])
+if (pid.value) {
+  order.value = await fetchOrderById(pid.value).catch(() => undefined)
+}
+
+if (!order.value) {
+  // Best effort: a failed request (e.g. signed-out visitor) leaves the neutral
+  // "not confirmed yet" state instead of breaking the page.
+  await Promise.allSettled([
+    load({ perPage: 1, allPages: false }),
+    refreshProfile(),
+  ])
+  order.value = orders.value[0]
+}
+else {
+  await Promise.allSettled([refreshProfile()])
+}
 
 const paid = computed(
   () => order.value?.paymentStatus === 'done' || order.value?.paymentStatus === 'slice_payment',
@@ -91,7 +102,7 @@ useHead({
         </div>
       </div>
 
-      <!-- Receipt (best effort: `pid` has no order resolver yet) -->
+      <!-- Receipt resolved from `pid` (the plain order id) -->
       <div
         v-if="order"
         class="flex w-full flex-col justify-center gap-4 rounded-[12px] border border-T-300 p-[19px]"
@@ -121,7 +132,7 @@ useHead({
 
           <div class="flex items-center justify-between gap-3">
             <UiTypography as="span" size="lg" weight="regular" color="muted" class="leading-[17px]">
-              شناسه پرداخت:
+              شناسه سفارش (pid):
             </UiTypography>
             <UiTypography as="span" size="lg" weight="medium" class="leading-[17px]" dir="ltr">
               {{ pid }}
