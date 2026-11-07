@@ -48,23 +48,19 @@ function mapBlogCategory(item: ApiBlogCategory): BlogNavItem {
 /**
  * Shop departments for the header mega menu.
  *
- * The designed mock tree is used until the API responds (and again if it
- * returns an empty list), so navigation is never blank on a cold/offline API.
+ * The tree ships inside the `site-header` payload (`HeaderResource.categories`,
+ * a recursive `CategoryResource[]`), so the header and the mega menu share one
+ * request instead of two. The designed mock tree is used until the API
+ * responds (and again if it returns an empty list), so navigation is never
+ * blank on a cold/offline API.
  */
 export function useProductCategories() {
-  const api = useApi()
+  const { siteHeader, pending, error, refresh } = useSiteHeader()
 
-  const { data: categories, pending, error, refresh } = useAsyncData<Category[]>(
-    'shop-product-categories',
-    async () => {
-      const res = await api.get<ApiCategory[]>('/shop/public/product-category', { skipAuth: true })
-      const items = Array.isArray(res.data) ? res.data : []
-      return items.length ? items.map(mapCategory) : megaCategories
-    },
-    {
-      default: () => megaCategories,
-    },
-  )
+  const categories = computed<Category[]>(() => {
+    const items = siteHeader.value.categories ?? []
+    return items.length ? items.map(mapCategory) : megaCategories
+  })
 
   return { categories, pending, error, refresh }
 }
@@ -321,6 +317,8 @@ interface ApiMenu {
 
 interface ApiSiteHeader {
   menus?: ApiMenu[]
+  /** Root product categories with nested `children` (mega-menu tree, 3 levels). */
+  categories?: ApiCategory[]
   logo?: string | null
   logo_dark?: string | null
   tel?: string | null
@@ -383,7 +381,7 @@ export function useShopColors() {
 export function useSiteHeader() {
   const api = useApi()
 
-  const { data: siteHeader } = useAsyncData<ApiSiteHeader>(
+  const { data: siteHeader, pending, error, refresh } = useAsyncData<ApiSiteHeader>(
     'shop-site-header',
     async () => {
       const res = await api.get<ApiSiteHeader>('/shop/public/site-header', { skipAuth: true })
@@ -392,7 +390,7 @@ export function useSiteHeader() {
     { default: () => ({}) },
   )
 
-  return { siteHeader }
+  return { siteHeader, pending, error, refresh }
 }
 
 /** Full footer payload: menus, logo, contact, social and copyright. */

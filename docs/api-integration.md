@@ -96,10 +96,14 @@ CMS, contact form, dashboard recently-viewed and the `pid` order-id resolver).
 
 ## Phase 2 — Global shell / CMS (6 Public + Banner + Story)
 
-- [x] `GET /api/shop/public/site-header` → header logo/phone/menus
-      (menus with links replace the designed nav; all-null live data falls back)
-- [x] `GET /api/shop/public/product-category` → `categories/*` (mega + mobile)
-      and the landing category tiles; mock tree as fallback
+- [x] `GET /api/shop/public/site-header` → header logo/phone/menus **and the
+      `categories` mega-menu tree** (menus with links replace the designed nav;
+      all-null live data falls back). One request feeds the header, the desktop
+      mega menu, the mobile drawer and the landing category tiles; the tree is
+      3 levels deep (`children` is recursive) with the mock tree as fallback.
+- [ ] `GET /api/shop/public/product-category` — still served and returns the
+      same tree, but no longer requested: `useProductCategories()` reads
+      `HeaderResource.categories` from `site-header` to avoid a second call.
 - [x] `GET /api/shop/public/footer` → footer logo/contact/menus/about/copyright
       (designed columns kept per column when the API menu has no links)
 - [x] Blog header nav prefers `/shop/public/blog-header`, falling back to
@@ -117,6 +121,16 @@ CMS, contact form, dashboard recently-viewed and the `pid` order-id resolver).
 - [x] `GET /api/shop/products` (q, ids, pagination) → header search + `search.vue`
       (prices, stock, colours and `order_count` now come from the list payload —
       no per-result detail call)
+- [x] Category browsing → `/search?categories=<id,id,…>&name=<title>`: every
+      mega-menu row (root, secondary, tertiary, column headers), the mobile
+      drawer rows/leaves/«همه محصولات» headers and the landing category tiles
+      open the listing filtered by that node **plus all of its descendants**.
+      `useSearchResults(term, categoryIds)` sends one
+      `filters[categories][]=<id>` per id; `q` remains a plain text search and
+      a new header search drops the category params.
+- [x] `/search` keeps the two modes distinct: `?q=` shows «جستجو برای …»,
+      `?categories=&name=` shows «محصولات …» and an empty state that names the
+      category («در دسته … هنوز محصولی ثبت نشده است»).
 - [x] Landing carousels (`جدیدترین`, `پرفروش‌ترین`) → API products
       (`filters[sort]=newest` / `more_invoice`)
 - [x] Landing carousels no longer pay for one detail request per card.
@@ -135,8 +149,12 @@ CMS, contact form, dashboard recently-viewed and the `pid` order-id resolver).
 - [x] Debounced header search suggestions
 - [ ] `useSearchFilters` facets are still applied client-side; API brand ids
       are mapped by title, unsupported brands fall out of facets
-- [x] `filters[categories][]` accepts real category ids (children included) —
+- [x] `filters[categories][]` accepts real category ids and ORs repeated ids —
       the landing category panels each fetch their own product pool
+- [ ] The ids returned by `/shop/public/product-category` / `site-header`
+      (menu taxonomy, `103+`) are not the ids the seeded products carry
+      (`12`–`16`), so menu-driven listings are empty until the backend aligns
+      the two taxonomies — see `api-backend-gaps-open.md` §3.1 (gap #8)
 - [x] `POST /api/shop/products/{slug}/notify` `{channel, stock_id?}` →
       out-of-stock notify dialog (2026-11-02); contacts come from the profile,
       guests are sent to login, repeats are idempotent and the API `message` is

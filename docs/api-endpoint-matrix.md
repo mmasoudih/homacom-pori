@@ -54,7 +54,7 @@ the working `POST /shop/cart/set-payment-method`.
 | `GET /shop/products` | optional | 200 | `data:{items[3], pagination:{total,count,per_page,current_page,last_page,has_more_pages}}`; `is_favorite` present when signed in | ✅ |
 | `GET /shop/products?filters[s]=…` | optional | 200 / 422 | 1-char term → **422** «filters.s نباید کمتر از 2 کاراکتر باشد»; `qui` → 3 hits | ⚠️ |
 | `GET /shop/products?filters[homa_off]=1` | optional | 200 | 3 rows | ✅ |
-| `GET /shop/products?filters[categories][]=…` | optional | 200 / 422 | `12` → 11 products; `103/104/137/138` → 0; `2/5/8` → **422** (product-attached legacy ids) — see A1 | ⚠️ |
+| `GET /shop/products?filters[categories][]=…` | optional | 200 / 422 | Repeated ids OR together (`12`+`13` → 13 products). Only the product-attached ids `12`–`16` return rows; every public-tree id (`103/104/105/137`) → 200 with 0; `2/5/8` → **422** — see A1 | ⚠️ |
 | `GET /shop/products/{slug}` | optional | 200 | full detail (`stocks`, `service_groups`, `suggested`, `rate`, `galleries`, `is_favorite`) | ✅ |
 | `GET /shop/products/{id}/comments` | optional | 200 | 5 published comments (array) | ✅ |
 | `GET /shop/banners` | public | 200 | 26 rows (`image`,`link`,`position`,`target`) | ✅ |
@@ -162,7 +162,7 @@ the working `POST /shop/cart/set-payment-method`.
 
 | # | Area | Finding | Impact / Ask |
 | --- | --- | --- | --- |
-| A1 | Catalog | `filters[categories][]` rejects **2, 5, 8** — ids that products actually reference (`product 1 → [2,5,12]`) — with 422 «فیلتر انتخاب شده معتبر نیست», while every id in `/shop/public/product-category` (103+, 104, 137, 138) answers 200 with **0 products**. Only `12` returned products (11). | Category panels and category browsing are effectively empty; align product↔category ids, allow any category attached to a product, and decide whether a parent filter includes descendants. |
+| A1 | Catalog | Two category id spaces: products carry `12`–`16` (لپ تاپ ایسوس/لنوو/مک بوک/اچ پی/مایکروسافت, 8/6/6/11/7 products) while `/shop/public/product-category` and `site-header.categories` return ids `103+` with the **same titles**. Public ids filter to **0 products**; `2/5/8` → 422 «فیلتر انتخاب شده معتبر نیست»; repeated ids are OR-ed (`12`+`13` → 13). | Every menu/category listing is empty. Attach products to the public-tree ids (or expose the product taxonomy publicly), accept every id a product references, and confirm whether a parent filter includes descendants — the frontend already sends all descendant ids. |
 | A2 | Content | `/shop/public/site-header` and `/shop/public/blog-header` return the same payload except for one menu title («منوی اصلی سایت» vs «منوی وبلاگ»): same `blog_title`, `logo`, menus and the same 8 product categories. | Confirm the blog header should reuse the shop menus/categories (the wording suggests it may be a copy). |
 | A3 | Search | `filters[s]` needs **≥2 characters** (1 char → 422). `useProductSearch` sends whatever was typed (1 char) and swallows the 422, so a one-letter search shows nothing with no message. | Enforce min 2 chars in the UI or accept 1 char server-side. |
 | A4 | Address | `POST /shop/user/address` requires `nickname` **≥3 chars**; the dialog only checks non-empty, so a 2-char recipient name produces a raw 422 toast. | Mirror the rule in the form (or relax it). |

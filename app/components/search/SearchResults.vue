@@ -9,6 +9,8 @@ const props = defineProps<{
   products: SearchProduct[]
   /** Category tiles for the mobile «بر اساس دسته‌بندی» row. */
   categories: SearchCategoryTile[]
+  /** True when `query` is a category name (mega-menu listing, not a text search). */
+  categoryListing?: boolean
 }>()
 
 const source = computed(() => props.products)
@@ -58,7 +60,8 @@ function selectCategory(tile: SearchCategoryTile) {
     <h1 class="text-[18px] font-bold text-T-900 lg:text-[22px]">
       <span class="lg:hidden">{{ query || 'همه محصولات' }}</span>
       <span class="hidden lg:inline">
-        <template v-if="query">جستجو برای «{{ query }}»</template>
+        <template v-if="categoryListing && query">محصولات «{{ query }}»</template>
+        <template v-else-if="query">جستجو برای «{{ query }}»</template>
         <template v-else>همه محصولات</template>
       </span>
     </h1>
@@ -105,7 +108,7 @@ function selectCategory(tile: SearchCategoryTile) {
           <SearchSortBar v-model:sort="sort" :count="filtered.length" />
         </div>
 
-        <SearchResultsGrid :products="filtered" :query="query || 'محصولات'" />
+        <SearchResultsGrid :products="filtered" :query="query || 'محصولات'" :category-listing="categoryListing" />
       </div>
     </div>
 

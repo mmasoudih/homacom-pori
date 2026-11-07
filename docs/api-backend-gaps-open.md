@@ -172,16 +172,32 @@ the fresh cart token after checkout.
 
 ### 3.1 Category filter misaligned — **High**
 
-Products reference category ids `2`, `5`, `8`, `12`. Filtering by `2/5/8` →
-**422** «فیلتر انتخاب شده معتبر نیست»; every id in
-`/shop/public/product-category` (`103`, `104`, `137`, `138`, …) → 200 with **0
-products**; only `12` returns rows (`total:11`). The landing
-`<BestOfCategorySection>` asks one pool per public category, so most panels are
-empty and most products are unreachable by category.
+The public menu tree and the product→category assignments are **two different id
+spaces**, so every category link in the UI opens an empty listing:
 
-**Ask:** accept any category attached to a product, decide whether parents
-include descendants, and align the public tree with the product assignments
-(seed data).
+| Public tree (`/shop/public/product-category`, `site-header.categories`) | Products' own `categories[].id` |
+| --- | --- |
+| `105` لپ تاپ ایسوس | `12` لپ تاپ ایسوس (8 products) |
+| `106` لپ تاپ لنوو | `13` لپ تاپ لنوو (6) |
+| `108` مک بوک | `14` مک بوک اپل (6) |
+| `107` لپ تاپ اچ پی | `15` لپ تاپ اچ پی (11) |
+| `109` لپ تاپ مایکروسافت | `16` لپ تاپ مایکروسافت (7) |
+
+- Filtering by a public id (`103`, `104`, `105`, `137`, …) → **200 with 0
+  products**; filtering by `12`–`16` returns rows. `2`, `5`, `8` (also
+  referenced by some products) → **422** «فیلتر انتخاب شده معتبر نیست».
+- Multiple ids are **OR-ed**: `12` + `13` → 13 products (8 + 6 minus one product
+  that carries both).
+- The landing `<BestOfCategorySection>` and now the mega menu / mobile drawer /
+  landing tiles all query by public-tree ids, so they are empty until the
+  taxonomies are aligned. The frontend sends the selected node **and every
+  descendant id**, so a parent works whether or not the backend expands
+  descendants itself.
+
+**Ask:** attach the seeded products to the public-tree category ids (or expose
+the product taxonomy publicly and make the menu use it), allow every id that a
+product references, and confirm whether a parent filter already includes
+descendants (the frontend currently sends them explicitly).
 
 ### 3.2 `filters[s]` minimum length — **Medium**
 

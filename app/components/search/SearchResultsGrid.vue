@@ -6,6 +6,8 @@ import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 defineProps<{
   products: SearchProduct[]
   query: string
+  /** True when `query` is a category name rather than a text search. */
+  categoryListing?: boolean
 }>()
 
 // Desktop keeps the square-card grid; mobile switches to the single-column
@@ -15,7 +17,7 @@ const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
 </script>
 
 <template>
-  <SearchEmpty v-if="!products.length" :query="query" />
+  <SearchEmpty v-if="!products.length" :query="query" :category-listing="categoryListing" />
 
   <div
     v-else-if="isDesktop"

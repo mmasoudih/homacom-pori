@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { initialMegaPath, type Category } from '~/data/categories'
+import { categoryListRoute } from '~/utils/categories'
 
 const props = defineProps<{
   open: boolean
@@ -49,6 +50,17 @@ function onSecondarySelect(item: Category) {
 
 function onTertiarySelect(item: Category) {
   activeTertiary.value = item
+}
+
+/**
+ * Open the product list filtered by `category` and all of its descendants.
+ * Hover still previews the branch; a click on any row (root, secondary,
+ * tertiary) or on a column header navigates.
+ */
+function openCategory(category?: Category) {
+  if (!category) return
+  emit('close')
+  navigateTo(categoryListRoute(category))
 }
 
 function columnItems(column: Column) {
@@ -135,44 +147,60 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
                 variant="root"
                 :active="item.id === activeRoot?.id"
                 @select="onRootSelect(item)"
+                @open="openCategory(item)"
               />
             </div>
 
-            <!-- Level 2 — secondary categories -->
+            <!-- Level 2 — secondary categories.
+                 The column is always rendered so the panel keeps the same
+                 widths; only its content is omitted when the root has none. -->
             <div
               data-mega-column="secondary"
               class="flex-1 overflow-y-auto border-l border-T-400 px-6 pb-8 pt-4"
               role="group"
               aria-label="زیردسته‌ها"
             >
-              <CategoriesCategoryColumnHeader :title="`همه محصولات ${activeRoot?.title ?? ''}`" />
-              <CategoriesCategoryItem
-                v-for="item in secondaryItems"
-                :key="item.id"
-                :item="item"
-                variant="secondary"
-                :active="item.id === activeSecondary?.id"
-                @select="onSecondarySelect(item)"
-              />
+              <template v-if="secondaryItems.length">
+                <CategoriesCategoryColumnHeader
+                  :title="`همه محصولات ${activeRoot?.title ?? ''}`"
+                  @open="openCategory(activeRoot)"
+                />
+                <CategoriesCategoryItem
+                  v-for="item in secondaryItems"
+                  :key="item.id"
+                  :item="item"
+                  variant="secondary"
+                  :active="item.id === activeSecondary?.id"
+                  @select="onSecondarySelect(item)"
+                  @open="openCategory(item)"
+                />
+              </template>
             </div>
 
-            <!-- Level 3 — deepest categories -->
+            <!-- Level 3 — deepest categories.
+                 Same rule: keep the column (and its width), drop only the
+                 content when there is no deeper level. -->
             <div
-              v-if="activeSecondary"
               data-mega-column="tertiary"
               class="flex-1 overflow-y-auto px-6 pb-8 pt-4"
               role="group"
               aria-label="جزئیات"
             >
-              <CategoriesCategoryColumnHeader :title="`همه محصولات ${activeSecondary.title}`" />
-              <CategoriesCategoryItem
-                v-for="item in tertiaryItems"
-                :key="item.id"
-                :item="item"
-                variant="tertiary"
-                :active="item.id === activeTertiary?.id"
-                @select="onTertiarySelect(item)"
-              />
+              <template v-if="tertiaryItems.length">
+                <CategoriesCategoryColumnHeader
+                  :title="`همه محصولات ${activeSecondary?.title ?? ''}`"
+                  @open="openCategory(activeSecondary)"
+                />
+                <CategoriesCategoryItem
+                  v-for="item in tertiaryItems"
+                  :key="item.id"
+                  :item="item"
+                  variant="tertiary"
+                  :active="item.id === activeTertiary?.id"
+                  @select="onTertiarySelect(item)"
+                  @open="openCategory(item)"
+                />
+              </template>
             </div>
           </div>
         </nav>
