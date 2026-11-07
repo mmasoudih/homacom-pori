@@ -1,9 +1,10 @@
-# Backend gaps — open items only (2026-11-02)
+# Backend gaps — open items only (2026-11-03)
 
 Filtered view of [`api-backend-gaps.md`](./api-backend-gaps.md): **only items
 that are still open**. Resolved rounds (2026-10-25, 2026-10-29 round 1/round 2,
-2026-11-02) are removed; the 2026-11-02 round was verified against the spec and
-unauthenticated live calls only (no test credentials for authenticated checks).
+2026-11-02, 2026-11-03) are removed; the 2026-11-03 round was verified against
+the PDF + OpenAPI document and unauthenticated live calls only (no test
+credentials for authenticated checks).
 Per-endpoint status is in [`api-endpoint-matrix.md`](./api-endpoint-matrix.md).
 
 Base `https://new.ahoma.ir/api` · OpenAPI `https://new.ahoma.ir/docs?api-docs.json`
@@ -14,8 +15,8 @@ Base `https://new.ahoma.ir/api` · OpenAPI `https://new.ahoma.ir/docs?api-docs.j
 | --- | --- | --- | --- | --- |
 | 1 | Payments | No gateway can start a session (Mellat/Melli config errors, Saman `-111`, `myCredit` admin URL) | **Critical** | Any card/wallet payment |
 | 2 | Payments | `payment.success` / `url` / `data` contract unreliable | **Critical** | Correct checkout branching |
-| 3 | Payments | No `pid` → payment resolver; `wallet/charge` returns no id | High | `/payment-result`, top-up confirmation |
-| 4 | Payments | Gateway callback return link + per-gateway POST fields unknown | High | Trustworthy result page |
+| 3 | Payments | `wallet/charge` returns no identifier, so top-up confirmation relies on the profile/ledger refresh | Medium | `dashboard/wallet` top-up result |
+| 4 | Payments | Per-gateway POST field names unknown (return link is now documented) | Medium | Trustworthy result page |
 | 5 | Cart | No line update for `services[]`/insurance | Medium | “Add service/insurance” dialogs |
 | 6 | Cart | `set-user-address` requires undocumented `cart_token` | Low | Spec/consumers |
 | 7 | Cart | Misleading 422 on cart-token mismatch; fresh cart has `cart_token:null` | Low | Debuggability |
@@ -32,13 +33,28 @@ Base `https://new.ahoma.ir/api` · OpenAPI `https://new.ahoma.ir/docs?api-docs.j
 | 18 | Comments | Status enum values undocumented | Low | Moderation UI |
 | 19 | Tickets | No delete-ticket endpoint | Medium | Dashboard delete |
 | 20 | Payments | `max_online_payment_amount` only in `/public/footer` | Low | Correct limit guard |
-| 21 | Static | No CMS pages, notifications feed, compare persistence | Low | Those surfaces |
+| 21 | Static | Terms/guarantee/installment/branch/collaboration pages, notifications feed, compare persistence | Low | Those surfaces |
 | 22 | Wallet | Ledger row shape unverified (zero rows on the test account) | Low | `reason_title`/`in_out` rendering |
-| 23 | Docs | OpenAPI list envelopes + `legal-information` required fields are stale | Low | Spec consumers / codegen |
 
 ---
 
-## 0. Resolved in the 2026-11-02 round (for reference)
+## 0. Resolved in the 2026-11-03 round (for reference)
+
+`nov-3.pdf` (2026-11-03) closed the payment-`pid` question and the about/contact
+CMS gap:
+
+| Gap (was open) | Now |
+| --- | --- |
+| No `pid` → invoice resolver | The gateway return link is `/payment-result?pid=<order_id>`; `pid` is the **plain order id**, resolved with `GET /shop/order/{id}` |
+| Gateway return link unknown | Documented in the PDF; the page no longer guesses for a valid `pid` |
+| No about/contact CMS | `GET /shop/public/about` (`about_us`, `about_us_link`, `seo_about`) and `GET /shop/public/contact` (phones, email, address, socials, `contact_popup`, `contact_popup_status`) |
+| No contact form endpoint | `POST /shop/contact-us` (single `contact` field: email or 11-digit mobile; 422 field errors) |
+| Dashboard had no recently-viewed | `GET /shop/user/dashboard` now returns `last_visited_product[]` (product + `last_visited_at`) |
+| OpenAPI drift on list envelopes / `legal-information` | The 2026-11-02 payloads are now in the spec (was item 23) |
+
+---
+
+## 0.1 Resolved in the 2026-11-02 round (for reference)
 
 The PDF round added every order-lifecycle endpoint the dashboard was missing and
 fixed the 2026-10-31 regressions:
@@ -60,7 +76,7 @@ fixed the 2026-10-31 regressions:
 | Ticket `medium` labelled «کم» | label corrected to «اولویت متوسط» |
 | `legal-information` accepted empty company | `company_name` + `company_register_id` required |
 
-OpenAPI drift from that round is item 23 below.
+OpenAPI drift from that round was resolved in the 2026-11-03 round.
 
 ---
 
@@ -97,27 +113,27 @@ handler follows a nested URL and dead-ends. Failure payloads are HTTP **200**
 `url` always present when `success`, `data` only gateway form fields, failures as
 `success:false` with a user-facing `message`. Publish it in the PDF/OpenAPI.
 
-### 1.3 No `pid` resolver — **High**
+### 1.3 `wallet/charge` has no identifier — **Medium**
 
-`hash_id` is a small integer (`14146`, `14199`, `14252`), not a hash.
-`GET /shop/payment/{id}` (and `/shop/order/payment/…`, `/shop/payments/…`,
-`/payment/…`) → **404** for invoice ids and payment ids. `POST /wallet/charge`
-returns **no identifier at all** (`{success,gate,url,token,message,data}`).
+`POST /wallet/charge` returns no identifier at all
+(`{success,gate,url,token,message,data}`), so the top-up result cannot be tied to
+a charge row; `dashboard/wallet` refreshes the profile/ledger instead. The
+invoice side is fixed (2026-11-03): the return link is
+`/payment-result?pid=<order_id>` and `pid` is the plain order id.
 
-**Ask:** `GET /shop/payment/{pid}` returning `{target: invoice|wallet_charge,
-…, final_state}`, **or** include `invoice_id`/`hash_id` (and a wallet marker) in
-the bank return URL and in the charge response.
+**Ask:** include an `invoice_id`/charge id in the charge response and the bank
+return URL so the wallet top-up can resolve its own row.
 
-### 1.4 Gateway callback + form contract — **High**
+### 1.4 Gateway callback + form contract — **Medium**
 
-No successful payment has ever been observed, so the return payload and the
-per-gateway POST field names (`RefId`, …) are still unverified; only
-`/payment/verify/{gate}` (POST-only) and the admin `payment-from-credit` URL
-exist.
+The browser return link (`/payment-result?pid=<order_id>`) is documented as of
+2026-11-03, but no successful payment has ever been observed, so the returned
+payload and the per-gateway POST field names (`RefId`, …) are still unverified;
+only `/payment/verify/{gate}` (POST-only) and the admin `payment-from-credit`
+URL exist.
 
-**Ask:** document the browser return URL (`/payment-result?pid=…`) and a
-per-gateway field table (which gateways POST which keys, which are GET-only).
-`/payment-result?pid=…` currently guesses the newest invoice (`per_page=1`).
+**Ask:** a per-gateway field table (which gateways POST which keys, which are
+GET-only) and one observed successful round-trip.
 
 ---
 
@@ -287,10 +303,11 @@ footer is the source of truth).
 
 ## 6. Missing surfaces — **Low**
 
-No CMS/static-page endpoints (about, terms, guarantee, installment, contact,
-branch, collaboration), no notifications feed, no compare persistence. The
-2026-11-02 `POST /products/{slug}/notify` is a restock reminder, not a
-notifications feed.
+About and contact are now real (2026-11-03: `/shop/public/about`,
+`/shop/public/contact`, `POST /shop/contact-us`). Still missing: terms,
+guarantee, installment, branch and collaboration pages, a notifications feed and
+compare persistence. The 2026-11-02 `POST /products/{slug}/notify` is a restock
+reminder, not a notifications feed.
 
 **Ask:** confirm these are out of scope for the backend, or publish endpoints.
 
@@ -303,17 +320,16 @@ notifications feed.
 | 1 | `GET /shop/order` → `data: []` | `data.items` + `data.pagination` |
 | 2 | `GET /shop/wallet/transactions` → `data: []` | `data.items` + `data.pagination` |
 | 3 | `GET /shop/order/refers` → `data: []` + root `pagination` | `data.items` + `data.pagination` |
-| 4 | `legal-information` body has no `required` array | `company_name` + `company_register_id` required (2026-11-02) |
-| 5 | `set-user-address` body = `{user_address_id}` | also requires `cart_token` (422 without) |
-| 6 | `add-qty`/`sub-qty` body = `{cart_item_id}` | `cart_token` needed when the cart has one |
-| 7 | `POST /shop/cart/set/payment-method` (slash) exists | 404; only `/set-payment-method` works (client now calls the dash route) |
-| 8 | `wallet/charge` example `payment_method_id:1` | id 1 = `myCredit` (wallet) → 422 by design |
-| 9 | checkout `payment.success` | true for Saman with `url:null`, `token:"-111"` |
-| 10 | spec JSON at `https://new.ahoma.ir/docs?api-docs.json` | `/api/docs?api-docs.json` is **404** (the older note used that path) |
+| 4 | `set-user-address` body = `{user_address_id}` | also requires `cart_token` (422 without) |
+| 5 | `add-qty`/`sub-qty` body = `{cart_item_id}` | `cart_token` needed when the cart has one |
+| 6 | `POST /shop/cart/set/payment-method` (slash) exists | 404; only `/set-payment-method` works (client now calls the dash route) |
+| 7 | `wallet/charge` example `payment_method_id:1` | id 1 = `myCredit` (wallet) → 422 by design |
+| 8 | checkout `payment.success` | true for Saman with `url:null`, `token:"-111"` |
+| 9 | spec JSON at `https://new.ahoma.ir/docs?api-docs.json` | `/api/docs?api-docs.json` is **404** (the older note used that path) |
 
-Everything else in the 2026-11-02 PDF is now in the spec: `cancel`/`refer`/
-`repay`, `refers`, `dashboard`, `notify`, `UserOrderResponse.items`, order
-`type=all` + status aliases and ticket-create `file`.
+The 2026-11-02 list/`legal-information` drift and the whole 2026-11-03 round
+(`about`, `contact`, `contact-us`, dashboard `last_visited_product`,
+`payment/pay` + `payment/verify/{gate}`) are now in the spec.
 
 ---
 
@@ -327,6 +343,9 @@ Everything else in the 2026-11-02 PDF is now in the spec: `cancel`/`refer`/
   refers/dashboard/notify/avatar delete/ticket file): unauthenticated calls
   return **401**, which proves the routes exist, but no test credentials were
   available for an end-to-end check.
+- Authenticated behaviour of the 2026-11-03 endpoints (`contact-us` submit,
+  dashboard `last_visited_product`): the public about/contact payloads were
+  checked unauthenticated; the form POST and the visit history need an account.
 - Ownership 404s (`invoice_refer_must_be_paid` etc. are documented, not
   observed).
 

@@ -10,10 +10,10 @@ independently.
 **Backend asks / missing data:** see [`api-backend-gaps.md`](./api-backend-gaps.md)
 (history + evidence) and [`api-backend-gaps-open.md`](./api-backend-gaps-open.md)
 (open items only).
-**Live endpoint status (2026-10-31 sweep + 2026-11-02 delta):**
+**Live endpoint status (2026-10-31 sweep + 2026-11-02 / 2026-11-03 deltas):**
 [`api-endpoint-matrix.md`](./api-endpoint-matrix.md).
-**Last updated:** 2026-11-02 (applied the `api-changes-2.pdf` round; verified
-against the OpenAPI document + unauthenticated route checks).
+**Last updated:** 2026-11-03 (applied the `nov-3.pdf` round: public about/contact
+CMS, contact form, dashboard recently-viewed and the `pid` order-id resolver).
 
 ## Current state (audit)
 
@@ -46,17 +46,23 @@ against the OpenAPI document + unauthenticated route checks).
       `data.items` + `data.pagination` envelopes, order `items[]`,
       `type=all` + status tab aliases, avatar delete, ticket-create `file`,
       `product_slug` fix, weekday validation and corrected ticket labels.
+- [x] 2026-11-03 backend update applied (`nov-3.pdf`): public `about` +
+      `contact` CMS content, `POST /shop/contact-us`, dashboard
+      `last_visited_product`, product-detail visit tracking and the payment
+      `pid` = plain order id resolver.
 - [x] Wallet is real (2026-10-29 round 2): balance from `profile.credit`,
       ledger from `GET /shop/wallet/transactions`, top-up from
       `POST /shop/wallet/charge` → gateway (`/dashboard/wallet`).
 - [ ] Still designed-mock: notifications feed, insurance/services after
-      add-to-cart, static CMS pages. Returns and paying an existing invoice are
+      add-to-cart. Static pages are real where the backend publishes content
+      (`about`, `contact` — 2026-11-03); terms/guarantee/installment/branch/
+      collaboration remain static. Returns and paying an existing invoice are
       now real (2026-11-02).
 - [x] No blocking backend bugs remain for the wired endpoints (the 2026-10-23
       order 500s, empty ticket departments and payment-method 404 are fixed).
-- [ ] Still open: gateway checkout/callback (no gateway starts a session), the
-      `pid` resolver, cart line services, and the spec drift on list envelopes —
-      see `api-backend-gaps-open.md`.
+- [ ] Still open: gateway checkout/callback (no gateway starts a session),
+      cart line services, and the spec drift on list envelopes — see
+      `api-backend-gaps-open.md`.
 
 ## Phase 0 — Shared infrastructure
 
@@ -393,19 +399,32 @@ against the OpenAPI document + unauthenticated route checks).
 - [x] `TicketResource.status` / `.priority` are `{ value, label }` objects; the
       status chip displays the API label (flat-string payloads still accepted).
 
-## Phase 12 — Static/CMS pages (no endpoints in spec)
+## Phase 12 — Static/CMS pages
 
 - [x] `GET /api/shop/faqs` → `faq.vue` (mock content as fallback)
 - [x] `GET /api/shop/brands` → `brands.vue`, `landing/BrandsSection`
+- [x] `GET /api/shop/public/about` → `about-us.vue` (2026-11-03): the designed
+      hero/sections stay, the API `about_us` HTML is appended below them as a
+      rich-text article, with an optional `about_us_link` CTA; `seo_about`
+      drives the page title/description. Structured per-block payload request:
+      [`about-page-content-contract.md`](./about-page-content-contract.md).
+- [x] `GET /api/shop/public/contact` → `contact-us.vue` (2026-11-03): phones,
+      mobile, email, address and social links are live; `contact_popup` +
+      `contact_popup_status` drive the floating support widget, which only
+      mounts on the contact page. Static-copy contract request:
+      [`contact-page-content-contract.md`](./contact-page-content-contract.md).
+- [x] `POST /api/shop/contact-us` → `contact-us.vue` (2026-11-03): the single
+      contact field is validated as email or 11-digit mobile, and 422 field
+      errors are mapped back onto the input.
 - [x] Header/footer/blog menu `link` values are resolved absolute URLs; the
       designed navigation is only a fallback for link-less rows (the footer's
       five group headers are dropdown parents by design).
 - [ ] Blog category title still requires the extra
       `GET /shop/public/blog-category` call.
 - [ ] Blog `filters[s]` is ignored by the backend.
-- [ ] Confirm backend for: about, terms, guarantee, installment, contact, branch,
-      collaboration, notifications (none in the spec — see gaps doc)
-- [ ] Keep mock or move to CMS — decision needed
+- [ ] Terms, guarantee, installment, branch and collaboration still have no
+      endpoint (about/contact resolved 2026-11-03 — see gaps doc).
+- [ ] Notifications feed stays mock until an endpoint exists
 
 ## Known gaps / decisions
 
@@ -431,10 +450,12 @@ against the OpenAPI document + unauthenticated route checks).
    `payment_method` to `manual`, so the order detail and the result page render
    `gate`. The gateway is still selected by `payment_method_id` at checkout, and
    `gate` is the field that records what actually ran.
-8. **`/payment-result?pid=…` cannot resolve `pid`**: the bank redirects with the
-   hashed payment id, but no endpoint maps it to an invoice. The page uses a
-   newest-invoice heuristic plus a profile refresh, so it is correct for the
-   common case but not authoritative — blocking ask in `api-backend-gaps.md`.
+8. **`/payment-result?pid=…`** (2026-11-03): the gateway return link is
+   `/payment-result?pid=<order_id>` and `pid` is the plain order id, so the page
+   resolves it through `fetchOrderById` (`GET /shop/order/{id}`) and uses the
+   authoritative invoice. The newest-invoice fallback (`per_page=1`) only
+   remains for a missing or unknown `pid`, and the profile is refreshed so the
+   wallet balance is current. See `api-backend-gaps-open.md`.
 9. **Wallet is real** (2026-10-29 round 2): `GET /wallet/transactions` drives
    `/dashboard/wallet` (filters under `filters[...]`, `reason_title` labels,
    colour by `in_out`) and `POST /wallet/charge` drives the top-up dialog. The
@@ -445,10 +466,11 @@ against the OpenAPI document + unauthenticated route checks).
     (`cart_item_id` only); min/max are enforced server-side.
 12. **Ticket enums are objects** (`{ value, label }`) for `status` and
     `priority`; flat strings remain tolerated.
-13. **Remaining blockers**: `pid` resolver, gateway checkout/callback, wallet
-    callback semantics, cart line service updates, ticket delete, static pages
-    and the notifications feed — see `api-backend-gaps-open.md`. Order cancel,
-    returns, repay, avatar delete and ticket-create attachments are resolved
-    (2026-11-02).
+13. **Remaining blockers**: gateway checkout/callback (no gateway starts a
+    session), wallet callback semantics, cart line service updates, ticket
+    delete and the notifications feed — see `api-backend-gaps-open.md`. The
+    `pid` resolver, order cancel, returns, repay, avatar delete, ticket-create
+    attachments and the about/contact CMS endpoints are resolved (2026-11-02 /
+    2026-11-03).
 14. **OpenAPI codegen**: types are hand-written per feature; consider
     `openapi-typescript` once the payloads stabilise.

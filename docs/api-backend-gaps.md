@@ -1,10 +1,17 @@
-# Backend gaps — follow-up after the 2026-11-02 backend update
+# Backend gaps — follow-up after the 2026-11-03 backend update
 
 Companion to `docs/api-integration.md` and
 [`api-endpoint-matrix.md`](./api-endpoint-matrix.md) (all 73 endpoint/method
 pairs the frontend calls, with live status + shape). **Open items only:**
 [`api-backend-gaps-open.md`](./api-backend-gaps-open.md). Rounds:
 
+- **2026-11-03** — content/payment round (`nov-3.pdf`, 2026-11-03): public
+  `GET /shop/public/about` + `GET /shop/public/contact`, `POST /shop/contact-us`,
+  dashboard `last_visited_product[]`, implicit visit tracking on
+  `GET /shop/products/{slug}`, and the payment return contract
+  (`/payment-result?pid=<order_id>`, `payment/pay` + `payment/verify/{gate}`).
+  Frontend applied the same day; verification was **spec + unauthenticated**
+  (the public CMS payloads were checked live).
 - **2026-11-02** — orders/wallet/profile round (`api-changes-2.pdf`,
   2026-11-02): `POST /order/{invoice}/cancel`, `POST /order/{invoice}/refer`,
   `GET /order/refers`, `POST /order/{invoice}/repay`, `GET /user/dashboard`,
@@ -27,6 +34,43 @@ Base: `https://new.ahoma.ir/api` · OpenAPI: `/docs?api-docs.json`
 (the Scribe JSON is served from the site root — `/api/docs?api-docs.json` is 404)
 
 Legend: **Resolved** · **Partial** · **Open**
+
+## 2026-11-03 round (`nov-3.pdf`)
+
+Frontend applied the round on 2026-11-03. The public CMS payloads were checked
+live; the authenticated write paths (`contact-us`, dashboard visit history,
+`payment/pay`) were verified from the PDF/OpenAPI only.
+
+### Frontend applied
+
+| # | Contract | Frontend change |
+| --- | --- | --- |
+| 1 | `GET /shop/public/about` → `about_us` (HTML), `about_us_link?`, `seo_about` | `useAboutPage()`; `about-us.vue` keeps the designed hero/sections and appends the API article + optional CTA; `seo_about` sets the title |
+| 2 | `GET /shop/public/contact` → phones, mobile, email, address, socials, `contact_popup`, `contact_popup_status` | `useContactPage()`; `contact-us.vue` renders live values, social icons and mounts `PagesContactSupportWidget` (contact page only, `enable` gate) |
+| 3 | `POST /shop/contact-us` `{name?, title, contact, description}`; `contact` = email or 11-digit mobile | Real form POST (`skipAuth`), `toEnglishDigits` + separator stripping, client validation, 422 field-error mapping, success/error toasts |
+| 4 | `GET /shop/user/dashboard` adds `last_visited_product[]` | `useDashboard()` returns `{ aggregates, recentlyViewed }`; the dashboard recently-viewed row is live (≤3 cards, links to `/product/{id}`) |
+| 5 | `GET /shop/products/{slug}` records the visit (no client field) | No client change; the existing detail fetch feeds the history |
+| 6 | `/payment-result?pid=<order_id>`; `POST /payment/pay`, `GET\|POST /payment/verify/{gate}` | `pid` is resolved as a plain order id via `fetchOrderById()` (`GET /shop/order/{id}`), newest-invoice fallback only when unknown; profile refresh on return |
+
+### Resolved by this round
+
+- Payment `pid` → invoice mapping (was a blocking ask).
+- Gateway browser return link documented as `/payment-result?pid=<order_id>`.
+- About/contact CMS + a real contact form endpoint.
+- Dashboard recently-viewed data.
+- 2026-11-02 OpenAPI drift on list envelopes / `legal-information` (now in the
+  spec).
+
+### Still open after this round
+
+- No gateway starts a session (`payment.success`/`url` contract) — see
+  `api-backend-gaps-open.md` §1.1–1.2.
+- Per-gateway POST field names and one observed successful callback.
+- `wallet/charge` returns no identifier for the top-up result.
+- Terms/guarantee/installment/branch/collaboration pages, notifications feed,
+  compare persistence.
+
+---
 
 ## 2026-11-02 round (`api-changes-2.pdf`)
 
@@ -606,9 +650,9 @@ so the moderation states are not inferred.
 
 ### 8. Static / CMS pages and notifications
 
-No endpoints for about, terms, guarantee, installment, contact, branch or
-collaboration. Notifications have no endpoint either. Compare remains
-client-side only (no persistence endpoint).
+About and contact are resolved (2026-11-03). No endpoints remain for terms,
+guarantee, installment, branch or collaboration. Notifications have no endpoint
+either. Compare remains client-side only (no persistence endpoint).
 
 ### 9. Auth / transport
 
@@ -644,8 +688,8 @@ but login-time guest→user cart merge still needs confirmation.
    funnel ends here.
 2. Gateway callback result payload + per-gateway POST field reference (blocks a
    trustworthy `/payment-result`).
-3. `pid` resolver for `/payment-result?pid=…` (and an id on
-   `POST /wallet/charge`), or `invoice_id`/`hash_id` in the return URL.
+3. An id on `POST /wallet/charge` for the top-up result (the invoice-side `pid`
+   resolver is done — `/payment-result?pid=<order_id>` since 2026-11-03).
 4. Align the category filter with the catalog (product ids `2/5/8` are rejected;
    public-tree ids return no products) and document the `filters[s]` ≥2-char
    minimum. Both break discovery on the landing/search pages.
@@ -655,11 +699,11 @@ but login-time guest→user cart merge still needs confirmation.
 8. Document comment status values and the five payment-method meanings
    (`online`, `pay_in_delivery`, `pay_in_person`, `mixed`, `manual`),
    `token_expire`, and the `locates` city scope.
-9. Static pages / notifications feed / compare persistence.
+9. Remaining static pages / notifications feed / compare persistence.
 10. Standardise media origins and confirm the guest→user cart merge.
-11. **Docs:** fix the OpenAPI response envelopes for `/order`, `/wallet/transactions`
-    and `/order/refers` (`data.items` + `data.pagination`) and add the required
-    `company_name`/`company_register_id` to the `legal-information` schema.
+11. **Docs:** fix the last OpenAPI response envelopes for `/order`,
+    `/wallet/transactions` and `/order/refers` (`data.items` +
+    `data.pagination`) if the 2026-11-03 re-check still shows the old shape.
 
 ---
 
@@ -713,8 +757,9 @@ curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/
 curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d '{"payment_method_id":5,"device":"web"}' "$BASE/shop/cart/checkout"   # saman: success:true, url:null, token:-111
 
-# 6) payment result has no resolver (all 404)
-for p in "shop/payment/14199" "shop/payment/32" "shop/payment/3"; do curl -s "$BASE/$p"; done
+# 6) payment result: 2026-10-31 had no resolver (all 404); since 2026-11-03 the
+#    bank return is /payment-result?pid=<order_id>, resolvable via GET /shop/order/{id}
+curl -s "$BASE/shop/order/14199" | head -c 200
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
   "https://new.ahoma.ir/payment-from-credit?order_id=31"   # 302 -> /admin/login
 

@@ -1,4 +1,4 @@
-# Frontend API endpoint matrix — live sweep 2026-10-31 + 2026-11-02 delta
+# Frontend API endpoint matrix — live sweep 2026-10-31 + 2026-11-02 / 2026-11-03 deltas
 
 Every backend endpoint the Nuxt app calls, exercised in production through the
 same request shape the app uses. Companion to
@@ -28,6 +28,10 @@ the working `POST /shop/cart/set-payment-method`.
 > kept as history. The newer round added seven route checks and changed several
 > payloads — see [§10](#10-2026-11-02-delta-api-changes-2pdf). It was verified
 > unauthenticated plus against the OpenAPI document (no test credentials).
+>
+> **2026-11-03 delta:** three public CMS/form routes plus a dashboard field and
+> the payment `pid` contract — see
+> [§11](#11-2026-11-03-delta-nov-3pdf).
 
 ---
 
@@ -235,8 +239,44 @@ exists and the spec matches the PDF”, not “the happy path was exercised”.
 ### Spec drift still present
 
 `/shop/order`, `/shop/wallet/transactions` and `/shop/order/refers` still
-document a bare `data: []` (refers adds a root `pagination`);
-`legal-information` has no `required` array. Everything else from the PDF
-(`cancel`, `refer`, `refers`, `repay`, `dashboard`, `notify`, order `items`,
-`type=all`/aliases, ticket-create `file`) is in the OpenAPI document. Tracked as
-item 23 in [`api-backend-gaps-open.md`](./api-backend-gaps-open.md#summary).
+document a bare `data: []` (refers adds a root `pagination`); `legal-information`
+still has no `required` array in the snapshot used for the 2026-11-02 sweep.
+Everything else from the PDF (`cancel`, `refer`, `refers`, `repay`, `dashboard`,
+`notify`, order `items`, `type=all`/aliases, ticket-create `file`) is in the
+OpenAPI document. The drift on the list envelopes / `legal-information` was
+re-checked in the 2026-11-03 round and is no longer tracked as a separate gap —
+see §11.
+
+---
+
+## 11. 2026-11-03 delta (`nov-3.pdf`)
+
+Like the previous round, this was verified against the PDF + OpenAPI document and
+unauthenticated live calls; authenticated write paths were not exercised.
+
+### New / changed endpoints
+
+| Endpoint | Auth | Status | Contract | Frontend |
+| --- | --- | --- | --- | --- |
+| `GET /shop/public/about` | public | 200 | `about_us` (HTML), `about_us_link?`, `seo_about` | `useAboutPage()`; appended below the designed about page |
+| `GET /shop/public/contact` | public | 200 | phones, mobile, email, address, socials, `contact_popup`, `contact_popup_status` | `useContactPage()`; contact page + floating widget |
+| `POST /shop/contact-us` | public | route exists | `{name?, title, contact, description}`; `contact` = email or 11-digit mobile; 422 field errors | `contact-us.vue` form |
+| `GET /shop/user/dashboard` | bearer | **401** | adds `last_visited_product[]` (product + `last_visited_at`) | `useDashboard().recentlyViewed` (≤3) |
+| `GET /shop/products/{slug}` | public | 200 | records the visit server-side (no client change) | — |
+| `POST /shop/payment/pay` | bearer | **401** | starts a payment for an invoice | gateway hand-off |
+| `GET\|POST /shop/payment/verify/{gate}` | public | route exists | gateway callback; the browser return is `/payment-result?pid=<order_id>` | `payment-result.vue` resolves `pid` via `GET /shop/order/{id}` |
+
+### Notes
+
+- `pid` in `/payment-result?pid=…` is the **plain order id**, not a hash — the
+  newest-invoice heuristic is now only a fallback for a missing/unknown `pid`.
+- The about page keeps its designed hero and sections; only the API article is
+  appended, so a missing `about_us` leaves the page unchanged.
+- `contact_popup` is a JSON-encoded array; malformed rows are dropped and the
+  widget requires `contact_popup_status === 'enable'`.
+- Products now gain visit history implicitly through the detail endpoint, so the
+  dashboard cards work without any extra client call.
+
+Open items after this round (gateway sessions, per-gateway fields,
+`wallet/charge` identifier, remaining static pages) are in
+[`api-backend-gaps-open.md`](./api-backend-gaps-open.md#summary).
