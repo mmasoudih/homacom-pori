@@ -33,16 +33,27 @@ const discount = computed(() =>
     </div>
 
     <div class="relative lg:flex lg:min-h-0 lg:flex-1 lg:items-center lg:justify-center">
-      <ProductImage
-        :src="product.image"
-        :alt="product.title"
-        container-class="mx-auto size-[120px] shrink-0 rounded-[16px]"
-      />
+      <NuxtLink
+        :to="product.id ? `/product/${product.id}` : '#'"
+        class="block"
+        :aria-label="product.title"
+      >
+        <ProductImage
+          :src="product.image"
+          :alt="product.title"
+          container-class="mx-auto size-[120px] shrink-0 rounded-[16px]"
+        />
+      </NuxtLink>
     </div>
 
-    <UiTypography as="h3" size="lg" weight="regular" class="mt-3 line-clamp-2 h-10 leading-[20px]">
-      {{ product.title }}
-    </UiTypography>
+    <NuxtLink
+      :to="product.id ? `/product/${product.id}` : '#'"
+      class="mt-3 block"
+    >
+      <UiTypography as="h3" size="lg" weight="regular" class="line-clamp-2 h-10 leading-[20px]">
+        {{ product.title }}
+      </UiTypography>
+    </NuxtLink>
 
     <ProductPrice
       class="mt-2 items-end"
