@@ -8,6 +8,7 @@ import {
   IconPackage,
 } from '@tabler/icons-vue'
 import type { Category } from '~/data/categories'
+import { categoryListRoute } from '~/utils/categories'
 import mobileIcon from '../../../public/icons/category-menu/mobile.svg?raw'
 import laptopIcon from '../../../public/icons/category-menu/laptop.svg?raw'
 import smartWatchIcon from '../../../public/icons/category-menu/watch.svg?raw'
@@ -66,14 +67,29 @@ function selectRoot(cat: Category) {
   expandedIds.value = new Set()
 }
 
-/** Drill from the root list into a brand / subcategory. */
+/**
+ * Open the product list filtered by `category` and all of its descendants
+ * (the node is a menu category, so its children are included in the filter).
+ */
+function goToCategory(category?: Category | null) {
+  if (!category) return
+  emit('update:open', false)
+  navigateTo(categoryListRoute(category))
+}
+
+/** Drill from the root list into a brand / subcategory that has children. */
 function openChild(cat: Category) {
   if (!cat.children?.length) {
-    close()
+    goToCategory(cat)
     return
   }
   activeChild.value = cat
   expandedIds.value = new Set()
+}
+
+/** The drilled level's own listing (header button / breadcrumb target). */
+function openCurrentCategory() {
+  goToCategory(activeChild.value ?? activeRoot.value)
 }
 
 function backToRoot() {
@@ -92,6 +108,19 @@ function isExpanded(cat: Category) {
   return expandedIds.value.has(cat.id)
 }
 
+// The API tree replaces the mock fallback once the header payload resolves.
+// Re-point the selection by id so a drill-down started against the fallback
+// cannot keep showing mock children next to the real rail.
+watch(categories, (list) => {
+  const root = list.find(cat => cat.id === activeRootId.value)
+  if (!root) {
+    reset()
+    return
+  }
+  if (activeChild.value && !root.children?.some(child => child.id === activeChild.value!.id))
+    activeChild.value = null
+})
+
 function close() {
   emit('update:open', false)
 }
@@ -103,8 +132,22 @@ function onKeydown(event: KeyboardEvent) {
 // Close when tapping anything outside the sheet (only the floating bottom nav
 // sits above it). Uses click (bubble) so the bottom-nav trigger — which stops
 // propagation — can still toggle the sheet without it instantly closing.
+//
+// Remember where the gesture started: drilling into a level unmounts the tapped
+// row (or its chevron), so by the time the click reaches the document the
+// target is no longer inside the sheet and `contains()` wrongly reports an
+// outside tap — which used to close the sheet right after opening a sub-level.
+// pointerdown always fires while the tapped row is still mounted.
+let pointerDownInsideSheet = false
+
+function onPointerDown(event: PointerEvent) {
+  const target = event.target as Node | null
+  pointerDownInsideSheet = !!(target && overlayEl.value?.contains(target))
+}
+
 function onOutsideClick(event: MouseEvent) {
   if (!props.open) return
+  if (pointerDownInsideSheet) return
   const target = event.target as Node | null
   if (!target) return
   if (overlayEl.value?.contains(target)) return
@@ -116,13 +159,16 @@ watch(
   (open) => {
     if (open) {
       reset()
+      pointerDownInsideSheet = false
       document.addEventListener('keydown', onKeydown)
+      document.addEventListener('pointerdown', onPointerDown, true)
       document.addEventListener('click', onOutsideClick)
       // Lock background scrolling while the full-screen sheet is open.
       document.documentElement.style.overflow = 'hidden'
     }
     else {
       document.removeEventListener('keydown', onKeydown)
+      document.removeEventListener('pointerdown', onPointerDown, true)
       document.removeEventListener('click', onOutsideClick)
       document.documentElement.style.overflow = ''
     }
@@ -131,6 +177,7 @@ watch(
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
+  document.removeEventListener('pointerdown', onPointerDown, true)
   document.removeEventListener('click', onOutsideClick)
   document.documentElement.style.overflow = ''
 })
@@ -201,7 +248,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 class="flex h-[52px] w-full items-center gap-2 text-start text-primary"
-                @click="close"
+                @click="openCurrentCategory"
               >
                 <span class="text-[15px] font-semibold">
                   همه محصولات {{ activeChild?.title ?? activeRoot.title }}
@@ -218,11 +265,18 @@ onBeforeUnmount(() => {
                 <li v-for="cat in rootItems" :key="cat.id">
                   <button
                     type="button"
-                    class="flex h-[54px] w-full items-center justify-between rounded-xl px-3 text-start text-[15px] font-medium text-T-900 transition-colors hover:bg-T-200"
+                    class="flex h-[54px] w-full items-center gap-1 rounded-xl px-3 text-start text-[15px] font-medium text-T-900 transition-colors hover:bg-T-200"
+                    :aria-label="cat.children?.length
+                      ? `باز کردن زیردسته‌های ${cat.title}`
+                      : `مشاهده محصولات ${cat.title}`"
                     @click="openChild(cat)"
                   >
-                    <span>{{ cat.title }}</span>
-                    <IconChevronLeft v-if="cat.children?.length" class="size-5 shrink-0 text-T-600" />
+                    <span class="min-w-0 flex-1 truncate">{{ cat.title }}</span>
+                    <IconChevronLeft
+                      v-if="cat.children?.length"
+                      class="size-5 shrink-0 text-T-600"
+                      aria-hidden="true"
+                    />
                   </button>
                 </li>
               </ul>
@@ -236,15 +290,19 @@ onBeforeUnmount(() => {
                 >
                   <button
                     type="button"
-                    class="flex h-[54px] w-full items-center justify-between rounded-xl px-3 text-start text-[15px] font-medium text-T-900"
-                    @click="cat.children?.length ? toggleGroup(cat) : close()"
+                    class="flex h-[54px] w-full items-center gap-1 px-3 text-start text-[15px] font-medium text-T-900"
+                    :aria-label="cat.children?.length
+                      ? (isExpanded(cat)
+                        ? `بستن زیردسته‌های ${cat.title}`
+                        : `باز کردن زیردسته‌های ${cat.title}`)
+                      : `مشاهده محصولات ${cat.title}`"
+                    @click="cat.children?.length ? toggleGroup(cat) : goToCategory(cat)"
                   >
-                    <span>{{ cat.title }}</span>
-                    <IconChevronUp v-if="isExpanded(cat)" class="size-5 shrink-0 text-T-900" />
-                    <IconChevronDown
-                      v-else-if="cat.children?.length"
-                      class="size-5 shrink-0 text-T-600"
-                    />
+                    <span class="min-w-0 flex-1 truncate">{{ cat.title }}</span>
+                    <template v-if="cat.children?.length">
+                      <IconChevronUp v-if="isExpanded(cat)" class="size-5 shrink-0 text-T-900" aria-hidden="true" />
+                      <IconChevronDown v-else class="size-5 shrink-0 text-T-600" aria-hidden="true" />
+                    </template>
                   </button>
 
                   <div v-if="isExpanded(cat)" class="grid grid-cols-3 gap-x-1 gap-y-4 px-1.5 pb-4 pt-1">
@@ -253,7 +311,7 @@ onBeforeUnmount(() => {
                       :key="leaf.id"
                       type="button"
                       class="flex flex-col items-center gap-2"
-                      @click="close"
+                      @click="goToCategory(leaf)"
                     >
                       <span class="flex size-14 items-center justify-center rounded-full bg-T-50 text-T-600">
                         <IconPackage class="size-6" />
@@ -274,7 +332,7 @@ onBeforeUnmount(() => {
                     :key="cat.id"
                     type="button"
                     class="flex flex-col items-center gap-2"
-                    @click="openChild(cat)"
+                    @click="goToCategory(cat)"
                   >
                     <span class="flex size-14 items-center justify-center rounded-full bg-T-50 text-T-600">
                       <IconPackage class="size-6" />

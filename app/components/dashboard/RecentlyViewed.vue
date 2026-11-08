@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { IconChevronLeft } from '@tabler/icons-vue'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { recentlyViewed } from '~/data/dashboard'
+
+// `GET /shop/user/dashboard` → `data.last_visited_product[]` (2026-11-03).
+// The section disappears for a user who has not viewed anything yet.
+const { recentlyViewed } = useDashboard()
 </script>
 
 <template>
-  <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
+  <section
+    v-if="recentlyViewed.length"
+    class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6"
+  >
     <!-- Section title -->
     <div class="flex items-center gap-[9px]">
       <span class="relative block h-4 w-[17px] rotate-180">
@@ -24,12 +30,12 @@ import { recentlyViewed } from '~/data/dashboard'
     >
       <CarouselContent class="ms-0">
         <CarouselItem
-          v-for="(product, i) in recentlyViewed"
-          :key="i"
+          v-for="(item, i) in recentlyViewed"
+          :key="item.product.apiId ?? item.product.id ?? i"
           class="w-[170px] shrink-0 basis-auto ps-0 lg:w-[249.67px]"
           :class="i > 0 ? 'border-s border-T-400' : ''"
         >
-          <DashboardRecentProductCard :product="product" />
+          <DashboardRecentProductCard :product="item.product" />
         </CarouselItem>
       </CarouselContent>
 

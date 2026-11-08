@@ -5,8 +5,17 @@ export interface BranchInfo {
   addressLabel: string
   address: string
   phone: string
+  /** Static map snapshot exported from the Figma `Branch-desktop` frame. */
+  map: string
+  /** Mobile crop of the same map, exported from the `Branch-mobile` frame. */
+  mapMobile: string
   images: string[]
 }
+
+/** Assets exported from the `Branch-desktop` and `Branch-mobile` frames in FigCraft. */
+const branchMap = '/icons/branch/map.png'
+const branchMapMobile = '/icons/branch/map-mobile.png'
+const branchGallery = '/icons/branch/gallery.png'
 
 export const branches: BranchInfo[] = [
   {
@@ -16,12 +25,9 @@ export const branches: BranchInfo[] = [
     addressLabel: 'آدرس شعبه اول:',
     address: 'تهران، خیابان وحدت اسلامی، نبش کوچه چیت‌سازی، پلاک ۳۶۵',
     phone: '۰۲۱-۳۲۵۰۷۸۹',
-    images: [
-      '/assets/branches/branch-1.jpg',
-      '/assets/branches/branch-2.jpg',
-      '/assets/branches/branch-1.jpg',
-      '/assets/branches/branch-2.jpg',
-    ],
+    map: branchMap,
+    mapMobile: branchMapMobile,
+    images: [branchGallery, branchGallery, branchGallery, branchGallery],
   },
   {
     id: 'branch-2',
@@ -30,19 +36,16 @@ export const branches: BranchInfo[] = [
     addressLabel: 'آدرس شعبه دوم:',
     address: 'تهران، خیابان ولیعصر، بالاتر از میدان ونک، کوچه یاس، پلاک ۲۴، واحد ۵',
     phone: '۰۲۱-۳۳۵۰۷۲۹۸',
-    images: [
-      '/assets/branches/branch-2.jpg',
-      '/assets/branches/branch-1.jpg',
-      '/assets/branches/branch-2.jpg',
-      '/assets/branches/branch-1.jpg',
-    ],
+    map: branchMap,
+    mapMobile: branchMapMobile,
+    images: [branchGallery, branchGallery, branchGallery, branchGallery],
   },
 ]
 
 export const branchPage = {
   title: 'راهنمای آنلاین',
   subtitle: 'فروشگاه‌های حضوری هماکام در سراسر تهران آماده پذیرایی از شما هستند',
-  tabs: ['راهنمای آنلاین', 'راهنمای خرید', 'امکانات فروشگاه', 'شعبات آنلاین', 'فروشگاه‌های حضوری هماکام'],
+  tabs: ['راهنمای گارانتی', 'راهنمای خرید', 'فروشگاه‌های حضوری هماکام', 'مرجوعی کالا', 'راهنمای ثبت نام'],
   sectionTitle: 'فروشگاه‌های حضوری هماکام',
   intro:
     'برای تجربه‌ای نزدیک‌تر و آشنایی با محصولات، به فروشگاه‌های حضوری هماکام مراجعه کنید. کارشناسان ما در محل، شما را در انتخاب بهترین محصول راهنمایی می‌کنند.',

@@ -2,12 +2,11 @@
 import { IconArrowRight } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 import { Checkbox } from '@/components/ui/checkbox'
-import { findOrder } from '~/data/orders'
 
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => String(route.params.id))
-const order = computed(() => findOrder(id.value))
+const { order } = useOrderDetail(id)
 
 const selected = ref<Record<string, boolean>>({})
 
@@ -74,7 +73,14 @@ useHead({
       </label>
     </div>
 
-    <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+    <div
+      v-else
+      class="rounded-[16px] border border-T-400 bg-T-50 p-8 text-center text-[13px] font-semibold text-T-800"
+    >
+      سفارش مورد نظر یافت نشد.
+    </div>
+
+    <div v-if="order" class="mt-6 flex flex-wrap items-center justify-between gap-3">
       <button
         type="button"
         class="h-11 min-w-[160px] rounded-xl border border-T-400 bg-T-50 px-6 text-[13px] font-semibold text-T-800 transition-colors hover:border-T-500"

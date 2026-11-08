@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toPersianDigits } from '~/utils/format'
+import { categoryListRoute } from '~/utils/categories'
 import mobileIcon from '../../../public/icons/mobile.svg?raw'
 import laptopIcon from '../../../public/icons/laptop.svg?raw'
 import smartWatchIcon from '../../../public/icons/smart-watch.svg?raw'
@@ -30,6 +31,8 @@ const categories = computed(() =>
     count: String(category.children?.length ?? ''),
     icon: iconForTitle(category.title),
     accent: index === 2,
+    // Same target as the mega menu: the category's filtered product list.
+    to: categoryListRoute(category),
   })),
 )
 
@@ -51,10 +54,10 @@ const iconMap: Record<string, string> = {
 
     <!-- Mobile: circular icon grid -->
     <div class="mt-[18px] grid grid-cols-4 gap-y-[13px] lg:hidden">
-      <a
+      <NuxtLink
         v-for="cat in categories"
         :key="cat.title"
-        :href="`/search?q=${encodeURIComponent(cat.title)}`"
+        :to="cat.to"
         class="group flex flex-col items-center gap-[6px]"
       >
         <span
@@ -71,7 +74,7 @@ const iconMap: Record<string, string> = {
         <span class="text-center text-[13px] font-medium leading-[18px] text-foreground">
           {{ cat.title }}
         </span>
-      </a>
+      </NuxtLink>
     </div>
 
     <!-- Desktop: card grid -->
@@ -83,8 +86,8 @@ const iconMap: Record<string, string> = {
         dir="ltr"
       >
         <!-- Content card -->
-        <a
-          :href="`/search?q=${encodeURIComponent(cat.title)}`"
+        <NuxtLink
+          :to="cat.to"
           class="col-span-2 col-start-2 row-start-1 my-[5px] flex items-center justify-start rounded-[20px] border-2 border-T-400 bg-T-50 pl-[45px] pr-10 transition-colors group-hover:border-R-50"
           dir="rtl"
         >
@@ -102,7 +105,7 @@ const iconMap: Record<string, string> = {
               <span class="text-[14px] font-bold text-foreground">{{ toPersianDigits(cat.count) }}</span>
             </p>
           </div>
-        </a>
+        </NuxtLink>
 
         <!-- Circle -->
         <div

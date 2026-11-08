@@ -21,6 +21,7 @@ const props = defineProps<{
 
 defineEmits<{
   select: []
+  open: []
 }>()
 
 const iconMap: Record<string, typeof IconDeviceMobile> = {
@@ -49,7 +50,7 @@ const withChevron = computed(() => props.variant === 'root' || props.variant ===
     ]"
     data-mega-item
     :data-mega-column="variant"
-    @click="$emit('select')"
+    @click="$emit('open')"
     @mouseenter="$emit('select')"
   >
     <Icon

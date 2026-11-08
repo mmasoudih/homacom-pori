@@ -1,6 +1,8 @@
 <script setup lang="ts">
 defineProps<{
   query: string
+  /** True when `query` is a category name rather than a text search. */
+  categoryListing?: boolean
 }>()
 </script>
 
@@ -11,7 +13,12 @@ defineProps<{
       نتیجه‌ای یافت نشد!
     </UiTypography>
     <UiTypography as="p" size="lg" weight="medium" color="subtle">
-      متأسفانه محصولی با عنوان <span class="text-T-900">«{{ query }}»</span> پیدا نشد.
+      <template v-if="categoryListing">
+        متأسفانه در دسته <span class="text-T-900">«{{ query }}»</span> هنوز محصولی ثبت نشده است.
+      </template>
+      <template v-else>
+        متأسفانه محصولی با عنوان <span class="text-T-900">«{{ query }}»</span> پیدا نشد.
+      </template>
     </UiTypography>
   </div>
 </template>

@@ -16,6 +16,9 @@ useHead({
         <div class="flex min-w-0 flex-1 flex-col gap-6">
           <DashboardOrderStats />
 
+          <!-- Recently viewed (`last_visited_product`, 2026-11-03) -->
+          <DashboardRecentlyViewed />
+
           <!-- Mobile profile + account menu -->
           <DashboardProfileCard class="rounded-[20px] bg-T-50 p-4 lg:hidden" />
           <DashboardNavMenu class="-mt-3 rounded-[20px] bg-T-50 p-4 lg:hidden" />

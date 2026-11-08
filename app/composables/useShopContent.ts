@@ -48,23 +48,19 @@ function mapBlogCategory(item: ApiBlogCategory): BlogNavItem {
 /**
  * Shop departments for the header mega menu.
  *
- * The designed mock tree is used until the API responds (and again if it
- * returns an empty list), so navigation is never blank on a cold/offline API.
+ * The tree ships inside the `site-header` payload (`HeaderResource.categories`,
+ * a recursive `CategoryResource[]`), so the header and the mega menu share one
+ * request instead of two. The designed mock tree is used until the API
+ * responds (and again if it returns an empty list), so navigation is never
+ * blank on a cold/offline API.
  */
 export function useProductCategories() {
-  const api = useApi()
+  const { siteHeader, pending, error, refresh } = useSiteHeader()
 
-  const { data: categories, pending, error, refresh } = useAsyncData<Category[]>(
-    'shop-product-categories',
-    async () => {
-      const res = await api.get<ApiCategory[]>('/shop/public/product-category', { skipAuth: true })
-      const items = Array.isArray(res.data) ? res.data : []
-      return items.length ? items.map(mapCategory) : megaCategories
-    },
-    {
-      default: () => megaCategories,
-    },
-  )
+  const categories = computed<Category[]>(() => {
+    const items = siteHeader.value.categories ?? []
+    return items.length ? items.map(mapCategory) : megaCategories
+  })
 
   return { categories, pending, error, refresh }
 }
@@ -321,6 +317,8 @@ interface ApiMenu {
 
 interface ApiSiteHeader {
   menus?: ApiMenu[]
+  /** Root product categories with nested `children` (mega-menu tree, 3 levels). */
+  categories?: ApiCategory[]
   logo?: string | null
   logo_dark?: string | null
   tel?: string | null
@@ -383,7 +381,7 @@ export function useShopColors() {
 export function useSiteHeader() {
   const api = useApi()
 
-  const { data: siteHeader } = useAsyncData<ApiSiteHeader>(
+  const { data: siteHeader, pending, error, refresh } = useAsyncData<ApiSiteHeader>(
     'shop-site-header',
     async () => {
       const res = await api.get<ApiSiteHeader>('/shop/public/site-header', { skipAuth: true })
@@ -392,7 +390,7 @@ export function useSiteHeader() {
     { default: () => ({}) },
   )
 
-  return { siteHeader }
+  return { siteHeader, pending, error, refresh }
 }
 
 /** Full footer payload: menus, logo, contact, social and copyright. */
@@ -409,4 +407,189 @@ export function useSiteFooter() {
   )
 
   return { siteFooter }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public about + contact pages (2026-11-03)                                   */
+/* -------------------------------------------------------------------------- */
+
+interface ApiAbout {
+  about_us?: string | null
+  about_us_link?: string | null
+  seo_about?: string | null
+}
+
+export interface AboutContent {
+  /** Rich HTML for the About Us article — render with `v-html`, never escape twice. */
+  aboutUs: string
+  aboutUsLink: string
+  seoAbout: string
+}
+
+const EMPTY_ABOUT: AboutContent = { aboutUs: '', aboutUsLink: '', seoAbout: '' }
+
+/**
+ * About Us copy (`GET /shop/public/about`).
+ *
+ * Unset option keys come back as `null`, so every field is normalised to a
+ * string and the page keeps its designed content until real copy exists.
+ */
+export function useAboutPage() {
+  const api = useApi()
+
+  const { data: about, pending, error, refresh } = useAsyncData<AboutContent>(
+    'shop-public-about',
+    async () => {
+      try {
+        const res = await api.get<ApiAbout>('/shop/public/about', { skipAuth: true })
+        const row = res.data ?? {}
+        return {
+          aboutUs: row.about_us ?? '',
+          aboutUsLink: row.about_us_link ?? '',
+          seoAbout: row.seo_about ?? '',
+        }
+      }
+      catch {
+        return EMPTY_ABOUT
+      }
+    },
+    { default: () => EMPTY_ABOUT },
+  )
+
+  return { about, pending, error, refresh }
+}
+
+/** One entry of the floating support widget (`contact_popup` array). */
+export interface ContactPopupEntry {
+  title: string
+  /** Absolute URL, storage path or icon-font class. */
+  icon: string
+  link: string
+  /** CMS-provided inline style (string or object). */
+  style?: string | Record<string, string>
+  /** CMS-provided extra classes. */
+  class?: string
+}
+
+export interface ContactSocials {
+  twitter: string
+  telegram: string
+  linkedin: string
+  instagram: string
+  /** The backend key keeps the `watsapp` spelling. */
+  whatsapp: string
+}
+
+export interface ContactContent {
+  tel: string
+  mobile: string
+  email: string
+  address: string
+  socials: ContactSocials
+  popup: ContactPopupEntry[]
+  popupEnabled: boolean
+}
+
+interface ApiContact {
+  tel?: string | null
+  mobile?: string | null
+  email?: string | null
+  address?: string | null
+  twitter?: string | null
+  telegram?: string | null
+  linkedin?: string | null
+  instagram?: string | null
+  watsapp?: string | null
+  contact_popup?: unknown
+  contact_popup_status?: string | null
+}
+
+const EMPTY_CONTACT: ContactContent = {
+  tel: '',
+  mobile: '',
+  email: '',
+  address: '',
+  socials: { twitter: '', telegram: '', linkedin: '', instagram: '', whatsapp: '' },
+  popup: [],
+  popupEnabled: false,
+}
+
+/**
+ * `contact_popup` is a decoded JSON array, but a malformed or double-encoded
+ * row must degrade to `[]` instead of breaking the page.
+ */
+function parseContactPopup(value: unknown): ContactPopupEntry[] {
+  let rows: unknown = value
+  if (typeof rows === 'string') {
+    try {
+      rows = JSON.parse(rows)
+    }
+    catch {
+      rows = []
+    }
+  }
+  if (!Array.isArray(rows)) return []
+
+  return rows.flatMap((row) => {
+    if (!row || typeof row !== 'object') return []
+
+    const entry = row as Record<string, unknown>
+    const title = typeof entry.title === 'string' ? entry.title : ''
+    const link = typeof entry.link === 'string' ? entry.link : ''
+    const icon = typeof entry.icon === 'string' ? entry.icon : ''
+    if (!title && !link) return []
+
+    const style = typeof entry.style === 'string' || (entry.style && typeof entry.style === 'object')
+      ? entry.style as string | Record<string, string>
+      : undefined
+
+    return [{
+      title,
+      link,
+      icon,
+      style,
+      class: typeof entry.class === 'string' ? entry.class : undefined,
+    }]
+  })
+}
+
+/**
+ * Contact Us payload (`GET /shop/public/contact`).
+ *
+ * All 11 keys are always present; missing settings are `null`. The designed
+ * copy is kept for labels, and `contact_popup_status` gates the widget.
+ */
+export function useContactPage() {
+  const api = useApi()
+
+  const { data: contact, pending, error, refresh } = useAsyncData<ContactContent>(
+    'shop-public-contact',
+    async () => {
+      try {
+        const res = await api.get<ApiContact>('/shop/public/contact', { skipAuth: true })
+        const row = res.data ?? {}
+        return {
+          tel: row.tel ?? '',
+          mobile: row.mobile ?? '',
+          email: row.email ?? '',
+          address: row.address ?? '',
+          socials: {
+            twitter: row.twitter ?? '',
+            telegram: row.telegram ?? '',
+            linkedin: row.linkedin ?? '',
+            instagram: row.instagram ?? '',
+            whatsapp: row.watsapp ?? '',
+          },
+          popup: parseContactPopup(row.contact_popup),
+          popupEnabled: row.contact_popup_status === 'enable',
+        }
+      }
+      catch {
+        return EMPTY_CONTACT
+      }
+    },
+    { default: () => EMPTY_CONTACT },
+  )
+
+  return { contact, pending, error, refresh }
 }

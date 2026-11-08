@@ -18,6 +18,7 @@ const {
   saveCompany: updateCompany,
   saveBank: updateBank,
   uploadAvatar,
+  removeAvatar,
   requestPasswordCode,
   savePassword: updatePassword,
 } = useUserProfile()
@@ -85,7 +86,13 @@ async function onImageChange(event: Event) {
 }
 
 function removeImage() {
-  toast.info('حذف تصویر پروفایل از این صفحه هنوز توسط سرور پشتیبانی نمی‌شود.')
+  removeAvatar()
+    .then((res) => {
+      toast.success(res.message || 'تصویر پروفایل حذف شد.')
+    })
+    .catch((err) => {
+      toast.error(apiErrorMessage(err, 'حذف تصویر پروفایل انجام نشد.'))
+    })
 }
 
 function onEdit(field: EditField) {

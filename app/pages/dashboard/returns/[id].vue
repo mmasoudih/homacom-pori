@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { IconFileInvoice } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
-import type { ReturnRequest } from '~/data/orders'
-import { findReturn, returnItemStatusMeta, returnStatusMeta } from '~/data/orders'
+import { returnItemStatusMeta, returnStatusMeta } from '~/data/orders'
+import { apiErrorMessage } from '~/composables/useApi'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id))
-const request = computed<ReturnRequest | undefined>(() => findReturn(id.value))
+const { refer: request, load } = useReferDetail(id)
+
+await load().catch((err) => {
+  toast.error(apiErrorMessage(err, 'دریافت درخواست مرجوعی انجام نشد.'))
+})
 
 const meta = computed(() => (request.value ? returnStatusMeta[request.value.status] : null))
 
@@ -56,7 +60,7 @@ useHead({
             <span>آدرس:</span>
             <b class="font-semibold text-T-800">انبار مرکزی هماکام - واحد مرجوعی، تهران، بلوار فردوس شرق، پلاک ۱۲۸</b>
           </div>
-          <div class="mt-2 flex flex-wrap items-center gap-x-2 text-[11.5px] text-T-600">
+          <div v-if="request.postalCode" class="mt-2 flex flex-wrap items-center gap-x-2 text-[11.5px] text-T-600">
             <span>کد پستی:</span>
             <DashboardOrdersCopyValue :value="toPersianDigits(request.postalCode)" :copy-value="request.postalCode" />
           </div>
@@ -176,7 +180,7 @@ useHead({
           <span>آدرس:</span>
           <b class="font-semibold text-T-800">انبار مرکزی هماکام - واحد مرجوعی، تهران، بلوار فردوس شرق، پلاک ۱۲۸</b>
         </div>
-        <div class="mt-2 flex flex-wrap items-center gap-x-2 text-[11.5px] text-T-600">
+        <div v-if="request.postalCode" class="mt-2 flex flex-wrap items-center gap-x-2 text-[11.5px] text-T-600">
           <span>کد پستی:</span>
           <DashboardOrdersCopyValue :value="toPersianDigits(request.postalCode)" :copy-value="request.postalCode" />
         </div>

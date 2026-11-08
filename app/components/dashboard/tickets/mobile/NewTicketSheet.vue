@@ -27,7 +27,7 @@ const emit = defineEmits<{
 const subject = ref('')
 const topic = ref('')
 const description = ref('')
-const attachment = ref('')
+const file = ref<File | null>(null)
 const priority = ref<TicketPriority>('medium')
 
 watch(
@@ -37,15 +37,14 @@ watch(
       subject.value = ''
       topic.value = ''
       description.value = ''
-      attachment.value = ''
+      file.value = null
       priority.value = 'medium'
     }
   },
 )
 
 function onFileChange(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  attachment.value = file ? file.name : ''
+  file.value = (event.target as HTMLInputElement).files?.[0] ?? null
 }
 
 function close() {
@@ -61,7 +60,7 @@ function submit() {
     subject: subject.value.trim(),
     topic: topic.value,
     description: description.value.trim(),
-    attachment: attachment.value,
+    file: file.value,
     priority: priority.value,
   })
   close()
@@ -133,7 +132,7 @@ const sheetShell
         <div class="flex flex-col gap-2">
           <UiTypography as="span" size="lg" weight="regular" color="default">پیوست فایل (اختیاری)</UiTypography>
           <div class="flex h-11 items-center justify-between gap-3 rounded-xl border border-T-400 ps-3 text-[12.5px]">
-            <span class="min-w-0 flex-1 truncate text-T-600">{{ attachment || 'فایلی انتخاب نشد' }}</span>
+            <span class="min-w-0 flex-1 truncate text-T-600">{{ file?.name || 'فایلی انتخاب نشد' }}</span>
             <input id="ticket-attachment" type="file" class="hidden" @change="onFileChange">
             <label
               for="ticket-attachment"

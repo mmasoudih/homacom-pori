@@ -1,4 +1,6 @@
+import type { ApiList } from '~/composables/useApi'
 import type { Ticket, TicketMessage, TicketStatus } from '~/data/tickets'
+import { listPayload } from '~/composables/useApi'
 
 export interface TicketDepartment {
   id: number
@@ -46,6 +48,8 @@ export interface CreateTicketPayload {
   departmentId: number
   priority: 'low' | 'medium' | 'top'
   content: string
+  /** Optional attachment (`file`, multipart). */
+  file?: File | null
 }
 
 function formatDate(value?: string | null): string {
@@ -132,10 +136,10 @@ export function useTickets() {
   async function load() {
     pending.value = true
     try {
-      const res = await api.get<ApiTicket[]>('/shop/user/ticket', {
+      const res = await api.get<ApiTicket[] | ApiList<ApiTicket>>('/shop/user/ticket', {
         query: { 'filters[per_page]': 100 },
       })
-      tickets.value = (res.data ?? []).map(mapTicket)
+      tickets.value = listPayload<ApiTicket>(res.data).items.map(mapTicket)
     }
     finally {
       loaded.value = true
@@ -144,12 +148,24 @@ export function useTickets() {
   }
 
   async function create(payload: CreateTicketPayload) {
-    const res = await api.post<ApiTicket>('/shop/user/ticket', {
+    let body: Record<string, string | number> | FormData = {
       subject: payload.subject,
       department_id: payload.departmentId,
       priority: payload.priority,
       content: payload.content,
-    })
+    }
+
+    if (payload.file) {
+      const form = new FormData()
+      form.append('subject', payload.subject)
+      form.append('department_id', String(payload.departmentId))
+      form.append('priority', payload.priority)
+      form.append('content', payload.content)
+      form.append('file', payload.file)
+      body = form
+    }
+
+    const res = await api.post<ApiTicket>('/shop/user/ticket', body)
     if (res.data) tickets.value = [mapTicket(res.data), ...tickets.value]
     return res
   }

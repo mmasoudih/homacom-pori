@@ -15,6 +15,26 @@ export interface ApiPagination {
   has_more_pages: boolean
 }
 
+/** Paginated list payload (`data.items` + `data.pagination`). */
+export interface ApiList<T> {
+  items?: T[]
+  pagination?: ApiPagination
+}
+
+/**
+ * Read a list payload in either serialization.
+ *
+ * The 2026-11-02 contract standardises `data.items` + `data.pagination`, but
+ * some endpoints still return the bare array documented in the OpenAPI spec.
+ * Consumers use this helper so a backend rollout cannot break a list screen.
+ */
+export function listPayload<T>(
+  data: T[] | ApiList<T> | null | undefined,
+): { items: T[], pagination?: ApiPagination } {
+  if (Array.isArray(data)) return { items: data }
+  return { items: data?.items ?? [], pagination: data?.pagination }
+}
+
 /** Laravel validation / error payload shape. */
 export interface ApiErrorPayload {
   message?: string
@@ -121,6 +141,13 @@ export function useApi() {
     }
   }
 
+  /**
+   * Exchange the session token for a fresh one.
+   *
+   * `POST /auth/refresh` rotates the token — the old value is revoked as soon
+   * as the new one is issued — so the cookie is overwritten in place and
+   * concurrent 401s share the same in-flight refresh attempt.
+   */
   async function refreshToken(): Promise<boolean> {
     if (!refreshInFlight) {
       refreshInFlight = (async () => {

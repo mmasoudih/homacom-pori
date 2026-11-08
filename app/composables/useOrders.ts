@@ -1,18 +1,60 @@
-import type { Order, OrderItem, OrderStatus, OrderTransaction } from '~/data/orders'
+import type {
+  Order,
+  OrderItem,
+  OrderPaymentStatus,
+  OrderStatus,
+  OrderTransaction,
+  ReturnItem,
+  ReturnItemStatus,
+  ReturnRequest,
+  ReturnStatus,
+} from '~/data/orders'
+import type { ApiList, ApiPagination } from '~/composables/useApi'
+import type { CheckoutResponse } from '~/composables/useCart'
+import { listPayload } from '~/composables/useApi'
 import { toPersianDigits } from '~/utils/format'
 import { resolveMediaUrl } from '~/utils/media'
+import { detectDevice } from '~/utils/payment'
 
+/** `UserOrderItemResource` (2026-11-02) + the older flat projection. */
 interface ApiOrderItem {
   id: number
+  /** 2026-11-02 shape. */
+  product_title?: string | null
+  store_title?: string | null
+  count?: number | null
+  customer_price?: number | string | null
+  real_price?: number | string | null
+  product_discount_price?: number | string | null
+  row_discount_price?: number | string | null
+  other_discount_price?: number | string | null
+  fee?: number | string | null
+  shipping_price?: number | string | null
+  payable_price?: number | string | null
+  status?: string | null
+  stock?: {
+    id?: number | null
+    img?: string | null
+    color?: { title?: string | null, code?: string | null } | null
+    warranty?: { title?: string | null } | null
+    size?: { title?: string | null } | null
+  } | null
+  product?: {
+    id?: number | null
+    title?: string | null
+    slug?: string | null
+    img?: string | null
+  } | null
+  /** Legacy flat projection. */
   product_id?: number | null
   product_slug?: string | null
-  title: string
+  title?: string | null
   image?: string | null
   img?: string | null
   color?: { title?: string | null, code?: string | null } | string | null
   warranty?: { title?: string | null } | string | null
-  quantity: number
-  price: number | string
+  quantity?: number | null
+  price?: number | string | null
 }
 
 interface ApiAddress {
@@ -100,6 +142,55 @@ interface ApiOrder {
   payment?: ApiPayment | null
   paid_amount?: number | string | null
   transactions?: ApiOrderTransaction[]
+  /** Invoice payment state (`waiting_payment` | `slice_payment` | `done`). */
+  payment_status?: string | null
+  /** Always `manual` after a gateway settlement — display `gate` instead. */
+  payment_method?: string | null
+  /** Gateway that actually handled the payment (`mellat`, `saman`, …). */
+  gate?: string | null
+  payable_price?: number | string | null
+  paid_price?: number | string | null
+  shipping_title?: string | null
+  invoice_date?: string | null
+}
+
+/**
+ * `ShopReferItemResource` (2026-11-02).
+ *
+ * The refer row only carries ids and the customer's note; the product title,
+ * image and quantity come from the invoice (`sub_invoice_id` = order item id).
+ */
+interface ApiReferItem {
+  id: number
+  refer_id?: number | null
+  invoice_id?: number | null
+  sub_invoice_id?: number | null
+  stock_id?: number | null
+  product_id?: number | null
+  price?: number | string | null
+  step?: string | null
+  customer_cause_description?: string | null
+  /** Not documented, but present on some serializations. */
+  count?: number | null
+}
+
+/** `ShopReferResource` (2026-11-02). */
+interface ApiRefer {
+  id: number
+  invoice_id?: number | null
+  user_id?: number | null
+  step?: string | null
+  description?: string | null
+  items?: ApiReferItem[]
+  created_at?: string | null
+}
+
+/** One line of the `POST /order/{invoice}/refer` payload. */
+export interface ReferPayloadItem {
+  /** `shop_invoice_items.id` — the order item's `id`. */
+  item_id: number
+  count: number
+  description?: string
 }
 
 const FALLBACK_IMAGE = '/figma/fill-e393cbb3afd42faa.png'
@@ -127,6 +218,13 @@ function mapStatus(status: string): OrderStatus {
   return 'processing'
 }
 
+/** Invoice payment state (`payment_status`); `null` when the API omits it. */
+function mapPaymentStatus(value: unknown): OrderPaymentStatus | undefined {
+  return value === 'waiting_payment' || value === 'slice_payment' || value === 'done'
+    ? value
+    : undefined
+}
+
 function formatDate(value?: string | null): string {
   if (!value) return ''
   const date = new Date(value)
@@ -135,18 +233,21 @@ function formatDate(value?: string | null): string {
 }
 
 function mapItem(item: ApiOrderItem, apiBase: string): OrderItem {
-  const color = item.color
+  const stock = item.stock
+  const product = item.product
+  const color = stock?.color ?? item.color
+  const productId = product?.id ?? item.product_id
 
   return {
     id: String(item.id),
-    title: item.title,
-    image: resolveMediaUrl(item.image ?? item.img, apiBase) || FALLBACK_IMAGE,
+    title: item.product_title ?? item.title ?? product?.title ?? '',
+    image: resolveMediaUrl(item.image ?? item.img ?? product?.img ?? stock?.img, apiBase) || FALLBACK_IMAGE,
     color: titleOf(color),
     colorHex: color && typeof color === 'object' ? color.code ?? '#d4d4d8' : '#d4d4d8',
-    warranty: titleOf(item.warranty),
-    productCode: item.product_slug || (item.product_id ? String(item.product_id) : ''),
-    quantity: num(item.quantity),
-    price: num(item.price),
+    warranty: titleOf(stock?.warranty ?? item.warranty),
+    productCode: product?.slug ?? item.product_slug ?? (productId != null ? String(productId) : ''),
+    quantity: num(item.count ?? item.quantity),
+    price: num(item.customer_price ?? item.price ?? item.payable_price),
   }
 }
 
@@ -212,9 +313,16 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
     id: String(order.id),
     code: String(order.invoice ?? order.code ?? order.id),
     status,
+    rawStatus: order.status,
+    rawType: order.type,
     amount,
     date: formatDate(order.created_at),
     deliveredAt: formatDate(order.delivery_date),
+    paymentStatus: mapPaymentStatus(order.payment_status),
+    gate: text(order.gate) || undefined,
+    paymentMethod: text(order.payment_method) || undefined,
+    payablePrice: num(order.payable_price) || amount,
+    paidPrice: num(order.paid_price ?? order.paid_amount ?? paid),
     items: (order.items ?? []).map(item => mapItem(item, apiBase)),
     transactions: mapTransactions(order.transactions),
     receiver: {
@@ -244,6 +352,7 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
         ?? shipping?.title
         ?? shipping?.name
         ?? shipping?.carrier
+        ?? order.shipping_title
         ?? order.shipping_method,
       ),
       discount: num(shipping?.discount ?? order.shipping_discount),
@@ -256,12 +365,132 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
   }
 }
 
+/** Refer step → the return card's coarse status. */
+function mapReferStatus(step: string): ReturnStatus {
+  if (step === 'refer_reject') return 'rejected'
+  if (step === 'refer_accept') return 'approved'
+  if (step === 'refer_done') return 'completed'
+  return 'review'
+}
+
+/** Per-item refer step → the item chip status. */
+function mapReferItemStatus(step: string): ReturnItemStatus {
+  if (step === 'refer_reject') return 'rejected'
+  if (step === 'refer_accept' || step === 'refer_done') return 'approved'
+  return 'review'
+}
+
+function mapReferItem(item: ApiReferItem, orderItems: ApiOrderItem[], apiBase: string): ReturnItem {
+  const match = orderItems.find(row => String(row.id) === String(item.sub_invoice_id))
+  const color = match?.stock?.color ?? match?.color
+
+  return {
+    id: String(item.id),
+    title: match?.product_title ?? match?.title ?? match?.product?.title ?? '',
+    image: resolveMediaUrl(
+      match?.img ?? match?.product?.img ?? match?.stock?.img,
+      apiBase,
+    ) || FALLBACK_IMAGE,
+    color: titleOf(color),
+    colorHex: color && typeof color === 'object' ? color.code ?? '#d4d4d8' : '#d4d4d8',
+    warranty: titleOf(match?.stock?.warranty ?? match?.warranty),
+    quantity: num(item.count ?? match?.count ?? match?.quantity) || 1,
+    amount: num(item.price),
+    status: mapReferItemStatus(text(item.step)),
+    reason: item.customer_cause_description ?? '',
+  }
+}
+
+/**
+ * `ShopReferResource` → the dashboard's `ReturnRequest`.
+ *
+ * `orderItems` are the invoice's `UserOrderItemResource` rows, passed so the
+ * return card can show the product (the refer row only carries `sub_invoice_id`).
+ */
+function mapRefer(refer: ApiRefer, orderItems: ApiOrderItem[], apiBase: string): ReturnRequest {
+  const items = (refer.items ?? []).map(item => mapReferItem(item, orderItems, apiBase))
+  const step = text(refer.step)
+
+  return {
+    id: String(refer.id),
+    orderCode: String(refer.invoice_id ?? ''),
+    trackingCode: String(refer.id),
+    status: mapReferStatus(step),
+    step,
+    date: formatDate(refer.created_at),
+    amount: items.reduce((sum, item) => sum + item.amount, 0),
+    items,
+    postalCode: '',
+    invoiceId: refer.invoice_id ?? undefined,
+    description: refer.description ?? undefined,
+  }
+}
+
+/** `GET /shop/order` filters (2026-11-02 contract). */
+export type OrderType = 'all' | 'sales' | 'refer' | 'purchase'
+
+export interface OrdersQuery {
+  /**
+   * Order status filter. `all` (or omitting it) disables the filter; the tab
+   * aliases `current`, `delivered` and `cancelled` are accepted since
+   * 2026-11-02, alongside every concrete status.
+   */
+  status?: string
+  /** Order type filter; `all` (or omitting it) returns every type. */
+  type?: OrderType
+  /** Invoice payment state — the "paid / unpaid / instalment" axis. */
+  paymentStatus?: OrderPaymentStatus | 'all'
+  /** 1-based page. */
+  page?: number
+  /** 1…100 (the backend rejects anything outside that range). */
+  perPage?: number
+  /**
+   * Keep requesting pages until one returns fewer rows than `per_page`
+   * (the endpoint has no `meta`/`links`, so this is the only end signal).
+   * Defaults to `true` for the dashboard list, which paginates client-side.
+   */
+  allPages?: boolean
+}
+
+/** Hard stop for the page loop (10 × 100 rows). */
+const MAX_PAGES = 10
+
+const ORDER_STATUSES = new Set([
+  'all',
+  // Tab aliases (2026-11-02).
+  'current',
+  'delivered',
+  'cancelled',
+  'completing',
+  'waiting',
+  'waiting_payment',
+  'paid',
+  'cancel_customer',
+  'cancel_store',
+  'cancel_operator',
+  'processing',
+  'preparing',
+  'stock',
+  'packaging',
+  'ready_for_send',
+  'send_to_center',
+  'sending',
+  'delivery',
+  'returned',
+  'refer_request',
+  'refer_accept',
+  'refer_reject',
+  'refer_done',
+])
+
 /**
  * Orders list for the dashboard.
  *
- * One request (`status=all&type=sales`) returns every order of the authenticated
- * user, newest first. The tabs are grouped client-side; the backend no longer
- * needs one request per status (2026-10-25).
+ * Filters follow the 2026-10-29 contract: `status`, `type`, `payment_status`,
+ * `per_page` (1…100) and `page`. The endpoint is always newest-first and has no
+ * pagination metadata, so the list is assembled by requesting pages until one
+ * comes back short. Every value is validated client-side first, because the
+ * backend answers a bad filter with a 422 instead of ignoring it.
  */
 export function useOrders() {
   const api = useApi()
@@ -271,16 +500,45 @@ export function useOrders() {
   const pending = ref(false)
   const loaded = ref(false)
 
-  async function load() {
+  async function load(query: OrdersQuery = {}) {
+    const perPage = Math.min(100, Math.max(1, Math.trunc(query.perPage ?? 100)))
+    const startPage = Math.max(1, Math.trunc(query.page ?? 1))
+    const allPages = query.allPages ?? true
+
+    const params: Record<string, string | number> = {
+      per_page: perPage,
+      page: startPage,
+    }
+    if (query.status && query.status !== 'all' && ORDER_STATUSES.has(query.status))
+      params.status = query.status
+    if (query.type && query.type !== 'all') params.type = query.type
+    if (query.paymentStatus && query.paymentStatus !== 'all')
+      params.payment_status = query.paymentStatus
+
     pending.value = true
     try {
-      const res = await api.get<ApiOrder[]>('/shop/order', {
-        query: { status: 'all', type: 'sales' },
-      })
+      const rows: ApiOrder[] = []
+      let page = startPage
+      let fetched = 0
 
-      orders.value = (res.data ?? [])
-        .map(order => mapOrder(order, apiBase))
-        .sort((a, b) => Number(b.id) - Number(a.id))
+      while (true) {
+        const res = await api.get<ApiOrder[] | ApiList<ApiOrder>>('/shop/order', {
+          query: { ...params, page },
+        })
+        const { items: chunk, pagination } = listPayload<ApiOrder>(res.data)
+        rows.push(...chunk)
+        fetched += 1
+
+        // `data.pagination` is authoritative when present; otherwise a short
+        // page (or an empty array) means this was the last one.
+        const hasNext = pagination
+          ? pagination.has_more_pages && chunk.length > 0
+          : chunk.length >= perPage
+        if (!allPages || !hasNext || fetched >= MAX_PAGES) break
+        page += 1
+      }
+
+      orders.value = rows.map(order => mapOrder(order, apiBase))
       loaded.value = true
     }
     finally {
@@ -291,18 +549,216 @@ export function useOrders() {
   return { orders, pending, loaded, load }
 }
 
-/** One order by its invoice/id — the full `UserOrderResponse`, no mock fallback. */
-export function useOrderDetail(invoice: Ref<string>) {
+/**
+ * Invoice actions (2026-11-02): cancel, request a return and re-pay.
+ *
+ * Errors are thrown as {@link ApiError} — callers show `apiErrorMessage(err)`,
+ * never a hard-coded Persian sentence (the backend translates the reason).
+ */
+export function useOrderActions() {
+  const api = useApi()
+
+  /** `POST /shop/order/{invoice}/cancel` — 404 means missing *or* not yours. */
+  async function cancel(invoice: string, description?: string) {
+    const body = description?.trim() ? { description: description.trim() } : {}
+    const res = await api.post<ApiOrder>(
+      `/shop/order/${encodeURIComponent(invoice)}/cancel`,
+      body,
+    )
+    return res
+  }
+
+  /** `POST /shop/order/{invoice}/refer` — 201 with the new refer row. */
+  async function refer(invoice: string, items: ReferPayloadItem[]) {
+    const res = await api.post<ApiRefer>(
+      `/shop/order/${encodeURIComponent(invoice)}/refer`,
+      { items },
+    )
+    return res
+  }
+
+  /** `POST /shop/order/{invoice}/repay` — fresh gateway redirect. */
+  async function repay(invoice: string, paymentMethodId: string | number, device?: string) {
+    const res = await api.post<CheckoutResponse>(
+      `/shop/order/${encodeURIComponent(invoice)}/repay`,
+      {
+        payment_method_id: Number(paymentMethodId),
+        device: device ?? detectDevice(),
+      },
+    )
+    if (!res.data) throw new Error(res.message || 'شروع مجدد پرداخت انجام نشد.')
+    return res
+  }
+
+  return { cancel, refer, repay }
+}
+
+/** `GET /shop/order/refers` filters. */
+export type ReferStep
+  = | 'all'
+    | 'start_refer'
+    | 'refer_operator'
+    | 'refer_accept'
+    | 'refer_reject'
+    | 'refer_done'
+
+export interface RefersQuery {
+  /** `all` (or omitting it) disables the step filter. */
+  step?: ReferStep
+  /** 1-based page. */
+  page?: number
+  /** 1…100 (defaults to 100 so the dashboard gets the list in one request). */
+  perPage?: number
+}
+
+const REFER_STEPS = new Set<string>([
+  'all',
+  'start_refer',
+  'refer_operator',
+  'refer_accept',
+  'refer_reject',
+  'refer_done',
+])
+
+/**
+ * Return requests for the dashboard.
+ *
+ * `data.items` + `data.pagination` are the documented 2026-11-02 shape, but the
+ * OpenAPI spec still says bare array + root `pagination`, so `listPayload()`
+ * accepts both. Refer rows only carry `sub_invoice_id`; the referenced invoice
+ * is fetched once per `invoice_id` to resolve the product title/image.
+ */
+export function useRefers() {
   const api = useApi()
   const config = useRuntimeConfig()
   const apiBase = String(config.public.apiBase || '')
 
+  const refers = ref<ReturnRequest[]>([])
+  const pagination = ref<ApiPagination | undefined>()
+  const pending = ref(false)
+  const loaded = ref(false)
+
+  const orderItemsCache = new Map<number, ApiOrderItem[]>()
+
+  async function invoiceItems(invoiceId?: number | null): Promise<ApiOrderItem[]> {
+    if (!invoiceId) return []
+    const cached = orderItemsCache.get(invoiceId)
+    if (cached) return cached
+
+    try {
+      const res = await api.get<ApiOrder>(`/shop/order/${invoiceId}`)
+      const items = res.data?.items ?? []
+      orderItemsCache.set(invoiceId, items)
+      return items
+    }
+    catch {
+      return []
+    }
+  }
+
+  async function enrich(rows: ApiRefer[]): Promise<ReturnRequest[]> {
+    const invoiceIds = [...new Set(
+      rows
+        .map(row => row.invoice_id)
+        .filter((id): id is number => typeof id === 'number'),
+    )]
+
+    const byInvoice = new Map<number, ApiOrderItem[]>()
+    await Promise.all(invoiceIds.map(async (id) => {
+      byInvoice.set(id, await invoiceItems(id))
+    }))
+
+    return rows.map(row =>
+      mapRefer(row, byInvoice.get(row.invoice_id ?? -1) ?? [], apiBase),
+    )
+  }
+
+  async function load(query: RefersQuery = {}) {
+    const perPage = Math.min(100, Math.max(1, Math.trunc(query.perPage ?? 100)))
+    const page = Math.max(1, Math.trunc(query.page ?? 1))
+
+    const params: Record<string, string | number> = {
+      per_page: perPage,
+      page,
+    }
+    if (query.step && query.step !== 'all' && REFER_STEPS.has(query.step))
+      params.step = query.step
+
+    pending.value = true
+    try {
+      const res = await api.get<ApiRefer[] | ApiList<ApiRefer>>('/shop/order/refers', {
+        query: params,
+      })
+      const payload = listPayload<ApiRefer>(res.data)
+      refers.value = await enrich(payload.items)
+      pagination.value = payload.pagination
+      loaded.value = true
+    }
+    finally {
+      pending.value = false
+    }
+  }
+
+  return { refers, pagination, pending, loaded, load }
+}
+
+/**
+ * One return request by its refer id.
+ *
+ * There is no single-refer endpoint, so the paginated list is scanned (newest
+ * first) until the id is found; the detail screen never falls back to mock data.
+ */
+export function useReferDetail(id: Ref<string>) {
+  const { refers, pagination, pending, loaded, load } = useRefers()
+  const refer = ref<ReturnRequest | undefined>(undefined)
+  const notFound = computed(() => loaded.value && !pending.value && !refer.value)
+
+  async function fetch() {
+    for (let page = 1; page <= MAX_PAGES; page += 1) {
+      await load({ page, perPage: 100 })
+      const found = refers.value.find(row => row.id === id.value)
+      if (found) {
+        refer.value = found
+        return
+      }
+
+      const hasNext = pagination.value
+        ? pagination.value.has_more_pages && refers.value.length > 0
+        : refers.value.length >= 100
+      if (!hasNext) break
+    }
+
+    refer.value = undefined
+  }
+
+  return { refer, pending, loaded, notFound, load: fetch }
+}
+
+/**
+ * One order by its invoice/id — the full `UserOrderResponse`, no mock fallback.
+ *
+ * Used by the order detail page and by `/payment-result`, where the gateway
+ * now redirects with a plain `pid=<order_id>` (2026-11-03).
+ */
+export async function fetchOrderById(invoice: string): Promise<Order | undefined> {
+  const id = invoice.trim()
+  if (!id) return undefined
+
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+
+  const res = await api.get<ApiOrder>(`/shop/order/${encodeURIComponent(id)}`)
+  return res.data ? mapOrder(res.data, apiBase) : undefined
+}
+
+/** Reactive wrapper over {@link fetchOrderById}. */
+export function useOrderDetail(invoice: Ref<string>) {
   const { data, pending, error, refresh } = useAsyncData<Order | undefined>(
     () => `shop-order-${invoice.value}`,
     async () => {
       try {
-        const res = await api.get<ApiOrder>(`/shop/order/${encodeURIComponent(invoice.value)}`)
-        return res.data ? mapOrder(res.data, apiBase) : undefined
+        return await fetchOrderById(invoice.value)
       }
       catch {
         return undefined

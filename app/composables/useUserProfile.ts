@@ -284,6 +284,13 @@ export function useUserProfile() {
     return profile.value.avatar
   }
 
+  async function removeAvatar() {
+    const res = await api.del('/shop/user/profile/avatar')
+    updateData({ avatar: null })
+    profile.value.avatar = undefined
+    return res
+  }
+
   async function requestPasswordCode() {
     await api.post('/shop/user/profile/reset-password/send-code')
   }
@@ -303,6 +310,7 @@ export function useUserProfile() {
     pending,
     loaded,
     load,
+    refresh,
     saveName,
     saveEmail,
     saveNationalId,
@@ -310,6 +318,7 @@ export function useUserProfile() {
     saveCompany,
     saveBank,
     uploadAvatar,
+    removeAvatar,
     requestPasswordCode,
     savePassword,
   }

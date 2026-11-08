@@ -12,8 +12,10 @@ withDefaults(
     class?: string
     /** Mobile payment-step invoice (Figma 3645): padded block, title, no total. */
     payment?: boolean
+    /** Disables the CTA while the order is being submitted. */
+    busy?: boolean
   }>(),
-  { blockedLabel: '', title: '', class: '', payment: false },
+  { blockedLabel: '', title: '', class: '', payment: false, busy: false },
 )
 
 const emit = defineEmits<{
@@ -111,7 +113,8 @@ const rowIcons: Record<string, string> = {
       <button
         v-else-if="ctaLabel"
         type="button"
-        class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300 transition-colors hover:bg-R-400"
+        class="flex h-[42px] w-full items-center justify-center rounded-[12px] bg-R-300 transition-colors hover:bg-R-400 disabled:opacity-60"
+        :disabled="busy"
         @click="emit('submit')"
       >
         <UiTypography as="span" size="lg" weight="bold" color="white">{{ ctaLabel }}</UiTypography>

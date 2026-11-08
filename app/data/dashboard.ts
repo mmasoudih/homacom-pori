@@ -13,7 +13,7 @@ export interface WalletInfo {
   maxCharge: number
 }
 
-export type OrderStatTone = 'current' | 'delivered' | 'returned'
+export type OrderStatTone = 'current' | 'cancelled' | 'returned'
 
 export interface OrderStat {
   key: OrderStatTone
@@ -59,9 +59,9 @@ export const wallet: WalletInfo = {
 export const unreadNotifications = 0
 
 export const orderStats: OrderStat[] = [
-  { key: 'current', label: 'سفارش‌های جاری', count: 3 },
-  { key: 'delivered', label: 'تحویل داده شده', count: 15 },
-  { key: 'returned', label: 'کالاهای مرجوع شده', count: 1 },
+  { key: 'current', label: 'سفارش‌های جاری', count: 0 },
+  { key: 'cancelled', label: 'سفارش‌های لغو شده', count: 0 },
+  { key: 'returned', label: 'کالاهای مرجوع شده', count: 0 },
 ]
 
 export const dashboardNav: DashboardNavItem[] = [

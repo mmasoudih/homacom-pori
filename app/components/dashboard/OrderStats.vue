@@ -5,36 +5,35 @@ import { toPersianDigits } from '~/utils/format'
 
 const statIcon: Record<OrderStatTone, string> = {
   current: '/icons/truck-colour.svg',
-  delivered: '/icons/box-check.svg',
+  cancelled: '/icons/close-x.svg',
   returned: '/icons/box-return.svg',
 }
 
 const statHref: Record<OrderStatTone, string> = {
   current: '/dashboard/orders?tab=current',
-  delivered: '/dashboard/orders?tab=delivered',
+  cancelled: '/dashboard/orders?tab=cancelled',
   returned: '/dashboard/orders?tab=returned',
 }
 
-const { orders, load } = useOrders()
-await load().catch(() => {
-  // Keep the zero-count stats when the API is unavailable.
-})
+// `GET /shop/user/dashboard` — one aggregate request instead of paging the
+// whole order list and counting client-side.
+const { aggregates } = useDashboard()
 
 const orderStats = computed<OrderStat[]>(() => [
   {
     key: 'current',
     label: 'سفارش‌های جاری',
-    count: orders.value.filter(order => order.status === 'awaiting_payment' || order.status === 'processing').length,
+    count: aggregates.value.inProgressInvoices,
   },
   {
-    key: 'delivered',
-    label: 'تحویل داده شده',
-    count: orders.value.filter(order => order.status === 'delivered').length,
+    key: 'cancelled',
+    label: 'سفارش‌های لغو شده',
+    count: aggregates.value.cancelledInvoices,
   },
   {
     key: 'returned',
     label: 'کالاهای مرجوع شده',
-    count: 0,
+    count: aggregates.value.otherInvoices,
   },
 ])
 </script>

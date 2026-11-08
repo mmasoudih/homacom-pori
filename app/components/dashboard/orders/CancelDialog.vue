@@ -3,13 +3,17 @@ import { toast } from 'vue-sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { typographyVariants } from '~/components/ui/typography'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean
-}>()
+  pending?: boolean
+}>(), {
+  pending: false,
+})
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'confirmed': []
+  /** The customer's reason; the parent calls the API and closes on success. */
+  'confirmed': [description: string]
 }>()
 
 const reason = ref('')
@@ -30,9 +34,9 @@ function confirm() {
     toast.error('لطفا دلیل لغو سفارش را بنویسید.')
     return
   }
-  emit('confirmed')
-  toast.success('سفارش شما لغو شد.')
-  close()
+  // The parent owns the request: it shows the backend message and closes the
+  // dialog only after a successful cancel.
+  emit('confirmed', reason.value.trim())
 }
 </script>
 
@@ -61,10 +65,11 @@ function confirm() {
       <div class="mt-2 flex gap-3">
         <button
           type="button"
-          class="h-11 flex-1 rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90"
+          class="h-11 flex-1 rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="pending"
           @click="confirm"
         >
-          لغو سفارش
+          {{ pending ? 'در حال لغو…' : 'لغو سفارش' }}
         </button>
         <button
           type="button"

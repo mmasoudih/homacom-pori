@@ -10,7 +10,6 @@ import {
   IconMoodSad,
   IconPlus,
   IconTrash,
-  IconX,
 } from '@tabler/icons-vue'
 import type { OrderItem } from '~/data/orders'
 import { returnReasons } from '~/data/orders'
@@ -21,7 +20,6 @@ const props = defineProps<{
   quantity: number
   reason: string
   description: string
-  images: string[]
 }>()
 
 const emit = defineEmits<{
@@ -31,8 +29,6 @@ const emit = defineEmits<{
   increment: []
   decrement: []
   remove: []
-  upload: [event: Event]
-  removeImage: [index: number]
 }>()
 
 const moods: { key: NonNullable<OrderItem['rating']>; icon: Component; label: string }[] = [
@@ -143,34 +139,5 @@ function onReasonChange(event: Event) {
       />
     </div>
 
-    <!-- Upload -->
-    <div class="mt-4">
-      <span class="text-[12px] font-medium text-T-700">اپلود تصویر</span>
-      <div class="mt-2 flex flex-wrap items-center gap-3">
-        <label
-          class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-indigo-300 p-6 text-center text-indigo-500"
-        >
-          <IconPlus class="size-5" />
-          <span class="text-[11px] font-semibold">افزودن</span>
-          <input type="file" accept="image/*" class="hidden" @change="emit('upload', $event)">
-        </label>
-
-        <div v-for="(image, index) in images" :key="index" class="relative">
-          <img
-            :src="image"
-            alt="preview"
-            class="size-14 rounded-xl border border-T-300 object-cover"
-          >
-          <button
-            type="button"
-            class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-white"
-            aria-label="حذف تصویر"
-            @click="emit('removeImage', index)"
-          >
-            <IconX class="size-3" />
-          </button>
-        </div>
-      </div>
-    </div>
   </section>
 </template>

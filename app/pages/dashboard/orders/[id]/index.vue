@@ -2,19 +2,54 @@
 import { IconArrowLeft, IconBox, IconFileInvoice } from '@tabler/icons-vue'
 import { useMediaQuery } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import { orderStatusMeta } from '~/data/orders'
+import { orderStatusMeta, paymentStatusMeta } from '~/data/orders'
+import { apiErrorMessage } from '~/composables/useApi'
 import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 import { formatPriceFa, toPersianDigits } from '~/utils/format'
+import { gatewayLabel } from '~/utils/payment'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id))
 
-const { order, notFound } = useOrderDetail(id)
+const { order, notFound, refresh } = useOrderDetail(id)
+const { cancel: cancelOrder } = useOrderActions()
 
 const cancelOpen = ref(false)
+const cancelling = ref(false)
 
-function onCancelled() {
-  if (order.value) order.value = { ...order.value, status: 'cancelled' }
+/** `POST /order/{invoice}/cancel` only accepts these statuses. */
+const CANCELLABLE = new Set(['completing', 'waiting', 'waiting_payment', 'paid'])
+
+const canCancel = computed(() => {
+  const status = order.value?.rawStatus
+  if (!status) return false
+  // `rawStatus` is also exposed for aliases; the backend decides finally and
+  // answers 422 `invoice_cancel_invalid_status` when it disagrees.
+  return CANCELLABLE.has(status) || order.value?.status === 'awaiting_payment'
+})
+
+const canReturn = computed(() =>
+  order.value?.status === 'delivered' && order.value?.paymentStatus === 'done',
+)
+
+async function onCancelled(description: string) {
+  if (!order.value) return
+
+  cancelling.value = true
+  try {
+    const res = await cancelOrder(order.value.id, description)
+    toast.success(res.message || 'سفارش شما لغو شد.')
+    cancelOpen.value = false
+    await refresh()
+  }
+  catch (err) {
+    // 404 = missing *or* another user's order; the backend message says which
+    // guard failed (invalid status, window, …).
+    toast.error(apiErrorMessage(err, 'لغو سفارش انجام نشد.'))
+  }
+  finally {
+    cancelling.value = false
+  }
 }
 
 function onInvoice() {
@@ -27,13 +62,23 @@ const mobileStatus = computed(() => (order.value ? orderStatusMeta[order.value.s
 
 const mobileInfoItems = computed<{ label: string; value: string; stacked?: boolean }[]>(() => {
   if (!order.value) return []
-  return [
+  const rows: { label: string; value: string; stacked?: boolean }[] = [
     { label: 'کد سفارش', value: toPersianDigits(order.value.code) },
     { label: 'تاریخ ثبت سفارش', value: order.value.date },
     { label: 'تحویل گیرنده', value: order.value.receiver.name },
     { label: 'شماره تلفن همراه', value: toPersianDigits(order.value.receiver.phone) },
-    { label: 'آدرس', value: order.value.receiver.address, stacked: true },
   ]
+
+  if (order.value.paymentStatus)
+    rows.push({ label: 'وضعیت پرداخت', value: paymentStatusMeta[order.value.paymentStatus].label })
+
+  // After settlement `payment_method` is `manual`; show the real gateway.
+  if (order.value.gate)
+    rows.push({ label: 'درگاه پرداخت', value: gatewayLabel(order.value.gate) })
+
+  rows.push({ label: 'آدرس', value: order.value.receiver.address, stacked: true })
+
+  return rows
 })
 
 const mobileAmountItems = computed<{ label: string; value: string }[]>(() => {
@@ -196,7 +241,7 @@ useHead({
 
     <!-- 7. Bottom CTA -->
     <NuxtLink
-      v-if="order.status === 'delivered' || order.status === 'cancelled'"
+      v-if="canReturn"
       :to="`/dashboard/orders/${order.id}/return`"
       class="flex h-12 w-full items-center justify-center rounded-xl border border-primary text-[13px] font-bold text-primary transition-colors hover:bg-R-50"
     >
@@ -204,7 +249,7 @@ useHead({
     </NuxtLink>
 
     <button
-      v-else-if="order.status === 'processing' || order.status === 'shipping'"
+      v-else-if="canCancel"
       type="button"
       class="flex h-12 w-full items-center justify-center rounded-xl border border-primary text-[13px] font-bold text-primary transition-colors hover:bg-R-50"
       @click="cancelOpen = true"
@@ -236,8 +281,8 @@ useHead({
   </DashboardOrdersMobileBareShell>
 
   <ClientOnly>
-    <DashboardOrdersCancelDialog v-if="isDesktop" v-model:open="cancelOpen" @confirmed="onCancelled" />
-    <DashboardOrdersMobileCancelSheet v-else v-model:open="cancelOpen" @confirmed="onCancelled" />
+    <DashboardOrdersCancelDialog v-if="isDesktop" v-model:open="cancelOpen" :pending="cancelling" @confirmed="onCancelled" />
+    <DashboardOrdersMobileCancelSheet v-else v-model:open="cancelOpen" :pending="cancelling" @confirmed="onCancelled" />
   </ClientOnly>
   </div>
 </template>

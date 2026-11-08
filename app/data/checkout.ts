@@ -24,12 +24,22 @@ export interface CheckoutAddress {
   lng?: number
 }
 
+export type ShippingMethodType = 'postal' | 'present' | 'delivery' | 'in-person'
+
 export interface ShippingMethod {
+  /** Backend `shop_shipping.id` (kept as a string for the UI). */
   id: string
   name: string
   price: number
   /** Small provider mark rendered next to the name. */
   provider: string
+  /** Backend `type`; a `delivery` method also needs a delivery period. */
+  type?: ShippingMethodType
+  /** Absolute logo URL, or a local fallback icon. */
+  logo?: string
+  description?: string
+  /** Free above this cart subtotal (`up_to_free`; 0/undefined = never free). */
+  freeAbove?: number
 }
 
 export interface DeliveryDay {
@@ -37,6 +47,18 @@ export interface DeliveryDay {
   weekday: string
   day: string
   month: string
+  /** English weekday (`Saturday`…) used to match `GET /public/delivery-periods`. */
+  weekdayEn: string
+}
+
+/** A 30-minute delivery slot from `GET /api/shop/public/delivery-periods`. */
+export interface DeliveryPeriod {
+  id: string
+  /** English weekday name, or `''` for the designed fallback slots. */
+  day: string
+  /** `HH:MM` (already stripped of the API's seconds). */
+  start: string
+  end: string
 }
 
 export interface PaymentGateway {
@@ -92,37 +114,77 @@ export const checkoutAddresses: CheckoutAddress[] = [
 ]
 
 export const shippingMethods: ShippingMethod[] = [
-  { id: 'tipax', name: 'تیپاکس', price: 300_000, provider: 'تیپاکس' },
-  { id: 'pishtaz-bike', name: 'پیک موتوری', price: 200_000, provider: 'پیشتاز' },
-  { id: 'bike', name: 'پیک موتوری', price: 150_000, provider: 'پیک' },
+  { id: 'tipax', name: 'تیپاکس', price: 300_000, provider: 'تیپاکس', type: 'postal', logo: '/icons/cart/ship-tipax.svg' },
+  { id: 'pishtaz-bike', name: 'پیک موتوری', price: 200_000, provider: 'پیشتاز', type: 'delivery', logo: '/icons/cart/ship-pishtaz.svg' },
+  { id: 'bike', name: 'پیک موتوری', price: 150_000, provider: 'پیک', type: 'delivery', logo: '/icons/cart/ship-bike.svg' },
 ]
 
-export const deliveryTimeSlots = ['۱۸ الی ۱۶', '۱۴ الی ۱۲', '۱۰ الی ۰۸'] as const
+/**
+ * Designed fallback slots, used only when the public delivery-period endpoint
+ * returns nothing. An empty `day` matches every weekday.
+ */
+export const fallbackDeliveryPeriods: DeliveryPeriod[] = [
+  { id: 'slot-18-16', day: '', start: '16:00', end: '18:00' },
+  { id: 'slot-12-14', day: '', start: '12:00', end: '14:00' },
+  { id: 'slot-08-10', day: '', start: '08:00', end: '10:00' },
+]
+
+/** English weekday names, indexed like `Date.getDay()` (0 = Sunday). */
+const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+
+/** `yyyy-mm-dd` in the browser's local calendar (the API's date format). */
+function localDateKey(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 /**
- * The next five delivery days in the Persian calendar (same shape as the
- * frame's date chips: weekday / day / month).
+ * The next delivery dates that actually have a slot.
+ *
+ * `GET /public/delivery-periods` only knows weekdays, so the chips are the next
+ * real dates whose weekday is offered. When `periods` carries no weekday
+ * (designed fallback) every upcoming day is offered.
  */
-export function getDeliveryDays(count = 5, from = new Date()): DeliveryDay[] {
+export function getDeliveryDays(
+  periods: DeliveryPeriod[] = [],
+  count = 7,
+  from = new Date(),
+): DeliveryDay[] {
   const weekday = new Intl.DateTimeFormat('fa-IR', { weekday: 'long' })
   const day = new Intl.DateTimeFormat('fa-IR', { day: 'numeric' })
   const month = new Intl.DateTimeFormat('fa-IR', { month: 'long' })
 
-  return Array.from({ length: count }, (_, index) => {
+  const offered = new Set(periods.map(period => period.day).filter(Boolean))
+  const everyDay = offered.size === 0
+  const days: DeliveryDay[] = []
+
+  for (let offset = 1; offset <= (everyDay ? count : 21) && days.length < count; offset += 1) {
     const date = new Date(from)
-    date.setDate(from.getDate() + index + 1)
-    return {
-      id: date.toISOString().slice(0, 10),
+    date.setDate(from.getDate() + offset)
+    const weekdayEn = WEEKDAYS_EN[date.getDay()] ?? ''
+
+    if (!everyDay && !offered.has(weekdayEn)) continue
+
+    days.push({
+      // Local calendar date — `toISOString()` would shift a day in Tehran
+      // before 03:30 and send the wrong `receive_date` to the backend.
+      id: localDateKey(date),
       weekday: weekday.format(date),
       day: day.format(date),
       month: month.format(date),
-    }
-  })
+      weekdayEn,
+    })
+  }
+
+  return days
 }
 
 export const paymentGateways: PaymentGateway[] = [
   { id: 'sepah', title: 'سپ', subtitle: 'درگاه بانک سپه', logo: '/icons/cart/gw-sepah.svg' },
   { id: 'mellat', title: 'تاپ', subtitle: 'درگاه بانک ملت', logo: '/icons/cart/gw-mellat.svg' },
+  { id: 'tara', title: 'تارا', subtitle: 'درگاه پرداخت تارا', logo: '' },
 ]
 
 /** Installment services shown when «پرداخت اقساطی» is selected (Figma 27704). */
@@ -158,6 +220,14 @@ export const installmentProviders: InstallmentProvider[] = [
     monthly: '۲,۰۰۰,۰۰۰ تومان ماهیانه',
     terms: '۴ قسطه بدون کارمزد',
     logo: '/icons/cart/inst-digipay.svg',
+  },
+  {
+    id: 'azki',
+    name: 'آزکی',
+    badge: 'اقساطی',
+    monthly: '',
+    terms: 'خرید اعتباری و پرداخت اقساطی',
+    logo: '',
   },
 ]
 

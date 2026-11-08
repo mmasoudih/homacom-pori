@@ -139,7 +139,7 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
             : 'border-[#EBEDF0] bg-T-50 hover:border-T-500'"
           @click.stop="emit('update:method', 'online'); emit('update:gatewayId', gateway.id)"
         >
-          <img :src="gateway.logo" alt="" class="size-8 shrink-0 lg:size-10">
+          <img v-if="gateway.logo" :src="gateway.logo" alt="" class="size-8 shrink-0 lg:size-10">
 
           <span class="flex min-w-0 flex-1 flex-col gap-1 text-start">
             <UiTypography as="span" size="lg">{{ gateway.title }}</UiTypography>
@@ -167,7 +167,7 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
             : 'border-[#EBEDF0] bg-T-50 hover:border-T-500'"
           @click.stop="emit('update:method', 'installment'); emit('update:installmentId', provider.id)"
         >
-          <img :src="provider.logo" alt="" class="size-10 shrink-0">
+          <img v-if="provider.logo" :src="provider.logo" alt="" class="size-10 shrink-0">
 
           <span class="flex min-w-0 flex-1 flex-col gap-1 text-start">
             <span class="flex items-center gap-2.5">
@@ -175,10 +175,13 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
               <span class="text-T-400 lg:hidden">|</span>
               <UiTypography as="span" size="lg" class="leading-[17px]">{{ provider.name }}</UiTypography>
             </span>
-            <span class="flex items-center gap-1 text-[12.5px] leading-[15px] text-T-700">
-              <span class="truncate">{{ provider.monthly }}</span>
-              <span class="text-T-400">|</span>
-              <span class="shrink-0">{{ provider.terms }}</span>
+            <span
+              v-if="provider.monthly || provider.terms"
+              class="flex items-center gap-1 text-[12.5px] leading-[15px] text-T-700"
+            >
+              <span v-if="provider.monthly" class="truncate">{{ provider.monthly }}</span>
+              <span v-if="provider.monthly && provider.terms" class="text-T-400">|</span>
+              <span v-if="provider.terms" class="shrink-0">{{ provider.terms }}</span>
             </span>
           </span>
 

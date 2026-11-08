@@ -4,6 +4,10 @@ import { IconChevronLeft } from '@tabler/icons-vue'
 defineProps<{
   title: string
 }>()
+
+defineEmits<{
+  open: []
+}>()
 </script>
 
 <template>
@@ -11,6 +15,7 @@ defineProps<{
     <button
       type="button"
       class="flex h-[54px] w-full items-center text-[14px] font-medium text-primary transition-colors duration-150 ease-out hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      @click="$emit('open')"
     >
       <span>{{ title }}</span>
       <IconChevronLeft class="ms-3 size-4 shrink-0" />
