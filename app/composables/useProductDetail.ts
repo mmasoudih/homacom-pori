@@ -12,7 +12,7 @@ import type {
   SpecTableRow,
   WarrantyOption,
 } from '~/data/product'
-import { getProductDetail, mockProductDetail } from '~/data/product'
+import { mockProductDetail } from '~/data/product'
 import { ApiError } from '~/composables/useApi'
 import { resolveMediaUrl } from '~/utils/media'
 
@@ -180,21 +180,25 @@ function activeServicePrice(item: ApiServiceItem): { price: number, oldPrice?: n
 }
 
 function mapServiceCatalog(groups: ApiServiceGroup[]): ServiceCategory[] {
-  return groups.map((group, index) => ({
-    id: `service-group-${group.id}`,
-    title: group.name,
-    icon: SERVICE_ICONS[index % SERVICE_ICONS.length]!,
-    ...(group.selection_mode === 'single' || group.selection_mode === 'multiple'
-      ? { selectionMode: group.selection_mode }
-      : {}),
-    maxSelections: group.max_selections ?? null,
-    items: (group.items ?? []).map<ServiceCatalogItem>(item => ({
-      id: String(item.id),
-      label: item.title,
-      ...activeServicePrice(item),
-      serviceType: item.service_type ?? undefined,
-    })),
-  }))
+  return groups.map((group, index) => {
+    const icon = SERVICE_ICONS[index % SERVICE_ICONS.length]!
+    return {
+      id: `service-group-${group.id}`,
+      title: group.name,
+      icon,
+      ...(group.selection_mode === 'single' || group.selection_mode === 'multiple'
+        ? { selectionMode: group.selection_mode }
+        : {}),
+      maxSelections: group.max_selections ?? null,
+      items: (group.items ?? []).map<ServiceCatalogItem>(item => ({
+        id: String(item.id),
+        label: item.title,
+        ...activeServicePrice(item),
+        serviceType: item.service_type ?? undefined,
+        icon,
+      })),
+    }
+  })
 }
 
 function mapServicePackages(groups: ApiServiceGroup[]): ServicePackage[] {
@@ -401,8 +405,9 @@ function mapProduct(api: ApiProduct, comments: ApiComment[], apiBase: string): P
 }
 
 /**
- * Product detail by slug, with the designed mock product as a fallback so the
- * page keeps rendering when the API is cold/offline or the slug is a demo id.
+ * Product detail by slug. The page renders only API data: a missing product
+ * (404) or a failed request surfaces as `notFound`/`error` instead of silently
+ * rendering the design mock.
  */
 export function useProductDetail(slug: Ref<string>) {
   const api = useApi()
@@ -414,50 +419,45 @@ export function useProductDetail(slug: Ref<string>) {
     async () => {
       const path = `/shop/products/${encodeURIComponent(slug.value)}`
 
+      let res
       try {
-        let res
+        res = await api.get<ApiProduct>(path)
+      }
+      catch (err) {
+        // A stale/expired bearer token must not break a public product page.
+        if (err instanceof ApiError && err.status === 401)
+          res = await api.get<ApiProduct>(path, { skipAuth: true })
+        else
+          throw err
+      }
+
+      if (!res.data)
+        return undefined
+
+      let comments: ApiComment[] = []
+      try {
+        const commentsPath = `/shop/products/${res.data.id}/comments`
+
+        // Authenticated requests also return the viewer's own pending
+        // comments; fall back to the anonymous thread on a stale token.
+        let commentsRes
         try {
-          res = await api.get<ApiProduct>(path)
+          commentsRes = await api.get<ApiComment[]>(commentsPath)
         }
         catch (err) {
-          // A stale/expired bearer token must not break a public product page.
           if (err instanceof ApiError && err.status === 401)
-            res = await api.get<ApiProduct>(path, { skipAuth: true })
+            commentsRes = await api.get<ApiComment[]>(commentsPath, { skipAuth: true })
           else
             throw err
         }
 
-        if (!res.data)
-          return getProductDetail(slug.value)
-
-        let comments: ApiComment[] = []
-        try {
-          const commentsPath = `/shop/products/${res.data.id}/comments`
-
-          // Authenticated requests also return the viewer's own pending
-          // comments; fall back to the anonymous thread on a stale token.
-          let commentsRes
-          try {
-            commentsRes = await api.get<ApiComment[]>(commentsPath)
-          }
-          catch (err) {
-            if (err instanceof ApiError && err.status === 401)
-              commentsRes = await api.get<ApiComment[]>(commentsPath, { skipAuth: true })
-            else
-              throw err
-          }
-
-          comments = Array.isArray(commentsRes.data) ? commentsRes.data : []
-        }
-        catch {
-          // Comments are optional — the detail page still renders without them.
-        }
-
-        return mapProduct(res.data, comments, apiBase)
+        comments = Array.isArray(commentsRes.data) ? commentsRes.data : []
       }
       catch {
-        return getProductDetail(slug.value)
+        // Comments are optional — the detail page still renders without them.
       }
+
+      return mapProduct(res.data, comments, apiBase)
     },
     {
       watch: [slug],

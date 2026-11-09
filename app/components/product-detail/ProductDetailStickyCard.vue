@@ -1,14 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  IconChevronLeft,
-  IconTruckDelivery,
-  IconRefresh,
-  IconBuildingStore,
-  IconShoppingCart,
-  IconShieldCheck,
-  IconLock,
-} from '@tabler/icons-vue'
 import type { ProductDetail, StickyLink, WarrantyOption } from '~/data/product'
 import { formatPriceFa } from '~/utils/format'
 import { getDiscountPercent } from '~/utils/product'
@@ -27,6 +18,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'add-to-cart': []
+  'notify-me': []
 }>()
 
 const isAvailable = computed(() => props.product.stockStatus === 'available')
@@ -39,129 +31,169 @@ const discountPercent = computed(() =>
   getDiscountPercent(props.product.price, props.product.oldPrice ?? 0),
 )
 
+/** Icon assets exported from the Figma frame «Frame 3294». */
 const linkIcons = {
-  delivery: IconTruckDelivery,
-  return: IconRefresh,
-  inPerson: IconBuildingStore,
-} as const
-
-const linkIconClass = {
-  delivery: 'text-[#FFAA39]',
-  return: 'text-[#3D7BFA]',
-  inPerson: 'text-R-300',
+  delivery: '/icons/product-detail/truck-color-32.svg',
+  return: '/icons/product-detail/reload-32.svg',
+  inPerson: '/icons/product-detail/building-32.svg',
 } as const
 </script>
 
 <template>
-  <div :class="cn('flex w-full flex-col gap-4', props.class)">
-    <!-- Product summary / unavailable card -->
+  <div :class="cn('flex w-full flex-col gap-[18px]', props.class)">
+    <!-- Product summary -->
     <div
       v-if="isAvailable"
-      class="flex flex-col gap-4 rounded-2xl border border-T-300 bg-T-50 p-4"
+      class="flex flex-col gap-5 rounded-[12px] border border-T-400 bg-T-50 px-6 py-[22px]"
     >
-      <div class="flex items-center gap-3">
-        <div class="relative size-[84px] shrink-0 overflow-hidden rounded-xl border border-T-300 bg-T-50">
+      <!-- Thumbnail + title -->
+      <div class="flex items-center gap-2">
+        <div
+          class="size-[60px] shrink-0 overflow-hidden rounded-[7px] border border-T-400 bg-T-50"
+        >
           <img
             :src="product.images[0]?.src"
             :alt="product.title"
-            class="size-full object-contain p-1"
+            class="size-full object-contain"
           >
         </div>
-        <p class="line-clamp-3 text-[12.5px] font-medium leading-[20px] text-T-900">
+        <UiTypography as="p" size="md" class="line-clamp-3 flex-1 text-start leading-[15px]">
           {{ product.title }}
-        </p>
+        </UiTypography>
       </div>
 
+      <div class="h-px w-full bg-T-300" />
+
       <!-- Total -->
-      <div class="flex items-end justify-between gap-3 border-t border-T-300 pt-3">
-        <span class="text-[12.5px] text-T-700">جمع کل</span>
+      <div class="flex items-end justify-between gap-3">
+        <UiTypography size="lg" weight="semibold">جمع کل</UiTypography>
+
         <span class="flex flex-col items-end gap-1">
-          <span v-if="product.oldPrice" class="flex items-center gap-2">
+          <span v-if="product.oldPrice" class="flex items-center gap-1.5">
+            <UiTypography size="xl" weight="medium" color="subtle" class="line-through leading-[19px]">
+              {{ formatPriceFa(product.oldPrice) }}
+            </UiTypography>
             <span
               v-if="discountPercent"
-              class="flex h-[21px] items-center rounded-full bg-R-300 px-2 text-[10.5px] font-extrabold text-white"
+              class="flex h-5 items-center rounded-full bg-R-300 px-2"
             >
-              ٪{{ discountPercent }}
+              <UiTypography size="xs" weight="bold" color="white">٪{{ discountPercent }}</UiTypography>
             </span>
-            <span class="text-[12px] text-T-600 line-through">{{ formatPriceFa(product.oldPrice) }}</span>
           </span>
-          <span class="flex items-baseline gap-1">
-            <span class="text-[18px] font-extrabold text-T-900">{{ formatPriceFa(product.price) }}</span>
-            <span class="text-[11px] text-T-700">تومان</span>
+
+          <span class="flex items-baseline gap-1.5">
+            <UiTypography size="2xl" weight="bold" class="leading-[22px]">{{ formatPriceFa(product.price) }}</UiTypography>
+            <UiTypography size="md" weight="semibold" color="subtle">تومان</UiTypography>
           </span>
         </span>
       </div>
 
+      <!-- Add to cart -->
       <button
         type="button"
-        class="flex h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-R-300 text-[13.5px] font-bold text-white transition-colors hover:bg-R-400"
+        class="flex h-[42px] w-full items-center justify-center gap-1.5 rounded-[12px] bg-R-300 px-[18px] transition-colors hover:bg-R-400"
         @click="emit('add-to-cart')"
       >
-        <IconShoppingCart class="size-4.5" />
-        افزودن به سبد خرید
+        <img
+          src="/icons/product-detail/shopping-bag-22.svg"
+          alt=""
+          class="size-[22px] shrink-0"
+        >
+        <UiTypography size="lg" weight="bold" color="white">افزودن به سبد خرید</UiTypography>
       </button>
 
-      <div class="flex flex-col gap-2.5">
-        <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
-          <span class="text-[12.5px] text-T-700">رنگ:</span>
-          <span class="flex items-center gap-2">
-            <span
-              v-if="selectedColor"
-              class="size-[18px] shrink-0 rounded-full border border-T-500"
-              :style="{ backgroundColor: selectedColor.value }"
-            />
-            <span class="text-[12.5px] font-medium text-T-900">
-              {{ selectedColor?.name || 'انتخاب نشده' }}
-            </span>
+      <!-- Selected colour / warranty -->
+      <div class="flex flex-col gap-1">
+        <div class="flex h-11 items-center justify-between gap-3 rounded-[12px] bg-R-25 px-4">
+          <span class="flex min-w-0 items-center gap-1.5">
+            <ProductDetailColorSwatch />
+            <UiTypography size="md" color="muted" class="shrink-0">رنگ:</UiTypography>
           </span>
+          <UiTypography size="md" weight="medium" class="truncate">
+            {{ selectedColor?.name || 'انتخاب نشده' }}
+          </UiTypography>
         </div>
 
-        <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
-          <span class="text-[12.5px] text-T-700">گارانتی:</span>
-          <span class="flex items-center gap-1.5">
-            <IconShieldCheck class="size-4 text-R-300" />
-            <span class="text-[12.5px] font-medium text-T-900">
-              {{ selectedWarranty?.label || 'انتخاب نشده' }}
-            </span>
+        <div class="flex h-11 items-center justify-between gap-3 rounded-[12px] bg-R-25 px-4">
+          <span class="flex min-w-0 items-center gap-1.5">
+            <img
+              src="/icons/product-detail/certificate-20.svg"
+              alt=""
+              class="size-5 shrink-0"
+            >
+            <UiTypography size="md" color="muted" class="shrink-0">گارانتی:</UiTypography>
           </span>
+          <UiTypography size="md" weight="medium" class="truncate text-end">
+            {{ selectedWarranty?.label || 'انتخاب نشده' }}
+          </UiTypography>
         </div>
       </div>
     </div>
 
-    <div v-else class="flex flex-col items-center gap-3 rounded-2xl border border-T-300 bg-T-50 p-4 text-center">
-      <IconLock class="mt-1 size-9 text-T-600" stroke-width="1.5" />
-      <p class="text-[13px] font-medium text-T-900">این کالا فعلا موجود نیست</p>
-      <p class="text-[12px] leading-[18px] text-T-700">
-        این محصول در حال حاضر موجود نیست. می‌توانید از محصولات جایگزین در بالای صفحه دیدن نمایید.
-      </p>
-      <span class="my-1 flex w-full items-center gap-3">
-        <span class="h-px flex-1 bg-T-300" />
-        <span class="text-[14px] text-T-700">ناموجود</span>
-        <span class="h-px flex-1 bg-T-300" />
-      </span>
+    <!-- Unavailable -->
+    <div
+      v-else
+      class="flex flex-col gap-5 rounded-[12px] border border-T-400 bg-T-50 px-6 py-[22px]"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="size-[60px] shrink-0 overflow-hidden rounded-[7px] border border-T-400 bg-T-50"
+        >
+          <img
+            :src="product.images[0]?.src"
+            :alt="product.title"
+            class="size-full object-contain"
+          >
+        </div>
+        <UiTypography as="p" size="md" class="line-clamp-3 flex-1 text-start leading-[15px]">
+          {{ product.title }}
+        </UiTypography>
+      </div>
+
+      <div class="h-px w-full bg-T-300" />
+
+      <div class="flex flex-col items-center gap-3">
+        <div class="flex w-full items-center gap-1.5">
+          <span class="h-px flex-1 bg-T-500" />
+          <UiTypography size="xl" color="muted">ناموجود</UiTypography>
+          <span class="h-px flex-1 bg-T-500" />
+        </div>
+
+        <button
+          type="button"
+          class="flex h-[42px] w-full items-center justify-center gap-1.5 rounded-[12px] border border-R-300 px-[18px] transition-colors hover:bg-R-25"
+          @click="emit('notify-me')"
+        >
+          <img src="/icons/product-detail/bell-22.svg" alt="" class="size-[22px]">
+          <UiTypography size="lg" weight="medium" class="text-R-300">موجود شد خبرم کن</UiTypography>
+        </button>
+      </div>
     </div>
 
     <!-- Service links -->
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-1">
       <button
         v-for="link in links"
         :key="link.title"
         type="button"
-        class="flex items-center justify-between gap-3 rounded-xl border border-T-300 bg-T-50 px-4 py-3.5 text-start transition-colors hover:bg-T-100"
+        class="flex items-center justify-between gap-3 rounded-[12px] border border-T-400 bg-T-50 px-4 py-3 text-start transition-colors hover:bg-T-100"
       >
-        <span class="flex items-center gap-3">
-          <component
-            :is="linkIcons[link.icon]"
-            class="size-7 shrink-0"
-            :class="linkIconClass[link.icon]"
-            stroke-width="1.5"
-          />
-          <span class="flex flex-col gap-0.5">
-            <span class="text-[13px] font-bold text-T-900">{{ link.title }}</span>
-            <span class="text-[11.5px] text-T-700">{{ link.subtitle }}</span>
+        <span class="flex min-w-0 flex-1 items-center gap-3">
+          <img
+            :src="linkIcons[link.icon]"
+            alt=""
+            class="size-8 shrink-0"
+          >
+          <span class="flex min-h-[46px] min-w-0 flex-col justify-center gap-1">
+            <UiTypography size="lg" weight="medium" class="truncate leading-[17px]">{{ link.title }}</UiTypography>
+            <UiTypography size="md" color="muted" class="truncate leading-[15px]">{{ link.subtitle }}</UiTypography>
           </span>
         </span>
-        <IconChevronLeft class="size-4 shrink-0 text-T-600" />
+        <img
+          src="/icons/product-detail/angle-left-16.svg"
+          alt=""
+          class="size-4 shrink-0"
+        >
       </button>
     </div>
   </div>

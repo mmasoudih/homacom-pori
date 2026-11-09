@@ -77,6 +77,8 @@ export interface ServiceCatalogItem {
   oldPrice?: number
   /** Backend `service_type` (`physical` / `digital`, …). */
   serviceType?: string
+  /** Category icon used by the selected-services chips. */
+  icon?: ServiceCategory['icon']
   /** When set, a «جزئیات بیمه» link opens the insurance-info dialog. */
   detailLink?: string
 }
@@ -443,6 +445,12 @@ const SERVICE_CATALOG: ServiceCategory[] = [
     ],
   },
 ]
+
+// Give every item its category icon so the selected-services chips can render it
+// without carrying the whole catalog around.
+for (const category of SERVICE_CATALOG) {
+  for (const item of category.items) item.icon = category.icon
+}
 
 const INSURANCE_TEXT = {
   title: 'بیمه سامانی',

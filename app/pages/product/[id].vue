@@ -37,12 +37,34 @@ useSeoMeta({
 
 const selectedWarrantyId = ref('')
 const selectedColor = ref('')
-const selectedInsuranceId = ref<string | null>(null)
+const selectedInsuranceId = ref<string | null | undefined>(undefined)
 const addedServiceIds = ref<string[]>([])
+
+/**
+ * The selection defaults are derived from the product so the server render and
+ * the hydrated client render agree (a post-hydration default caused Vue to keep
+ * the SSR class attributes, e.g. the selected warranty never showed its border).
+ */
+const effectiveWarrantyId = computed({
+  get: () => selectedWarrantyId.value || product.value?.defaultWarrantyId || '',
+  set: (value: string) => { selectedWarrantyId.value = value },
+})
+
+const effectiveColor = computed({
+  get: () => selectedColor.value || product.value?.colors[0]?.value || '',
+  set: (value: string) => { selectedColor.value = value },
+})
+
+const effectiveInsuranceId = computed<string | null>({
+  get: () => selectedInsuranceId.value === undefined
+    ? (product.value?.insuranceOptions[0]?.id ?? null)
+    : selectedInsuranceId.value,
+  set: (value: string | null) => { selectedInsuranceId.value = value },
+})
 
 const selectedWarranty = computed(() =>
   product.value
-    ? product.value.warrantyOptions.find(w => w.id === selectedWarrantyId.value)
+    ? product.value.warrantyOptions.find(w => w.id === effectiveWarrantyId.value)
       ?? product.value.warrantyOptions[0]
     : undefined,
 )
@@ -60,7 +82,7 @@ const servicesPrice = computed(() =>
 )
 
 const selectedInsurancePrice = computed(() =>
-  product.value?.insuranceOptions.find(i => i.id === selectedInsuranceId.value)?.price ?? 0,
+  product.value?.insuranceOptions.find(i => i.id === effectiveInsuranceId.value)?.price ?? 0,
 )
 
 /** Services + insurance, added on top of the product price (mobile bar). */
@@ -110,9 +132,9 @@ function addSelectionToCart(quantity?: number) {
   if (!product.value) return
   addProduct({
     product: product.value,
-    color: selectedColor.value,
+    color: effectiveColor.value,
     warrantyId: selectedWarranty.value?.id,
-    insuranceId: selectedInsuranceId.value,
+    insuranceId: effectiveInsuranceId.value,
     serviceIds: addedServiceIds.value,
     stockId: selectedStockId.value,
     quantity: quantity ?? product.value.minOrderQuantity ?? 1,
@@ -124,9 +146,9 @@ function addSellerToCart(seller: Seller) {
   if (!product.value) return
   addProduct({
     product: product.value,
-    color: selectedColor.value,
+    color: effectiveColor.value,
     warrantyId: selectedWarranty.value?.id,
-    insuranceId: selectedInsuranceId.value,
+    insuranceId: effectiveInsuranceId.value,
     serviceIds: addedServiceIds.value,
     seller,
   })
@@ -140,9 +162,9 @@ function removeServiceById(serviceId: string) {
 watch(
   id,
   () => {
-    selectedWarrantyId.value = product.value?.defaultWarrantyId ?? ''
+    selectedWarrantyId.value = ''
     selectedColor.value = ''
-    selectedInsuranceId.value = null
+    selectedInsuranceId.value = undefined
     addedServiceIds.value = []
     if (import.meta.client)
       window.scrollTo({ top: 0 })
@@ -221,20 +243,20 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
     <!-- Mobile action header -->
     <ProductDetailMobileHeader @back="goBack" />
 
-    <main class="flex w-full flex-col items-center lg:px-6 lg:pb-14">
+    <main class="flex w-full flex-col items-center lg:pb-14">
       <!-- Product not found -->
-      <ProductDetailNotFound v-if="!loading && notFound" class="mt-10 w-full max-w-[1440px] px-4 lg:mt-16 lg:px-0" />
+      <ProductDetailNotFound v-if="!loading && notFound" class="mt-10 w-full max-w-[1350px] px-4 lg:mt-16 lg:px-0" />
 
       <template v-else>
         <!-- Skeleton -->
-        <ProductDetailSkeleton v-if="loading || !product" class="w-full max-w-[1440px]" />
+        <ProductDetailSkeleton v-if="loading || !product" class="w-full max-w-[1350px]" />
 
         <template v-else>
           <!-- ======================= Mobile hero ======================= -->
           <ProductDetailHeroMobile
-            v-model:selected-warranty-id="selectedWarrantyId"
-            v-model:selected-color="selectedColor"
-            v-model:selected-insurance-id="selectedInsuranceId"
+            v-model:selected-warranty-id="effectiveWarrantyId"
+            v-model:selected-color="effectiveColor"
+            v-model:selected-insurance-id="effectiveInsuranceId"
             v-model:active-tab="activeTab"
             :product="product"
             :added-services="addedServices"
@@ -248,11 +270,11 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           <!-- ==================== Desktop breadcrumb ==================== -->
           <UiBreadcrumb
             :trail="product.breadcrumb"
-            class="mx-auto mt-6 hidden w-full max-w-[1440px] lg:flex"
+            class="mx-auto mt-6 hidden w-full max-w-[1350px] lg:flex"
           />
 
           <!-- ======================= Desktop hero ======================= -->
-          <div class="mt-6 hidden w-full max-w-[1440px] grid-cols-[374px_1fr_324px] items-start gap-9 lg:grid [&>*]:min-w-0">
+          <div class="mt-6 hidden w-full max-w-[1350px] grid-cols-[minmax(340px,374px)_minmax(0,1fr)_minmax(270px,324px)] items-start gap-9 lg:grid [&>*]:min-w-0">
             <ProductDetailGallery
               :images="product.images"
               :alt="product.title"
@@ -262,9 +284,9 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
             />
 
             <ProductDetailInfoBox
-              v-model:selected-warranty-id="selectedWarrantyId"
-              v-model:selected-color="selectedColor"
-              v-model:selected-insurance-id="selectedInsuranceId"
+              v-model:selected-warranty-id="effectiveWarrantyId"
+              v-model:selected-color="effectiveColor"
+              v-model:selected-insurance-id="effectiveInsuranceId"
               :product="product"
               :added-services="addedServices"
               @open-services="dialogs.services = true"
@@ -276,8 +298,8 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
             <ProductDetailPurchaseBox
               :product="product"
               :selected-warranty="selectedWarranty!"
-              :selected-color="selectedColor"
-              :selected-insurance-id="selectedInsuranceId"
+              :selected-color="effectiveColor"
+              :selected-insurance-id="effectiveInsuranceId"
               :added-services="addedServices"
               :services-price="servicesPrice"
               @open-services="dialogs.services = true"
@@ -296,10 +318,10 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           </div>
 
           <!-- ================== Desktop trust strip =================== -->
-          <ProductDetailTrustStrip class="mt-8 hidden w-full max-w-[1440px] lg:flex" />
+          <ProductDetailTrustStrip class="mt-8 hidden w-full max-w-[1350px] lg:flex" />
 
           <!-- ============== Review + specs + comments + related ============== -->
-          <div class="mt-8 flex w-full max-w-[1440px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
+          <div class="mt-8 flex w-full max-w-[1350px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
             <div class="flex min-w-0 flex-col gap-10 lg:gap-12">
               <ProductDetailTabs
                 :active="activeTab"
@@ -334,9 +356,10 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
               <ProductDetailStickyCard
                 :product="product"
                 :links="product.stickyLinks"
-                :selected-color="selectedColor"
+                :selected-color="effectiveColor"
                 :selected-warranty="selectedWarranty"
                 @add-to-cart="addSelectionToCart()"
+                @notify-me="dialogs.notify = true"
               />
             </div>
           </div>
@@ -345,16 +368,16 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           <ProductDetailRelatedSection
             :title="product.relatedTitle"
             :products="product.related"
-            class="mt-6 w-full max-w-[1440px] px-4 lg:mt-14 lg:px-0"
+            class="mt-6 w-full max-w-[1350px] px-4 lg:mt-14 lg:px-0"
           />
 
           <!-- ================== Insurance / benefits ===================== -->
-          <ProductDetailHomaInsuranceBanner class="mt-12 hidden w-full max-w-[1440px] lg:block" />
+          <ProductDetailHomaInsuranceBanner class="mt-12 hidden w-full max-w-[1350px] lg:block" />
 
           <ProductDetailInPersonBenefits
             :title="product.inPersonBenefits.title"
             :text="product.inPersonBenefits.text"
-            class="mt-6 w-full max-w-[1440px] px-4 lg:px-0"
+            class="mt-6 w-full max-w-[1350px] px-4 lg:px-0"
           />
         </template>
       </template>
@@ -387,6 +410,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
     <ProductDetailCommentDialog
       v-if="product"
       v-model:open="dialogs.comment"
+      variant="figma"
       :product="product"
       :product-id="product.stockId ? Number(product.id) : null"
     />

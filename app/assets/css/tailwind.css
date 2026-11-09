@@ -189,6 +189,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Brand red / primary */
+  --color-R-25: var(--R-25);
   --color-R-10: var(--R-10);
   --color-R-50: var(--R-50);
   --color-R-75: var(--R-75);
@@ -242,6 +243,7 @@
   --radius: 0.625rem;
 
   /* Brand red / primary palette */
+  --R-25: #fff2f4;
   --R-10: #fde9ec;
   --R-50: #fde9ec;
   --R-75: #f8a5af;
@@ -301,6 +303,9 @@
 }
 
 .dark {
+  /* Soft brand tint surfaces */
+  --R-25: #3a2024;
+
   /* Neutral / text palette (dark mode) — T-* classes stay readable on dark bg */
   --T-50: #1f1f21;
   --T-100: #262628;

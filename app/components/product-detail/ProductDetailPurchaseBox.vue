@@ -1,14 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  IconBell,
-  IconChevronLeft,
-  IconShoppingCart,
-  IconShieldCheck,
-  IconTag,
-  IconPencil,
-  IconShoppingBag,
-} from '@tabler/icons-vue'
 import type { ProductDetail, ServiceCatalogItem, WarrantyOption } from '~/data/product'
 import { formatPriceFa } from '~/utils/format'
 import { getDiscountPercent } from '~/utils/product'
@@ -63,185 +54,194 @@ const payable = computed(
   <!-- =============================================== -->
   <div
     v-if="!isAvailable"
-    :class="cn('flex w-full flex-col items-center gap-6 rounded-2xl border border-T-300 bg-T-50 p-5', props.class)"
+    :class="cn('flex w-full flex-col items-center gap-6 rounded-[12px] border border-T-400 bg-white p-5', props.class)"
   >
-    <div class="mt-1 flex size-[46px] items-center justify-center text-T-600">
-      <svg viewBox="0 0 24 24" fill="none" class="size-[46px]" aria-hidden="true">
-        <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-        <path d="M9.5 9.5 12 12m0 0 2.5 2.5M12 12l-2.5 2.5M12 12l2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-    </div>
+    <img src="/icons/product-detail/tag-exclamation-circle-46.svg" alt="" class="size-[46px]">
 
-    <div class="flex flex-col items-center gap-2 text-center">
-      <p class="text-[14px] font-medium text-T-900">این کالا فعلا موجود نیست</p>
-      <p class="max-w-[282px] text-[12.5px] leading-[18px] text-T-700">
+    <div class="flex w-full flex-col items-center gap-2 text-center">
+      <UiTypography as="p" size="lg" weight="medium">این کالا فعلا موجود نیست</UiTypography>
+      <UiTypography as="p" size="md" color="muted" class="w-full">
         این محصول در حال حاضر موجود نیست. می‌توانید از محصولات جایگزین در بالای صفحه دیدن نمایید.
-      </p>
+      </UiTypography>
     </div>
 
-    <div class="flex w-full items-center gap-3">
-      <span class="h-px flex-1 bg-T-300" />
-      <span class="text-[16px] text-T-700">ناموجود</span>
-      <span class="h-px flex-1 bg-T-300" />
-    </div>
+    <div class="flex w-full flex-col items-center gap-3">
+      <div class="flex w-full items-center gap-1.5">
+        <span class="h-px flex-1 bg-T-500" />
+        <UiTypography size="xl" color="muted">ناموجود</UiTypography>
+        <span class="h-px flex-1 bg-T-500" />
+      </div>
 
-    <button
-      type="button"
-      class="flex h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-R-300 text-[14px] font-medium text-R-300 transition-colors hover:bg-R-10"
-      @click="emit('notify-me')"
-    >
-      موجود شد خبرم کن
-      <IconBell class="size-5" />
-    </button>
+      <button
+        type="button"
+        class="flex h-[42px] w-full items-center justify-center gap-1.5 rounded-[12px] border border-R-300 px-[18px] transition-colors hover:bg-R-25"
+        @click="emit('notify-me')"
+      >
+        <img src="/icons/product-detail/bell-22.svg" alt="" class="size-[22px]">
+        <UiTypography size="lg" weight="medium" class="text-R-300">موجود شد خبرم کن</UiTypography>
+      </button>
+    </div>
   </div>
 
   <!-- =============================================== -->
-  <!-- Summary / purchase box                           -->
+  <!-- Summary / purchase box (design: frame-product-price) -->
   <!-- =============================================== -->
   <div
     v-else
-    :class="cn('flex w-full flex-col gap-4 rounded-2xl border border-T-300 bg-T-50 p-5', props.class)"
+    :class="cn('flex w-full flex-col gap-6 rounded-[12px] border border-T-400 bg-white p-5', props.class)"
   >
-    <div class="flex flex-col">
+    <!-- Price breakdown -->
+    <div class="flex flex-col gap-1.5">
       <!-- Product price -->
-      <div class="flex items-center justify-between gap-3 py-3">
-        <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
-          <IconTag class="size-4 text-T-600" />
-          قیمت کالا:
+      <div class="flex items-center justify-between gap-3 border-b border-T-300 py-3">
+        <span class="flex items-center gap-1.5">
+          <img src="/icons/product-detail/tag-simple-20.svg" alt="" class="size-5 shrink-0">
+          <UiTypography size="md" color="muted">قیمت کالا:</UiTypography>
         </span>
-        <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
-          {{ formatPriceFa(product.price) }}
-          <span class="text-[11px] font-normal text-T-700">تومان</span>
+        <span class="flex items-baseline gap-1.5">
+          <UiTypography size="lg" weight="medium">{{ formatPriceFa(product.price) }}</UiTypography>
+          <UiTypography size="sm" weight="semibold" color="subtle">تومان</UiTypography>
         </span>
       </div>
-      <div class="h-px w-full bg-T-300" />
 
       <!-- Discount -->
-      <div v-if="discountAmount > 0" class="flex items-center justify-between gap-3 py-3">
-        <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
-          <IconPencil class="size-4 text-R-300" />
-          تخفیف:
+      <div v-if="discountAmount > 0" class="flex items-center justify-between gap-3 border-b border-T-300 py-3">
+        <span class="flex items-center gap-1.5">
+          <img src="/icons/product-detail/percent-bubble-tag-20.svg" alt="" class="size-5 shrink-0">
+          <UiTypography size="md" color="muted">تخفیف:</UiTypography>
         </span>
-        <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
-          {{ formatPriceFa(discountAmount) }}
-          <span class="text-[11px] font-normal text-T-700">تومان</span>
+        <span class="flex items-baseline gap-1.5">
+          <UiTypography size="lg" weight="medium">{{ formatPriceFa(discountAmount) }}</UiTypography>
+          <UiTypography size="sm" weight="semibold" color="subtle">تومان</UiTypography>
         </span>
       </div>
-      <div v-if="discountAmount > 0" class="h-px w-full bg-T-300" />
 
       <!-- Insurance -->
-      <div v-if="selectedInsurance" class="flex flex-col gap-1.5 py-3">
+      <div
+        v-if="selectedInsurance"
+        class="flex min-h-[75px] flex-col justify-center gap-1.5 border-b border-T-300 py-3"
+      >
         <div class="flex items-center justify-between gap-3">
-          <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
-            <IconShieldCheck class="size-4 text-T-600" />
-            مبلغ بیمه:
+          <span class="flex items-center gap-1.5">
+            <img src="/icons/product-detail/shield-check-20.svg" alt="" class="size-5 shrink-0">
+            <UiTypography size="md" color="muted">مبلغ بیمه‌:</UiTypography>
           </span>
-          <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
-            {{ formatPriceFa(selectedInsurance.price) }}
-            <span class="text-[11px] font-normal text-T-700">تومان</span>
+          <span class="flex items-baseline gap-1.5">
+            <UiTypography size="lg" weight="medium">{{ formatPriceFa(selectedInsurance.price) }}</UiTypography>
+            <UiTypography size="sm" weight="semibold" color="subtle">تومان</UiTypography>
           </span>
         </div>
-        <div class="flex items-center justify-between gap-3">
-          <span class="truncate text-[11.5px] text-T-700">({{ selectedInsurance.name }})</span>
+        <div class="flex min-h-[25px] items-center justify-between gap-3 pr-3">
+          <UiTypography size="lg" class="truncate text-start">
+            ({{ selectedInsurance.name }})
+          </UiTypography>
           <button
             type="button"
-            class="flex shrink-0 items-center gap-0.5 text-[11.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+            class="flex shrink-0 items-center gap-1"
             @click="emit('open-insurance')"
           >
-            جزئیات
-            <IconChevronLeft class="size-3.5" />
+            <UiTypography size="md" weight="medium" class="text-R-300 transition-colors hover:text-R-400">جزئیات</UiTypography>
+            <img src="/icons/product-detail/angle-left-13.svg" alt="" class="size-[13px]">
           </button>
         </div>
       </div>
-      <div v-if="selectedInsurance" class="h-px w-full bg-T-300" />
 
       <!-- Services -->
-      <div v-if="addedServices.length" class="flex flex-col gap-1.5 py-3">
+      <div
+        v-if="addedServices.length"
+        class="flex min-h-[75px] flex-col justify-center gap-1.5 border-b border-T-300 py-3"
+      >
         <div class="flex items-center justify-between gap-3">
-          <span class="flex items-center gap-1.5 text-[12.5px] text-T-700">
-            <IconShoppingBag class="size-4 text-T-600" />
-            خدمات:
+          <span class="flex items-center gap-1.5">
+            <img src="/icons/product-detail/package-simple-arrow-down-20.svg" alt="" class="size-5 shrink-0">
+            <UiTypography size="md" color="muted">خدمات:</UiTypography>
           </span>
-          <span class="flex items-baseline gap-1 text-[13px] font-medium text-T-900">
-            {{ formatPriceFa(servicesPrice) }}
-            <span class="text-[11px] font-normal text-T-700">تومان</span>
+          <span class="flex items-baseline gap-1.5">
+            <UiTypography size="lg" weight="medium">{{ formatPriceFa(servicesPrice) }}</UiTypography>
+            <UiTypography size="sm" weight="semibold" color="subtle">تومان</UiTypography>
           </span>
         </div>
-        <div class="flex items-center justify-between gap-3">
-          <span class="truncate text-[11.5px] text-T-700">
+        <div class="flex min-h-[25px] items-center justify-between gap-3 pr-3">
+          <UiTypography size="lg" class="truncate text-start">
             ({{ addedServices.length }} مورد)
-          </span>
+          </UiTypography>
           <button
             type="button"
-            class="flex shrink-0 items-center gap-0.5 text-[11.5px] font-medium text-R-300 transition-colors hover:text-R-400"
+            class="flex shrink-0 items-center gap-1"
             @click="emit('open-services')"
           >
-            جزئیات
-            <IconChevronLeft class="size-3.5" />
+            <UiTypography size="md" weight="medium" class="text-R-300 transition-colors hover:text-R-400">جزئیات</UiTypography>
+            <img src="/icons/product-detail/angle-left-13.svg" alt="" class="size-[13px]">
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Total -->
-    <div class="flex items-end justify-between gap-3 border-t border-T-300 pt-4">
-      <span class="text-[13px] text-T-700">جمع کل</span>
-      <span class="flex flex-col items-end gap-1">
-        <span v-if="product.oldPrice" class="flex items-center gap-2">
-          <span class="text-[12px] text-T-600 line-through">{{ formatPriceFa(product.oldPrice) }}</span>
-          <span
-            v-if="discountPercent"
-            class="flex h-[21px] items-center rounded-full bg-R-300 px-2 text-[10.5px] font-extrabold text-white"
-          >
-            ٪{{ discountPercent }}
+    <!-- Total + add to cart -->
+    <div class="flex flex-col gap-3">
+      <div class="flex items-end justify-between gap-3">
+        <UiTypography size="lg" weight="semibold">جمع کل</UiTypography>
+
+        <span class="flex flex-col items-end gap-1">
+          <span v-if="product.oldPrice" class="flex items-center gap-1.5">
+            <UiTypography size="xl" weight="medium" color="subtle" class="line-through leading-[19px]">
+              {{ formatPriceFa(product.oldPrice) }}
+            </UiTypography>
+            <span
+              v-if="discountPercent"
+              class="flex h-5 items-center rounded-full bg-R-300 px-2"
+            >
+              <UiTypography size="xs" weight="bold" color="white">٪{{ discountPercent }}</UiTypography>
+            </span>
           </span>
-        </span>
-        <span class="flex items-baseline gap-1">
-          <span class="text-[22px] font-extrabold text-T-900">{{ formatPriceFa(payable) }}</span>
-          <span class="text-[12px] text-T-700">تومان</span>
-        </span>
-      </span>
-    </div>
 
-    <!-- Add to cart -->
-    <button
-      type="button"
-      class="flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-R-300 text-[14px] font-bold text-white transition-colors hover:bg-R-400"
-      @click="emit('add-to-cart')"
-    >
-      <IconShoppingCart class="size-5" />
-      افزودن به سبد خرید
-    </button>
-
-    <p
-      v-if="(product.minOrderQuantity ?? 1) > 1"
-      class="-mt-2 text-center text-[11.5px] text-T-600"
-    >
-      حداقل خرید این کالا {{ product.minOrderQuantity }} عدد است.
-    </p>
-
-    <!-- Selected color + warranty -->
-    <div class="flex flex-col gap-2.5">
-      <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
-        <span class="text-[12.5px] text-T-700">رنگ:</span>
-        <span class="flex items-center gap-2">
-          <span
-            v-if="selectedColor"
-            class="size-[18px] shrink-0 rounded-full border border-T-500"
-            :style="{ backgroundColor: selectedColor.value }"
-          />
-          <span class="text-[12.5px] font-medium text-T-900">
-            {{ selectedColor?.name || 'انتخاب نشده' }}
+          <span class="flex items-baseline gap-1.5">
+            <UiTypography size="2xl" weight="bold" class="leading-[22px]">{{ formatPriceFa(payable) }}</UiTypography>
+            <UiTypography size="md" weight="semibold" color="subtle">تومان</UiTypography>
           </span>
         </span>
       </div>
 
-      <div class="flex items-center justify-between gap-3 rounded-lg bg-R-10 px-4 py-3">
-        <span class="text-[12.5px] text-T-700">گارانتی:</span>
-        <span class="flex items-center gap-1.5">
-          <IconShieldCheck class="size-4 text-R-300" />
-          <span class="text-[12.5px] font-medium text-T-900">{{ selectedWarranty.label }}</span>
+      <button
+        type="button"
+        class="flex h-[42px] w-full items-center justify-center gap-1.5 rounded-[12px] bg-R-300 px-[18px] transition-colors hover:bg-R-400"
+        @click="emit('add-to-cart')"
+      >
+        <img src="/icons/product-detail/shopping-bag-22.svg" alt="" class="size-[22px] shrink-0">
+        <UiTypography size="lg" weight="bold" color="white">افزودن به سبد خرید</UiTypography>
+      </button>
+
+      <UiTypography
+        v-if="(product.minOrderQuantity ?? 1) > 1"
+        as="p"
+        size="sm"
+        color="subtle"
+        class="text-center"
+      >
+        حداقل خرید این کالا {{ product.minOrderQuantity }} عدد است.
+      </UiTypography>
+    </div>
+
+    <!-- Selected color + warranty -->
+    <div class="flex flex-col gap-1.5">
+      <div class="flex h-11 items-center justify-between gap-3 rounded-[12px] bg-R-25 px-4">
+        <span class="flex min-w-0 items-center gap-1.5">
+          <ProductDetailColorSwatch />
+          <UiTypography size="md" color="muted" class="shrink-0">رنگ:</UiTypography>
         </span>
+        <UiTypography size="md" weight="medium" class="truncate">
+          {{ selectedColor?.name || 'انتخاب نشده' }}
+        </UiTypography>
+      </div>
+
+      <div class="flex h-11 items-center justify-between gap-3 rounded-[12px] bg-R-25 px-4">
+        <span class="flex min-w-0 items-center gap-1.5">
+          <img src="/icons/product-detail/certificate-20.svg" alt="" class="size-5 shrink-0">
+          <UiTypography size="md" color="muted" class="shrink-0">گارانتی:</UiTypography>
+        </span>
+        <UiTypography size="md" weight="medium" class="truncate text-end">
+          {{ selectedWarranty.label }}
+        </UiTypography>
       </div>
     </div>
   </div>

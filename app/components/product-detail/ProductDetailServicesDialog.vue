@@ -1,33 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
-import {
-  IconPackage,
-  IconFileText,
-  IconX,
-  IconDeviceMobile,
-  IconUmbrella,
-  IconReceipt,
-  IconShieldCheck,
-  IconPlug,
-  IconUsb,
-  IconDeviceGamepad,
-  IconApps,
-} from '@tabler/icons-vue'
 import type { ServiceCatalogItem, ServiceCategory } from '~/data/product'
-import { formatPrice } from '~/utils/format'
-import { cn } from '~/lib/utils'
-
-const categoryIcons = {
-  sim: IconDeviceMobile,
-  insurance: IconUmbrella,
-  invoice: IconReceipt,
-  warranty: IconShieldCheck,
-  charger: IconPlug,
-  accessory: IconUsb,
-  games: IconDeviceGamepad,
-  apps: IconApps,
-} as const
+import { SERVICE_ICON_SRC } from '~/utils/productDetailIcons'
+import { formatPriceFa } from '~/utils/format'
 
 const props = withDefaults(
   defineProps<{
@@ -44,7 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const draft = ref<Set<string>>(new Set())
-const expanded = ref<string>('cat-insurance')
+const expanded = ref<string>('')
 
 watch(
   () => props.open,
@@ -52,7 +28,7 @@ watch(
     if (open) {
       draft.value = new Set(props.selectedIds)
       const firstWithSelection = props.categories.find(c => c.items.some(i => draft.value.has(i.id)))
-      expanded.value = firstWithSelection?.id ?? props.categories[1]?.id ?? props.categories[0]?.id ?? ''
+      expanded.value = firstWithSelection?.id ?? props.categories[0]?.id ?? ''
     }
   },
   { immediate: true },
@@ -60,6 +36,10 @@ watch(
 
 function countInGroup(category: ServiceCategory): number {
   return category.items.filter(item => draft.value.has(item.id)).length
+}
+
+function toggleExpanded(category: ServiceCategory) {
+  expanded.value = expanded.value === category.id ? '' : category.id
 }
 
 function toggle(category: ServiceCategory, id: string) {
@@ -105,117 +85,131 @@ const dialogShell
   <UiDialog :open="open" @update:open="emit('update:open', $event)">
     <UiDialogContent
       :class="dialogShell"
+      overlay-class="bg-[#1D1D1F]/45"
       :show-close-button="false"
-      class="max-w-[580px] gap-0 rounded-2xl p-0 lg:max-w-[580px]"
+      class="flex max-w-[543px] flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0 shadow-none lg:h-[622px] lg:max-h-[92vh] lg:max-w-[543px]"
     >
       <!-- Header -->
-      <div class="flex flex-col gap-3 p-6 pb-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="flex size-11 items-center justify-center rounded-xl bg-R-10 text-R-300">
-              <IconPackage class="size-6" stroke-width="1.5" />
-            </span>
-            <div class="flex flex-col gap-1">
-              <UiDialogTitle class="text-[16px] font-bold text-T-900">
-                افزودن خدمت و لوازم جانبی
-              </UiDialogTitle>
-              <UiDialogDescription class="text-[12.5px] text-T-700">
-                موردی را که می‌خواهید انتخاب کنید
-              </UiDialogDescription>
-            </div>
-          </div>
-          <UiDialogClose
-            class="flex size-9 items-center justify-center rounded-full text-T-600 transition-colors hover:bg-T-100 hover:text-T-900"
-            aria-label="بستن"
-          >
-            <IconX class="size-5" />
-          </UiDialogClose>
+      <div class="flex h-[94px] shrink-0 items-center gap-3 px-6">
+        <span class="flex size-[46px] shrink-0 items-center justify-center rounded-xl bg-R-10">
+          <img src="/icons/product-detail/package-simple-arrow-down-22-red.svg" alt="" class="size-[22px]">
+        </span>
+
+        <div class="flex min-w-0 flex-1 flex-col gap-[5px]">
+          <UiDialogTitle as-child>
+            <UiTypography as="h2" size="xl" weight="bold">
+              افزودن خدمات و لوازم جانبی
+            </UiTypography>
+          </UiDialogTitle>
+          <UiDialogDescription as-child>
+            <UiTypography as="p" size="md" color="muted">
+              دسته موردنظر را باز کنید و انتخاب کنید
+            </UiTypography>
+          </UiDialogDescription>
         </div>
+
+        <UiDialogClose
+          class="flex size-5 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+          aria-label="بستن"
+        >
+          <img src="/icons/product-detail/xmark-20.svg" alt="" class="size-5">
+        </UiDialogClose>
       </div>
 
-      <div class="h-px w-full bg-T-300" />
+      <div class="mx-6 h-px shrink-0 bg-T-400" />
 
-      <!-- Body: accordion of categories -->
-      <div class="max-h-[420px] overflow-y-auto px-6 max-lg:max-h-[52vh] max-lg:px-4">
-        <UiAccordion
-          type="single"
-          collapsible
-          class="flex w-full flex-col gap-2"
-          :default-value="expanded"
-          @update:model-value="expanded = $event as string"
-        >
-          <UiAccordionItem
-            v-for="(category, ci) in categories"
-            :key="category.id"
-            :value="category.id"
-            class="rounded-xl border border-T-300 px-4 last:border-b max-lg:px-3"
+      <!-- Body -->
+      <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-6 pt-6 pb-6 max-lg:max-h-[54vh] max-lg:px-4 max-lg:pt-4">
+        <div v-for="category in categories" :key="category.id" class="shrink-0 overflow-hidden rounded-lg border border-T-300">
+          <!-- Category header -->
+          <button
+            type="button"
+            class="flex w-full items-center gap-3 p-3 text-start transition-colors hover:bg-T-100"
+            :aria-expanded="expanded === category.id"
+            @click="toggleExpanded(category)"
           >
-            <UiAccordionTrigger class="py-4 text-[13.5px] font-medium text-T-900 hover:no-underline [&>svg]:size-4 [&>svg]:text-T-600">
-              <span class="flex w-full items-center gap-2">
-                <component :is="categoryIcons[category.icon]" class="size-5 shrink-0 text-T-600" stroke-width="1.5" />
-                {{ category.title }}
-                <span
-                  v-if="category.items.some(item => draft.has(item.id))"
-                  class="ms-auto flex size-[18px] items-center justify-center rounded-full bg-R-300 text-[10.5px] font-bold text-white"
+            <img
+              :src="SERVICE_ICON_SRC[category.icon]"
+              alt=""
+              class="size-6 shrink-0 object-contain"
+            >
+
+            <UiTypography as="span" size="lg" weight="semibold" class="min-w-0 flex-1 truncate">
+              {{ category.title }}
+            </UiTypography>
+
+            <span
+              v-if="countInGroup(category)"
+              class="flex h-[25px] min-w-[29px] shrink-0 items-center justify-center rounded-full border border-white bg-R-300 px-1"
+            >
+              <UiTypography size="md" weight="bold" color="white" class="tracking-[0.88px]">
+                {{ countInGroup(category) }}
+              </UiTypography>
+            </span>
+
+            <img
+              src="/icons/product-detail/angle-down-16.svg"
+              alt=""
+              class="size-4 shrink-0"
+            >
+          </button>
+
+          <!-- Category items -->
+          <div
+            v-if="expanded === category.id"
+            class="flex flex-col gap-3 px-3 pb-3"
+          >
+            <div class="h-px w-full bg-T-300" />
+
+            <div class="flex flex-col gap-2">
+              <button
+                v-for="item in category.items"
+                :key="item.id"
+                type="button"
+                class="flex min-h-5 w-full items-center gap-1.5 text-start"
+                role="checkbox"
+                :aria-checked="draft.has(item.id)"
+                @click="toggle(category, item.id)"
+              >
+                <img
+                  :src="draft.has(item.id)
+                    ? '/icons/product-detail/check-square-18-red.svg'
+                    : '/icons/product-detail/check-square-18-gray.svg'"
+                  alt=""
+                  class="size-[18px] shrink-0"
                 >
-                  {{ category.items.filter(item => draft.has(item.id)).length }}
+
+                <UiTypography as="span" size="md" class="min-w-0 flex-1 truncate">
+                  {{ item.label }}
+                </UiTypography>
+
+                <span v-if="item.price" class="flex w-[79px] shrink-0 items-center gap-[5px]">
+                  <UiTypography size="md" weight="medium">{{ formatPriceFa(item.price) }}</UiTypography>
+                  <UiTypography size="xs" color="muted">تومان</UiTypography>
                 </span>
-              </span>
-            </UiAccordionTrigger>
-            <UiAccordionContent class="pb-4">
-              <ul class="flex flex-col gap-2.5" :class="ci === 0 && 'pt-1'">
-                <li
-                  v-for="item in category.items"
-                  :key="item.id"
-                  class="flex items-center justify-between gap-3"
-                >
-                  <label
-                    class="flex cursor-pointer items-center gap-2.5"
-                    :class="cn(item.price === 0 && 'text-T-700')"
-                  >
-                    <UiCheckbox
-                      :model-value="draft.has(item.id)"
-                      class="size-[18px]"
-                      @update:model-value="toggle(category, item.id)"
-                    />
-                    <span class="text-[12.5px] text-T-900">{{ item.label }}</span>
-                  </label>
-                  <span class="flex items-center gap-3">
-                    <button
-                      v-if="item.detailLink"
-                      type="button"
-                      class="flex items-center gap-1 text-[11.5px] text-[#3D7BFA] transition-opacity hover:opacity-80"
-                      @click.prevent
-                    >
-                      <IconFileText class="size-3.5" />
-                      جزئیات بیمه
-                    </button>
-                    <span v-if="item.price" class="flex items-center gap-2 text-[12px] text-T-700">
-                      <span v-if="item.oldPrice" class="text-T-500 line-through">{{ formatPrice(item.oldPrice) }}</span>
-                      {{ formatPrice(item.price) }} تومان
-                    </span>
-                  </span>
-                </li>
-              </ul>
-            </UiAccordionContent>
-          </UiAccordionItem>
-        </UiAccordion>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center justify-between border-t border-T-300 px-6 py-4">
-        <div class="flex flex-col gap-1">
-          <span class="text-[12.5px] text-T-700">{{ selectedItems.length }} مورد انتخاب شده است</span>
-          <span v-if="totalPrice" class="text-[12.5px] font-bold text-T-900">
-            مجموع: {{ formatPrice(totalPrice) }} تومان
+      <div class="flex h-[79px] shrink-0 items-start justify-between gap-2.5 border-t border-T-300 bg-white px-6 py-[15px]">
+        <div class="flex min-w-0 flex-1 flex-col items-start gap-[9px]">
+          <UiTypography size="md" color="muted">({{ selectedItems.length }} خدمت) برای این کالا</UiTypography>
+          <span class="flex items-center gap-[5px]">
+            <UiTypography size="lg" weight="semibold">{{ formatPriceFa(totalPrice) }}</UiTypography>
+            <UiTypography size="md" color="muted">تومان</UiTypography>
           </span>
         </div>
-        <UiButton
-          class="h-[42px] w-[132px] rounded-xl text-[13.5px] font-bold"
+
+        <button
+          type="button"
+          class="flex h-[42px] w-[121px] shrink-0 items-center justify-center rounded-xl bg-R-300 px-[18px] transition-colors hover:bg-R-400"
           @click="confirm"
         >
-          تایید
-        </UiButton>
+          <UiTypography size="lg" weight="bold" color="white">تایید</UiTypography>
+        </button>
       </div>
     </UiDialogContent>
   </UiDialog>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
-import { IconBell } from '@tabler/icons-vue'
 import { apiErrorMessage } from '~/composables/useApi'
 import type { NotifyChannel } from '~/composables/useProductNotify'
 import { toastIcons } from '~/utils/toast'
@@ -119,74 +118,94 @@ const dialogShell
   <UiDialog :open="open" @update:open="emit('update:open', $event)">
     <UiDialogContent
       :class="dialogShell"
+      overlay-class="bg-[#1D1D1F]/45"
       :show-close-button="false"
-      class="max-w-[420px] gap-0 rounded-2xl p-0 lg:max-w-[420px]"
+      class="flex max-w-[419px] flex-col gap-8 rounded-3xl border-0 bg-white p-0 shadow-none lg:h-[348px] lg:max-w-[419px]"
     >
       <!-- Header -->
-      <div class="flex flex-col gap-3.5 px-6 pt-5">
-        <div class="flex items-center justify-between">
-          <UiDialogTitle class="text-[16px] font-bold text-T-900">اطلاع‌رسانی موجودی</UiDialogTitle>
+      <div class="flex h-[72px] shrink-0 flex-col">
+        <div class="flex h-[71px] items-center gap-3 px-6">
+          <div class="flex min-w-0 flex-1 flex-col gap-[5px]">
+            <UiDialogTitle as-child>
+              <UiTypography as="h2" size="xl" weight="bold">
+                اطلاع‌رسانی موجودی
+              </UiTypography>
+            </UiDialogTitle>
+          </div>
+
           <UiDialogClose
-            class="flex size-9 items-center justify-center rounded-full text-T-600 transition-colors hover:bg-T-100 hover:text-T-900"
+            class="flex size-5 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
             aria-label="بستن"
-          />
+          >
+            <img src="/icons/product-detail/xmark-20.svg" alt="" class="size-5">
+          </UiDialogClose>
         </div>
-        <div class="h-px w-full bg-T-300" />
+
+        <div class="mx-6 h-px bg-T-400" />
       </div>
 
       <!-- Body -->
-      <div class="flex flex-col gap-7 px-6 py-6">
-        <p class="text-[15px] leading-[24px] text-T-900">
+      <div class="flex flex-col gap-7 px-6 lg:min-h-[122px]">
+        <UiTypography as="p" size="xl">
           در صورت موجود شدن کالا، چطور می‌توانیم به شما اطلاع دهیم؟
-        </p>
+        </UiTypography>
 
-        <p v-if="!authenticated" class="text-[13px] leading-[22px] text-T-700">
+        <UiTypography v-if="!authenticated" as="p" size="md" color="muted" class="leading-[20px]">
           برای فعال‌سازی اطلاع‌رسانی موجودی ابتدا وارد حساب کاربری خود شوید. شماره موبایل و ایمیل
           از پروفایل شما خوانده می‌شود.
-        </p>
+        </UiTypography>
 
-        <p v-else-if="loadingContacts" class="text-[13px] leading-[22px] text-T-700">
+        <UiTypography v-else-if="loadingContacts" as="p" size="md" color="muted" class="leading-[20px]">
           در حال دریافت اطلاعات حساب کاربری…
-        </p>
+        </UiTypography>
 
-        <p v-else-if="!options.length" class="text-[13px] leading-[22px] text-T-700">
+        <UiTypography v-else-if="!options.length" as="p" size="md" color="muted" class="leading-[20px]">
           شماره موبایل یا ایمیل فعالی در حساب شما ثبت نشده است. برای دریافت اطلاع‌رسانی، ابتدا
           اطلاعات حساب خود را تکمیل کنید.
-        </p>
+        </UiTypography>
 
-        <div v-else class="flex flex-col gap-2.5">
-          <label
+        <div v-else class="flex flex-col gap-2">
+          <button
             v-for="option in options"
             :key="option.id"
-            class="flex cursor-pointer items-center justify-end gap-2"
+            type="button"
+            class="flex items-center gap-1.5 text-start"
+            role="checkbox"
+            :aria-checked="checked.has(option.id)"
+            @click="toggle(option.id)"
           >
-            <span class="order-1 text-[12.5px] text-T-900">{{ option.label }}</span>
-            <UiCheckbox
-              :model-value="checked.has(option.id)"
-              class="order-2 size-[18px]"
-              @update:model-value="toggle(option.id)"
-            />
-          </label>
+            <img
+              :src="checked.has(option.id)
+                ? '/icons/product-detail/check-square-18-red.svg'
+                : '/icons/product-detail/check-square-18-gray.svg'"
+              alt=""
+              class="size-[18px] shrink-0"
+            >
+            <UiTypography as="span" size="md" class="min-w-0 flex-1 text-start">
+              {{ option.label }}
+            </UiTypography>
+          </button>
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center justify-between gap-6 px-6 pb-6">
+      <div class="flex h-[90px] shrink-0 items-center gap-6 px-8 py-6">
         <button
           type="button"
-          class="flex h-[42px] flex-1 items-center justify-center gap-2 rounded-xl bg-R-300 text-[14px] font-bold text-white transition-colors hover:bg-R-400 disabled:opacity-60"
-          :disabled="submitting || loadingContacts"
-          @click="submit"
+          class="flex h-[42px] min-w-0 flex-1 items-center justify-center rounded-xl bg-T-300 px-[18px] transition-colors hover:bg-T-400"
+          @click="emit('update:open', false)"
         >
-          {{ authenticated ? 'ثبت' : 'ورود به حساب' }}
-          <IconBell v-if="false" class="size-4" />
+          <UiTypography size="lg" weight="semibold">انصراف</UiTypography>
         </button>
         <button
           type="button"
-          class="flex h-[42px] flex-1 items-center justify-center rounded-xl bg-T-300 text-[14px] font-semibold text-T-900 transition-colors hover:bg-T-400"
-          @click="emit('update:open', false)"
+          class="flex h-[42px] min-w-0 flex-1 items-center justify-center rounded-xl bg-R-300 px-[18px] transition-colors hover:bg-R-400 disabled:opacity-60"
+          :disabled="submitting || loadingContacts"
+          @click="submit"
         >
-          انصراف
+          <UiTypography size="lg" weight="bold" color="white">
+            {{ authenticated ? 'ثبت' : 'ورود به حساب' }}
+          </UiTypography>
         </button>
       </div>
     </UiDialogContent>

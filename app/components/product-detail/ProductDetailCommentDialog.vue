@@ -3,7 +3,9 @@ import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { IconPlus, IconMinus, IconX } from '@tabler/icons-vue'
 import { apiErrorMessage } from '~/composables/useApi'
+import { typographyVariants } from '~/components/ui/typography'
 import { toastIcons } from '~/utils/toast'
+import { RATING_FACE_SELECTED_SRC, RATING_FACE_SRC } from '~/utils/productDetailIcons'
 
 /** Minimal shape so the dialog can serve both the product page and dashboard comments. */
 export interface CommentDialogProduct {
@@ -25,6 +27,8 @@ const props = withDefaults(
     initialText?: string
     initialPositives?: string[]
     initialNegatives?: string[]
+    /** `figma` renders the product-page design; `legacy` keeps the shared dashboard/blog look. */
+    variant?: 'legacy' | 'figma'
   }>(),
   {
     productId: null,
@@ -34,6 +38,7 @@ const props = withDefaults(
     initialText: '',
     initialPositives: () => [],
     initialNegatives: () => [],
+    variant: 'legacy',
   },
 )
 
@@ -72,6 +77,13 @@ watch(
 )
 
 const canSubmit = computed(() => rating.value > 0 && text.value.trim().length >= 10)
+
+const ratingLabel = computed(() => ratings.find(item => item.value === rating.value)?.label ?? '')
+const ratingSummary = computed(() =>
+  rating.value > 0
+    ? `${ratingLabel.value} (${rating.value} از 5)`
+    : 'امتیازی انتخاب نشده',
+)
 
 function addPoint(list: 'positive' | 'negative') {
   const value = (list === 'positive' ? positiveDraft : negativeDraft).value.trim()
@@ -131,7 +143,7 @@ const dialogShell
 </script>
 
 <template>
-  <UiDialog :open="open" @update:open="emit('update:open', $event)">
+  <UiDialog v-if="variant === 'legacy'" :open="open" @update:open="emit('update:open', $event)">
     <UiDialogContent
       :class="dialogShell"
       :show-close-button="false"
@@ -299,6 +311,205 @@ const dialogShell
         >
           ثبت دیدگاه
         </UiButton>
+      </div>
+    </UiDialogContent>
+  </UiDialog>
+
+  <!-- ================================================ -->
+  <!-- Product-page design variant                       -->
+  <!-- ================================================ -->
+  <UiDialog v-else :open="open" @update:open="emit('update:open', $event)">
+    <UiDialogContent
+      :class="dialogShell"
+      overlay-class="bg-[#1D1D1F]/45"
+      :show-close-button="false"
+      class="flex max-w-[506px] flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0 shadow-none lg:h-[1098px] lg:max-h-[calc(100dvh-2px)] lg:max-w-[506px]"
+    >
+      <!-- Header -->
+      <div class="flex h-[71px] shrink-0 items-center gap-3 px-6">
+        <div class="flex min-w-0 flex-1 flex-col gap-[5px]">
+          <UiDialogTitle as-child>
+            <UiTypography as="h2" size="xl" weight="bold">
+              ثبت دیدگاه
+            </UiTypography>
+          </UiDialogTitle>
+        </div>
+        <UiDialogClose
+          class="flex size-5 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+          aria-label="بستن"
+        >
+          <img src="/icons/product-detail/xmark-20.svg" alt="" class="size-5">
+        </UiDialogClose>
+      </div>
+
+      <div class="mx-6 h-px shrink-0 bg-T-400" />
+
+      <!-- Scrollable body -->
+      <div class="flex min-h-0 flex-1 flex-col gap-[25px] overflow-y-auto px-6 pt-[27px] pb-2 max-lg:max-h-[62vh] max-lg:px-4 max-lg:pt-4 lg:pb-1.5">
+        <!-- Product summary -->
+        <div class="flex h-[90px] shrink-0 items-center gap-5 rounded-xl border border-T-400 p-3">
+          <img
+            :src="product.images[0]?.src"
+            :alt="product.title"
+            class="size-16 shrink-0 rounded-[7px] object-contain lg:border lg:border-T-400"
+          >
+          <UiTypography as="p" size="md" class="line-clamp-2 flex-1 text-start">
+            {{ product.title }}
+          </UiTypography>
+        </div>
+
+        <!-- Rating -->
+        <div class="flex shrink-0 flex-col gap-[15px]">
+          <div class="flex items-center gap-2.5">
+            <UiTypography as="p" size="lg" weight="medium">امتیاز شما به این کالا:</UiTypography>
+            <UiTypography as="span" size="lg" color="muted">{{ ratingSummary }}</UiTypography>
+          </div>
+
+          <div class="flex items-stretch gap-2">
+            <button
+              v-for="option in [...ratings].reverse()"
+              :key="option.value"
+              type="button"
+              class="flex h-[104px] flex-1 flex-col items-center justify-center gap-3 rounded-[20px] border p-5 transition-colors"
+              :class="rating === option.value
+                ? 'border-R-300 bg-R-25'
+                : 'border-T-400 bg-transparent hover:bg-T-100'"
+              :aria-pressed="rating === option.value"
+              @click="rating = option.value"
+            >
+              <img
+                :src="rating === option.value
+                  ? RATING_FACE_SELECTED_SRC[option.value]
+                  : RATING_FACE_SRC[option.value]"
+                alt=""
+                class="size-8 shrink-0 object-contain"
+              >
+              <UiTypography as="span" size="md">{{ option.label }}</UiTypography>
+            </button>
+          </div>
+        </div>
+
+        <!-- Comment text -->
+        <div class="flex shrink-0 flex-col gap-1.5 lg:min-h-[143px] lg:justify-center">
+          <UiTypography as="p" size="lg" weight="medium" class="px-1">دیدگاه شما درباره این کالا:</UiTypography>
+          <textarea
+            v-model="text"
+            rows="3"
+            placeholder="متن دیدگاه ..."
+            class="h-[112px] w-full resize-none rounded-xl border border-T-500 bg-T-50 px-3 py-[15px] text-T-900 outline-none transition-colors placeholder:text-T-600 focus:border-R-300 lg:bg-white"
+            :class="typographyVariants({ size: 'lg' })"
+          />
+        </div>
+
+        <!-- Positive points -->
+        <div class="flex shrink-0 flex-col gap-1.5 rounded-xl border border-T-400 p-3 lg:min-h-[214px]">
+          <div class="flex items-center gap-1">
+            <img src="/icons/product-detail/plus-18.svg" alt="" class="size-[18px]">
+            <UiTypography as="p" size="lg" weight="medium">نکات مثبت</UiTypography>
+          </div>
+
+          <div class="flex h-[50px] items-center gap-1.5 rounded-xl border border-T-500 bg-white px-3 py-4">
+            <input
+              v-model="positiveDraft"
+              type="text"
+              placeholder="نکات مثبت"
+              class="min-w-0 flex-1 bg-transparent text-T-900 outline-none placeholder:text-T-600"
+              :class="typographyVariants({ size: 'lg' })"
+              @keydown.enter.prevent="addPoint('positive')"
+            >
+            <button
+              type="button"
+              class="flex h-7 shrink-0 items-center justify-center rounded-lg px-2 transition-colors"
+              :class="positiveDraft.trim() ? 'text-T-900 hover:text-R-300' : 'text-T-600'"
+              @click="addPoint('positive')"
+            >
+              <UiTypography size="lg" weight="semibold">ثبت</UiTypography>
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-1.5 lg:min-h-[105px] lg:justify-center">
+            <div
+              v-for="(point, i) in positives"
+              :key="`fig-pos-${i}`"
+              class="flex min-h-[40px] items-center gap-1 rounded-lg border border-T-300 bg-T-200 p-2.5"
+            >
+              <img src="/icons/product-detail/plus-14.svg" alt="" class="size-3.5 shrink-0">
+              <UiTypography as="span" size="md" class="min-w-0 flex-1 truncate text-start">{{ point }}</UiTypography>
+              <button
+                type="button"
+                class="flex size-4 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+                :aria-label="`حذف ${point}`"
+                @click="positives.splice(i, 1)"
+              >
+                <img src="/icons/product-detail/xmark-16-gray.svg" alt="" class="size-4">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Negative points -->
+        <div class="flex shrink-0 flex-col gap-1.5 rounded-xl border border-T-400 p-3 lg:min-h-[214px]">
+          <div class="flex items-center gap-1">
+            <img src="/icons/product-detail/minus-18.svg" alt="" class="size-[18px]">
+            <UiTypography as="p" size="lg" weight="medium">نکات منفی</UiTypography>
+          </div>
+
+          <div class="flex h-[50px] items-center gap-1.5 rounded-xl border border-T-500 bg-white px-3 py-4">
+            <input
+              v-model="negativeDraft"
+              type="text"
+              placeholder="نکات منفی"
+              class="min-w-0 flex-1 bg-transparent text-T-900 outline-none placeholder:text-T-600"
+              :class="typographyVariants({ size: 'lg' })"
+              @keydown.enter.prevent="addPoint('negative')"
+            >
+            <button
+              type="button"
+              class="flex h-7 shrink-0 items-center justify-center rounded-lg px-2 transition-colors"
+              :class="negativeDraft.trim() ? 'text-T-900 hover:text-R-300' : 'text-T-600'"
+              @click="addPoint('negative')"
+            >
+              <UiTypography size="lg" weight="semibold">ثبت</UiTypography>
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-1.5 lg:min-h-[105px] lg:justify-center">
+            <div
+              v-for="(point, i) in negatives"
+              :key="`fig-neg-${i}`"
+              class="flex min-h-[40px] items-center gap-1 rounded-lg border border-T-300 bg-T-200 p-2.5"
+            >
+              <img src="/icons/product-detail/minus-14.svg" alt="" class="size-3.5 shrink-0">
+              <UiTypography as="span" size="md" class="min-w-0 flex-1 truncate text-start">{{ point }}</UiTypography>
+              <button
+                type="button"
+                class="flex size-4 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+                :aria-label="`حذف ${point}`"
+                @click="negatives.splice(i, 1)"
+              >
+                <img src="/icons/product-detail/xmark-16-gray.svg" alt="" class="size-4">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex h-[92px] shrink-0 items-center justify-between gap-2.5 border-t border-T-300 bg-white px-6 py-6 lg:items-start">
+        <button
+          type="button"
+          class="flex h-[42px] w-[182px] items-center justify-center rounded-xl bg-T-300 max-lg:w-auto max-lg:flex-1 px-[18px] transition-colors hover:bg-T-400"
+          @click="emit('update:open', false)"
+        >
+          <UiTypography size="lg" weight="bold">انصراف</UiTypography>
+        </button>
+        <button
+          type="button"
+          class="flex h-[42px] w-[182px] items-center justify-center rounded-xl bg-R-300 max-lg:w-auto max-lg:flex-1 px-[18px] transition-colors hover:bg-R-400"
+          @click="submit"
+        >
+          <UiTypography size="lg" weight="bold" color="white">ثبت دیدگاه</UiTypography>
+        </button>
       </div>
     </UiDialogContent>
   </UiDialog>
