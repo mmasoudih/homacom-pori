@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
 import type { ExpertReview } from '~/data/product'
 import { cn } from '~/lib/utils'
@@ -20,8 +20,13 @@ const emit = defineEmits<{
 }>()
 
 const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
-/** Desktop collapses the review inline; mobile hands off to the detail sheet. */
+/**
+ * Desktop collapses inline (design «Frame 3115» on the Mobile page): the
+ * collapsed preview is header + title + body text + «مشاهده بیشتر»; the image
+ * and the quick-look list only appear once expanded. Mobile keeps the sheet.
+ */
 const expanded = ref(false)
+const showExtras = computed(() => !isDesktop.value || expanded.value)
 
 function onShowMore() {
   if (isDesktop.value) expanded.value = !expanded.value
@@ -55,30 +60,31 @@ function onShowMore() {
           v-for="(paragraph, i) in review.intro"
           :key="i"
           class="text-[13px] leading-[30px] text-T-800 lg:text-[16px] lg:leading-[38.4px]"
-          :class="!expanded && 'lg:line-clamp-2'"
         >
           {{ paragraph }}
         </p>
 
-        <img
-          :src="review.image"
-          :alt="review.imageAlt"
-          class="mx-auto h-auto w-full rounded-2xl object-cover lg:my-[30px] lg:h-[342px] lg:w-[608px] lg:max-w-none lg:rounded-[20px] lg:object-contain"
-        >
-
-        <p class="text-[14px] font-bold text-T-900 lg:text-[16px] lg:font-semibold lg:leading-[38.4px]">
-          {{ review.quickLookTitle }}
-        </p>
-
-        <ul class="flex flex-col gap-2 ps-6 lg:gap-0 lg:ps-[30px]">
-          <li
-            v-for="item in review.quickLook"
-            :key="item"
-            class="list-disc text-[13px] leading-[28px] marker:text-T-600 lg:text-[16px] lg:leading-[38.4px] lg:text-T-800 lg:marker:text-T-800"
+        <template v-if="showExtras">
+          <img
+            :src="review.image"
+            :alt="review.imageAlt"
+            class="mx-auto h-auto w-full rounded-2xl object-cover lg:my-[30px] lg:h-[342px] lg:w-[608px] lg:max-w-none lg:rounded-[20px] lg:object-contain"
           >
-            {{ item }}
-          </li>
-        </ul>
+
+          <p class="text-[14px] font-bold text-T-900 lg:text-[16px] lg:font-semibold lg:leading-[38.4px]">
+            {{ review.quickLookTitle }}
+          </p>
+
+          <ul class="flex flex-col gap-2 ps-6 lg:gap-0 lg:ps-[30px]">
+            <li
+              v-for="item in review.quickLook"
+              :key="item"
+              class="list-disc text-[13px] leading-[28px] marker:text-T-600 lg:text-[16px] lg:leading-[38.4px] lg:text-T-800 lg:marker:text-T-800"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </template>
       </div>
 
       <!-- «مشاهده بیشتر»: right aligned, 12.5 bold with the exported chevron on its left -->
