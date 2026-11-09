@@ -36,7 +36,13 @@ const items = [
 </script>
 
 <template>
+  <!--
+    `dir="ltr"` on the grid keeps the item order exactly as «Frame 3217» lays it
+    out (tag → coins → truck → shield, left to right). Each item flips back to
+    RTL so its icon stays on the start side and the copy stays right aligned.
+  -->
   <div
+    dir="ltr"
     :class="cn(
       'grid w-full grid-cols-4 items-center gap-8 rounded-[20px] border border-T-400 bg-T-50 px-6 py-5',
       props.class,
@@ -45,6 +51,7 @@ const items = [
     <div
       v-for="item in items"
       :key="item.title"
+      dir="rtl"
       class="flex h-[61px] items-center gap-5"
     >
       <img :src="item.icon" alt="" class="size-[38px] shrink-0">
