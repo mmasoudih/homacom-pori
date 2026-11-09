@@ -233,11 +233,11 @@ function scrollToSection(id: string) {
 
       <!-- Empty services state -->
       <div v-else class="flex flex-col gap-[18px]">
-        <div class="flex items-center justify-between gap-2.5">
-          <UiTypography as="h2" size="xl" weight="semibold">خدمات و لوازم جانبی:</UiTypography>
+        <div class="flex h-[25px] items-center justify-between gap-2.5">
+          <UiTypography as="h2" size="xl" weight="semibold" class="leading-[19px]">خدمات و لوازم جانبی:</UiTypography>
           <button
             type="button"
-            class="flex items-center gap-1 transition-colors"
+            class="flex h-[25px] items-center gap-1 transition-colors"
             @click="emit('open-services')"
           >
             <img src="/icons/product-detail/plus-15.svg" alt="" class="size-[15px]">
@@ -247,7 +247,23 @@ function scrollToSection(id: string) {
           </button>
         </div>
 
-        <div class="flex h-[159px] flex-col items-center justify-center gap-[14px] rounded-[20px] border border-T-500 bg-T-100 px-3 py-[9px]">
+        <div class="relative flex h-[159px] flex-col items-center justify-center gap-[14px] rounded-[20px] bg-T-100 px-3 py-[9px]">
+          <!-- Dashed outline from the design (5/5 dash, radius 20) -->
+          <svg class="pointer-events-none absolute inset-0 size-full text-T-500" aria-hidden="true">
+            <rect
+              x="0.5"
+              y="0.5"
+              width="calc(100% - 1px)"
+              height="calc(100% - 1px)"
+              rx="19.5"
+              ry="19.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1"
+              stroke-dasharray="5 5"
+            />
+          </svg>
+
           <img src="/icons/product-detail/package-simple-arrow-down-22.svg" alt="" class="size-[22px]">
 
           <div class="flex flex-col items-center gap-0.5 text-center">
@@ -259,7 +275,7 @@ function scrollToSection(id: string) {
 
           <button
             type="button"
-            class="flex h-9 w-full max-w-[202px] items-center justify-center gap-1.5 rounded-xl border border-R-300 px-[18px] transition-colors hover:bg-R-25"
+            class="flex h-9 w-full max-w-[202px] items-center justify-center gap-1.5 rounded-[12px] border border-R-300 px-[18px] transition-colors hover:bg-R-25"
             @click="emit('open-services')"
           >
             <img src="/icons/product-detail/plus-15.svg" alt="" class="size-[15px]">

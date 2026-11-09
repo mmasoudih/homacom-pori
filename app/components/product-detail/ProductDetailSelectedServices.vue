@@ -23,15 +23,15 @@ function iconFor(service: ServiceCatalogItem) {
 <template>
   <div class="flex flex-col gap-[18px]">
     <!-- Header -->
-    <div class="flex items-center justify-between gap-2.5">
+    <div class="flex h-[25px] items-center justify-between gap-2.5">
       <div class="flex items-center gap-2.5">
-        <UiTypography as="h2" size="xl" weight="semibold">خدمات و لوازم جانبی:</UiTypography>
+        <UiTypography as="h2" size="xl" weight="semibold" class="leading-[19px]">خدمات و لوازم جانبی:</UiTypography>
         <UiTypography size="lg" color="muted">{{ countLabel }}</UiTypography>
       </div>
 
       <button
         type="button"
-        class="flex items-center gap-1 transition-colors"
+        class="flex h-[25px] items-center gap-1 transition-colors"
         @click="emit('open-services')"
       >
         <img src="/icons/product-detail/plus-15.svg" alt="" class="size-[15px]">
