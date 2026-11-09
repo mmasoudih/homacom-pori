@@ -201,7 +201,7 @@ function summaryStar(star: number) {
         <!-- Distribution: 1 star on top … 5 stars at the bottom -->
         <div class="flex w-[191px] flex-col gap-1">
           <div v-for="star in 5" :key="star" class="flex h-[15px] items-center gap-[7px]">
-            <span class="text-[12.5px] font-medium leading-[15px] text-T-900">{{ star }}</span>
+            <span class="w-[6px] shrink-0 text-[12.5px] font-medium leading-[15px] text-T-900">{{ star }}</span>
             <div class="h-[9px] flex-1 overflow-hidden rounded-full bg-T-300">
               <div
                 class="h-full rounded-full bg-R-200"
