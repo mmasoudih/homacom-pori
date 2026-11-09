@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import type { ExpertReview } from '~/data/product'
 import { cn } from '~/lib/utils'
+import { DESKTOP_MEDIA_QUERY } from '~/utils/breakpoints'
 
 const props = withDefaults(
   defineProps<{
@@ -15,6 +18,15 @@ const props = withDefaults(
 const emit = defineEmits<{
   'show-more': []
 }>()
+
+const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY)
+/** Desktop collapses the review inline; mobile hands off to the detail sheet. */
+const expanded = ref(false)
+
+function onShowMore() {
+  if (isDesktop.value) expanded.value = !expanded.value
+  else emit('show-more')
+}
 </script>
 
 <template>
@@ -43,6 +55,7 @@ const emit = defineEmits<{
           v-for="(paragraph, i) in review.intro"
           :key="i"
           class="text-[13px] leading-[30px] text-T-800 lg:text-[16px] lg:leading-[38.4px]"
+          :class="!expanded && 'lg:line-clamp-2'"
         >
           {{ paragraph }}
         </p>
@@ -50,7 +63,7 @@ const emit = defineEmits<{
         <img
           :src="review.image"
           :alt="review.imageAlt"
-          class="mx-auto h-auto w-full rounded-2xl object-cover lg:my-[30px] lg:h-[342px] lg:w-[608px] lg:max-w-none lg:rounded-[20px]"
+          class="mx-auto h-auto w-full rounded-2xl object-cover lg:my-[30px] lg:h-[342px] lg:w-[608px] lg:max-w-none lg:rounded-[20px] lg:object-contain"
         >
 
         <p class="text-[14px] font-bold text-T-900 lg:text-[16px] lg:font-semibold lg:leading-[38.4px]">
@@ -70,13 +83,18 @@ const emit = defineEmits<{
 
       <!-- «مشاهده بیشتر»: right aligned, 12.5 bold with the exported chevron on its left -->
       <button
-        v-if="showMoreCount"
+        v-if="showMoreCount || isDesktop"
         type="button"
         class="flex items-center gap-1 self-start text-[13px] font-medium text-R-300 transition-colors hover:text-R-400 lg:text-[12.5px] lg:font-bold"
-        @click="emit('show-more')"
+        @click="onShowMore"
       >
-        <span>مشاهده بیشتر</span>
-        <img src="/icons/product-detail/angle-down-14.svg" alt="" class="size-4 lg:size-3.5">
+        <span>{{ expanded ? 'مشاهده کمتر' : 'مشاهده بیشتر' }}</span>
+        <img
+          src="/icons/product-detail/angle-down-14.svg"
+          alt=""
+          class="size-4 transition-transform lg:size-3.5"
+          :class="expanded && 'rotate-180'"
+        >
       </button>
     </article>
   </section>
