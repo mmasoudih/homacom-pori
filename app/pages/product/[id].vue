@@ -318,7 +318,7 @@ function navigateToSection(target: 'review' | 'specs' | 'comments') {
           </div>
 
           <!-- ================== Desktop trust strip =================== -->
-          <ProductDetailTrustStrip class="mt-8 hidden w-full max-w-[1350px] lg:flex" />
+          <ProductDetailTrustStrip class="mt-8 hidden w-full max-w-[1350px] lg:grid" />
 
           <!-- ============== Review + specs + comments + related ============== -->
           <div class="mt-8 flex w-full max-w-[1350px] flex-col gap-10 px-4 lg:mt-12 lg:grid lg:grid-cols-[1fr_324px] lg:items-start lg:gap-9 lg:px-0">
