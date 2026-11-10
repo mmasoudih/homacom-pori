@@ -10,6 +10,7 @@ import {
   findBlogCategory,
   postsByCategory,
 } from '~/data/blog'
+import { blogPosts as landingBlogPosts } from '~/data/landing'
 import { ApiError } from '~/composables/useApi'
 import { toPersianDigits } from '~/utils/format'
 import { resolveMediaUrl } from '~/utils/media'
@@ -161,6 +162,51 @@ function fallbackHome(): BlogHome {
       ...mockSections.flatMap(section => section.posts),
     ]),
   }
+}
+
+/** Designed placeholder cards for the landing «وبلاگ» row. */
+const landingFallbackPosts: BlogPost[] = landingBlogPosts.map(post => ({
+  slug: '',
+  title: post.title,
+  image: post.image,
+  date: post.date,
+  age: '',
+  category: '',
+  categorySlug: '',
+}))
+
+/**
+ * Landing «وبلاگ» row.
+ *
+ * `GET /shop/blogs` returns the front-page payload (`lastPosts` + one block per
+ * category). The landing strip only needs the newest cards, so the first
+ * `limit` posts are mapped to card view models and the designed placeholders
+ * are kept as the default whenever the API is empty or unreachable.
+ */
+export function useLandingBlogPosts(limit = 4) {
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+
+  const { data, pending, error, refresh } = useAsyncData<BlogPost[]>(
+    'landing-blog-posts',
+    async () => {
+      try {
+        const res = await api.get<ApiBlogHome>('/shop/blogs', { skipAuth: true })
+        const posts = (res.data?.lastPosts ?? [])
+          .map(post => mapPost(post, apiBase))
+          .filter(post => post.title)
+        if (posts.length) return posts.slice(0, limit)
+      }
+      catch {
+        // Fall back to the designed cards below.
+      }
+      return landingFallbackPosts
+    },
+    { default: () => landingFallbackPosts },
+  )
+
+  return { posts: data, pending, error, refresh }
 }
 
 /** Blog landing: latest posts + one section per API category. */

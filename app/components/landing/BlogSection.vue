@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { blogPosts } from '~/data/landing'
+import type { BlogPost } from '~/data/blog'
 import { toPersianDigits } from '~/utils/format'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+
+const { posts } = useLandingBlogPosts(4)
+
+/** Route to the article; placeholder cards have no slug and fall back to the index. */
+function postHref(post: BlogPost): string {
+  return post.slug && post.categorySlug
+    ? `/blog/${post.categorySlug}/${post.slug}`
+    : '/blog'
+}
 </script>
 
 <template>
@@ -15,11 +24,11 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     >
       <CarouselContent class="-ms-3">
         <CarouselItem
-          v-for="(post, i) in blogPosts"
+          v-for="(post, i) in posts"
           :key="i"
           class="w-[222px] shrink-0 basis-auto ps-3"
         >
-          <NuxtLink to="/blog" class="group block overflow-hidden rounded-2xl border border-T-400 bg-T-50">
+          <NuxtLink :to="postHref(post)" class="group block overflow-hidden rounded-2xl border border-T-400 bg-T-50">
             <!-- Image -->
             <div class="aspect-[210/151] w-full overflow-hidden">
               <img
@@ -61,8 +70,9 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
     <!-- Desktop: grid -->
     <div class="mt-[18px] hidden grid-cols-1 gap-[18px] lg:mx-auto lg:grid lg:max-w-[1350px] lg:grid-cols-4">
       <NuxtLink
-        v-for="(post, i) in blogPosts"
+        v-for="(post, i) in posts"
         :key="i"
+        :to="postHref(post)"
         class="group overflow-hidden rounded-2xl border border-T-400 bg-T-50 lg:h-[327px]"
       >
         <!-- Image -->
