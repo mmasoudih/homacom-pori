@@ -229,47 +229,51 @@ const selectedCategory = ref(0)
 
       <!-- Comparison -->
       <section class="mt-20 w-full max-w-[1440px] px-4 lg:mt-24 lg:px-6">
-        <div class="mx-auto grid max-w-[920px] grid-cols-1 gap-5 lg:grid-cols-2">
-          <!-- Them (right in RTL) -->
-          <div class="rounded-[20px] border border-T-400 bg-T-50 p-8">
-            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
-              {{ collaborationPage.compareThemTitle }}
-            </UiTypography>
-            <ul class="mt-6 flex flex-col gap-4">
-              <li
-                v-for="item in collaborationPage.compareThemItems"
-                :key="item"
-                class="flex items-center gap-3"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
-                  <path d="M13.7197 14.7803C14.0126 15.0732 14.4874 15.0732 14.7803 14.7803C15.0732 14.4874 15.0732 14.0126 14.7803 13.7197L10.0607 9L14.7803 4.28033C15.0732 3.98744 15.0732 3.51256 14.7803 3.21967C14.4874 2.92678 14.0126 2.92678 13.7197 3.21967L9 7.93934L4.28033 3.21967C3.98744 2.92678 3.51256 2.92678 3.21967 3.21967C2.92678 3.51256 2.92678 3.98744 3.21967 4.28033L7.93934 9L3.21967 13.7197C2.92678 14.0126 2.92678 14.4874 3.21967 14.7803C3.51256 15.0732 3.98744 15.0732 4.28033 14.7803L9 10.0607L13.7197 14.7803Z" fill="#9CA3AF"/>
-                </svg>
-                <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
-                  {{ item }}
-                </UiTypography>
-              </li>
-            </ul>
-          </div>
+        <div class="mx-auto max-w-[920px]">
+          <LandingSectionTitle :title="collaborationPage.compareTitle" variant="centered" />
 
-          <!-- Us (left in RTL) -->
-          <div class="max-lg:order-first rounded-[20px] border border-R-300 bg-R-10 p-8">
-            <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
-              {{ collaborationPage.compareUsTitle }}
-            </UiTypography>
-            <ul class="mt-6 flex flex-col gap-4">
-              <li
-                v-for="item in collaborationPage.compareUsItems"
-                :key="item"
-                class="flex items-center gap-3"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
-                  <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
-                  {{ item }}
-                </UiTypography>
-              </li>
-            </ul>
+          <div class="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <!-- Them (right in RTL) -->
+            <div class="rounded-[20px] border border-T-400 bg-T-50 p-8">
+              <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
+                {{ collaborationPage.compareThemTitle }}
+              </UiTypography>
+              <ul class="mt-6 flex flex-col gap-4">
+                <li
+                  v-for="item in collaborationPage.compareThemItems"
+                  :key="item"
+                  class="flex items-center gap-3"
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                    <path d="M13.7197 14.7803C14.0126 15.0732 14.4874 15.0732 14.7803 14.7803C15.0732 14.4874 15.0732 14.0126 14.7803 13.7197L10.0607 9L14.7803 4.28033C15.0732 3.98744 15.0732 3.51256 14.7803 3.21967C14.4874 2.92678 14.0126 2.92678 13.7197 3.21967L9 7.93934L4.28033 3.21967C3.98744 2.92678 3.51256 2.92678 3.21967 3.21967C2.92678 3.51256 2.92678 3.98744 3.21967 4.28033L7.93934 9L3.21967 13.7197C2.92678 14.0126 2.92678 14.4874 3.21967 14.7803C3.51256 15.0732 3.98744 15.0732 4.28033 14.7803L9 10.0607L13.7197 14.7803Z" fill="#9CA3AF"/>
+                  </svg>
+                  <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
+                    {{ item }}
+                  </UiTypography>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Us (left in RTL) -->
+            <div class="max-lg:order-first rounded-[20px] border border-R-300 bg-R-10 p-8">
+              <UiTypography as="h3" size="xl" weight="semibold" color="default" class="text-start max-lg:text-[14px]">
+                {{ collaborationPage.compareUsTitle }}
+              </UiTypography>
+              <ul class="mt-6 flex flex-col gap-4">
+                <li
+                  v-for="item in collaborationPage.compareUsItems"
+                  :key="item"
+                  class="flex items-center gap-3"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                    <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
+                    {{ item }}
+                  </UiTypography>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -277,6 +281,9 @@ const selectedCategory = ref(0)
       <!-- Products -->
       <section class="mt-20 w-full max-w-[1020px] px-4 lg:mt-24 lg:px-6">
         <LandingSectionTitle :title="collaborationPage.productsTitle" variant="centered" title-size="16" />
+        <p class="mx-auto mt-4 max-w-[640px] text-center text-[15px] leading-[26px] text-T-700">
+          {{ collaborationPage.productsIntro }}
+        </p>
 
         <!-- Mobile: circular icon grid -->
         <div class="mt-8 grid grid-cols-4 gap-y-[13px] lg:hidden">
