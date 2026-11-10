@@ -1,7 +1,6 @@
 import type { FaqItem } from '~/components/pages/FaqAccordion.vue'
 
 export interface CollaborationPageData {
-  breadcrumb: string[]
   chartTitle: string
   stats: Array<{ value: string, label: string }>
   headline: string
@@ -27,7 +26,6 @@ export interface CollaborationPageData {
 }
 
 export const collaborationPage: CollaborationPageData = {
-  breadcrumb: ['هماکام', 'پنل همکار و سازمانی'],
   chartTitle: 'روند رشد فروش شرکای هماکام',
   stats: [
     { value: '42%', label: 'صرفه‌جویی در خرید' },

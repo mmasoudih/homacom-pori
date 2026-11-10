@@ -5,6 +5,9 @@
  */
 const { page: branchPage } = useBranchPage()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 useHead({
   title: 'فروشگاه‌های حضوری هماکام | هماکام',
 })
@@ -35,13 +38,15 @@ watch(
       <!--
         DEBUG: `.not-from-api` paints red everything that does NOT come from
         `GET /shop/public/branch-page` (hardcoded labels, local SVG/PNG assets,
-        mock copy). Remove the class from these nodes to restore the design.
+        mock copy). The breadcrumb is route-driven (`~/utils/breadcrumbs`), so
+        it is not marked. Remove the class from these nodes to restore the
+        design.
       -->
 
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — route-driven -->
       <UiBreadcrumb
-        :trail="['هماکام', 'فروشگاه‌های حضوری']"
-        class="not-from-api mx-auto hidden w-full max-w-[1398px] px-4 pt-10 lg:flex lg:px-6 lg:pt-3 lg:leading-[15px]"
+        :trail="breadcrumb"
+        class="mx-auto hidden w-full max-w-[1398px] px-4 pt-10 lg:flex lg:px-6 lg:pt-3 lg:leading-[15px]"
       />
 
       <!-- Hero -->

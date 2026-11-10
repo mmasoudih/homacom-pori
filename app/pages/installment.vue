@@ -22,6 +22,9 @@ useHead({
 // the fallback while the API is cold or a key has not been saved yet.
 const { page: installmentPage } = useInstallmentPage()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 const selectedCategory = ref(0)
 const selectedPartner = ref(0)
 
@@ -98,8 +101,9 @@ const categoryIcons: Record<string, string> = {
       <!--
         DEBUG: `.not-from-api` paints red everything that does NOT come from
         `GET /shop/public/installment-page` (hardcoded labels, local SVG/PNG
-        assets, mock copy). Remove the class from these nodes to restore the
-        design.
+        assets, mock copy). The breadcrumb is route-driven
+        (`~/utils/breadcrumbs`), so it is not marked. Remove the class from
+        these nodes to restore the design.
       -->
 
       <!-- Hero -->
@@ -108,8 +112,8 @@ const categoryIcons: Record<string, string> = {
       >
         <div class="relative z-10 flex h-full w-full flex-col bg-white/60 px-4 py-10 backdrop-blur-[45px] lg:px-8 lg:py-14">
           <div class="mx-auto flex w-full max-w-[1120px] flex-1 flex-col">
-          <!-- Breadcrumb trail is hardcoded, not part of the endpoint -->
-          <UiBreadcrumb :trail="['هماکام', 'خرید اقساطی']" class="not-from-api -mt-8 mb-6 shrink-0 max-lg:hidden" />
+          <!-- Breadcrumb: route-driven (`~/utils/breadcrumbs`) -->
+          <UiBreadcrumb :trail="breadcrumb" class="-mt-8 mb-6 shrink-0 max-lg:hidden" />
           <div class="grid flex-1 grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_380px] lg:gap-16">
           <!-- Mobile: hero copy sits on the plain page background — the offset
                utilities bleed it over the overlay padding + grid gap so no

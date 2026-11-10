@@ -5,6 +5,9 @@ import { aboutPage } from '~/data/pages/about'
 // fallback (and as the hero/sections above the API article).
 const { about } = useAboutPage()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 /** `about_us_link` may still be the `{URL}` placeholder — only render real URLs. */
 const aboutLink = computed(() =>
   /^https?:\/\//i.test(about.value.aboutUsLink) ? about.value.aboutUsLink : '',
@@ -29,15 +32,15 @@ useHead(() => ({
       DEBUG: `.not-from-api` paints red everything that does NOT come from
       `GET /shop/public/about` — that endpoint only returns the article body
       (`about_us`), a link (`about_us_link`, currently `{URL}`) and a meta
-      description, so the breadcrumb, the hero card and the article above the
-      live paragraph are mock. Remove the class from these nodes to restore the
-      design.
+      description, so the hero card and the article above the live paragraph
+      are mock. The breadcrumb is route-driven (`~/utils/breadcrumbs`), so it is
+      not marked. Remove the class from these nodes to restore the design.
     -->
 
-    <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
+    <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — route-driven -->
     <UiBreadcrumb
-      :trail="['هماکام', 'درباره ما']"
-      class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      :trail="breadcrumb"
+      class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
     />
 
     <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">

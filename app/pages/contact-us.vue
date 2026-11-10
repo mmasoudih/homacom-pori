@@ -34,6 +34,9 @@ useHead({
 // fallback for every missing/null setting.
 const { contact } = useContactPage()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 const phone = computed(() => contact.value.tel || contact.value.mobile || contactPage.phone.number)
 const mobile = computed(() => {
   const value = contact.value.mobile
@@ -143,14 +146,15 @@ const onSubmit = handleSubmit(async (values) => {
       DEBUG: `.not-from-api` paints red everything that does NOT come from
       `GET /shop/public/contact` — that endpoint only returns tel, mobile,
       email, address, socials and the popup, so all page copy, form labels and
-      local assets are mock. Remove the class from these nodes to restore the
-      design.
+      local assets are mock. The breadcrumb is route-driven
+      (`~/utils/breadcrumbs`), so it is not marked. Remove the class from these
+      nodes to restore the design.
     -->
 
-    <!-- Desktop-only breadcrumb (top right), same gutters as the FAQ page — trail is hardcoded -->
+    <!-- Desktop-only breadcrumb (top right), same gutters as the FAQ page — route-driven -->
     <UiBreadcrumb
-      :trail="['همکام', 'تماس با ما']"
-      class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      :trail="breadcrumb"
+      class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
     />
 
     <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">

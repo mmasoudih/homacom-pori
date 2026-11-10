@@ -8,6 +8,9 @@ useHead({
 
 const { brandItems } = useBrands()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 const searchQuery = ref('')
 const currentPage = ref(1)
 const pageSize = 40
@@ -41,15 +44,16 @@ watch(searchQuery, () => {
       <!--
         DEBUG: `.not-from-api` paints red everything that does NOT come from
         `GET /shop/brands` — that endpoint only returns the brand titles, their
-        Latin names and logo URLs, so the breadcrumb, the page title/subtitle,
-        the search placeholder and the CEO band are mock. Remove the class from
+        Latin names and logo URLs, so the page title/subtitle, the search
+        placeholder and the CEO band are mock. The breadcrumb is route-driven
+        (see `~/utils/breadcrumbs`), so it is not marked. Remove the class from
         these nodes to restore the design.
       -->
 
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — route-driven -->
       <UiBreadcrumb
-        :trail="['همکام', 'برندها']"
-        class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        :trail="breadcrumb"
+        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
       <PagesPageHeader

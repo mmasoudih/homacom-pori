@@ -832,7 +832,6 @@ function mapCollaborationPage(data: ApiCollaborationPage): CollaborationPageData
   const faqItems = mapFaqItems(data.faq)
 
   return {
-    breadcrumb: collaborationPage.breadcrumb,
     chartTitle: text(content.chart_title, collaborationPage.chartTitle),
     stats: stats.length ? stats : collaborationPage.stats,
     headline: text(content.headline, collaborationPage.headline),

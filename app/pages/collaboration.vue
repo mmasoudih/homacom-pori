@@ -25,6 +25,9 @@ useHead({
 // is the fallback while the API is cold or a key has not been saved yet.
 const { page: collaborationPage } = useCollaborationPage()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 /** Split `headline` around `headlineHighlight` so only that word gets the accent colour. */
 const heroHeadline = computed(() => {
   const headline = collaborationPage.value.headline
@@ -72,14 +75,15 @@ const selectedCategory = ref(0)
       <!--
         DEBUG: `.not-from-api` paints red everything that does NOT come from
         `GET /shop/public/collaboration-page` (mock copy from
-        `~/data/pages/collaboration` or local assets). Remove the class from
-        these nodes to restore the normal design.
+        `~/data/pages/collaboration` or local assets). The breadcrumb is
+        route-driven (`~/utils/breadcrumbs`), so it is not marked. Remove the
+        class from these nodes to restore the normal design.
       -->
 
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail comes from the mock file, the API has no breadcrumb -->
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — route-driven -->
       <UiBreadcrumb
-        :trail="collaborationPage.breadcrumb"
-        class="not-from-api mx-auto hidden w-full max-w-[1121px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        :trail="breadcrumb"
+        class="mx-auto hidden w-full max-w-[1121px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
       <!-- Hero -->

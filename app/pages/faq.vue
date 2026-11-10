@@ -8,6 +8,9 @@ useHead({
 
 const { faqContent } = useFaqs()
 
+// Route-driven trail (`~/utils/breadcrumbs`), not mock page copy.
+const breadcrumb = useBreadcrumb()
+
 const activeCategory = ref(-1)
 const searchQuery = ref('')
 
@@ -34,14 +37,15 @@ const filteredItems = computed(() => {
       <!--
         DEBUG: `.not-from-api` paints red everything that does NOT come from
         `GET /shop/faqs` (page copy from `~/data/pages/faq`, hardcoded labels,
-        local SVG assets). Remove the class from these nodes to restore the
-        design.
+        local SVG assets). The breadcrumb is route-driven
+        (`~/utils/breadcrumbs`), so it is not marked. Remove the class from
+        these nodes to restore the design.
       -->
 
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — route-driven -->
       <UiBreadcrumb
-        :trail="['هماکام', 'سوالات متداول']"
-        class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        :trail="breadcrumb"
+        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
       <!-- Title, subtitle and the FAQ icon are all hardcoded (no page-copy endpoint) -->
