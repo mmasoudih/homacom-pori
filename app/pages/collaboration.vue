@@ -69,10 +69,17 @@ const selectedCategory = ref(0)
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center">
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+      <!--
+        DEBUG: `.not-from-api` paints red everything that does NOT come from
+        `GET /shop/public/collaboration-page` (mock copy from
+        `~/data/pages/collaboration` or local assets). Remove the class from
+        these nodes to restore the normal design.
+      -->
+
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail comes from the mock file, the API has no breadcrumb -->
       <UiBreadcrumb
         :trail="collaborationPage.breadcrumb"
-        class="mx-auto hidden w-full max-w-[1121px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        class="not-from-api mx-auto hidden w-full max-w-[1121px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
       <!-- Hero -->
@@ -84,9 +91,9 @@ const selectedCategory = ref(0)
               {{ collaborationPage.chartTitle }}
             </UiTypography>
 
-            <!-- SVG chart -->
+            <!-- SVG chart (drawn locally, not from the API) -->
             <div class="relative mt-4">
-              <svg viewBox="0 0 320 150" class="h-auto w-full">
+              <svg viewBox="0 0 320 150" class="not-from-api h-auto w-full rounded-[8px]">
                 <defs>
                   <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="#FFE0E5" />
@@ -111,8 +118,8 @@ const selectedCategory = ref(0)
                 />
               </svg>
 
-              <!-- Floating badge -->
-              <div class="absolute right-4 top-4 flex h-[50px] items-center gap-2 rounded-full bg-T-50/70 px-4 shadow-sm backdrop-blur-lg">
+              <!-- Floating badge (hardcoded 30%+, not bound to `stats`) -->
+              <div class="not-from-api absolute right-4 top-4 flex h-[50px] items-center gap-2 rounded-full bg-T-50/70 px-4 shadow-sm backdrop-blur-lg">
                 <span class="text-[13px] font-bold text-primary">30%+</span>
                 <UiTypography as="span" size="2xs" weight="regular" color="muted" class="lg:text-[12px]">حاشیه سود فروش</UiTypography>
                 <IconChartLine class="size-4 text-primary" />
@@ -168,7 +175,7 @@ const selectedCategory = ref(0)
               :key="item"
               class="flex items-center gap-1.5 text-foreground"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="not-from-api rounded-[3px]">
                 <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <UiTypography as="span" size="md" weight="regular" color="inherit" class="lg:text-[13.5px]">
@@ -197,7 +204,7 @@ const selectedCategory = ref(0)
             :key="audience.title"
             class="flex flex-col rounded-[20px] border border-T-400 bg-T-50 px-7 py-6 lg:min-h-[248px]"
           >
-            <span class="flex size-[48px] shrink-0 items-center justify-center rounded-[12px] border-2 border-R-10 bg-R-10">
+            <span class="not-from-api flex size-[48px] shrink-0 items-center justify-center rounded-[12px] border-2 border-R-10 bg-R-10">
               <span
                 class="[&>svg]:block [&>svg]:size-6"
                 aria-hidden="true"
@@ -244,7 +251,7 @@ const selectedCategory = ref(0)
                   :key="item"
                   class="flex items-center gap-3"
                 >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="not-from-api shrink-0 rounded-[3px]">
                     <path d="M13.7197 14.7803C14.0126 15.0732 14.4874 15.0732 14.7803 14.7803C15.0732 14.4874 15.0732 14.0126 14.7803 13.7197L10.0607 9L14.7803 4.28033C15.0732 3.98744 15.0732 3.51256 14.7803 3.21967C14.4874 2.92678 14.0126 2.92678 13.7197 3.21967L9 7.93934L4.28033 3.21967C3.98744 2.92678 3.51256 2.92678 3.21967 3.21967C2.92678 3.51256 2.92678 3.98744 3.21967 4.28033L7.93934 9L3.21967 13.7197C2.92678 14.0126 2.92678 14.4874 3.21967 14.7803C3.51256 15.0732 3.98744 15.0732 4.28033 14.7803L9 10.0607L13.7197 14.7803Z" fill="#9CA3AF"/>
                   </svg>
                   <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
@@ -265,7 +272,7 @@ const selectedCategory = ref(0)
                   :key="item"
                   class="flex items-center gap-3"
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="not-from-api shrink-0 rounded-[3px]">
                     <path d="M13.3327 4L5.99935 11.3333L2.66602 8" stroke="#EF233C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   <UiTypography as="span" size="xl" weight="regular" color="muted" class="max-lg:text-[14px]">
@@ -299,7 +306,7 @@ const selectedCategory = ref(0)
               :class="pi === selectedCategory ? 'border-R-10 bg-T-50' : 'border-T-200 bg-T-50'"
             >
               <span
-                class="[&>svg]:block [&>svg]:size-[30px]"
+                class="not-from-api rounded-[8px] [&>svg]:block [&>svg]:size-[30px]"
                 :class="pi === selectedCategory ? 'text-primary' : 'text-T-700'"
                 aria-hidden="true"
                 v-html="productIcons[product]"
@@ -322,7 +329,7 @@ const selectedCategory = ref(0)
             @click="selectedCategory = pi"
           >
             <span
-              class="[&>svg]:block"
+              class="not-from-api rounded-[8px] [&>svg]:block"
               aria-hidden="true"
               v-html="productIcons[product]"
             />
@@ -351,10 +358,25 @@ const selectedCategory = ref(0)
         </div>
       </section>
 
-      <LandingCeoSection class="mt-20 w-full lg:mt-24" />
+      <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+      <LandingCeoSection class="not-from-api mt-20 w-full rounded-[24px] lg:mt-24" />
     </main>
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/*
+ * DEBUG marker: red = this piece does NOT come from
+ * `GET /shop/public/collaboration-page` (mock copy or a locally drawn asset).
+ * `grep -n not-from-api` lists every marked node; delete the rule and the
+ * class usages to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+</style>
