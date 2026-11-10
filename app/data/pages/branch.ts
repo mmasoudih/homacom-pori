@@ -12,10 +12,20 @@ export interface BranchInfo {
   images: string[]
 }
 
+/** Live page copy (`GET /shop/public/branch-page`), designed copy as fallback. */
+export interface BranchPageData {
+  title: string
+  subtitle: string
+  tabs: string[]
+  sectionTitle: string
+  intro: string
+  branches: BranchInfo[]
+}
+
 /** Assets exported from the `Branch-desktop` and `Branch-mobile` frames in FigCraft. */
-const branchMap = '/icons/branch/map.png'
-const branchMapMobile = '/icons/branch/map-mobile.png'
-const branchGallery = '/icons/branch/gallery.png'
+export const branchMap = '/icons/branch/map.png'
+export const branchMapMobile = '/icons/branch/map-mobile.png'
+export const branchGallery = '/icons/branch/gallery.png'
 
 export const branches: BranchInfo[] = [
   {
@@ -42,7 +52,7 @@ export const branches: BranchInfo[] = [
   },
 ]
 
-export const branchPage = {
+export const branchPage: BranchPageData = {
   title: 'راهنمای آنلاین',
   subtitle: 'فروشگاه‌های حضوری هماکام در سراسر تهران آماده پذیرایی از شما هستند',
   tabs: ['راهنمای گارانتی', 'راهنمای خرید', 'فروشگاه‌های حضوری هماکام', 'مرجوعی کالا', 'راهنمای ثبت نام'],

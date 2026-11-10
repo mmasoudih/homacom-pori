@@ -1,11 +1,30 @@
 <script setup lang="ts">
-import { branchPage } from '~/data/pages/branch'
+/**
+ * Live copy + branch rows from `GET /shop/public/branch-page`; the designed
+ * page data remains the fallback for anything the admin has not saved yet.
+ */
+const { page: branchPage } = useBranchPage()
 
 useHead({
   title: 'فروشگاه‌های حضوری هماکام | هماکام',
 })
 
 const activeTab = ref(2)
+
+/**
+ * The tab list is admin-editable, so highlight the tab that matches the
+ * current page title and fall back to the designed index when nothing matches.
+ */
+watch(
+  () => [branchPage.value.tabs, branchPage.value.sectionTitle] as const,
+  ([tabs, sectionTitle]) => {
+    const match = tabs.findIndex(tab => tab.trim() === sectionTitle.trim())
+    activeTab.value = match >= 0
+      ? match
+      : Math.min(2, Math.max(tabs.length - 1, 0))
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

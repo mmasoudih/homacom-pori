@@ -10,6 +10,8 @@ import type { BrandItem } from '~/data/pages/brands'
 import { brandsPage } from '~/data/pages/brands'
 import type { CollaborationPageData } from '~/data/pages/collaboration'
 import { collaborationPage } from '~/data/pages/collaboration'
+import type { BranchInfo, BranchPageData } from '~/data/pages/branch'
+import { branchGallery, branchMap, branchMapMobile, branchPage } from '~/data/pages/branch'
 import { faqCategories, faqItems } from '~/data/pages/faq'
 import type { InstallmentPageData } from '~/data/pages/installment'
 import { installmentPage } from '~/data/pages/installment'
@@ -878,6 +880,99 @@ export function useCollaborationPage() {
       }
     },
     { default: () => collaborationPage },
+  )
+
+  return { page, pending, error, refresh }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public branch page (2026-11-09)                                             */
+/* -------------------------------------------------------------------------- */
+
+interface ApiBranch {
+  name?: string | null
+  hours?: string | null
+  address?: string | null
+  phone?: string | null
+  images?: Array<string | null> | null
+}
+
+interface ApiBranchPageContent {
+  title?: string | null
+  subtitle?: string | null
+  tabs?: Array<string | null> | null
+  section_title?: string | null
+  intro?: string | null
+}
+
+interface ApiBranchPage {
+  content?: ApiBranchPageContent | null
+  branches?: ApiBranch[] | null
+}
+
+/**
+ * Branch rows carry no map (the API only stores the gallery), so the designed
+ * map snapshots stay as the map layer.
+ */
+function mapBranch(branch: ApiBranch, index: number, apiBase: string): BranchInfo {
+  const name = (branch.name ?? '').trim()
+  const images = (branch.images ?? [])
+    .map(image => resolveMediaUrl(image, apiBase))
+    .filter((image): image is string => !!image)
+
+  return {
+    id: `api-branch-${index + 1}`,
+    name,
+    hours: branch.hours ?? '',
+    addressLabel: name ? `آدرس ${name}:` : 'آدرس شعبه:',
+    address: branch.address ?? '',
+    phone: branch.phone ?? '',
+    map: branchMap,
+    mapMobile: branchMapMobile,
+    images: images.length ? images : [branchGallery],
+  }
+}
+
+function mapBranchPage(data: ApiBranchPage, apiBase: string): BranchPageData {
+  const content = data.content ?? {}
+  const tabs = (content.tabs ?? []).filter((tab): tab is string => !!tab?.trim())
+  const branches = (data.branches ?? [])
+    .map((branch, index) => mapBranch(branch, index, apiBase))
+    .filter(branch => branch.name || branch.address)
+
+  return {
+    title: text(content.title, branchPage.title),
+    subtitle: text(content.subtitle, branchPage.subtitle),
+    tabs: tabs.length ? tabs : branchPage.tabs,
+    sectionTitle: text(content.section_title, branchPage.sectionTitle),
+    intro: text(content.intro, branchPage.intro),
+    branches: branches.length ? branches : branchPage.branches,
+  }
+}
+
+/**
+ * Branch landing page (`GET /shop/public/branch-page`).
+ *
+ * Every content key is always present (unset ones `null`, `tabs` `[]`); the
+ * designed copy fills in whatever the admin has not saved yet.
+ */
+export function useBranchPage() {
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+
+  const { data: page, pending, error, refresh } = useAsyncData<BranchPageData>(
+    'shop-public-branch-page',
+    async () => {
+      try {
+        const res = await api.get<ApiBranchPage>('/shop/public/branch-page', { skipAuth: true })
+        return mapBranchPage(res.data ?? {}, apiBase)
+      }
+      catch {
+        return branchPage
+      }
+    },
+    { default: () => branchPage },
   )
 
   return { page, pending, error, refresh }
