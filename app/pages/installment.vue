@@ -95,13 +95,21 @@ const categoryIcons: Record<string, string> = {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
+      <!--
+        DEBUG: `.not-from-api` paints red everything that does NOT come from
+        `GET /shop/public/installment-page` (hardcoded labels, local SVG/PNG
+        assets, mock copy). Remove the class from these nodes to restore the
+        design.
+      -->
+
       <!-- Hero -->
       <section
         class="relative w-full max-w-[1440px] overflow-hidden bg-[url(/images/installment-bg-hero.png)] bg-cover bg-center bg-no-repeat lg:h-[668px]"
       >
         <div class="relative z-10 flex h-full w-full flex-col bg-white/60 px-4 py-10 backdrop-blur-[45px] lg:px-8 lg:py-14">
           <div class="mx-auto flex w-full max-w-[1120px] flex-1 flex-col">
-          <UiBreadcrumb :trail="['هماکام', 'خرید اقساطی']" class="-mt-8 mb-6 shrink-0 max-lg:hidden" />
+          <!-- Breadcrumb trail is hardcoded, not part of the endpoint -->
+          <UiBreadcrumb :trail="['هماکام', 'خرید اقساطی']" class="not-from-api -mt-8 mb-6 shrink-0 max-lg:hidden" />
           <div class="grid flex-1 grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_380px] lg:gap-16">
           <!-- Mobile: hero copy sits on the plain page background — the offset
                utilities bleed it over the overlay padding + grid gap so no
@@ -145,7 +153,8 @@ const categoryIcons: Record<string, string> = {
               </a>
             </div>
 
-            <div class="mt-5 flex flex-wrap items-center justify-start gap-x-6 gap-y-2">
+            <!-- Hardcoded feature chips (the API badge `card_badge` is unused) -->
+            <div class="not-from-api mt-5 flex flex-wrap items-center justify-start gap-x-6 gap-y-2">
               <span class="flex items-center gap-2">
                 <img src="/icons/installment/check-badge.svg" alt="" class="size-4 shrink-0">
                 <UiTypography as="span" size="md" weight="regular" color="muted">
@@ -161,8 +170,8 @@ const categoryIcons: Record<string, string> = {
             </div>
           </div>
 
-          <!-- Homacom branded panel -->
-          <div class="mx-auto flex w-full max-w-[380px] items-center justify-center py-8">
+          <!-- Homacom branded panel (fully hardcoded artwork) -->
+          <div class="not-from-api mx-auto flex w-full max-w-[380px] items-center justify-center py-8">
             <div class="relative h-[234px] w-[207px] lg:h-[280px] lg:w-[232px]">
               <!-- Stacked layers behind the card -->
               <div class="absolute inset-0 -translate-x-1.5 -translate-y-1.5 -rotate-[12deg] rounded-[24px] bg-white shadow-[0_24px_50px_-10px_rgba(15,15,20,0.28)]" />
@@ -224,7 +233,7 @@ const categoryIcons: Record<string, string> = {
                   <img
                     :src="stepIcons[step.icon]"
                     alt=""
-                    class="size-8"
+                    class="not-from-api size-8"
                   >
                   <UiTypography
                     as="span"
@@ -379,7 +388,7 @@ const categoryIcons: Record<string, string> = {
               :key="detail.label"
               class="flex flex-col items-start gap-2 rounded-[20px] bg-T-100 px-4 py-6 text-right"
             >
-              <UiTypography as="span" size="lg" weight="medium" color="default">
+              <UiTypography as="span" size="lg" weight="medium" color="default" class="not-from-api">
                 {{ detail.label }}
               </UiTypography>
               <UiTypography as="span" size="md" weight="regular" color="muted">
@@ -392,7 +401,7 @@ const categoryIcons: Record<string, string> = {
           <div class="mt-6 flex justify-start">
             <button
               type="button"
-              class="flex items-center gap-2 rounded-[12px] bg-primary px-6 py-3 transition-colors hover:bg-primary/90"
+              class="not-from-api--warn flex items-center gap-2 rounded-[12px] bg-primary px-6 py-3 transition-colors hover:bg-primary/90"
             >
               <UiTypography as="span" size="lg" weight="bold" color="white">
                 ثبت درخواست از {{ currentPartner.name }}
@@ -430,7 +439,7 @@ const categoryIcons: Record<string, string> = {
             :key="benefit.title"
             class="flex flex-col items-start gap-4 rounded-[16px] border border-T-400 bg-T-50 p-6 text-start transition-shadow"
           >
-            <span class="flex size-12 items-center justify-center rounded-[12px] bg-R-10">
+            <span class="not-from-api flex size-12 items-center justify-center rounded-[12px] bg-R-10">
               <img :src="benefitIcons[benefit.icon]" alt="" class="size-6">
             </span>
             <div class="flex flex-col gap-2">
@@ -463,7 +472,7 @@ const categoryIcons: Record<string, string> = {
               :class="ci === selectedCategory ? 'border-R-10 bg-T-50' : 'border-T-200 bg-T-50'"
             >
               <span
-                class="[&>svg]:block [&>svg]:size-[30px]"
+                class="not-from-api [&>svg]:block [&>svg]:size-[30px]"
                 :class="ci === selectedCategory ? 'text-primary' : 'text-T-700'"
                 aria-hidden="true"
                 v-html="categoryIcons[category]"
@@ -486,7 +495,7 @@ const categoryIcons: Record<string, string> = {
             @click="selectedCategory = ci"
           >
             <span
-              class="[&>svg]:block"
+              class="not-from-api [&>svg]:block"
               aria-hidden="true"
               v-html="categoryIcons[category]"
             />
@@ -522,9 +531,35 @@ const categoryIcons: Record<string, string> = {
       </section>
     </main>
 
-    <LandingCeoSection class="mt-16 w-full lg:mt-20" />
+    <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+    <LandingCeoSection class="not-from-api mt-16 w-full lg:mt-20" />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/**
+ * DEBUG marker: red = this piece does NOT come from
+ * `GET /shop/public/installment-page` (mock copy or a locally drawn asset).
+ * `grep -n not-from-api` lists every marked node; delete the rule and the
+ * class usages to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+
+/**
+ * Amber variant of the same marker, for pieces that sit on the brand red
+ * (`bg-primary` / `bg-R-300`) where a red tint would be invisible: hardcoded
+ * copy, or a control with no action wired to it.
+ */
+.not-from-api--warn {
+  background-color: rgb(245 158 11 / 0.35);
+  outline: 2px dashed #f59e0b;
+  outline-offset: 2px;
+}
+</style>
