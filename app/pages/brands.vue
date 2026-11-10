@@ -38,14 +38,22 @@ watch(searchQuery, () => {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+      <!--
+        DEBUG: `.not-from-api` paints red everything that does NOT come from
+        `GET /shop/brands` — that endpoint only returns the brand titles, their
+        Latin names and logo URLs, so the breadcrumb, the page title/subtitle,
+        the search placeholder and the CEO band are mock. Remove the class from
+        these nodes to restore the design.
+      -->
+
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
       <UiBreadcrumb
         :trail="['همکام', 'برندها']"
-        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
       <PagesPageHeader
-        class="pt-10 lg:pt-0"
+        class="not-from-api pt-10 lg:pt-0"
         :title="brandsPage.title"
         :subtitle="brandsPage.subtitle"
         title-size="3xl"
@@ -72,13 +80,13 @@ watch(searchQuery, () => {
         </template>
       </PagesPageHeader>
 
-      <!-- Search -->
+      <!-- Search: the field is real, the placeholder is mock copy -->
       <div class="mx-4 mt-8 flex h-[47px] w-[462px] max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-T-400 bg-T-50 px-5 focus-within:ring-2 focus-within:ring-primary/30">
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="brandsPage.searchPlaceholder"
-          class="w-full bg-transparent text-[14px] font-normal text-foreground placeholder:text-T-600 focus:outline-none"
+          class="not-from-api w-full bg-transparent text-[14px] font-normal text-foreground placeholder:text-T-600 focus:outline-none"
         >
         <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
@@ -102,9 +110,25 @@ watch(searchQuery, () => {
       />
     </main>
 
-    <LandingCeoSection />
+    <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+    <LandingCeoSection class="not-from-api" />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/**
+ * DEBUG marker: red = this piece does NOT come from `GET /shop/brands`
+ * (mock copy from `~/data/pages/brands`, a hardcoded label or a locally drawn
+ * asset).
+ * `grep -n "not-from-api"` lists every marked node; delete the classes and this
+ * rule to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+</style>
