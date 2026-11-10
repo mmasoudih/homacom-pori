@@ -176,7 +176,11 @@ export interface CheckoutPayment extends GatewayRedirect {
 
 export interface CheckoutResponse {
   invoice: CheckoutInvoice
-  payment: CheckoutPayment
+  /**
+   * Gateway hand-off. `null` for the offline `bank_transfer` method, which has
+   * no redirect at all — branch on `invoice.payment_method` before reading it.
+   */
+  payment: CheckoutPayment | null
 }
 
 const CART_STORAGE_KEY = 'homacom:cart:v1'

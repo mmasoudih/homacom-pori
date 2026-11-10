@@ -32,6 +32,25 @@ const canReturn = computed(() =>
   order.value?.status === 'delivered' && order.value?.paymentStatus === 'done',
 )
 
+const receiptSubmitted = ref(false)
+
+/**
+ * Offline bank transfer: the receipt upload card replaces the gateway CTA.
+ * Also shown once a receipt exists, so the submitted state stays visible even
+ * if the invoice flips to `manual` before an admin approves it.
+ */
+const isBankTransfer = computed(() => {
+  const current = order.value
+  if (!current) return false
+  if (receiptSubmitted.value || current.bankTransfer) return true
+  return current.paymentMethod === 'bank_transfer' && current.status === 'awaiting_payment'
+})
+
+function onReceiptSubmitted() {
+  receiptSubmitted.value = true
+  void refresh()
+}
+
 async function onCancelled(description: string) {
   if (!order.value) return
 
@@ -109,7 +128,16 @@ useHead({
       />
 
       <DashboardOrdersDetailInfo :order="order" />
-      <DashboardOrdersDetailShipping :order="order" @cancel="cancelOpen = true">
+      <DashboardOrdersBankTransferReceipt
+        v-if="isBankTransfer"
+        :order="order"
+        @submitted="onReceiptSubmitted"
+      />
+      <DashboardOrdersDetailShipping
+        :order="order"
+        :offline="isBankTransfer"
+        @cancel="cancelOpen = true"
+      >
         <DashboardOrdersDetailTransactions
           :transactions="order.transactions"
           class="mt-6"
@@ -201,7 +229,11 @@ useHead({
     </div>
 
     <!-- 4b. Awaiting payment extras -->
-    <div v-if="order.status === 'awaiting_payment' && order.payment" class="mb-4 flex flex-col gap-3">
+    <div v-if="isBankTransfer" class="mb-4 flex flex-col gap-3">
+      <DashboardOrdersBankTransferReceipt :order="order" @submitted="onReceiptSubmitted" />
+    </div>
+
+    <div v-else-if="order.status === 'awaiting_payment' && order.payment" class="mb-4 flex flex-col gap-3">
       <DashboardOrdersAlertNote>
         پرداخت شما کامل نشده و ۳۴ ساعت دیگر مهلت دارید. برای ثبت نهایی، پرداخت خود را کامل کنید.
       </DashboardOrdersAlertNote>
@@ -258,7 +290,7 @@ useHead({
     </button>
 
     <NuxtLink
-      v-else-if="order.status === 'awaiting_payment'"
+      v-else-if="order.status === 'awaiting_payment' && !isBankTransfer"
       :to="`/dashboard/orders/${order.id}/pay`"
       class="flex h-12 w-full items-center justify-center rounded-xl border border-primary text-[13px] font-bold text-primary transition-colors hover:bg-R-50"
     >

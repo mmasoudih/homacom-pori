@@ -91,6 +91,20 @@ export interface Order {
   /** Shipping-only tracking data. */
   deliveryCode?: string
   postalTracking?: string
+  /**
+   * Offline `bank_transfer` receipt, once the customer uploaded one
+   * (`POST /order/{invoice}/bank-transfer`, 2026-11-09).
+   */
+  bankTransfer?: OrderBankTransfer
+}
+
+/** Receipt state of a bank-transfer invoice. */
+export interface OrderBankTransfer {
+  /** Submission timestamp; empty when nothing was uploaded yet. */
+  submittedAt: string
+  /** Absolute URL of the uploaded receipt image. */
+  receipt: string
+  trackingNumber: string
 }
 
 export interface ReturnItem {

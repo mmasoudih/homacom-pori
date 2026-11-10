@@ -18,7 +18,7 @@ import { useShopOptions } from '~/composables/useShopOptions'
 import { useUserProfile } from '~/composables/useUserProfile'
 
 export type CheckoutStep = 'shipping' | 'payment'
-export type PaymentMethod = 'online' | 'wallet' | 'installment'
+export type PaymentMethod = 'online' | 'wallet' | 'installment' | 'bank_transfer'
 
 /**
  * Checkout session state (step 1 shipping info → step 2 payment).
@@ -42,7 +42,15 @@ export function useCheckout() {
     setShipping,
   } = cart
 
-  const { shippingMethods, deliveryPeriods, gateways, installments, walletOption } = useShopOptions()
+  const {
+    shippingMethods,
+    deliveryPeriods,
+    gateways,
+    installments,
+    walletOption,
+    bankTransferOption,
+    bankAccounts,
+  } = useShopOptions()
   const { profile } = useUserProfile()
 
   const step = ref<CheckoutStep>('shipping')
@@ -175,6 +183,7 @@ export function useCheckout() {
   const paymentMethodId = computed(() => {
     if (paymentMethod.value === 'wallet') return walletOption.value?.id ?? ''
     if (paymentMethod.value === 'installment') return installmentId.value
+    if (paymentMethod.value === 'bank_transfer') return bankTransferOption.value?.id ?? ''
     return gatewayId.value
   })
 
@@ -182,6 +191,8 @@ export function useCheckout() {
     if (paymentMethod.value === 'wallet') return walletOption.value?.title ?? 'کیف پول'
     if (paymentMethod.value === 'installment')
       return installments.value.find(provider => provider.id === installmentId.value)?.name ?? 'پرداخت اقساطی'
+    if (paymentMethod.value === 'bank_transfer')
+      return bankTransferOption.value?.title ?? 'واریز بانکی / کارت به کارت'
     return gateways.value.find(gateway => gateway.id === gatewayId.value)?.title ?? 'پرداخت اینترنتی'
   })
 
@@ -310,6 +321,8 @@ export function useCheckout() {
     gateways,
     installments,
     walletOption,
+    bankTransferOption,
+    bankAccounts,
     paymentMethod,
     paymentMethodId,
     paymentMethodLabel,

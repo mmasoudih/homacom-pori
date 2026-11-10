@@ -16,12 +16,22 @@ const { repay } = useOrderActions()
 const selectedMethodId = ref('')
 const paying = ref(false)
 
+/**
+ * A bank-transfer method without an active account cannot be paid, so it is
+ * hidden from the list instead of offering a dead end.
+ */
+const repayMethods = computed(() =>
+  paymentOptions.value.filter(option =>
+    option.type !== 'bank_transfer' || option.bankAccounts.length > 0,
+  ),
+)
+
 // Default to the first online gateway as soon as `/public/payment-methods`
 // resolves (the fallback list also works when the API is unreachable).
-watch(paymentOptions, (options) => {
-  if (selectedMethodId.value) return
+watch(repayMethods, (options) => {
+  if (selectedMethodId.value && options.some(option => option.id === selectedMethodId.value)) return
   const first = options.find(option => option.type === 'online') ?? options[0]
-  if (first) selectedMethodId.value = first.id
+  selectedMethodId.value = first?.id ?? ''
 }, { immediate: true })
 
 const totals = computed(() => {
@@ -34,6 +44,11 @@ const selectedMethod = computed(
   () => paymentOptions.value.find(option => option.id === selectedMethodId.value) ?? null,
 )
 
+/** Bank transfer has no gateway: the CTA only switches the invoice to it. */
+const payLabel = computed(() =>
+  selectedMethod.value?.type === 'bank_transfer' ? 'ادامه' : 'پرداخت',
+)
+
 async function pay() {
   if (!order.value) return
   if (!selectedMethodId.value) {
@@ -44,15 +59,29 @@ async function pay() {
   paying.value = true
   try {
     // `POST /order/{invoice}/repay` returns the same CheckoutResource shape as
-    // cart checkout, so the gateway hand-off is reused verbatim.
+    // cart checkout, so the gateway hand-off is reused verbatim. The offline
+    // bank-transfer method answers `payment: null` instead of a redirect.
     const res = await repay(order.value.id, selectedMethodId.value)
-    const handled = redirectToGateway(res.data!.payment)
+    const payment = res.data?.payment ?? null
 
-    if (!handled) {
-      // Wallet/credit methods settle server-side and return no redirect.
-      toast.success(res.message || res.data!.payment.message || 'پرداخت شما ثبت شد.')
-      router.push(`/dashboard/orders/${order.value.id}`)
+    if (payment && payment.success === false) {
+      toast.error(payment.message || 'اتصال به درگاه پرداخت انجام نشد.')
+      return
     }
+
+    if (payment && redirectToGateway(payment)) return
+
+    if (res.data?.invoice?.payment_method === 'bank_transfer') {
+      toast.success(res.message || 'فاکتور برای واریز بانکی ثبت شد.', {
+        description: 'رسید واریز را از صفحه سفارش بارگذاری کنید تا کارشناسان بررسی کنند.',
+      })
+      router.push(`/dashboard/orders/${order.value.id}`)
+      return
+    }
+
+    // Wallet/credit methods settle server-side and return no redirect.
+    toast.success(res.message || 'پرداخت شما ثبت شد.')
+    router.push(`/dashboard/orders/${order.value.id}`)
   }
   catch (err) {
     // 422: already paid, no longer payable or an invalid payment method.
@@ -92,9 +121,9 @@ useHead({
         <section class="rounded-[20px] border border-T-400 bg-T-50 p-4 lg:p-6">
           <h2 class="text-[14px] font-bold text-T-900">روش پرداخت</h2>
 
-          <div v-if="paymentOptions.length" class="mt-5 flex flex-col gap-3">
+          <div v-if="repayMethods.length" class="mt-5 flex flex-col gap-3">
             <div
-              v-for="method in paymentOptions"
+              v-for="method in repayMethods"
               :key="method.id"
               class="rounded-xl border p-4 transition-colors"
               :class="selectedMethodId === method.id ? 'border-primary/50' : 'border-T-400'"
@@ -128,7 +157,11 @@ useHead({
                 </span>
               </div>
 
-              <div v-if="selectedMethodId === method.id && method.typeFa" class="mt-3">
+              <div v-if="selectedMethodId === method.id && method.type === 'bank_transfer'" class="mt-3">
+                <CheckoutBankAccounts :accounts="method.bankAccounts" />
+              </div>
+
+              <div v-else-if="selectedMethodId === method.id && method.typeFa" class="mt-3">
                 <DashboardOrdersAlertNote>
                   {{ method.typeFa }}
                 </DashboardOrdersAlertNote>
@@ -164,10 +197,10 @@ useHead({
           <button
             type="button"
             class="mt-5 h-11 w-full rounded-xl bg-primary text-[13px] font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="paying || !paymentOptions.length"
+            :disabled="paying || !repayMethods.length"
             @click="pay"
           >
-            {{ paying ? 'در حال انتقال…' : 'پرداخت' }}
+            {{ paying ? 'در حال انتقال…' : payLabel }}
           </button>
 
           <p v-if="selectedMethod" class="mt-3 text-center text-[11.5px] text-T-600">
@@ -192,7 +225,7 @@ useHead({
     :back-to="`/dashboard/orders/${id}`"
   >
     <DashboardOrdersMobileCheckoutSummary
-      :methods="paymentOptions"
+      :methods="repayMethods"
       :selected-method="selectedMethodId"
       :order-code="order.code"
       :total="totals.total"
@@ -200,14 +233,18 @@ useHead({
       :remaining="totals.remaining"
       @update:selected-method="selectedMethodId = $event"
     />
+
+    <div v-if="selectedMethod?.type === 'bank_transfer'" class="mt-4">
+      <CheckoutBankAccounts :accounts="selectedMethod.bankAccounts" />
+    </div>
     <template #footer>
       <button
         type="button"
         class="h-12 w-full rounded-xl bg-primary text-[13px] font-bold text-white disabled:opacity-60"
-        :disabled="paying || !paymentOptions.length"
+        :disabled="paying || !repayMethods.length"
         @click="pay"
       >
-        {{ paying ? 'در حال انتقال…' : 'پرداخت' }}
+        {{ paying ? 'در حال انتقال…' : payLabel }}
       </button>
     </template>
   </DashboardOrdersMobileBareShell>

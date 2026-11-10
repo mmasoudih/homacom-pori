@@ -6,6 +6,8 @@ import { formatPriceFa, toPersianDigits } from "~/utils/format";
 
 const props = defineProps<{
   order: Order;
+  /** Offline bank transfer: the receipt form replaces the gateway CTA. */
+  offline?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -196,6 +198,7 @@ const items = computed(() => [
         </div>
 
         <NuxtLink
+          v-if="!offline"
           :to="`/dashboard/orders/${order.id}/pay`"
           class="inline-flex h-10 w-fit items-center gap-2 rounded-lg border border-primary bg-T-50 px-5 text-[12.5px] font-bold text-primary transition-colors hover:bg-R-50"
         >

@@ -37,6 +37,7 @@ const {
   timeSlot,
   gateways,
   installments,
+  bankAccounts,
   paymentMethod,
   paymentMethodId,
   gatewayId,
@@ -88,7 +89,12 @@ const blockedLabel = computed(() => {
 })
 
 const ctaLabel = computed(() => {
-  if (!isShippingStep.value) return submitting.value ? 'در حال انتقال به درگاه…' : 'پرداخت'
+  if (!isShippingStep.value) {
+    if (submitting.value) return 'در حال ثبت سفارش…'
+    // No gateway to hand off to: the invoice is created and the customer pays
+    // offline, then uploads the receipt from the order page.
+    return paymentMethod.value === 'bank_transfer' ? 'ثبت سفارش' : 'پرداخت'
+  }
   return 'ثبت سفارش'
 })
 
@@ -177,6 +183,7 @@ async function settlePayment() {
   try {
     const result = await checkout({ paymentMethodId: methodId })
     const payment = result.payment
+    const isBankTransfer = result.invoice?.payment_method === 'bank_transfer'
 
     if (payment && payment.success === false) {
       // The invoice *was* created — only the gateway hand-off failed. The cart
@@ -196,7 +203,22 @@ async function settlePayment() {
     forgetCart()
     reset()
 
-    if (payment?.url) {
+    // Bank transfer: `data.payment` is `null` — there is no gateway to follow.
+    // Send the customer to the invoice, where the receipt is uploaded.
+    if (isBankTransfer || !payment) {
+      toast.success('فاکتور شما ثبت شد.', {
+        description: 'مبلغ را به یکی از حساب‌های فروشگاه واریز و رسید را از صفحه سفارش بارگذاری کنید.',
+      })
+      const invoiceId = result.invoice?.id
+      if (invoiceId) {
+        await navigateTo(`/dashboard/orders/${invoiceId}`, { replace: true })
+        return
+      }
+      await navigateTo('/dashboard/orders', { replace: true })
+      return
+    }
+
+    if (payment.url) {
       redirectToGateway(payment)
       return
     }
@@ -435,6 +457,7 @@ async function applyDiscount() {
                 v-model:installment-id="installmentId"
                 :gateways="gateways"
                 :installments="installments"
+                :bank-accounts="bankAccounts"
                 :wallet-balance="walletBalance"
                 :wallet-insufficient="walletInsufficient"
                 :limit-exceeded="paymentMethod === 'online' && limitExceeded"

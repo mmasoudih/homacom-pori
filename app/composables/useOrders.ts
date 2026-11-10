@@ -1,5 +1,6 @@
 import type {
   Order,
+  OrderBankTransfer,
   OrderItem,
   OrderPaymentStatus,
   OrderStatus,
@@ -152,6 +153,24 @@ interface ApiOrder {
   paid_price?: number | string | null
   shipping_title?: string | null
   invoice_date?: string | null
+  /** Bank-transfer receipt (2026-11-09); only on `bank_transfer` invoices. */
+  bank_transfer?: ApiBankTransfer | null
+  receipt?: string | null
+  receipt_url?: string | null
+  receipt_submitted_at?: string | null
+  tracking_number?: string | null
+}
+
+/** `POST /shop/order/{invoice}/bank-transfer` payload + order-detail echoes. */
+export interface ApiBankTransfer {
+  invoice_id?: number | string | null
+  payment_method?: string | null
+  payment_status?: string | null
+  receipt?: string | null
+  receipt_url?: string | null
+  tracking_number?: string | null
+  submitted_at?: string | null
+  created_at?: string | null
 }
 
 /**
@@ -282,6 +301,35 @@ function joinAddress(block: ApiAddress | null | undefined, fallback: string): st
   return parts.filter((part): part is string => !!part).join('، ') || fallback
 }
 
+/**
+ * Bank-transfer receipt of an invoice; `undefined` when nothing was uploaded.
+ *
+ * Generic invoice fields (`submitted_at`, …) are deliberately not read here —
+ * the receipt state must come from the `bank_transfer` block or from an invoice
+ * whose `payment_method` is explicitly `bank_transfer`.
+ */
+function mapBankTransfer(order: ApiOrder, apiBase: string): OrderBankTransfer | undefined {
+  const raw = order.bank_transfer ?? null
+  const method = text(raw?.payment_method ?? order.payment_method)
+
+  if (!raw && method !== 'bank_transfer') return undefined
+
+  const submittedAt = text(raw?.submitted_at ?? raw?.created_at ?? order.receipt_submitted_at)
+  const receipt = resolveMediaUrl(
+    raw?.receipt ?? raw?.receipt_url ?? order.receipt ?? order.receipt_url,
+    apiBase,
+  )
+  const trackingNumber = text(raw?.tracking_number ?? order.tracking_number)
+
+  if (!submittedAt && !receipt && !trackingNumber) return undefined
+
+  return {
+    submittedAt: formatDate(submittedAt),
+    receipt,
+    trackingNumber,
+  }
+}
+
 function mapOrder(order: ApiOrder, apiBase: string): Order {
   const status = mapStatus(order.status)
   const amount = num(order.total_amount ?? order.payable_amount)
@@ -362,6 +410,7 @@ function mapOrder(order: ApiOrder, apiBase: string): Order {
     payment: paymentInfo,
     deliveryCode: text(order.delivery_code) || undefined,
     postalTracking: text(order.postal_tracking ?? order.tracking_code) || undefined,
+    bankTransfer: mapBankTransfer(order, apiBase),
   }
 }
 
@@ -590,7 +639,29 @@ export function useOrderActions() {
     return res
   }
 
-  return { cancel, refer, repay }
+  /**
+   * `POST /shop/order/{invoice}/bank-transfer` — upload the transfer receipt.
+   *
+   * Multipart (`tracking_number` + `receipt` image, max 5MB). One submission
+   * per invoice: a second attempt answers 422, so callers disable the form.
+   */
+  async function submitBankTransferReceipt(
+    invoice: string,
+    input: { trackingNumber: string, receipt: File },
+  ) {
+    const form = new FormData()
+    form.append('tracking_number', input.trackingNumber.trim())
+    form.append('receipt', input.receipt)
+
+    const res = await api.post<ApiBankTransfer>(
+      `/shop/order/${encodeURIComponent(invoice)}/bank-transfer`,
+      form,
+    )
+    if (!res.data) throw new Error(res.message || 'ثبت رسید پرداخت انجام نشد.')
+    return res
+  }
+
+  return { cancel, refer, repay, submitBankTransferReceipt }
 }
 
 /** `GET /shop/order/refers` filters. */

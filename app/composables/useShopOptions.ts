@@ -34,6 +34,24 @@ interface ApiDeliveryPeriod {
   end_time: string
 }
 
+/** Nested `type` object — the flat string + `type_fa` pair was replaced 2026-11-09. */
+interface ApiPaymentMethodType {
+  value?: string | null
+  label?: string | null
+}
+
+/** `bank_accounts` row; only the `bank_transfer` method carries the key at all. */
+interface ApiBankAccount {
+  id?: number | null
+  title?: string | null
+  bank_name?: string | null
+  account_number?: string | null
+  sheba_number?: string | null
+  card_number?: string | null
+  status?: string | null
+  sort?: number | null
+}
+
 /** `GET /api/shop/public/payment-methods` row (`PaymentMethodResource`). */
 interface ApiPaymentMethod {
   id: number
@@ -41,11 +59,25 @@ interface ApiPaymentMethod {
   title: string
   image?: string | null
   description?: string | null
-  type?: PaymentOptionType | null
+  /** Nested since 2026-11-09; the older flat string is still tolerated. */
+  type?: ApiPaymentMethodType | PaymentOptionType | string | null
+  /** Pre-2026-11-09 label — superseded by `type.label`. */
   type_fa?: string | null
+  bank_accounts?: ApiBankAccount[] | null
 }
 
-export type PaymentOptionType = 'online' | 'wallet' | 'installment'
+export type PaymentOptionType = 'online' | 'wallet' | 'installment' | 'bank_transfer'
+
+/** One shop bank account, rendered on the bank-transfer checkout step. */
+export interface BankAccount {
+  id: string
+  title: string
+  bankName: string
+  accountNumber: string
+  shebaNumber: string
+  cardNumber: string
+  status: string
+}
 
 /**
  * A payment method as the payment step needs it.
@@ -61,6 +93,8 @@ export interface PaymentOption {
   logo: string
   type: PaymentOptionType
   typeFa: string
+  /** Empty unless the method is `bank_transfer`. */
+  bankAccounts: BankAccount[]
 }
 
 /** Designed marks for the seeded gateways (the API image wins when present). */
@@ -112,10 +146,60 @@ function mapDeliveryPeriod(row: ApiDeliveryPeriod): DeliveryPeriod {
   }
 }
 
+const PAYMENT_TYPES = new Set<PaymentOptionType>([
+  'online',
+  'wallet',
+  'installment',
+  'bank_transfer',
+])
+
+/**
+ * Read `type`/label in either serialization.
+ *
+ * The API now sends `{ value, label }`; the previous contract was a flat
+ * `type` string plus a `type_fa` label. Unknown values fall back to `online`
+ * so a future method kind never disappears from the payment step.
+ */
+function paymentTypeOf(row: ApiPaymentMethod): { value: PaymentOptionType, label: string } {
+  const raw = row.type
+  const rawValue = typeof raw === 'string' ? raw : raw?.value ?? ''
+  const rawLabel = (raw && typeof raw === 'object' ? raw.label : '') || row.type_fa || ''
+  const normalized = rawValue === 'bank-transfer' || rawValue === 'bankTransfer'
+    ? 'bank_transfer'
+    : rawValue
+
+  return {
+    value: PAYMENT_TYPES.has(normalized as PaymentOptionType)
+      ? normalized as PaymentOptionType
+      : 'online',
+    label: rawLabel,
+  }
+}
+
+/** Bank accounts, but only for the method that actually has the key. */
+function mapBankAccounts(row: ApiPaymentMethod): BankAccount[] {
+  if (!('bank_accounts' in row)) return []
+
+  return [...(row.bank_accounts ?? [])]
+    .filter(account => !!account && typeof account === 'object')
+    // `sort`, then id — the order the admin arranged them in.
+    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0) || (a.id ?? 0) - (b.id ?? 0))
+    .map((account, index) => ({
+      id: String(account.id ?? index + 1),
+      title: account.title ?? '',
+      bankName: account.bank_name ?? '',
+      accountNumber: account.account_number ?? '',
+      shebaNumber: account.sheba_number ?? '',
+      cardNumber: account.card_number ?? '',
+      status: account.status ?? 'active',
+    }))
+    // Inactive accounts are hidden; the backend keeps them for history.
+    .filter(account => account.status !== 'inactive')
+}
+
 function mapPaymentOption(row: ApiPaymentMethod, apiBase: string): PaymentOption {
-  const type: PaymentOptionType
-    = row.type === 'wallet' || row.type === 'installment' ? row.type : 'online'
-  const fallbackLogo = type === 'installment' ? INSTALLMENT_LOGOS[row.key] : GATEWAY_LOGOS[row.key]
+  const type = paymentTypeOf(row)
+  const fallbackLogo = type.value === 'installment' ? INSTALLMENT_LOGOS[row.key] : GATEWAY_LOGOS[row.key]
 
   return {
     id: String(row.id),
@@ -123,8 +207,9 @@ function mapPaymentOption(row: ApiPaymentMethod, apiBase: string): PaymentOption
     title: row.title,
     description: row.description ?? '',
     logo: resolveMediaUrl(row.image, apiBase) || fallbackLogo || '',
-    type,
-    typeFa: row.type_fa ?? '',
+    type: type.value,
+    typeFa: type.label,
+    bankAccounts: mapBankAccounts(row),
   }
 }
 
@@ -190,6 +275,7 @@ export function useShopOptions() {
           logo: gateway.logo,
           type: 'online' as const,
           typeFa: 'پرداخت آنلاین',
+          bankAccounts: [],
         })),
         ...fallbackInstallments.map(provider => ({
           id: provider.id,
@@ -199,6 +285,7 @@ export function useShopOptions() {
           logo: provider.logo,
           type: 'installment' as const,
           typeFa: provider.badge,
+          bankAccounts: [],
         })),
       ]
     }
@@ -233,6 +320,16 @@ export function useShopOptions() {
     () => paymentOptions.value.find(option => option.type === 'wallet') ?? null,
   )
 
+  /** The offline bank-transfer method (present only once the shop has accounts). */
+  const bankTransferOption = computed(
+    () => paymentOptions.value.find(option => option.type === 'bank_transfer') ?? null,
+  )
+
+  /** Shop bank accounts to wire the money to (empty for every other method). */
+  const bankAccounts = computed<BankAccount[]>(
+    () => bankTransferOption.value?.bankAccounts ?? [],
+  )
+
   /** True once the first request settled (successful or not). */
   const loaded = computed(() => !pending.value)
 
@@ -243,6 +340,8 @@ export function useShopOptions() {
     gateways,
     installments,
     walletOption,
+    bankTransferOption,
+    bankAccounts,
     loaded,
     refresh,
   }

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { IconBuildingBank } from '@tabler/icons-vue'
 import type { InstallmentProvider, PaymentGateway } from '~/data/checkout'
 import type { PaymentMethod } from '~/composables/useCheckout'
+import type { BankAccount } from '~/composables/useShopOptions'
 import { formatPriceFa } from '~/utils/format'
 
-defineProps<{
+const props = defineProps<{
   method: PaymentMethod
   gatewayId: string
   gateways: PaymentGateway[]
@@ -11,6 +13,8 @@ defineProps<{
   installments: InstallmentProvider[]
   walletBalance: number
   walletInsufficient: boolean
+  /** Shop accounts for the offline bank-transfer method. */
+  bankAccounts?: BankAccount[]
   /** Shows the 395M note inside the online card on mobile (Figma 3509). */
   limitExceeded?: boolean
 }>()
@@ -22,7 +26,7 @@ const emit = defineEmits<{
   'requestCredit': []
 }>()
 
-const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: string }> = [
+const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon?: string }> = [
   {
     id: 'online',
     label: 'پرداخت اینترنتی',
@@ -36,13 +40,28 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
     hint: 'پرداخت از طریق سرویس های مختلف',
     icon: '/icons/cart/pay-coins.svg',
   },
+  {
+    id: 'bank_transfer',
+    label: 'واریز بانکی / کارت به کارت',
+    hint: 'واریز به حساب فروشگاه و بارگذاری رسید پرداخت',
+  },
 ]
+
+/**
+ * A bank-transfer method without an active account is a dead end, so the tile
+ * only appears once the shop actually published one.
+ */
+const visibleMethods = computed(() =>
+  methods.filter(item =>
+    item.id !== 'bank_transfer' || (props.bankAccounts?.length ?? 0) > 0,
+  ),
+)
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
     <div
-      v-for="item in methods"
+      v-for="item in visibleMethods"
       :key="item.id"
       class="flex cursor-pointer flex-col rounded-[12px] border border-[#EBEDF0] px-5 py-4 lg:py-[15px]"
       :class="item.id === 'wallet' ? 'gap-2' : 'gap-5'"
@@ -65,7 +84,11 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
             class="size-[18px] shrink-0"
           >
 
-          <img :src="item.icon" alt="" class="size-6 shrink-0">
+          <IconBuildingBank
+            v-if="item.id === 'bank_transfer'"
+            class="size-6 shrink-0 text-T-700"
+          />
+          <img v-else-if="item.icon" :src="item.icon" alt="" class="size-6 shrink-0">
 
           <UiTypography as="span" size="lgXl" weight="medium" class="min-w-0 flex-1">
             {{ item.label }}
@@ -148,6 +171,14 @@ const methods: Array<{ id: PaymentMethod, label: string, hint?: string, icon: st
             </UiTypography>
           </span>
         </button>
+      </div>
+
+      <!-- Bank accounts for the offline transfer (only that method has them) -->
+      <div
+        v-if="item.id === 'bank_transfer' && method === 'bank_transfer'"
+        class="flex flex-col gap-2"
+      >
+        <CheckoutBankAccounts :accounts="bankAccounts ?? []" />
       </div>
 
       <!-- Installment services (Figma Frame 3349 / 3350) -->
