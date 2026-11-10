@@ -25,15 +25,24 @@ useHead(() => ({
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+    <!--
+      DEBUG: `.not-from-api` paints red everything that does NOT come from
+      `GET /shop/public/about` — that endpoint only returns the article body
+      (`about_us`), a link (`about_us_link`, currently `{URL}`) and a meta
+      description, so the breadcrumb, the hero card and the article above the
+      live paragraph are mock. Remove the class from these nodes to restore the
+      design.
+    -->
+
+    <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
     <UiBreadcrumb
       :trail="['هماکام', 'درباره ما']"
-      class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
     />
 
     <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
-      <!-- Hero card -->
-      <section class="mt-10 w-full max-w-[1020px] rounded-[16px] bg-T-50 lg:mt-0 lg:grid lg:grid-cols-[209px_1fr] lg:gap-6 lg:p-8 lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      <!-- Hero card: subtitle + both paragraphs come from `~/data/pages/about` -->
+      <section class="not-from-api mt-10 w-full max-w-[1020px] rounded-[16px] bg-T-50 lg:mt-0 lg:grid lg:grid-cols-[209px_1fr] lg:gap-6 lg:p-8 lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
         <!-- Right rail -->
         <div class="flex flex-col items-center justify-center gap-5 rounded-[25px] bg-T-200 p-6 lg:h-[247px] lg:w-[209px]">
           <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,13 +90,14 @@ useHead(() => ({
 
       <!-- Article -->
       <section class="mt-10 w-full max-w-[1020px] rounded-[16px] bg-T-50 lg:mt-12 lg:p-8 lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+        <!-- Mock article (`aboutPage.sections`); the live copy is the paragraph below it -->
         <template v-for="(section, si) in aboutPage.sections" :key="si">
           <UiTypography
             as="h2"
             size="xl"
             weight="bold"
             color="default"
-            class="leading-[28px]"
+            class="not-from-api leading-[28px]"
             :class="si > 0 ? 'mt-8' : ''"
           >
             {{ section.heading }}
@@ -99,7 +109,7 @@ useHead(() => ({
             size="mdLg"
             weight="regular"
             color="emphasis"
-            class="mt-4 leading-[30px]"
+            class="not-from-api mt-4 leading-[30px]"
           >
             {{ para }}
           </UiTypography>
@@ -118,19 +128,21 @@ useHead(() => ({
           {{ about.aboutUs }}
         </p>
 
+        <!-- Renders only when `about_us_link` is a real URL (it is `{URL}` today);
+             the href would be API, the label is hardcoded -->
         <a
           v-if="aboutLink"
           :href="aboutLink"
           target="_blank"
           rel="noopener noreferrer"
-          class="mt-6 inline-flex h-[42px] items-center justify-center rounded-[12px] bg-T-200 px-5 text-sm font-medium text-T-900 transition-colors hover:bg-T-300"
+          class="not-from-api mt-6 inline-flex h-[42px] items-center justify-center rounded-[12px] bg-T-200 px-5 text-sm font-medium text-T-900 transition-colors hover:bg-T-300"
         >
           اطلاعات بیشتر
         </a>
       </section>
 
-      <!-- CEO / store description band (same as the landing page) -->
-      <LandingCeoSection class="mt-10 w-full lg:mt-12" />
+      <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+      <LandingCeoSection class="not-from-api mt-10 w-full lg:mt-12" />
     </main>
 
     <LandingSiteFooter class="mt-auto" />
@@ -139,6 +151,19 @@ useHead(() => ({
 </template>
 
 <style scoped>
+/**
+ * DEBUG marker: red = this piece does NOT come from `GET /shop/public/about`
+ * (mock copy from `~/data/pages/about`, a hardcoded label or a locally drawn
+ * asset).
+ * `grep -n "not-from-api"` lists every marked node; delete the classes and this
+ * rule to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+
 /* The API returns HTML-ish rich text; style it like the surrounding copy. */
 .about-rich :deep(h1),
 .about-rich :deep(h2),
