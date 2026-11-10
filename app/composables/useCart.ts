@@ -348,8 +348,20 @@ export function useCart() {
     { default: () => null },
   )
 
+  /**
+   * The `shop-cart` payload is a snapshot of the page load that produced it.
+   * Nuxt reuses that key on client-side navigation (no refetch), so applying it
+   * again at every `useCart()` would replace a cart mutated since — added lines,
+   * quantities, coupons — with stale data, making `/cart` look empty until a
+   * full reload. Apply the snapshot once per app instance and let the mutation
+   * endpoints (`applyCart` on every response) keep the state current.
+   */
+  const snapshotApplied = useState<boolean>('cart-snapshot-applied', () => false)
+
   watch(initialCart, (cart) => {
-    if (cart) applyCart(cart)
+    if (!cart || snapshotApplied.value) return
+    applyCart(cart)
+    snapshotApplied.value = true
   }, { immediate: true })
 
   function persist() {
