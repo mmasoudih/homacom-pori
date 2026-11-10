@@ -8,7 +8,11 @@ import type { Category } from '~/data/categories'
 import { megaCategories } from '~/data/categories'
 import type { BrandItem } from '~/data/pages/brands'
 import { brandsPage } from '~/data/pages/brands'
+import type { CollaborationPageData } from '~/data/pages/collaboration'
+import { collaborationPage } from '~/data/pages/collaboration'
 import { faqCategories, faqItems } from '~/data/pages/faq'
+import type { InstallmentPageData } from '~/data/pages/installment'
+import { installmentPage } from '~/data/pages/installment'
 import { resolveMediaUrl } from '~/utils/media'
 
 interface ApiCategory {
@@ -592,4 +596,289 @@ export function useContactPage() {
   )
 
   return { contact, pending, error, refresh }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public landing pages: installment + collaboration (2026-11-09)              */
+/* -------------------------------------------------------------------------- */
+
+interface ApiPageFaqItem {
+  id?: number
+  question?: string | null
+  answer?: string | null
+}
+
+interface ApiPageFaq {
+  id?: number
+  title?: string | null
+  slug?: string | null
+  items?: ApiPageFaqItem[] | null
+}
+
+/** FAQ subject → accordion items; an absent/unpublished FAQ yields `[]`. */
+function mapFaqItems(faq: ApiPageFaq | null | undefined): FaqItem[] {
+  return (faq?.items ?? [])
+    .map(item => ({ question: item.question ?? '', answer: item.answer ?? '' }))
+    .filter(item => item.question || item.answer)
+}
+
+/** API string setting → trimmed value, or the designed copy when unset. */
+function text(value: string | null | undefined, fallback: string): string {
+  const trimmed = (value ?? '').trim()
+  return trimmed || fallback
+}
+
+interface ApiInstallmentStep {
+  label?: string | null
+  subtitle?: string | null
+  icon?: string | null
+}
+
+interface ApiInstallmentBenefit {
+  title?: string | null
+  body?: string | null
+  icon?: string | null
+}
+
+interface ApiInstallmentContent {
+  title?: string | null
+  title_accent?: string | null
+  intro?: string | null
+  apply_cta?: string | null
+  complaints_cta?: string | null
+  card_badge?: string | null
+  steps_title?: string | null
+  steps?: ApiInstallmentStep[] | null
+  partners_title?: string | null
+  partners_intro?: string | null
+  benefits_title?: string | null
+  benefits_intro?: string | null
+  benefits?: ApiInstallmentBenefit[] | null
+  faq_title?: string | null
+  faq_subtitle?: string | null
+  categories_title?: string | null
+  categories?: Array<string | null> | null
+}
+
+interface ApiInstallmentPartner {
+  name?: string | null
+  logo?: string | null
+  color?: string | null
+  description?: string | null
+  guarantee?: string | null
+  settlement?: string | null
+  ceiling?: string | null
+  credit?: string | null
+}
+
+interface ApiInstallmentPage {
+  content?: ApiInstallmentContent | null
+  partners?: ApiInstallmentPartner[] | null
+  faq?: ApiPageFaq | null
+}
+
+function mapInstallmentPage(data: ApiInstallmentPage, apiBase: string): InstallmentPageData {
+  const content = data.content ?? {}
+
+  const steps = (content.steps ?? [])
+    .map(step => ({
+      label: step.label ?? '',
+      subtitle: step.subtitle ?? '',
+      icon: step.icon ?? '',
+    }))
+    .filter(step => step.label)
+
+  const benefits = (content.benefits ?? [])
+    .map(benefit => ({
+      title: benefit.title ?? '',
+      body: benefit.body ?? '',
+      icon: benefit.icon ?? '',
+    }))
+    .filter(benefit => benefit.title)
+
+  const categories = (content.categories ?? []).filter((category): category is string => !!category?.trim())
+
+  const partners = (data.partners ?? [])
+    .map(partner => ({
+      name: partner.name ?? '',
+      logo: resolveMediaUrl(partner.logo, apiBase),
+      color: partner.color || '#1D1D1F',
+      description: partner.description ?? '',
+      guarantee: partner.guarantee ?? '',
+      settlement: partner.settlement ?? '',
+      ceiling: partner.ceiling ?? '',
+      credit: partner.credit ?? '',
+    }))
+    .filter(partner => partner.name)
+
+  const faqItems = mapFaqItems(data.faq)
+
+  return {
+    title: text(content.title, installmentPage.title),
+    titleAccent: text(content.title_accent, installmentPage.titleAccent),
+    intro: text(content.intro, installmentPage.intro),
+    applyCta: text(content.apply_cta, installmentPage.applyCta),
+    complaintsCta: text(content.complaints_cta, installmentPage.complaintsCta),
+    cardBadge: text(content.card_badge, installmentPage.cardBadge),
+    stepsTitle: text(content.steps_title, installmentPage.stepsTitle),
+    steps: steps.length ? steps : installmentPage.steps,
+    partnersTitle: text(content.partners_title, installmentPage.partnersTitle),
+    partnersIntro: text(content.partners_intro, installmentPage.partnersIntro),
+    partners: partners.length ? partners : installmentPage.partners,
+    benefitsTitle: text(content.benefits_title, installmentPage.benefitsTitle),
+    benefitsIntro: text(content.benefits_intro, installmentPage.benefitsIntro),
+    benefits: benefits.length ? benefits : installmentPage.benefits,
+    faqTitle: text(content.faq_title, installmentPage.faqTitle),
+    faqSubtitle: text(content.faq_subtitle, installmentPage.faqSubtitle),
+    faqItems: faqItems.length ? faqItems : installmentPage.faqItems,
+    categoriesTitle: text(content.categories_title, installmentPage.categoriesTitle),
+    categories: categories.length ? categories : installmentPage.categories,
+  }
+}
+
+/**
+ * Installment landing page (`GET /shop/public/installment-page`).
+ *
+ * `data` is `{ content, partners, faq }` — every content key is always
+ * present, but unset keys are `null` and list blocks default to `[]`. The
+ * designed copy is used for anything the admin has not filled in yet, so the
+ * page keeps its layout on a cold or unseeded API.
+ */
+export function useInstallmentPage() {
+  const api = useApi()
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public.apiBase || '')
+
+  const { data: page, pending, error, refresh } = useAsyncData<InstallmentPageData>(
+    'shop-public-installment-page',
+    async () => {
+      try {
+        const res = await api.get<ApiInstallmentPage>('/shop/public/installment-page', { skipAuth: true })
+        return mapInstallmentPage(res.data ?? {}, apiBase)
+      }
+      catch {
+        return installmentPage
+      }
+    },
+    { default: () => installmentPage },
+  )
+
+  return { page, pending, error, refresh }
+}
+
+interface ApiCollaborationStat {
+  value?: string | null
+  label?: string | null
+}
+
+interface ApiCollaborationAudience {
+  title?: string | null
+  body?: string | null
+  icon?: string | null
+  tags?: Array<string | null> | null
+}
+
+interface ApiCollaborationContent {
+  chart_title?: string | null
+  stats?: ApiCollaborationStat[] | null
+  headline?: string | null
+  headline_highlight?: string | null
+  intro?: string | null
+  primary_cta?: string | null
+  secondary_cta?: string | null
+  trust_row?: Array<string | null> | null
+  audiences_title?: string | null
+  audiences_intro?: string | null
+  audiences?: ApiCollaborationAudience[] | null
+  compare_title?: string | null
+  compare_us_title?: string | null
+  compare_us_items?: Array<string | null> | null
+  compare_them_title?: string | null
+  compare_them_items?: Array<string | null> | null
+  products_title?: string | null
+  products_intro?: string | null
+  products?: Array<string | null> | null
+  faq_title?: string | null
+  faq_subtitle?: string | null
+}
+
+interface ApiCollaborationPage {
+  content?: ApiCollaborationContent | null
+  faq?: ApiPageFaq | null
+}
+
+function mapCollaborationPage(data: ApiCollaborationPage): CollaborationPageData {
+  const content = data.content ?? {}
+
+  const stats = (content.stats ?? [])
+    .map(stat => ({ value: stat.value ?? '', label: stat.label ?? '' }))
+    .filter(stat => stat.value || stat.label)
+
+  const audiences = (content.audiences ?? [])
+    .map(audience => ({
+      title: audience.title ?? '',
+      body: audience.body ?? '',
+      icon: audience.icon ?? '',
+      tags: (audience.tags ?? []).filter((tag): tag is string => !!tag?.trim()),
+    }))
+    .filter(audience => audience.title)
+
+  const trustRow = (content.trust_row ?? []).filter((item): item is string => !!item?.trim())
+  const compareUsItems = (content.compare_us_items ?? []).filter((item): item is string => !!item?.trim())
+  const compareThemItems = (content.compare_them_items ?? []).filter((item): item is string => !!item?.trim())
+  const products = (content.products ?? []).filter((item): item is string => !!item?.trim())
+  const faqItems = mapFaqItems(data.faq)
+
+  return {
+    breadcrumb: collaborationPage.breadcrumb,
+    chartTitle: text(content.chart_title, collaborationPage.chartTitle),
+    stats: stats.length ? stats : collaborationPage.stats,
+    headline: text(content.headline, collaborationPage.headline),
+    headlineHighlight: text(content.headline_highlight, collaborationPage.headlineHighlight),
+    intro: text(content.intro, collaborationPage.intro),
+    primaryCta: text(content.primary_cta, collaborationPage.primaryCta),
+    secondaryCta: text(content.secondary_cta, collaborationPage.secondaryCta),
+    trustRow: trustRow.length ? trustRow : collaborationPage.trustRow,
+    audiencesTitle: text(content.audiences_title, collaborationPage.audiencesTitle),
+    audiencesIntro: text(content.audiences_intro, collaborationPage.audiencesIntro),
+    audiences: audiences.length ? audiences : collaborationPage.audiences,
+    compareTitle: text(content.compare_title, collaborationPage.compareTitle),
+    compareUsTitle: text(content.compare_us_title, collaborationPage.compareUsTitle),
+    compareUsItems: compareUsItems.length ? compareUsItems : collaborationPage.compareUsItems,
+    compareThemTitle: text(content.compare_them_title, collaborationPage.compareThemTitle),
+    compareThemItems: compareThemItems.length ? compareThemItems : collaborationPage.compareThemItems,
+    productsTitle: text(content.products_title, collaborationPage.productsTitle),
+    productsIntro: text(content.products_intro, collaborationPage.productsIntro),
+    products: products.length ? products : collaborationPage.products,
+    faqTitle: text(content.faq_title, collaborationPage.faqTitle),
+    faqSubtitle: text(content.faq_subtitle, collaborationPage.faqSubtitle),
+    faqItems: faqItems.length ? faqItems : collaborationPage.faqItems,
+  }
+}
+
+/**
+ * B2B / collaboration landing page (`GET /shop/public/collaboration-page`).
+ *
+ * `data` is `{ content, faq }`; all 21 content keys are always present, unset
+ * keys are `null` and list blocks default to `[]`. As on the installment page,
+ * the designed copy fills in anything the admin has not saved yet.
+ */
+export function useCollaborationPage() {
+  const api = useApi()
+
+  const { data: page, pending, error, refresh } = useAsyncData<CollaborationPageData>(
+    'shop-public-collaboration-page',
+    async () => {
+      try {
+        const res = await api.get<ApiCollaborationPage>('/shop/public/collaboration-page', { skipAuth: true })
+        return mapCollaborationPage(res.data ?? {})
+      }
+      catch {
+        return collaborationPage
+      }
+    },
+    { default: () => collaborationPage },
+  )
+
+  return { page, pending, error, refresh }
 }

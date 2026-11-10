@@ -107,16 +107,15 @@ const onSubmit = handleSubmit(async (values) => {
   const contactValue = normalizeContact(values.contact)
 
   try {
-    await api.post('/shop/contact-us', {
+    const res = await api.post<{ id?: number }>('/shop/contact-us', {
       full_name: values.name.trim(),
       ...(isEmail(contactValue) ? { email: contactValue } : { mobile: contactValue }),
       title: values.subject,
       message: values.message.trim(),
     }, { skipAuth: true })
 
-    toast.success('پیام شما با موفقیت ثبت شد.', {
-      description: 'کارشناسان ما در اسرع وقت با شما تماس می‌گیرند.',
-    })
+    // The backend returns the Persian confirmation copy in the envelope.
+    toast.success(res.message || 'پیام شما با موفقیت ثبت شد.')
     resetForm()
   }
   catch (err) {

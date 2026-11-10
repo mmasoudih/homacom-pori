@@ -4,7 +4,6 @@ import {
   IconChevronRight,
 } from '@tabler/icons-vue'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { installmentPage } from '~/data/pages/installment'
 import { toPersianDigits } from '~/utils/format'
 import mobileCategoryIcon from '../../public/icons/category-menu/mobile.svg?raw'
 import laptopCategoryIcon from '../../public/icons/category-menu/laptop.svg?raw'
@@ -19,10 +18,14 @@ useHead({
   title: 'خرید اقساطی | هماکام',
 })
 
+// Live copy from `GET /shop/public/installment-page`; the designed content is
+// the fallback while the API is cold or a key has not been saved yet.
+const { page: installmentPage } = useInstallmentPage()
+
 const selectedCategory = ref(0)
 const selectedPartner = ref(0)
 
-const currentPartner = computed(() => installmentPage.partners[selectedPartner.value]!)
+const currentPartner = computed(() => installmentPage.value.partners[selectedPartner.value] ?? installmentPage.value.partners[0]!)
 const currentPartnerDetails = computed(() => {
   const partner = currentPartner.value
   return [
@@ -33,8 +36,21 @@ const currentPartnerDetails = computed(() => {
   ]
 })
 
+/** Split `title` around `titleAccent` so only the accent word gets the brand colour. */
+const heroTitle = computed(() => {
+  const title = installmentPage.value.title
+  const accent = installmentPage.value.titleAccent
+  const index = accent ? title.indexOf(accent) : -1
+  if (index < 0) return { before: title, accent: '', after: '' }
+  return {
+    before: title.slice(0, index),
+    accent: title.slice(index, index + accent.length),
+    after: title.slice(index + accent.length),
+  }
+})
+
 function selectPartner(step: number) {
-  const count = installmentPage.partners.length
+  const count = installmentPage.value.partners.length
   selectedPartner.value = (selectedPartner.value + step + count) % count
 }
 
@@ -98,7 +114,7 @@ const categoryIcons: Record<string, string> = {
               color="default"
               class="leading-[38px]"
             >
-              {{ installmentPage.title.replace(installmentPage.titleAccent, '') }}<span class="text-R-300">{{ installmentPage.titleAccent }}</span>
+              {{ heroTitle.before }}<span class="text-R-300">{{ heroTitle.accent }}</span>{{ heroTitle.after }}
             </UiTypography>
             <UiTypography
               as="p"

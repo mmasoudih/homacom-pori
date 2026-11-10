@@ -2,7 +2,6 @@
 import {
   IconChartLine,
 } from '@tabler/icons-vue'
-import { collaborationPage } from '~/data/pages/collaboration'
 import audienceStoreIcon from '../../public/icons/collaboration/audience-store.svg?raw'
 import audienceBuildingIcon from '../../public/icons/collaboration/audience-building.svg?raw'
 import audienceBankIcon from '../../public/icons/collaboration/audience-bank.svg?raw'
@@ -20,6 +19,23 @@ import speakersCategoryIcon from '../../public/icons/category-menu/speakers.svg?
 
 useHead({
   title: 'پنل همکار و سازمانی | هماکام',
+})
+
+// Live copy from `GET /shop/public/collaboration-page`; the designed content
+// is the fallback while the API is cold or a key has not been saved yet.
+const { page: collaborationPage } = useCollaborationPage()
+
+/** Split `headline` around `headlineHighlight` so only that word gets the accent colour. */
+const heroHeadline = computed(() => {
+  const headline = collaborationPage.value.headline
+  const highlight = collaborationPage.value.headlineHighlight
+  const index = highlight ? headline.indexOf(highlight) : -1
+  if (index < 0) return { before: headline, highlight: '', after: '' }
+  return {
+    before: headline.slice(0, index),
+    highlight: headline.slice(index, index + highlight.length),
+    after: headline.slice(index + highlight.length),
+  }
 })
 
 const audienceIcons: Record<string, string> = {
@@ -124,9 +140,7 @@ const selectedCategory = ref(0)
         <!-- Headline -->
         <div class="order-1 flex flex-col items-start text-start">
           <UiTypography as="h1" size="5xl" weight="bold" color="default" class="max-w-[560px] leading-[40px] max-lg:text-[22px]">
-            کالای دیجیتال با قیمت
-            <span class="text-primary">عمده</span>
-            ؛ سود بیشتر برای کسب‌وکار شما
+            {{ heroHeadline.before }}<span class="text-primary">{{ heroHeadline.highlight }}</span>{{ heroHeadline.after }}
           </UiTypography>
           <UiTypography as="p" size="lg" weight="regular" color="muted" class="mt-5 max-w-[620px] leading-[26px]">
             {{ collaborationPage.intro }}

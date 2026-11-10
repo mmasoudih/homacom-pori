@@ -5,8 +5,19 @@ import { aboutPage } from '~/data/pages/about'
 // fallback (and as the hero/sections above the API article).
 const { about } = useAboutPage()
 
+/** `about_us_link` may still be the `{URL}` placeholder — only render real URLs. */
+const aboutLink = computed(() =>
+  /^https?:\/\//i.test(about.value.aboutUsLink) ? about.value.aboutUsLink : '',
+)
+
+/** The API currently sends plain prose with `\r\n` breaks, but tolerate HTML too. */
+const aboutIsHtml = computed(() => /<[a-z][\s\S]*>/i.test(about.value.aboutUs))
+
 useHead(() => ({
-  title: about.value.seoAbout || 'درباره ما | هماکام',
+  title: 'درباره ما | هماکام',
+  meta: about.value.seoAbout
+    ? [{ name: 'description', content: about.value.seoAbout }]
+    : [],
 }))
 </script>
 
@@ -94,16 +105,22 @@ useHead(() => ({
           </UiTypography>
         </template>
 
-        <!-- Live About Us copy (rich HTML, 2026-11-03) -->
+        <!-- Live About Us copy: plain prose with `\r\n` (fall back to HTML if ever sent). -->
         <div
-          v-if="about.aboutUs"
+          v-if="about.aboutUs && aboutIsHtml"
           class="about-rich mt-8 border-t border-T-300 pt-8"
           v-html="about.aboutUs"
         />
+        <p
+          v-else-if="about.aboutUs"
+          class="mt-8 whitespace-pre-line border-t border-T-300 pt-8 text-[16px] leading-[30px] text-T-700"
+        >
+          {{ about.aboutUs }}
+        </p>
 
         <a
-          v-if="about.aboutUsLink"
-          :href="about.aboutUsLink"
+          v-if="aboutLink"
+          :href="aboutLink"
           target="_blank"
           rel="noopener noreferrer"
           class="mt-6 inline-flex h-[42px] items-center justify-center rounded-[12px] bg-T-200 px-5 text-sm font-medium text-T-900 transition-colors hover:bg-T-300"
