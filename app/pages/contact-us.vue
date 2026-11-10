@@ -139,15 +139,23 @@ const onSubmit = handleSubmit(async (values) => {
   <div class="flex min-h-dvh flex-col bg-background">
     <LandingSiteHeader />
 
-    <!-- Desktop-only breadcrumb (top right), same gutters as the FAQ page -->
+    <!--
+      DEBUG: `.not-from-api` paints red everything that does NOT come from
+      `GET /shop/public/contact` — that endpoint only returns tel, mobile,
+      email, address, socials and the popup, so all page copy, form labels and
+      local assets are mock. Remove the class from these nodes to restore the
+      design.
+    -->
+
+    <!-- Desktop-only breadcrumb (top right), same gutters as the FAQ page — trail is hardcoded -->
     <UiBreadcrumb
       :trail="['همکام', 'تماس با ما']"
-      class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+      class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
     />
 
     <main class="flex w-full flex-col items-center px-4 pb-16 lg:px-6">
-      <!-- Page hero -->
-      <div class="flex flex-col items-center pt-10 lg:pt-0">
+      <!-- Page hero: title + subtitle are mock copy -->
+      <div class="not-from-api flex flex-col items-center pt-10 lg:pt-0">
         <div class="flex items-center gap-3">
           <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g opacity="0.25">
@@ -177,8 +185,8 @@ const onSubmit = handleSubmit(async (values) => {
       </div>
 
       <div class="mt-10 flex w-full max-w-[903px] flex-col gap-5 lg:mt-12 lg:gap-3">
-        <!-- Online guide -->
-        <section class="rounded-[16px] border border-T-400 bg-T-50 p-5 lg:px-[38px] lg:py-[32px]">
+        <!-- Online guide: copy + rows come from `~/data/pages/contact`, links are hardcoded by index -->
+        <section class="not-from-api rounded-[16px] border border-T-400 bg-T-50 p-5 lg:px-[38px] lg:py-[32px]">
           <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
             <div class="flex flex-col gap-2">
               <UiTypography as="h2" size="lgXl" weight="bold" color="default">
@@ -247,7 +255,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <!-- Phone & socials -->
         <section class="flex flex-col gap-3 rounded-[16px] border border-T-400 bg-T-50 p-5 lg:flex-row lg:items-center lg:justify-between lg:px-[38px] lg:py-[32px]">
-          <div class="flex flex-col gap-3">
+          <div class="not-from-api flex flex-col gap-3">
             <UiTypography as="h2" size="lgXl" weight="bold" color="default">
               {{ contactPage.phone.title }}
             </UiTypography>
@@ -285,7 +293,8 @@ const onSubmit = handleSubmit(async (values) => {
               </UiTypography>
             </a>
 
-            <div class="flex w-full items-center justify-center gap-2 rounded-[12px] p-2 text-T-900 lg:w-[182px] lg:justify-between lg:p-0">
+            <!-- Socials: the API returns no social URLs, so this is the designed (non-clickable) row -->
+            <div class="not-from-api flex w-full items-center justify-center gap-2 rounded-[12px] p-2 text-T-900 lg:w-[182px] lg:justify-between lg:p-0">
               <component
                 :is="social.href ? 'a' : 'span'"
                 v-for="social in socialLinks"
@@ -305,7 +314,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <!-- Email -->
         <section class="flex flex-col gap-3 rounded-[16px] border border-T-400 bg-T-50 p-5 lg:flex-row lg:items-center lg:justify-between lg:px-[38px] lg:py-[32px]">
-          <div class="flex flex-col gap-3">
+          <div class="not-from-api flex flex-col gap-3">
             <UiTypography as="h2" size="lgXl" weight="bold" color="default">{{ contactPage.email.title }}</UiTypography>
             <p class="max-w-[435px] text-[14px] leading-[22px] text-T-700">
               <span
@@ -329,11 +338,12 @@ const onSubmit = handleSubmit(async (values) => {
           </a>
         </section>
 
-        <!-- Map + address -->
+        <!-- Map + address: the address is API, the map art, section title and the
+             "نمایش در نقشه" link (href="#") are not -->
         <section class="flex flex-col overflow-hidden rounded-[16px] border border-T-400 bg-T-50">
-          <PagesMapPlaceholder class="h-[141px] w-full rounded-none border-0" />
+          <PagesMapPlaceholder class="not-from-api not-from-api--covered h-[141px] w-full rounded-none border-0" />
           <div class="flex flex-col gap-2 p-5 lg:px-[38px] lg:py-[32px]">
-            <UiTypography as="h2" size="lgXl" weight="bold" color="default">
+            <UiTypography as="h2" size="lgXl" weight="bold" color="default" class="not-from-api">
               {{ contactPage.store.title }}
             </UiTypography>
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -342,7 +352,7 @@ const onSubmit = handleSubmit(async (values) => {
               </UiTypography>
               <a
                 href="#"
-                class="inline-flex h-[38px] w-full items-center justify-center gap-2 rounded-[12px] bg-T-200 px-5 transition-colors hover:bg-T-300 lg:w-fit"
+                class="not-from-api inline-flex h-[38px] w-full items-center justify-center gap-2 rounded-[12px] bg-T-200 px-5 transition-colors hover:bg-T-300 lg:w-fit"
               >
                 <UiTypography as="span" size="lg" weight="medium" color="default">
                   نمایش در نقشه
@@ -358,10 +368,11 @@ const onSubmit = handleSubmit(async (values) => {
         </section>
       </div>
 
-      <!-- Message form -->
+      <!-- Message form: the submit goes to `POST /shop/contact-us`, but every
+           label, placeholder and option below is mock copy -->
       <section class="mt-5 w-full max-w-[903px] rounded-[16px] border border-T-400 bg-T-50 p-5 lg:mt-3 lg:p-8">
-        <UiTypography as="h2" size="lg" weight="bold" color="default">{{ contactPage.form.title }}</UiTypography>
-        <UiTypography as="p" size="md" weight="regular" color="muted" class="mt-2 leading-[22px]">
+        <UiTypography as="h2" size="lg" weight="bold" color="default" class="not-from-api">{{ contactPage.form.title }}</UiTypography>
+        <UiTypography as="p" size="md" weight="regular" color="muted" class="not-from-api mt-2 leading-[22px]">
           {{ contactPage.form.subtitle }}
         </UiTypography>
 
@@ -371,7 +382,7 @@ const onSubmit = handleSubmit(async (values) => {
               <VeeField v-slot="{ componentField, errors }" name="name">
                 <Field :data-invalid="!!errors.length" class="gap-2">
                   <FieldLabel for="contact-name">
-                    <UiTypography as="span" size="lg" weight="regular" color="default">
+                    <UiTypography as="span" size="lg" weight="regular" color="default" class="not-from-api">
                       {{ contactPage.form.nameLabel }}
                     </UiTypography>
                   </FieldLabel>
@@ -380,7 +391,7 @@ const onSubmit = handleSubmit(async (values) => {
                     v-bind="componentField"
                     type="text"
                     placeholder="مثال: علی رضایی"
-                    class="h-[50px] rounded-[12px]"
+                    class="not-from-api h-[50px] rounded-[12px]"
                     :aria-invalid="!!errors.length"
                   />
                   <FieldError v-if="errors.length" :errors="errors" />
@@ -392,7 +403,7 @@ const onSubmit = handleSubmit(async (values) => {
               <VeeField v-slot="{ componentField, errors }" name="contact">
                 <Field :data-invalid="!!errors.length" class="gap-2">
                   <FieldLabel for="contact-phone">
-                    <UiTypography as="span" size="lg" weight="regular" color="default">
+                    <UiTypography as="span" size="lg" weight="regular" color="default" class="not-from-api">
                       {{ contactPage.form.contactLabel }}
                     </UiTypography>
                   </FieldLabel>
@@ -401,7 +412,7 @@ const onSubmit = handleSubmit(async (values) => {
                     v-bind="componentField"
                     type="text"
                     placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا email@example.com"
-                    class="h-[50px] rounded-[12px]"
+                    class="not-from-api h-[50px] rounded-[12px]"
                     :aria-invalid="!!errors.length"
                   />
                   <FieldError v-if="errors.length" :errors="errors" />
@@ -413,14 +424,14 @@ const onSubmit = handleSubmit(async (values) => {
               <VeeField v-slot="{ componentField, errors }" name="subject">
                 <Field :data-invalid="!!errors.length" class="gap-2">
                   <FieldLabel for="contact-subject">
-                    <UiTypography as="span" size="lg" weight="regular" color="default">
+                    <UiTypography as="span" size="lg" weight="regular" color="default" class="not-from-api">
                       {{ contactPage.form.subjectLabel }}
                     </UiTypography>
                   </FieldLabel>
                   <select
                     id="contact-subject"
                     v-bind="componentField"
-                    class="flex h-[50px] w-full items-center rounded-[12px] border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="not-from-api flex h-[50px] w-full items-center rounded-[12px] border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                     :aria-invalid="!!errors.length"
                   >
                     <option value="" disabled selected>
@@ -444,7 +455,7 @@ const onSubmit = handleSubmit(async (values) => {
             <VeeField v-slot="{ componentField, errors }" name="message">
               <Field :data-invalid="!!errors.length" class="gap-2">
                 <FieldLabel for="contact-message">
-                  <UiTypography as="span" size="lg" weight="regular" color="default">
+                  <UiTypography as="span" size="lg" weight="regular" color="default" class="not-from-api">
                     {{ contactPage.form.messageLabel }}
                   </UiTypography>
                 </FieldLabel>
@@ -452,7 +463,7 @@ const onSubmit = handleSubmit(async (values) => {
                   id="contact-message"
                   v-bind="componentField"
                   :placeholder="contactPage.form.messagePlaceholder"
-                  class="min-h-[140px] rounded-[12px]"
+                  class="not-from-api min-h-[140px] rounded-[12px]"
                   :aria-invalid="!!errors.length"
                 />
                 <FieldError v-if="errors.length" :errors="errors" />
@@ -461,7 +472,7 @@ const onSubmit = handleSubmit(async (values) => {
           </FieldGroup>
 
           <div class="flex justify-start">
-            <Button type="submit" class="h-[45px] w-full rounded-[12px] lg:w-[145px]" :disabled="isSubmitting">
+            <Button type="submit" class="not-from-api--warn h-[45px] w-full rounded-[12px] lg:w-[145px]" :disabled="isSubmitting">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-[18px] shrink-0">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M18.8006 4.70082C19.5524 2.53758 17.4878 0.435219 15.3162 1.20071L2.86998 5.58813C0.481304 6.43016 0.41644 9.80202 2.76925 10.7374L2.78243 10.7425L6.91009 12.2765C7.29519 12.4315 7.59961 12.743 7.74752 13.1367L9.35103 17.1869C10.2564 19.583 13.6447 19.5378 14.486 17.1168L18.8006 4.70082ZM15.7318 2.37961C16.8946 1.96971 18.0352 3.09548 17.6199 4.29051L13.3052 16.7065C12.847 18.0252 11.0098 18.0477 10.5192 16.7418L8.91569 12.6916C8.85132 12.5213 8.7708 12.3593 8.67594 12.2073L11.6913 9.19194C11.9354 8.94786 11.9354 8.55214 11.6913 8.30806C11.4472 8.06398 11.0515 8.06398 10.8074 8.30806L7.78995 11.3255C7.656 11.2429 7.51425 11.1715 7.36589 11.1125L7.35271 11.1074L3.225 9.57344C1.95069 9.06097 1.98946 7.22391 3.28555 6.76703L15.7318 2.37961Z" fill="white" />
               </svg>
@@ -474,7 +485,8 @@ const onSubmit = handleSubmit(async (values) => {
       </section>
     </main>
 
-    <LandingCeoSection />
+    <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+    <LandingCeoSection class="not-from-api" />
 
     <!-- Floating support widget (gated by contact_popup_status) -->
     <PagesContactSupportWidget
@@ -486,3 +498,43 @@ const onSubmit = handleSubmit(async (values) => {
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/**
+ * DEBUG marker: red = this piece does NOT come from `GET /shop/public/contact`
+ * (mock copy, a hardcoded label/placeholder or a locally drawn asset).
+ * Amber = hardcoded copy or a dead control sitting on the brand red surface,
+ * where a red tint would be invisible.
+ * `grep -n "not-from-api"` lists every marked node; delete the classes and this
+ * block to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+
+.not-from-api--warn {
+  background-color: rgb(245 158 11 / 0.35);
+  outline: 2px dashed #f59e0b;
+  outline-offset: 1px;
+}
+
+/**
+ * Some marks are covered by their own artwork (the map placeholder is a
+ * full-bleed SVG and its parent section clips the outline), so the tint is
+ * drawn as an overlay instead of a background.
+ */
+.not-from-api--covered {
+  position: relative;
+}
+
+.not-from-api--covered::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  pointer-events: none;
+}
+</style>
