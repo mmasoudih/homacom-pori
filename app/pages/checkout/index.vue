@@ -113,10 +113,16 @@ await loadCheckoutAddresses()
 
 // Keep the server cart in sync with the current checkout selection. The final
 // invoice is created by `settlePayment()` below.
+//
+// `immediate` matters: the page auto-selects the default address *before* this
+// watcher is registered, and `POST /shop/cart/checkout` rejects a cart whose
+// address was never pushed through `set-user-address` («آدرس انتخاب شده یافت
+// نشد»). Client-only so server rendering never performs a write.
 watch(addressId, (id) => {
+  if (!import.meta.client) return
   if (!id || !/^\d+$/.test(id)) return
   persistAddress(id).catch(() => {})
-})
+}, { immediate: true })
 
 watch(paymentMethod, (method) => {
   const apiMethod = method === 'online' || method === 'wallet' ? 'online' : 'mixed'
@@ -134,7 +140,7 @@ onMounted(() => {
 
 useHead({ title: 'تکمیل خرید | هماکام' })
 
-function next() {
+async function next() {
   if (isShippingStep.value) {
     if (!address.value) {
       if (addresses.value.length) addressOpen.value = true
@@ -146,6 +152,9 @@ function next() {
       shippingOpen.value = true
       return
     }
+    // The cart is the source of truth for checkout, so make sure the visible
+    // selection actually reached it before moving on.
+    if (!(await syncAddressOnCart())) return
     goToPayment()
     return
   }
@@ -161,6 +170,32 @@ function next() {
   }
 
   settlePayment()
+}
+
+/**
+ * Push the selected address onto the cart (`set-user-address`).
+ *
+ * Returns `false` (after a toast) when the selection is not a real backend id
+ * or the request fails, so callers can stop before creating an invoice the
+ * backend will reject. Non-numeric ids are local placeholders: persisting them
+ * is meaningless, but checkout must still fail loudly instead of silently.
+ */
+async function syncAddressOnCart(options: { silent?: boolean } = {}) {
+  const id = addressId.value
+  if (!id) return true
+  if (!/^\d+$/.test(id)) {
+    if (!options.silent) toast.error('آدرس انتخاب‌شده معتبر نیست؛ لطفاً آدرس را دوباره ثبت کنید.')
+    return false
+  }
+  try {
+    await persistAddress(id)
+    return true
+  }
+  catch (err) {
+    if (options.silent) return false
+    toast.error(apiErrorMessage(err, 'ثبت آدرس انتخاب‌شده انجام نشد.'))
+    return false
+  }
 }
 
 /**
@@ -181,6 +216,10 @@ async function settlePayment() {
   submitting.value = true
 
   try {
+    // The invoice reads the address from the cart, not from this form. Sync the
+    // current selection first so a stale/never-persisted address cannot turn
+    // the final step into a 422 («آدرس انتخاب شده یافت نشد»).
+    if (!(await syncAddressOnCart())) return
     const result = await checkout({ paymentMethodId: methodId })
     const payment = result.payment
     const isBankTransfer = result.invoice?.payment_method === 'bank_transfer'
@@ -282,7 +321,7 @@ async function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
       return
     }
 
-    await createAddress({
+    const result = await createAddress({
       title: values.city || 'آدرس جدید',
       state: state.id,
       city: city.id,
@@ -297,7 +336,16 @@ async function onAddressCreated(values: Omit<CheckoutAddress, 'id'>) {
       unit: values.unit ?? null,
     })
 
-    addAddress(values)
+    // The backend assigns the real address id; keep it on the checkout entry so
+    // selecting the new address can be persisted with `set-user-address`.
+    const createdId = result?.data?.id
+    if (!createdId) {
+      toast.error('ثبت آدرس انجام نشد؛ لطفاً دوباره تلاش کنید.')
+      return
+    }
+
+    addAddress(values, String(createdId))
+    await syncAddressOnCart({ silent: true })
     toast.success('آدرس جدید ثبت شد.')
   }
   catch (err) {

@@ -104,8 +104,16 @@ export function useCheckout() {
     () => addresses.value.find(item => item.id === addressId.value) ?? null,
   )
 
-  function addAddress(values: Omit<CheckoutAddress, 'id'>) {
-    const created: CheckoutAddress = { ...values, id: `addr-${Date.now().toString(36)}` }
+  /**
+   * Add a saved address to the checkout list and select it.
+   *
+   * `id` is the backend `shop_user_address.id` returned by
+   * `POST /shop/user/address`. It must be numeric: the cart only accepts real
+   * ids through `set-user-address`, so a local placeholder would make the
+   * address look selected while leaving the cart without one.
+   */
+  function addAddress(values: Omit<CheckoutAddress, 'id'>, id?: string) {
+    const created: CheckoutAddress = { ...values, id: id ?? `addr-${Date.now().toString(36)}` }
     addresses.value = [...addresses.value, created]
     addressId.value = created.id
     return created
