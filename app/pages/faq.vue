@@ -31,14 +31,22 @@ const filteredItems = computed(() => {
     <LandingSiteHeader />
 
     <main class="flex flex-col items-center pb-16">
-      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) -->
+      <!--
+        DEBUG: `.not-from-api` paints red everything that does NOT come from
+        `GET /shop/faqs` (page copy from `~/data/pages/faq`, hardcoded labels,
+        local SVG assets). Remove the class from these nodes to restore the
+        design.
+      -->
+
+      <!-- Desktop-only breadcrumb (no breadcrumb on mobile) — trail is hardcoded -->
       <UiBreadcrumb
         :trail="['هماکام', 'سوالات متداول']"
-        class="mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
+        class="not-from-api mx-auto hidden w-full max-w-[1440px] px-4 pt-10 lg:flex lg:px-6 lg:pt-4 lg:pb-8"
       />
 
+      <!-- Title, subtitle and the FAQ icon are all hardcoded (no page-copy endpoint) -->
       <PagesPageHeader
-        class="pt-10 lg:pt-0"
+        class="not-from-api pt-10 lg:pt-0"
         :title="faqPage.title"
         :subtitle="faqPage.subtitle"
       >
@@ -58,16 +66,16 @@ const filteredItems = computed(() => {
           v-model="searchQuery"
           type="text"
           :placeholder="faqPage.searchPlaceholder"
-          class="w-full bg-transparent text-[14px] font-normal text-foreground placeholder:text-T-600 focus:outline-none"
+          class="not-from-api w-full bg-transparent text-[14px] font-normal text-foreground placeholder:text-T-600 focus:outline-none"
         >
         <IconSearch class="size-5 shrink-0 text-T-600" />
       </div>
 
-      <!-- Category chips -->
+      <!-- Category chips: labels are API, the icons are assigned by position -->
       <PagesChipRow
         :active="activeCategory"
         :items="categories"
-        class="mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
+        class="faq-chips mt-8 w-full max-w-[1440px] px-4 lg:mt-10 lg:px-6"
         content-color="default"
         @select="(i: number) => (activeCategory = activeCategory === i ? -1 : i)"
       />
@@ -87,18 +95,46 @@ const filteredItems = computed(() => {
           size="lg"
           weight="regular"
           color="muted"
-          class="py-10 text-center"
+          class="not-from-api py-10 text-center"
         >
           سوالی با این عنوان یافت نشد.
         </UiTypography>
       </div>
     </main>
 
-    <LandingCeoSection />
+    <!-- CEO block: copy comes from `~/data/landing`, not from this endpoint -->
+    <LandingCeoSection class="not-from-api" />
 
-    <PagesAboutBand class="mt-auto lg:hidden" />
+    <!-- Mobile about band: mock copy -->
+    <PagesAboutBand class="not-from-api mt-auto lg:hidden" />
 
     <LandingSiteFooter class="mt-auto" />
     <LandingMobileBottomNav />
   </div>
 </template>
+
+<style scoped>
+/**
+ * DEBUG marker: red = this piece does NOT come from `GET /shop/faqs`
+ * (mock copy, a hardcoded label or a locally drawn asset).
+ * `grep -n "not-from-api\|faq-chips"` lists every marked node; delete the rules
+ * and the class usages to restore the normal design.
+ */
+.not-from-api {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+
+/**
+ * `PagesChipButton` owns its icon markup, so the chip icons are marked through
+ * the row instead of a class per icon: `useShopContent.ts` assigns them by
+ * position (`faqIcons[index % 7]`), so they do not come from the API either.
+ */
+.faq-chips :deep(button > span:first-child),
+.faq-chips :deep(button > svg:first-child) {
+  background-color: rgb(239 68 68 / 0.35);
+  outline: 1px solid #ef4444;
+  outline-offset: 1px;
+}
+</style>
